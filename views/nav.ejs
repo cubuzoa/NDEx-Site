@@ -1,6 +1,24 @@
-<div class="nav">
-<a href='/'>Home</a>
-<a href='/networks'>Networks</a>
-<a href='/groups'>Groups</a>
-<a href='/bench'>Bench</a>
+<div class="navbar">
+	<div class="navbar-inner">
+	  <div class="container">
+		<a href="/"><img src="/static/common/img/logo.png"></a>
+		
+		
+		<ul class="nav pull-right">   
+		  <li class="active"><a href="/">Home</a></li>
+		  <li><a href="/networks">Networks</a></li>
+		  <li><a href="/groups">Groups</a></li>
+		  <li><a href="/bench">Bench</a></li>
+		  <li><a href="/">Search Networks:</a></li>
+		  <li>
+		  	<form action="/search" method="get" class="navbar-search pull-right">
+              <input type="text" name="q" value="" class="search-query" placeholder="name / id / text">
+        	</form>
+          </li>
+          <li><a href="/login" >sign in</a></li>
+		</ul>
+
+	  </div>
+    </div>
 </div>
+
