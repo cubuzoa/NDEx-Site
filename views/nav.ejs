@@ -1,24 +1,43 @@
-<div class="navbar navbar-static-top">
+<div class="navbar ">
 	<div class="navbar-inner">
-	  <div class="container">
-		<a href="/"><img src="/static/common/img/logo.png"></a>
+	  <div class="container-fluid">
+	  	<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+	  		<span class="icon-bar"></span>
+	  		<span class="icon-bar"></span>
+	  		<span class="icon-bar"></span>
+	  	</a>
+		<div class="brand"><a href="/" >NDEx</a><% if (user) {%> <%= user.username %><%}%>
 		
+		<div class="nav-collapse">
 		
-		<ul class="nav pull-right">   
-		  <li class="active"><a href="/">Home</a></li>
-		  <li><a href="/networks">Networks</a></li>
-		  <li><a href="/groups">Groups</a></li>
-		  <li><a href="/bench">Bench</a></li>
-		  <li><a href="/">Search Networks:</a></li>
-		  <li>
-		  	<form action="/search" method="get" class="navbar-search pull-right">
-              <input type="text" name="q" value="" class="search-query" placeholder="name / id / text">
-        	</form>
-          </li>
-          <li><a href="/login" >sign in</a></li>
-		</ul>
-
-	  </div>
+			<ul class="nav pull-right"> 
+				<% if (!user) {%> 
+				<li><a href="/login" >sign in or join</a></li>
+				<%} else {%>
+				<li><a href="/logout" >sign out</a></li>
+				<%}%>
+				<li><a href="/contact" >contact</a></li>
+				<li><a href="/about" >about NDEx</a></li>
+				<li><a href="/policy" >policies</a></li>
+			</ul>
+	
+		
+			<ul class="nav pull-left main-nav">   
+			  
+			  <li><a href="/">Home</a></li>
+			  <li><a href="/networks">Networks</a></li>
+			  <li><a href="/search_groups">Groups</a></li>
+			  <li><a href="/search_users">Users</a></li>
+			  <% if (!user) { 
+			  } else { %> 
+			  <li><a href="/my_account">My Account</a></li>
+			  <li><a href="/manage_tasks">Tasks</a></li>
+			  <li><a href="/upload_networks">Upload</a></li>
+			  <%}%>
+			</ul>
+			
+		</div><!-- /.nav-collapse -->
+	  </div><!-- /.container-fluid -->
     </div>
 </div>
 

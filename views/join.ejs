@@ -1,0 +1,50 @@
+<% include head.ejs %>
+<% include nav.ejs %>
+<p>Join NDEx!</p>
+<p>TODO: form validation, reject bad passwords, be sure user is not logged in</p>
+
+<form action="/users" id="joinForm">
+	<div>
+	<label>Username:</label>
+	<input type="text" name="username"/><br/>
+	</div>
+	<div>
+	<label>Password:</label>
+	<input type="password" name="password"/>
+	</div>
+	<div>
+	<input type="submit" value="Submit"/>
+	</div>
+</form>
+
+<script>
+/* attach a submit handler to the form */
+$("#joinForm").submit(function(event) {
+  
+  /* stop form from submitting normally */
+  event.preventDefault();
+  
+  /* get some values from elements on the page: */
+  var $form = $( this ),
+      username = $form.find( 'input[name="username"]' ).val(),
+      password = $form.find( 'input[name="password"]' ).val(),
+      url = $form.attr( 'action' );
+      
+  /* Post the data via Ajax and process the returned JSON*/
+    $.ajax({
+           type: "POST",
+           url: url,
+           data: $form.serialize(), // serializes the form's elements.
+           dataType: "JSON",
+           success: function(data)
+           {
+               alert("OK : " + JSON.stringify(data)); // show response
+           },
+           error: function(data){
+           		alert("Error : " + JSON.stringify(data));
+           }
+         });
+          
+});
+</script>
+
