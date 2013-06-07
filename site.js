@@ -321,16 +321,16 @@ var serverConfig = {
 	port: 2424
 };
 
-var routes = require('../rest/routes');
+var routes = require('./rest/routes');
 
-var System = require('../rest/routes/System.js');
-var User = require('../rest/routes/User.js');
-var NPA = require('../rest/routes/NPA.js');
-var Group = require('../rest/routes/Group.js');
-var MemberRequest = require('../rest/routes/MemberRequest.js');
-var MemberInvitation = require('../rest/routes/MemberInvitation.js');
-var Network = require('../rest/routes/Network.js');
-var Task = require('../rest/routes/Task.js');
+var System = require('./rest/routes/System.js');
+var User = require('./rest/routes/User.js');
+var NPA = require('./rest/routes/NPA.js');
+var Group = require('./rest/routes/Group.js');
+var MemberRequest = require('./rest/routes/MemberRequest.js');
+var MemberInvitation = require('./rest/routes/MemberInvitation.js');
+var Network = require('./rest/routes/Network.js');
+var Task = require('./rest/routes/Task.js');
 
 // GET server description
 app.get('/', function(req, res) {
