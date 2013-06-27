@@ -231,32 +231,32 @@ function ensureAuthenticated(req, res, next) {
 //
 //-----------------------------------------------------------
 
-app.get('/my_account', ensureAuthenticated, function(req, res) {
+app.get('/myAccount', ensureAuthenticated, function(req, res) {
   res.render('my_account', {title: "My Account", 
   							user: req.user });
 });
 
-app.get('/networks', function(req, res) {
+app.get('/searchNetworks', function(req, res) {
   res.render('search_networks', {title: "Networks", 
   								 user: req.user });
 });
 
-app.get('/users', function(req, res) {
+app.get('/searchUsers', function(req, res) {
   res.render('search_users', {title: "Users",
   							  user: req.user });
 });
 
-app.get('/groups', function(req, res) {
+app.get('/searchGroups', function(req, res) {
   res.render('search_groups', {title: "Groups",
   							   user: req.user });
 });
 
-app.get('/tasks', ensureAuthenticated, function(req, res) {
+app.get('/manageTasks', ensureAuthenticated, function(req, res) {
   res.render('manage_tasks', {title: "Tasks",
   							  user: req.user });
 });
 
-app.get('/upload', ensureAuthenticated, function(req, res) {
+app.get('/uploadNetwork', ensureAuthenticated, function(req, res) {
   res.render('upload_network', {title: "Upload Network",
   								user: req.user });
 });
@@ -321,16 +321,16 @@ var serverConfig = {
 	port: 2424
 };
 
-var routes = require('./rest/routes');
+var routes = require('./routes');
 
-var System = require('./rest/routes/System.js');
-var User = require('./rest/routes/User.js');
-var NPA = require('./rest/routes/NPA.js');
-var Group = require('./rest/routes/Group.js');
-var MemberRequest = require('./rest/routes/MemberRequest.js');
-var MemberInvitation = require('./rest/routes/MemberInvitation.js');
-var Network = require('./rest/routes/Network.js');
-var Task = require('./rest/routes/Task.js');
+var System = require('./routes/System.js');
+var User = require('./routes/User.js');
+var NPA = require('./routes/NPA.js');
+var Group = require('./routes/Group.js');
+var MemberRequest = require('./routes/MemberRequest.js');
+var MemberInvitation = require('./routes/MemberInvitation.js');
+var Network = require('./routes/Network.js');
+var Task = require('./routes/Task.js');
 
 // GET server description
 app.get('/', function(req, res) {
@@ -365,7 +365,6 @@ app.post('/users', function(req, res) {
 	try {
 		User.createUser(username, password, function(result){
 			var status = result.status || 200;
-			console.log("status = " + status + " result = " + JSON.stringify(result));
 			res.send(status, result);
 		});
 	}
@@ -502,6 +501,68 @@ app.get('/groups/:groupname/members', function(req, res) {
 	}
 });
 
+// Create a new network in the specified account
+app.post('/networks', function(req, res) {
+    var network = req.body['network'];
+    var accountURI = req.body['accountURI'];
+	try {
+		Network.createNetwork(network, accountURI, function(result){
+			var status = result.status || 200;
+			res.send(status, result);
+		});
+	}
+	catch (e){
+		res.send(500, {error : e}); 
+	}
+});
+
+// delete a network
+app.delete('/networks/:networkId', function(req, res) {
+    var networkId = req.params['networkId'];
+	try {
+		Network.deleteNetwork(networkId, function(result){
+			var status = result.status || 200;
+			res.send(status, result);
+		});
+	}
+	catch (e){
+		res.send(500, {error : e}); 
+	}
+});
+
+// Returns the Network JDEx
+app.get('/networks/:networkId', function(req, res) {
+    var networkId = req.params['networkId'];
+	try {
+		Network.getNetwork(networkId, function(result){
+			var status = result.status || 200;
+			res.send(status, result);
+		});
+	}
+	catch (e){
+		res.send(500, {error : e}); 
+	}
+});
+
+// Find Networks by search expression
+app.get('/networks', function(req, res) {
+    var searchExpression = req.query['searchExpression'];
+    searchExpression = searchExpression || '*';
+    var limit = req.query['limit'];
+    limit = limit || 100;
+    var offset = req.query['offset'];
+    offset = offset || 0;
+	try {
+		Network.findNetworks(searchExpression, limit, offset, function(result){
+			var status = result.status || 200;
+			res.send(status, result);
+		});
+	}
+	catch (e){
+		res.send(500, {error : e}); 
+	}
+});
+
 
 var server = new orientdb.Server(serverConfig);
 var db = new orientdb.GraphDb('ndex', server, dbConfig);
@@ -521,6 +582,14 @@ db.open(function(err) {
 	Network.init(db, function(err) {if (err) {throw err;}});
 	Task.init(db, function(err) {if (err) {throw err;}});
 });
+
+
+
+//-----------------------------------------------------------
+//
+//				Authentication Functions
+//
+//-----------------------------------------------------------
 
 function findByUsername(username, fn) {
 	var cmd = "select from NDExUser where username = '" + username + "'";

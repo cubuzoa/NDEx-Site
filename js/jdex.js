@@ -1,9 +1,32 @@
+/*
+
+The jdex.js library will be used as a Node.js server module or as a browser client library
+
+for the moment, its only for node.js - need to sort out how it should
+manage xml parsing, using xmldom on the server side...
+
+
+
+(function(exports){
+
+    // The 
+
+   exports.test = function(){
+        return 'hello world'
+    };
+
+})(typeof exports === 'undefined'? this['mymodule']={}: exports);
+
+*/
+
 var $ = require("jquery");
 var DOMParser = require('xmldom').DOMParser;
 
+
 /*
-------------------------------------
-	JDEx Graph Format
+//------------------------------------
+//	JDEx Graph Format
+//------------------------------------
 
 //
 // Predicates are assumed to take nodes as their subject and object.
@@ -141,7 +164,15 @@ module.Graph.prototype = {
 		});
 		return foundNodes;
 	},
-	
+
+	findOrCreateNodeByIdentifier : function(identifier){
+		var node = this.nodeByIdentifier(identifier);
+		if (node) return node;
+		node = new module.Node(identifier);
+		this.addNode(node)
+		return node;
+	},
+		
 	findOrCreateNodeByTerm : function(term, name){
 		var node = this.nodeByIdentifier(term.identifier());
 		if (node) return node;
@@ -276,19 +307,25 @@ module.Graph.prototype = {
 	
 	termByNameAndNamespace : function (name, ns){
 		if (ns){
-			$.each(this.terms, function(index, term){
+			for (index in this.terms){
+				var term = this.terms[index];
 				if (term.ns && ns.id == term.ns.id && name == term.name){
+					//console.log("term found for " + name + " in " + ns.uri);
 					return term;
 				}
-			});
+			}
+			//console.log("term not found for " + name + " in " + ns.uri);
 		} else {
-			$.each(this.terms, function(index, term){
+			for (index in this.terms){
+				var term = this.terms[index];
 				if (!term.ns && name == term.name){
+					//console.log("term found for " + name);
 					return term;
 				}
-			});
+			}
+			//console.log("term not found for " + name);
 		}
-		console.log("term not found for " + name + " in " + ns.uri);		
+				
 		return false;
 	},
 	
@@ -312,7 +349,7 @@ module.Graph.prototype = {
 			}
 		});
 		
-		console.log("function term not found for function " + fn.identifier() + " and parameters TBD");		
+		//console.log("function term not found for function " + fn.identifier() + " and parameters TBD");		
 		return false;
 	},
 
@@ -347,7 +384,7 @@ module.Graph.prototype = {
 	findOrCreateNamespace : function (uri, prefix){
 		var ns = this.namespaceByURI(uri);
 		if (ns) return ns;
-		console.log("creating namespace for " + uri);
+		//console.log("creating namespace for " + uri);
 		ns = new module.Namespace(uri, prefix);
 		return this.addNamespace(ns)
 	},
@@ -442,15 +479,15 @@ module.Graph.prototype = {
 		return sources;
 	},
 	
-	serializeJDEx : function(){
+	toJDEx : function(){
 		var s_nodes = {},
-			s_namespaces = {},
-			s_nodeTypes = {},
-			s_edges = {},
-			s_terms = {},
-			s_properties = {},
-			s_supports = {},
-			s_citations = {};
+		s_namespaces = {},
+		s_nodeTypes = {},
+		s_edges = {},
+		s_terms = {},
+		s_properties = {},
+		s_supports = {},
+		s_citations = {};
 
 		$.each(this.namespaces, function(index, ns){
 			s_namespaces[index] = ns.serializeJDEx();
@@ -485,7 +522,8 @@ module.Graph.prototype = {
 		});	
 
 */		
-		return JSON.stringify({
+
+		return {
 				format: this.format, 
 				nodes: s_nodes, 
 				edges: s_edges, 
@@ -495,8 +533,17 @@ module.Graph.prototype = {
 				properties : s_properties,
 				citations : s_citations,
 				supports : s_supports
-				});
-		}
+				};
+		
+	},
+	
+	serializeJDEx : function(){
+
+		return JSON.stringify(this.toJDEx(mode));
+	}
+
+
+
 };
 
 
@@ -509,7 +556,6 @@ module.Graph.prototype = {
 module.Node = function(name, representedTerm){
 
 	this.properties = {};
-	this.id = id; 					// id within the graph
 	this.name = name; 
 	if (representedTerm){				
 		this.represents = representedTerm;
@@ -523,7 +569,9 @@ module.Node.prototype = {
 	constructor : module.Node,
 	
 	serializeJDEx : function(){
-		return { name: this.name, represents: this.represents.id};
+		var jdex = { name: this.name};
+		if (this.represents) jdex.represents = this.represents.id;
+		return jdex;
 	},
 	
 	getOutgoing : function(){
@@ -577,7 +625,7 @@ module.Node.prototype = {
 */
 
 module.Edge = function(subject, predicate, object){
-	console.log("creating edge with " + subject.name + " " + predicate.identifier() + " " + object.name);
+	//console.log("creating edge with " + subject.name + " " + predicate.identifier() + " " + object.name);
 	this.s = subject;
 	this.o = object;
 	this.p = predicate;
@@ -591,7 +639,17 @@ module.Edge.prototype = {
 	constructor : module.Edge,
 
 	serializeJDEx : function(){
-		return {s: this.s.id, p: this.p.id, o: this.o.id};
+		var s_edge = {s: this.s.id, p: this.p.id, o: this.o.id};
+		if (this.citation) s_edge.citation = this.citation.id;
+		if (this.support) s_edge.support = this.support.id;	
+		if (this.properties && this.properties.length > 0){
+			var props = {};
+			$.each(this.properties, function(property, value){
+				props[property] = value.id;
+			});
+			s_edge.properties = props;
+		}
+		return s_edge;
 	},
 	
 	reverse : function(){
@@ -646,10 +704,10 @@ module.Term = function(name, ns){
 		this.name = name;
 	}
 	if (ns){
-		console.log("creating term " + name + " in " + ns.uri);
+		//console.log("creating term " + name + " in " + ns.uri);
 		this.ns = ns;
 	} else {
-		console.log("creating term for " + name + " with no namespace");
+		//console.log("creating term for " + name + " with no namespace");
 	}
 	
 };
@@ -660,9 +718,9 @@ module.Term.prototype = {
 	
 	serializeJDEx : function(){
 		if (this.ns){
-			return {name : this.name, namespace: this.ns.id};
+			return {name: this.name, ns: this.ns.id};
 		} else {
-			return {name : this.name};
+			return {name: this.name};
 		}
 	
 	},
@@ -683,7 +741,7 @@ module.Term.prototype = {
 
 module.FunctionTerm = function(fn, parameters){
 
-	console.log("creating function term using " + fn.name);
+	//console.log("creating function term using " + fn.name);
 	
 	this.termFunction = fn;
 	this.parameters = parameters;	
@@ -732,11 +790,12 @@ module.Citation = function(citationType, referenceIdentifier, bibliographicCitat
 	this.identifier = referenceIdentifier;
 	this.properties = {};
 	this.contributors = [];
+	this.edges = [];
 	if (bibliographicCitation){
 		this.citation = bibliographicCitation;
 	}
 	if (title){
-		console.log("creating citation " + this.identifier + " titled " + title);
+		//console.log("creating citation " + this.identifier + " titled " + title);
 		this.title = title;
 	}
 	
@@ -750,10 +809,22 @@ module.Citation.prototype = {
 		this.contributors.push(contributor_name);
 	},
 	
+	addEdge : function(edge) {
+		this.edges.push(edge);
+		this.edges = $.unique(this.edges);	
+	},
+	
 	serializeJDEx : function(){
 		var jdex = {identifier : this.identifier, type: this.type};
 		if (this.title) jdex['title'] = this.title;
 		if (this.citation) jdex['citation'] = this.citation;
+		if (this.edges && this.edges.length > 0){
+			var edge_ids = [];
+			$.each(this.edges, function(index, edge){
+				edge_ids.push(edge.id);
+			});
+			jdex['edges'] = edge_ids;
+		}
 		jdex['contributors'] = [];
 		$.each(this.contributors, function(index, contributors){
 			jdex.contributors.push(contributors);
@@ -773,21 +844,31 @@ module.Citation.prototype = {
 module.Support = function(text){
 
 	this.text = text;
-	console.log("creating Support: " + text);
+	//console.log("creating Support: " + text);
 	this.properties = {};
-	
+	this.edges = [];
 };
 
 module.Support.prototype = {
 
 	constructor : module.Support,
 	
+	addEdge : function(edge) {
+		this.edges.push(edge);
+		this.edges = $.unique(this.edges);	
+	},
+	
 	serializeJDEx : function(){
-		if (this.citation){
-			return ({text: this.text, citation: this.citation.id});
-		} else {
-			return {text: this.text};	
+		var jdex = {text: this.text};
+		if (this.citation) jdex.citation =this.citation.id;
+		if (this.edges && this.edges.length > 0){
+			var edge_ids = [];
+			$.each(this.edges, function(index, edge){
+				edge_ids.push(edge.id);
+			});
+			jdex['edges'] = edge_ids;
 		}
+		return jdex;
 	}
 
 };
@@ -795,7 +876,7 @@ module.Support.prototype = {
 
 /*
 ------------------------------------
-	Translating from Other Formats
+	SIF -> JDEx
 ------------------------------------
 */
 
@@ -815,7 +896,16 @@ exports.createGraphFromSIF = function (data){
 		graph.findOrCreateEdge(subjectNode, predicate, objectNode);
 	
 	});
+	
+	return graph;
 }
+
+
+/*
+------------------------------------
+	XBEL -> JDEx
+------------------------------------
+*/
 
 exports.createGraphFromXBEL = function (xml_text){
 	var graph = new module.Graph();
@@ -824,10 +914,15 @@ exports.createGraphFromXBEL = function (xml_text){
 	// Process the header
 	var header = doc.documentElement.getElementsByTagName('bel:header').item(0);
 	module.processXBELHeader(graph, header);
+
+	// get the BEL relationship namespace
+	graph.belNS = graph.findOrCreateNamespace('http://resource.belframework.org/belframework/1.0/schema/', 'bel');
 	
+		
 	// Process the namespace group
 	var namespaceGroup = doc.documentElement.getElementsByTagName('bel:namespaceGroup').item(0);
 	module.processXBELNamespaceGroup(graph, namespaceGroup);
+
 	
 	// Process the annotation definition
 	var annotationDefinitionGroup = doc.documentElement.getElementsByTagName('bel:annotationDefinitionGroup').item(0);
@@ -837,7 +932,7 @@ exports.createGraphFromXBEL = function (xml_text){
 	
 	$.each(doc.documentElement.childNodes, function(index, statementGroup){
 		if (statementGroup.tagName == 'bel:statementGroup'){
-			var context = {annotations: {}};
+			var context = {annotations: []};
 			module.processXBELStatementGroup(graph, statementGroup, context);
 		}
 	}); 
@@ -891,7 +986,7 @@ module.processXBELHeader = function (graph, header){
 			var header_element = elements[0],
 				value = header_element.textContent,
 				predicate = graph.findOrCreateTerm(dc_info.term, dc_namespace_uri);
-			console.log("adding graph property: " + predicate.identifier() + " : " + value);
+			//console.log("adding graph property: " + predicate.identifier() + " : " + value);
 			graph.setProperty(predicate, value);
 		}
 	
@@ -909,10 +1004,9 @@ module.processXBELNamespaceGroup = function(graph, namespaceGroup){
 module.processXBELAnnotationDefinitionGroup = function(graph, AnnotationDefinitionGroup){
 	$.each(AnnotationDefinitionGroup.getElementsByTagName('bel:externalAnnotationDefinition'), function(index, extDef_info){
 		var uri = extDef_info.getAttribute('bel:url'),
-			prefix =  extDef_info.getAttribute('bel:id'),
-			belNS = graph.findOrCreateNamespace('http://resource.belframework.org/belframework/1.0/schema/', 'bel');
+			prefix =  extDef_info.getAttribute('bel:id');
 		graph.findOrCreateNamespace(uri, prefix);
-		graph.findOrCreateTerm(prefix, belNS);
+		graph.findOrCreateTerm(prefix, graph.belNS);
 	});
 }
 
@@ -922,7 +1016,7 @@ module.processXBELStatementGroup = function(graph, statementGroup, context){
 	// process the annotation group		
 	$.each(statementGroup.childNodes, function(index, element){
 		if (element.tagName == 'bel:annotationGroup'){
-			console.log("processing annotationGroup");
+			//console.log("processing annotationGroup");
 			module.processXBELAnnotationGroup(graph, element, context);
 		}
 	});
@@ -937,7 +1031,7 @@ module.processXBELStatementGroup = function(graph, statementGroup, context){
 	// recurse into any statement groups	
 	$.each(statementGroup.childNodes, function(index, innerGroup){
 		if (innerGroup.tagName == 'bel:statementGroup'){
-			var innerContext = {citation: context.citation, support: context.support, annotations:{}};
+			var innerContext = {citation: context.citation, support: context.support, annotations:[]};
 			$.each(context.annotations, function(index, value){
 				innerContext[index] = value;
 			});
@@ -956,22 +1050,22 @@ module.processXBELAnnotationGroup = function(graph, annotationGroup, context){
 					value = element.textContent,
 					ns = graph.namespaceByPrefix(propertyName);
 				
-				console.log("processing annotation " + );	
+				//console.log("processing annotation " + propertyName + " : " + value);	
 				if (ns) {
 					var valueTerm = graph.findOrCreateTerm(value, ns),
-						propertyTerm = graph.termByNameAndNamespace(propertyName, belNS);
-					context.annotations[propertyTerm.identifier()] = valueTerm;
+						propertyTerm = graph.termByNameAndNamespace(propertyName, graph.belNS);
+					context.annotations.push({property: propertyTerm, value: valueTerm});
 					
 				} else {
 					console.log("did not find namespace for " + propertyName);
 				}
 			
 			} else if (element.tagName == 'bel:citation'){
-				console.log("processing citation");
+				//console.log("processing citation");
 				context.citation = module.processXBELCitation(graph, element);
 				
 			} else if (element.tagName == 'bel:evidence'){
-				console.log("processing evidence");
+				//console.log("processing evidence");
 				context.support = module.processXBELEvidence(graph, element, context.citation);
 				
 			} else {
@@ -981,44 +1075,55 @@ module.processXBELAnnotationGroup = function(graph, annotationGroup, context){
 	});
 }
 
-module.processXBELStatement = function(graph, statement, annotations, citation, support){
-	console.log("processing statement");
-	// get the BEL relationship namespace
-	var belNS = graph.findOrCreateNamespace('http://resource.belframework.org/belframework/1.0/schema/', 'bel');
-	
+module.processXBELStatement = function(graph, statement, context){
+	//console.log("processing statement with context = " + context);
+
 	// find or create the predicate	
 	var relationshipName = statement.getAttribute('bel:relationship'),
-		p = graph.findOrCreateTerm(relationshipName, belNS),
+		p = graph.findOrCreateTerm(relationshipName, graph.belNS),
 		s, o;
 	
 	$.each(statement.childNodes, function(index, nodeElement){
 		if (nodeElement.tagName == 'bel:subject'){
 			// find or create the subject node
-			s = module.processXBELNodeElement(graph, nodeElement, belNS);
+			s = module.processXBELNodeElement(graph, nodeElement);
 		} else if (nodeElement.tagName == 'bel:object') {
 			// find or create the object node
-			o = module.processXBELNodeElement(graph, nodeElement, belNS);
+			o = module.processXBELNodeElement(graph, nodeElement);
 		}
 	});
 	// create the edge (because this is a BEL document, not a model, each statement creates a unique edge)
 	var edge = new module.Edge(s, p, o);
 	
-	// if there is a citation, add the edge
+	// if there is a citation, add the edge and vice versa
+	if (context.citation){
+		context.citation.addEdge(edge);
+		edge.citation = context.citation;
+	}
 	
 	// if there is a support, add the edge
-	
+	if (context.support){
+		context.support.addEdge(edge);
+		edge.support = context.support;
+	}
+		
 	// for each annotation, add it to the edge
+	$.each(context.annotations, function(index, pair){
+		//console.log("adding annotation to edge : " + pair.property.identifier() + " = " + pair.value.identifier());
+		edge.properties[pair.property.identifier()] = pair.value;
+	});
+		
 	
 	graph.addEdge(edge);
 }
 
-module.processXBELNodeElement = function(graph, nodeElement, belNS){
+module.processXBELNodeElement = function(graph, nodeElement){
 
 	var termElement = nodeElement.childNodes[1];
 	
 	// find or create the term function
 	var functionName = termElement.getAttribute('bel:function'),
-		fn = graph.findOrCreateTerm(functionName, belNS),
+		fn = graph.findOrCreateTerm(functionName, graph.belNS),
 		parameters = [];
 	
 
@@ -1080,10 +1185,10 @@ module.processXBELEvidence = function(graph, evidenceElement, citation){
 	
 	
 	if (citation){
-		console.log("citation = " + citation.id + " for support");
+		//console.log("citation = " + citation.id + " for support");
 		support.citation = citation;
 	} else {
-		console.log("citation = " + citation + " for support");
+		//console.log("citation = " + citation + " for support");
 	}
 	
 	graph.addSupport(support);
@@ -1091,6 +1196,11 @@ module.processXBELEvidence = function(graph, evidenceElement, citation){
 	return support;
 }
 
+/*
+------------------------------------
+	RDF -> JDEx
+------------------------------------
+*/
 
 /*
 exports.createGraphFromRDF = function (data){

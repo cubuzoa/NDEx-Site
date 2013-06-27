@@ -6,8 +6,8 @@ exports.init = function(orient, callback) {
 
 exports.createUser = function(username, password, callback){
 	console.log("calling createUser with arguments: '" + username + "' '" + password + "'");
-	var selectUserByUserNameCmd = "select from NDExUser where username = '" + username + "'";
-	var insertUserCmd = "insert into NDExUser (username, password) values('" + username + "', '" + password + "')";
+	var selectUserByUserNameCmd = "select from User where username = '" + username + "'";
+	var insertUserCmd = "insert into User (username, password) values('" + username + "', '" + password + "')";
 	console.log("first checking that username is not taken");
 	module.db.command(selectUserByUserNameCmd, function(err, users) {
 		if (err) {
@@ -35,7 +35,7 @@ exports.createUser = function(username, password, callback){
 
 exports.findUsersByUserName = function (nameExpression, limit, offset, callback){
 	console.log("calling findUsersByUserName with arguments: " + nameExpression + " " + limit + " " + offset);
-	var cmd = "select from NDExUser where username like " + nameExpression + " order by creation_date desc limit " + limit;
+	var cmd = "select from User where username like " + nameExpression + " order by creation_date desc limit " + limit;
 	console.log(cmd);
 	module.db.command(cmd, function(err, users) {
         callback({users : users, error : err});
@@ -44,7 +44,7 @@ exports.findUsersByUserName = function (nameExpression, limit, offset, callback)
 
 exports.getUser = function(username, callback){
 	console.log("calling getUser with username = '" + username + "'");
-	var cmd = "select from NDExUser where username = '" + username + "'";
+	var cmd = "select from User where username = '" + username + "'";
 	console.log(cmd);
 	module.db.command(cmd, function(err, users) {
 		// TODO - case where more than one user returned...
@@ -71,7 +71,7 @@ exports.getUser = function(username, callback){
 
 exports.deleteUser = function (username, callback){
 	console.log("calling delete user with username = '" + username + "'");
-	var cmd = "delete from NDExUser where username =  '" + username + "'";
+	var cmd = "delete from User where username =  '" + username + "'";
 	console.log(cmd);
 	module.db.command(cmd, function(err) {
         callback({error : err});
