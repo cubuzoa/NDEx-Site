@@ -10,9 +10,12 @@ Expected to be a global for the client, expected to be undefined and then requir
 
 
 
-(function(exports, $){
+(function(exports){
 
-	typeof $ === 'undefined'? $ = require('jQuery'): $;
+	if (typeof($) === 'undefined'){
+		console.log("requiring jQuery");
+		$ = require('jQuery');
+	}
 	
 	exports.host = "http://localhost:9999";
 	
@@ -156,6 +159,10 @@ Expected to be a global for the client, expected to be undefined and then requir
     exports.findNetworks = function(searchExpression, limit, offset, callback){
         var mergedRoute = '/networks';
         exports.ndexGet(mergedRoute, {searchExpression: searchExpression, limit: limit, offset: offset}, callback);
+    }
+    
+    exports.test = function(){
+    	alert("testing");
     }
 
 

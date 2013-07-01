@@ -114,21 +114,21 @@ for (n in specs.resourceTypes){
 			
 				functionLine = "    exports." + spec.fn + " = function(" + makeArgsFromParams(spec.routeParams) + 
 																makeArgsFromParams(spec.postData) +
-																"callback){";
-				actionLine = "        exports.ndexPost(mergedRoute, " + makeHashStringFromParams(spec.postData) + "callback);";
+																"callback, errorHandler){";
+				actionLine = "        exports.ndexPost(mergedRoute, " + makeHashStringFromParams(spec.postData) + "callback, errorHandler);";
 				
 			} else if (spec.method === "GET"){
 				var routeArgs = makeArgsFromParams(spec.routeParams),
 					queryArgs = makeArgsFromParams(spec.queryParams),
 					args = routeArgs + queryArgs;
 
-				functionLine = "    exports." + spec.fn + " = function(" + routeArgs + queryArgs + "callback){";
-				actionLine = "        exports.ndexGet(mergedRoute, " + makeHashStringFromParams(spec.queryParams) + "callback);";
+				functionLine = "    exports." + spec.fn + " = function(" + routeArgs + queryArgs + "callback, errorHandler){";
+				actionLine = "        exports.ndexGet(mergedRoute, " + makeHashStringFromParams(spec.queryParams) + "callback, errorHandler);";
 	
 			} else if (spec.method === "DELETE"){
 			
-				functionLine = "    exports." + spec.fn + " = function(" + makeArgsFromParams(spec.routeParams) + "callback){";
-				actionLine = "        exports.ndexDelete(mergedRoute, callback);";
+				functionLine = "    exports." + spec.fn + " = function(" + makeArgsFromParams(spec.routeParams) + "callback, errorHandler){";
+				actionLine = "        exports.ndexDelete(mergedRoute, callback, errorHandler);";
 
 			} else {
 				console.log("Error, no handler for method " + spec.method);

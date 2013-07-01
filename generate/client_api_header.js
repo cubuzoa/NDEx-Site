@@ -10,9 +10,12 @@ Expected to be a global for the client, expected to be undefined and then requir
 
 
 
-(function(exports, $){
+(function(exports){
 
-	typeof $ === 'undefined'? $ = require('jQuery'): $;
+	if (typeof($) === 'undefined'){
+		console.log("requiring jQuery");
+		$ = require('jQuery');
+	}
 	
 	exports.host = "http://localhost:9999";
 	

@@ -1,4 +1,69 @@
 <% include head.ejs %>
 <% include nav.ejs %>
-<p>TODO: Networks</p>
-</html>
+<script>
+// On form submit, send the search expression to findNetworks
+// with a limit of 100.
+
+function doSearch(offset) {
+	var searchExpression = $('#searchExpression').serialize(), 
+		limit = 100;
+		
+	ndexClient.test();
+	
+	console.log("Calling findNetworks");
+	
+	ndexClient.findNetworks(searchExpression, limit, offset, function(data){
+		console.log("Got results from findNetworks");
+		console.log(data);
+		for (i in data.networks){
+			var network = data.networks[i];
+			console.log(network.title);
+		}
+		
+		// Clears the searchResults div
+		$('#searchResults').html('');
+		
+		if (data.networks){
+			$.each(data.networks, function(index, item){
+				$('#searchResults').append(formatNetworkDescriptor(item));
+			});  
+		}
+    },
+    // error handler
+    function(error){
+    	$('#searchResults').append(formatError(error));
+    });
+    
+    return false;
+}
+
+function formatNetworkDescriptor(item){
+	var networkDIV = document.createElement('div');
+	$(networkDIV).addClass('networkDescriptor')
+					.html(item.title + " nodes:" + item.nodeCount);
+	return networkDIV;
+
+}
+
+function formatError(error){
+
+}
+
+</script>
+
+<form onsubmit="return doSearch(0);" id="searchForm">
+	<div>
+	<label>Query:</label>
+	<input type="text" name="searchExpression" id="searchExpression"/><br/>
+	</div>
+
+	<div>
+	<input type="submit" value="Search"/>
+	</div>
+</form>
+
+<div id="searchResults">
+
+</div>
+
+<% include foot.ejs %>

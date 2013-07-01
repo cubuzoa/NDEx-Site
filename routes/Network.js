@@ -208,9 +208,12 @@ exports.createNetwork = function(networkJDEx, accountURI, callback){
 exports.findNetworks = function (searchExpression, limit, offset, callback){
 	console.log("calling findNetworks with arguments: " + searchExpression + " " + limit + " " + offset);
 	// Temporary: ignore search expression and offset, just get the first n networks
-	var cmd = "select from Network order by creation_date desc limit " + limit;
+	
+	var descriptors = "properties.title as title, @rid as rid, nodes.size() as nodeCount, edges.size() as edgeCount";
+		cmd = "select " + descriptors + " from xNetwork order by creation_date desc limit " + limit;
 	console.log(cmd);
 	module.db.command(cmd, function(err, networks) {
+		// for each network, summarize the key facts
         callback({networks : networks, error : err});
     });
 };
