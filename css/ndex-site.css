@@ -1,10 +1,36 @@
+@font-face {
+    font-family: Roboto, sans-serif;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Roboto;
+    font-weight: 400;
+    font-size: 12px;
+}
+
+h1,h2,h3,h4,h5 {
+    font-family: Roboto;
+}
+
+h4 {
+    font-weight: 300;
+}
+
+.brand {
+	vertical-align: middle;
+	font-size: 20px;
+  	font-weight: 700;
+}
+
 .main-nav {
 	vertical-align: middle;
 	font-size: 18px;
-  	font-weight: bold;
+  	font-weight: 100;
 }
-
-
 
 .ndex-section {
 	font-size: 18px;

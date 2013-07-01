@@ -6,25 +6,12 @@
 	  		<span class="icon-bar"></span>
 	  		<span class="icon-bar"></span>
 	  	</a>
-		<div class="brand"><a href="/" >NDEx</a><% if (user) {%> <%= user.username %><%}%>
+		<div class="brand"><a href="/" >NDEx</a>
+		<% if (user) {%> <%= user.username %><%}%>
 		
-		<div class="nav-collapse">
-		
-			<ul class="nav pull-right"> 
-				<% if (!user) {%> 
-				<li><a href="/login" >sign in or join</a></li>
-				<%} else {%>
-				<li><a href="/logout" >sign out</a></li>
-				<%}%>
-				<li><a href="/contact" >contact</a></li>
-				<li><a href="/about" >about NDEx</a></li>
-				<li><a href="/policy" >policies</a></li>
-			</ul>
-	
-		
+		<div class="nav-collapse">			
 			<ul class="nav pull-left main-nav">   
 			  
-			  <li><a href="/">Home</a></li>
 			  <li><a href="/searchNetworks">Networks</a></li>
 			  <li><a href="/searchGroups">Groups</a></li>
 			  <li><a href="/searchUsers">Users</a></li>
@@ -33,6 +20,11 @@
 			  <li><a href="/myAccount">My Account</a></li>
 			  <li><a href="/ManageTasks">Tasks</a></li>
 			  <li><a href="/UploadNetwork">Upload</a></li>
+			  <%}%>
+			  <% if (!user) {%> 
+			  <li><a href="/login" >Sign in</a></li>
+			  <%} else {%>
+			  <li><a href="/logout" >Sign out</a></li>
 			  <%}%>
 			</ul>
 			
