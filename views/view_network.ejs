@@ -1,4 +1,73 @@
 <% include head.ejs %>
 <% include nav.ejs %>
-<p>TODO Search Results</p>
-</html>
+<!-- <script src="js/jgraph.js"></script> -->
+<script>
+/*
+
+function fetchNetwork(networkID) {
+	var searchExpression = $('#searchExpression').serialize(), 
+		limit = 100;
+		
+	ndexClient.test();
+	
+	console.log("Calling getNetwork");
+	
+	ndexClient.getNetwork(networkID, function(data){
+		console.log("Got results from getNetwork");
+		console.log(data);
+		var edges = data.network.edges;
+		for (i in edges){
+			var edge = edges[i];
+			console.log(network.title);
+		}
+		
+		jNetwork = new jgraph.Graph();
+		jNetwork.parsejDex(data.network);
+		
+		// Clears the searchResults div
+		$('#results').html('');
+		
+		if (jNetwork.edges){
+			$.each(jNetwork.edges, function(id, edge){
+				$('#edgeResults').append(formatEdge(edge));
+			});  
+		}
+    },
+    // error handler
+    function(error){
+    	$('#results').append(formatError(error));
+    });
+    
+    return false;
+}
+
+function formatEdge(edge){
+	var networkDIV = document.createElement('div');
+	$(networkDIV).addClass('edge')
+					.html(edge.s.name + " " + edge.p. + " " + edge.o.name);
+	return networkDIV;
+
+}
+
+function formatError(error){
+
+}
+*/
+</script>
+
+<form onsubmit="return doSearch(0);" id="searchForm">
+	<div>
+	<label>Query:</label>
+	<input type="text" name="searchExpression" id="searchExpression"/><br/>
+	</div>
+
+	<div>
+	<input type="submit" value="Search"/>
+	</div>
+</form>
+
+<div id="edgeResults">
+
+</div>
+
+<% include foot.ejs %>

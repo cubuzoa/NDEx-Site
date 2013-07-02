@@ -23,10 +23,10 @@ specs = require("./api_spec.js");
 
 //eyes.inspect(oe.operations);
 
-var restPath = "../";
+var sitePath = "../";
 var testPath = "../";
 
-var lines = fs.readFileSync('./generate_header.js').toString().split("\n");				
+var lines = fs.readFileSync('./site_header.js').toString().split("\n");				
 
 for (n in specs.resourceTypes){
 	resourceType = specs.resourceTypes[n];
@@ -107,23 +107,27 @@ for (n in specs.resourceTypes){
 	lines.push("	" + resourceType + ".init(db, function(err) {if (err) {throw err;}});");
 }
 
+// close off the initialization
 lines.push("});");
-lines.push("");
-lines.push("app.listen(port);");
-lines.push("console.log('REST server listening on port ' + port + '...');");
+
+
+// add the footer, including the call to run the server
+var footer_lines = fs.readFileSync('./site_footer.js').toString().split("\n");
+
+lines = lines.concat(footer_lines);
 
 // echo to the console
 for (index in lines){
 	console.log(lines[index]);
 }
 				
-var serverContent = lines.join("\n");
+var siteContent = lines.join("\n");
 
-var serverPath = restPath + "rest.js";
-console.log("outputting to " + serverPath);
+var sitePath = sitePath + "site.js";
+console.log("outputting to " + sitePath);
 
 // write the file	
-fs.writeFile(serverPath, serverContent, function(writeErr){
+fs.writeFile(sitePath, siteContent, function(writeErr){
 	if (writeErr){
 		console.log("error writing file " + err.toString);
 	} else {

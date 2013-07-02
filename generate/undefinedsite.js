@@ -4,18 +4,42 @@ var flash = require('connect-flash')
 //  , util = require('util')
   , LocalStrategy = require('passport-local').Strategy;
   
+//-----------------------------------------------------------
+// Temporary hack user database
+//-----------------------------------------------------------
+/*
+var users = [
+    { id: 1, username: 'bob', password: 'secret', email: 'bob@example.com' }
+  , { id: 2, username: 'joe', password: 'birthday', email: 'joe@example.com' }
+];
 
-var orientdb = require('orientdb');
+function findById(id, fn) {
+  var idx = id - 1;
+  if (users[idx]) {
+    fn(null, users[idx]);
+  } else {
+    fn(new Error('User ' + id + ' does not exist'));
+  }
+}
 
-var dbConfig = {
-	user_name: 'admin',
-	user_password: 'admin'
-};
 
-var serverConfig = {
-	host: 'localhost',
-	port: 2424
-};
+function findByUsername(username, fn) {
+  for (var i = 0, len = users.length; i < len; i++) {
+    var user = users[i];
+    if (user.username === username) {
+      return fn(null, user);
+    }
+  }
+  return fn(null, null);
+}
+*/
+
+
+
+//	console.log("calling getUser with username = '" + username + "'");
+//	console.log(cmd);
+
+//-----------------------------------------------------------
 
 var app = express();
 var port = 9999;
@@ -247,18 +271,15 @@ app.get('/uploadNetwork', ensureAuthenticated, function(req, res) {
 // These destinations do not require an authenticated user
 
 app.get('/policies', function(req, res) {
-  res.render('policies', {title: "Policies",
-  							user: req.user });
+  res.render('policies', {title: "Login"});
 });
 
 app.get('/contact', function(req, res) {
-  res.render('contact', {title: "Contact Information",
-  							user: req.user });
+  res.render('contact', {title: "Contact Information"});
 });
 
 app.get('/about', function(req, res) {
-  res.render('about', {title: "About NDEx",
-  						user: req.user });
+  res.render('about', {title: "About NDEx"});
 });
 
 
@@ -268,36 +289,14 @@ app.get('/about', function(req, res) {
 //
 //-----------------------------------------------------------
 
-app.get('/viewUser/:userId', function(req, res) {
+app.get('/view_user/:userId', function(req, res) {
   res.render('search_users', 
   			{	title: "Users", 
-  				userId: req.params['userId'],
-  				user: req.user 
-  			});
-});
-
-app.get('/viewNetwork/:networkId', function(req, res) {
-  res.render('view_network', 
-  			{	title: "Network", 
-  				networkId: req.params['networkId'],
-  				user: req.user 
-  			});
-});
-
-app.get('/visualizeNetwork/:networkId', function(req, res) {
-  res.render('cyjs_visualize_network', 
-  			{	title: "Network", 
-  				networkId: req.params['networkId'],
-  				user: req.user 
+  				userId: req.params['userId']
   			});
 });
 
 
-app.get('/visNet/:networkId', function(req, res) {
-  res.render('search_networks', {title: "Networks", 
-  								 networkId: req.params['networkId'],
-  								 user: req.user });
-});
 //-----------------------------------------------------------
 //
 //				The REST API
@@ -308,7 +307,7 @@ app.get('/visNet/:networkId', function(req, res) {
 //
 //-----------------------------------------------------------
 
-var routes = require('./routes');
+
 var System = require('./routes/System.js');
 var User = require('./routes/User.js');
 var NPA = require('./routes/NPA.js');
