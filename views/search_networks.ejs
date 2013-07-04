@@ -39,9 +39,20 @@ function doSearch(offset) {
 }
 
 function formatNetworkDescriptor(item){
-	var networkDIV = document.createElement('div');
+	var networkDIV = document.createElement('div'),
+		titleSpan = document.createElement('span'),
+		nodeCountSpan = document.createElement('span'),
+		edgeCountSpan = document.createElement('span');
+
+	
+	$(titleSpan).addClass('networkTitle').html(item.title);
+	$(nodeCountSpan).addClass('elementCount').html("nodes:" + item.nodeCount);
+	$(edgeCountSpan).addClass('elementCount').html("edges:" + item.edgeCount);
+			
 	$(networkDIV).addClass('networkDescriptor')
-					.html(item.title + " nodes:" + item.nodeCount);
+				 .append(titleSpan)
+				 .append(nodeCountSpan)
+				 .append(edgeCountSpan);
 	return networkDIV;
 
 }
