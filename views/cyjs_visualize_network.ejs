@@ -5,10 +5,6 @@
 
 <script>
 
-function convertToRID(id){
-	return id.replace("C","#").replace("R", ":");
-}
-
 // the network id passed from the ejs template
 var networkId = convertToRID('<%= networkId %>');
 
@@ -16,70 +12,55 @@ function formatError(error){
 
 }
 
-// On load, we get the network, then push it to cytoscape.js on the callback
-$(ndexClient.getNetwork(networkID, function(data){
-		console.log("Got results from getNetwork");
-		console.log(data);
-		var edges = data.network.edges;
-		for (i in edges){
-			var edge = edges[i];
-			console.log(edge.id);
-		}
-		
-		var cyNetworkParams = {
+var cyNetworkParams = {
 
 		  layout: {
 			name: 'circle'
 		  },
-  
 		  style: cytoscape.stylesheet()
 			.selector('node')
 			  .css({
-				'shape': 'data(faveShape)',
-				'width': 'mapData(weight, 40, 80, 20, 60)',
 				'content': 'data(name)',
 				'text-valign': 'center',
-				'text-outline-width': 2,
-				'text-outline-color': 'data(faveColor)',
-				'background-color': 'data(faveColor)',
-				'color': '#fff'
-			  })
-			.selector(':selected')
-			  .css({
-				'border-width': 3,
-				'border-color': '#333'
+				'color': 'white',
+//				'text-outline-width': 2,
+//				'text-outline-color': '#888'
 			  })
 			.selector('edge')
 			  .css({
-				'width': 'mapData(strength, 70, 100, 2, 6)',
-				'target-arrow-shape': 'triangle',
-				'source-arrow-shape': 'circle',
-				'line-color': 'data(faveColor)',
-				'source-arrow-color': 'data(faveColor)',
-				'target-arrow-color': 'data(faveColor)'
+				'target-arrow-shape': 'triangle'
 			  })
-			.selector('edge.questionable')
+			.selector(':selected')
 			  .css({
-				'line-style': 'dotted',
-				'target-arrow-shape': 'diamond'
+				'background-color': 'black',
+				'line-color': 'black',
+				'target-arrow-color': 'black',
+				'source-arrow-color': 'black'
 			  })
 			.selector('.faded')
 			  .css({
 				'opacity': 0.25,
 				'text-opacity': 0
-			  })
-			};
-			
+			  }), 
+		  
+
+		};
+
+// On load, we get the network, then push it to cytoscape.js on the callback
+$(ndexClient.getNetwork(networkId, function(data){
+		console.log("Got results from getNetwork");
+		console.log(data);
+	
   		var elements = {nodes: [], edges: []};
   		
   		$.each(data.network.nodes, function(index, node){
-  			var cyNode = {data:{id: node.id, name: node.id}};
+  			var cyNode = {data:{id: "n" + index, name: node.name}};
   			elements.nodes.push(cyNode);
   		
   		});
   		
   		$.each(data.network.edges, function(index, edge){
-  			var cyEdge = {data: {source: edge.s.id, target: edge.o.id}};
+  			var cyEdge = {data: {source: "n" + edge.s, target: "n" + edge.o}};
   			elements.edges.push(cyEdge);
   		});
   		
@@ -91,8 +72,8 @@ $(ndexClient.getNetwork(networkID, function(data){
     // error handler
     function(error){
     	$('#results').append(formatError(error));
-    });
-});
+    })
+);
 </script>
 
 <% include foot.ejs %>

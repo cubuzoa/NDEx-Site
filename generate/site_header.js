@@ -292,6 +292,14 @@ app.get('/visualizeNetwork/:networkId', function(req, res) {
   			});
 });
 
+app.get('/compareNetworks/:network1Id/:network2Id', function(req, res) {
+  res.render('triptych_compare_networks', 
+  			{	title: "Network", 
+  				network1Id: req.params['network1Id'],
+  				network2Id: req.params['network2Id'],
+  				user: req.user 
+  			});
+});
 
 app.get('/visNet/:networkId', function(req, res) {
   res.render('search_networks', {title: "Networks", 

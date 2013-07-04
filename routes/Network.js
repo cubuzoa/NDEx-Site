@@ -80,40 +80,43 @@ exports.createInitialDocument = function(networkJDEx){
 
 exports.createNetworkEdges = function(networkJDEx, network){
 	for(index in networkJDEx.edges){
-		// Get the predicate term
-		var edge = networkJDEx.edges[index],
-			networkRID = network["@rid"],
-			termCmd = "select from (traverse terms from " + networkRID + " while $depth < 2) where $depth = 1 and id = " + edge.p;
-		   
-		module.db.command(termCmd, function(err1, results1){
-
-			//
-			// Finding nodes and predicate term referenced by the edge, use traverse to search terms in this network:
-			//
-			// select from (traverse terms from #18:7 while $depth < 2) where $depth = 1 and id = 2
-			//
-			var	term = results1[0],
-				fromExp = "select from (traverse nodes from " + networkRID + " while $depth < 2) where $depth = 1 and id = " + edge.s,
-				toExp = "select from (traverse nodes from " + networkRID + " while $depth < 2) where $depth = 1 and id = " + edge.o,
-				 cmd = "create edge xEdge from (" + fromExp + ") to (" + toExp + ") set p = " + term["@rid"] + ", n = " + networkRID ;
-				 
-			module.db.command(cmd, function (err2, results2){
-				console.log("ran " + cmd);
-				console.log("got " + Object.keys(results2[0]).join(", "));
-			
-			
-				// now link the edge to the network, not just the nodes
-				var newEdge = results2[0],
-					updateCmd = "update " + networkRID + " add edges = " + newEdge["@rid"];
-					module.db.command(updateCmd, function (err3, results3){
-						console.log("ran " + updateCmd);
-						if (err3) console.log("error: " + err3);
-					});
-			
-				if (err2) console.log("error: " + err2);
-			});
-		});
+		exports.createNetworkEdge(network["@rid"], networkJDEx.edges[index]);
 	}
+}
+
+exports.createNetworkEdge = function(networkRID, edge){
+	// Get the predicate term
+	var termCmd = "select from (traverse terms from " + networkRID + " while $depth < 2) where $depth = 1 and id = " + edge.p;
+	console.log("index " + index + " edge " + edge.s + " " + edge.o);
+	
+	module.db.command(termCmd, function(err1, results1){
+
+		//
+		// Finding nodes and predicate term referenced by the edge, use traverse to search terms in this network:
+		//
+		// select from (traverse terms from #18:7 while $depth < 2) where $depth = 1 and id = 2
+		//		
+		var	term = results1[0],
+			fromExp = "select from (traverse nodes from " + networkRID + " while $depth < 2) where $depth = 1 and id = " + edge.s,
+			toExp = "select from (traverse nodes from " + networkRID + " while $depth < 2) where $depth = 1 and id = " + edge.o,
+			 cmd = "create edge xEdge from (" + fromExp + ") to (" + toExp + ") set p = " + term["@rid"] + ", n = " + networkRID ;
+			 
+		module.db.command(cmd, function (err2, results2){
+			console.log("ran " + cmd);
+			console.log("got " + Object.keys(results2[0]).join(", "));
+		
+		
+			// now link the edge to the network, not just the nodes
+			var newEdge = results2[0],
+				updateCmd = "update " + networkRID + " add edges = " + newEdge["@rid"];
+				module.db.command(updateCmd, function (err3, results3){
+					console.log("ran " + updateCmd);
+					if (err3) console.log("error: " + err3);
+				});
+		
+			if (err2) console.log("error: " + err2);
+		});
+	});
 }
 
 exports.linkNodesToTerms = function(networkJDEx, networkRID){
@@ -224,17 +227,70 @@ exports.getNetwork = function(networkId, callback){
 	var cmd = "select from " + networkId + "";
 	console.log(cmd);
 	module.db.command(cmd, function(err, networks) {
-		if (err){
-			console.log("caught orient db error " + err);
-			callback({network : null, error : err, status : 500});
-		} else {
+		if (exports.checkErr(err, "finding network", callback)){
 			try {
 				if (!networks || networks.length < 1){
 					console.log("found no networks by id = '" + networkId + "'");
 					callback({status : 404});
 				} else {
-					console.log("found " + networks.length + " networks, first one is " + JSON.stringify(networks[0]));
-					callback({network : networks[0]});
+					console.log("found " + networks.length + " networks, first one is " + networks[0]["@rid"]);
+					
+					var result = {namespaces : {}, terms: {}, nodes: {}, edges: {}};
+					
+					// get the namespaces
+					var ns_cmd = "select id, prefix, uri, @rid as rid from (traverse namespaces from " + networkId + ") where $depth = 1";
+					module.db.command(ns_cmd, function(err, namespaces) {
+						if(exports.checkErr(err, "getting namespaces", callback)){
+						
+							// process the namespaces
+							for (i in namespaces){
+								var ns = namespaces[i];
+								result.namespaces[ns.id] = {prefix: ns.prefix, rid: ns.rid, uri: ns.uri};
+							}
+							
+							// get the terms
+							var term_cmd = "select id, name, ns.id as nsid, @rid as rid from (traverse terms from " + networkId + ") where $depth = 1";
+							module.db.command(term_cmd, function(err, terms) {
+								if (exports.checkErr(err, "getting terms", callback)){
+						
+									// process the terms
+									for (i in terms){
+										var term = terms[i];
+										result.terms[term.id] = {name: term.name, rid: term.rid, ns: term.nsid};
+									}
+							
+									// get the nodes
+									// TODO - get the defining terms...
+									var node_cmd = "select id, name, @rid as rid from (traverse nodes from " + networkId + ") where $depth = 1";
+									module.db.command(node_cmd, function(err, nodes) {
+										if (exports.checkErr(err, "getting nodes", callback)){
+						
+											// process the nodes
+											for (i in nodes){
+												var node = nodes[i];
+												result.nodes[node.id] = {name: node.name, rid: node.rid};
+											}
+											// get the edges
+											var edge_cmd = "select  in.id as s, p.id as p, out.id as o, @rid as rid from (traverse edges from " + networkId + ") where $depth = 1)";
+											module.db.command(edge_cmd, function(err, edges) {
+												if (exports.checkErr(err, "getting edges", callback)){
+										
+													// process the edges
+													for (i in edges){
+														var edge = edges[i];
+														result.edges[i] = {s: edge.s, p: edge.p, o: edge.o, rid: edge.rid};
+													}
+										
+													callback({network : result});
+												}
+											}); // close edge query
+										}
+									}); // close node query
+								}
+							}); // close term query
+						}
+					}); // close namespace query
+					
 				}
 			}
 			catch (e){
@@ -242,8 +298,91 @@ exports.getNetwork = function(networkId, callback){
 				callback({network : null, error : e.toString(), status : 500});	
 			}
 		}
-    });
+    }); // close find network query
 };
+
+exports.checkErr = function(err, where, callback){
+	if (err){
+			console.log("DB error, " + where + " : " + err);
+			callback({network : null, error : err, status : 500});
+			return false;
+	}
+	return true;
+};
+
+exports.networkToJDEx = function(network){
+		var o_nodes = [],
+		o_namespaces = [],
+		//s_nodeTypes = [],
+		o_edges = [],
+		o_terms = [],
+		o_properties = {};
+		//s_supports = {},
+		//s_citations = {};
+		
+		console.log("networkToJDEx: " + network);
+
+		for(index in network.namespaces){
+			var ns = network.namespaces[index];
+			o_namespaces.push({id: ns.id, prefix: ns.prefix, uri: ns.uri, rid: ns['@rid']});
+		}
+
+		// for each base term, create with id and name, link to namespace later
+		for(index in network.terms){
+			var term = network.terms[index];
+			if (term.name){
+				console.log("term: " + term.id);
+				var o_term = {type: "b", id: term.id, name: term.name, rid: term['@rid']};
+				if (term.ns){
+					o_term.ns = term.ns.id;
+				}
+				o_terms.push(o_term);
+			}
+		}
+
+		// just copy the graph properties
+		for(index in network.properties){
+			var value = network.properties[index];
+			o_properties[index] = value;
+		}
+
+		// for each node, create with id and name, link to defining term later									
+		for(index in network.nodes){
+			var node = network.nodes[index],
+				o_node = {id: node.id, rid: node['@rid']};
+			if (node.name) o_node.name = node.name;
+			o_nodes.push(o_node);
+		}
+
+		// for each node, create with id and name, link to defining term later									
+		for(index in network.nodes){
+			var node = network.nodes[index],
+				o_node = {id: node.id, rid: node['@rid']};
+			if (node.name) o_node.name = node.name;
+			o_nodes.push(o_node);
+		}	
+
+		// for each node, create with id and name, link to defining term later									
+		for(index in network.edges){
+			var edge = network.edges[index],
+				o_edge = {id: edge.id, rid: edge['@rid'], s: edge.s.id, o: edge.o.id};
+			if (edge.p) o_edge.p = edge.p.id;
+			o_edges.push(o_edge);
+		}
+			
+		return {
+
+				format: network.format, 
+				namespaces: o_namespaces,
+				terms: o_terms,
+				properties : o_properties,
+				nodes: o_nodes, 
+				edges: o_edges, 
+				//nodeTypes: s_nodeTypes,
+				//citations : s_citations,
+				//supports : s_supports
+			};
+}
 
 // delete a network
 exports.deleteNetwork = function (networkId, callback){

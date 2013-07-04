@@ -1,0 +1,76 @@
+	body {
+		background-color: #3333FF;
+		margin: 0px;
+		overflow: hidden;
+		font-family: helvetica neue, helvetica, arial, sans-serif;
+		}
+
+	#controls { 
+		position:absolute; 
+		width: 60px; 
+		right: 10px;
+		text-align:right; 
+		margin:1em 0 -4.5em 0; 
+		z-index:1010; 
+		}
+		
+	#logo { 
+		float: left;
+		padding-left: 10px;
+		width: 300px; 
+		text-align:left; 
+		}
+	
+	#footer { 
+		position:absolute; 
+		width: 100%; 
+		bottom: 5px;
+		text-align:right; 
+		z-index:1001; 
+		color: white;
+		background-color:rgba(0,0,0,0.0);
+		}
+		
+	#copyright { 
+		float: right;
+		width: 300px; 
+		right: 10px;
+		text-align:right; 
+		position:absolute; 
+		bottom: 5px;
+		}
+			
+	#details { 
+		position:absolute; 
+		width: 80%; 
+		left: 50%;
+		margin-left: -40%;
+		bottom: 50px;
+		
+		text-align:left; 
+		padding: 0.5em;
+		z-index:1001; 
+		
+		border-radius: 10px;
+		color: white;
+		
+		background-color:rgba(0,0,0,0.80);
+
+		}
+	
+	#details ul{
+		list-style-type: square;
+	}
+	
+	#hide_details {
+		float: right; 
+		text-align:right; 
+		}
+		
+	#expand {
+		vertical-align: middle; 
+		}
+		
+
+	
+	

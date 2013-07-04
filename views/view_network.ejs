@@ -1,73 +1,83 @@
 <% include head.ejs %>
 <% include nav.ejs %>
-<!-- <script src="js/jgraph.js"></script> -->
+
+<div id="edges"></div>
+<div id="nodes"></div>
+<div id="error"></div>
 <script>
-/*
 
-function fetchNetwork(networkID) {
-	var searchExpression = $('#searchExpression').serialize(), 
-		limit = 100;
-		
-	ndexClient.test();
-	
-	console.log("Calling getNetwork");
-	
-	ndexClient.getNetwork(networkID, function(data){
-		console.log("Got results from getNetwork");
-		console.log(data);
-		var edges = data.network.edges;
-		for (i in edges){
-			var edge = edges[i];
-			console.log(network.title);
-		}
-		
-		jNetwork = new jgraph.Graph();
-		jNetwork.parsejDex(data.network);
-		
-		// Clears the searchResults div
-		$('#results').html('');
-		
-		if (jNetwork.edges){
-			$.each(jNetwork.edges, function(id, edge){
-				$('#edgeResults').append(formatEdge(edge));
-			});  
-		}
-    },
-    // error handler
-    function(error){
-    	$('#results').append(formatError(error));
-    });
-    
-    return false;
-}
-
-function formatEdge(edge){
-	var networkDIV = document.createElement('div');
-	$(networkDIV).addClass('edge')
-					.html(edge.s.name + " " + edge.p. + " " + edge.o.name);
-	return networkDIV;
-
-}
+// the network id passed from the ejs template
+var networkId = convertToRID('<%= networkId %>');
 
 function formatError(error){
 
 }
-*/
+
+function formatEdge(edge, network){
+	var edgeDIV = document.createElement('div'),
+		idSpan = document.createElement('span'),
+		subjectSpan = document.createElement('span'),
+		predicateSpan = document.createElement('span'),
+		objectSpan = document.createElement('span'),
+		subject = network.nodes[edge.s],
+		object = network.nodes[edge.o],
+		predicate = network.terms[edge.p]; 
+		
+	$(idSpan).addClass('edgeId').html(edge.id);
+	$(subjectSpan).addClass('nodeName').html(subject.name);
+	$(objectSpan).addClass('nodeName').html(object.name);
+	$(predicateSpan).addClass('predicateName').html(predicate.name);
+		
+	$(edgeDIV).addClass('edge')
+			  .append(idSpan)
+			  .append(subjectSpan)
+			  .append(predicateSpan)
+			  .append(objectSpan);
+			  
+	return edgeDIV;
+}
+
+function formatNode(node){
+	var nodeDIV = document.createElement('div'),
+		idSpan = document.createElement('span'),
+		nameSpan = document.createElement('span');
+	
+	$(idSpan).addClass('nodeId').html(node.id);
+	$(nameSpan).addClass('nodeName').html(node.name);
+	
+	$(nodeDIV).addClass('node')
+			  .append(idSpan)
+			  .append(nameSpan);
+			  
+	return nodeDIV;
+
+}
+
+
+// On load, we get the network, then push it to cytoscape.js on the callback
+$(ndexClient.getNetwork(networkId, function(data){
+		console.log("Got results from getNetwork");
+		console.log(data);
+	
+  		// Clears the nodes and edges divs
+		$('#nodes').html('');
+		$('#edges').html('');
+		
+  		$.each(data.network.nodes, function(index, node){
+			$('#nodes').append(formatNode(node));
+		});  
+
+  		
+  		$.each(data.network.edges, function(index, edge){
+  			$('#edges').append(formatEdge(edge, data.network));
+  		});
+
+    },
+    // error handler
+    function(error){
+    	$('#error').append(formatError(error));
+    })
+);
 </script>
-
-<form onsubmit="return doSearch(0);" id="searchForm">
-	<div>
-	<label>Query:</label>
-	<input type="text" name="searchExpression" id="searchExpression"/><br/>
-	</div>
-
-	<div>
-	<input type="submit" value="Search"/>
-	</div>
-</form>
-
-<div id="edgeResults">
-
-</div>
 
 <% include foot.ejs %>

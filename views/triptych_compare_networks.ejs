@@ -1,0 +1,326 @@
+<% include head.ejs %>
+
+<link rel="stylesheet" type="text/css" href="/css/BEL_mp_demo.css" />
+
+<script type="text/javascript" src="/js/three/Three.js"></script>
+
+<script type="text/javascript" src="/js/three/RequestAnimationFrame.js"></script>
+
+<script type="text/javascript" src="/js/triptych/Core/Triptych-1.1.4.js"></script>
+
+<script type="text/javascript" src="/js/triptych/GraphLoader/JDExGraphLoader.js"></script>
+
+<script type="text/javascript" src="/js/triptych/Visualizer/WebGLVisualizer-1.1.3.js"></script>
+
+<script type="text/javascript" src="/js/triptych/Visualizer/TwoPlaneVisualizer.js"></script>
+
+<script type="text/javascript" src="/js/triptych/Controls/BasicControls-1.1.3.js"></script>
+
+<script type="text/javascript" src="/js/triptych/LayoutEngine/ForceDirectedLayoutEngine-1.1.2.js"></script>
+
+<script type="text/javascript" src="/js/triptych/LayoutEngine/MP2LayoutEngine-1.1.1.js"></script>
+
+
+<div id="controls">
+	<span id="fly"><img  src="/img/fly_icon.png" height=40></span>
+	<span id="zoom_in"><img  src="/img/zoom_in_icon.png" height=40></span>
+	<span id="zoom_out"><img  src="/img/zoom_out_icon.png" height=40></span>
+</div>
+
+<div id="details">
+	<span id="expand"><img  src="/img/expand_icon.png" height=40>&nbsp;Perturb</span>
+	<div id="hide_details">
+		<img  src="/img/close_icon.png" height=40>
+	</div>
+	<div id="detailsContent"></div>
+</div>
+
+<div id="error"></div>
+
+<script>
+
+// the network id passed from the ejs template
+var network1Id = convertToRID('<%= network1Id %>');
+var network2Id = convertToRID('<%= network2Id %>');
+
+function formatError(error){
+
+}
+
+/*
+	Animation 
+*/
+
+var start = Date.now();
+var rate = 30; // Hz
+var lastFrameNumber;
+
+var visualizer, graph, layoutEngine, space, controls, loader;
+
+function animate() {
+	requestAnimationFrame( animate );
+	var elapsed = Date.now() - start;
+	var frameNumber = Math.round(elapsed/(1000/rate));
+	//
+	// Check to see if it is time for the next update
+	//
+	if (frameNumber == lastFrameNumber) return;
+	lastFrameNumber = frameNumber;
+	space.update();	
+}
+
+
+/*
+	Merge the two JDEx graphs into one Triptych graph
+	With edges between corresponding nodes.
+	
+	Each node is assigned to a plane.
+*/
+
+function createComparisonGraph(g1, g2){
+	var g = new TRIPTYCH.Graph();
+	addGraphWithPlane(g, g1, "one");
+	addGraphWithPlane(g, g2, "two");
+	return g;
+}
+
+function addGraphWithPlane (internalGraph, graph, plane){
+	$.each(graph.nodes, function(index, node){
+		copyNodeWithPlane(internalGraph, node, plane);	
+	});
+		
+	$.each(graph.edges, function(index, edge){
+		copyEdgeWithPlane(internalGraph, edge, plane);
+	});
+		
+	return internalGraph;
+	
+}
+
+function copyEdgeWithPlane(graph, edge, plane){
+	var rel = graph.findOrCreateRelationship(edge.relationship.type);
+	var from = copyNodeWithPlane(graph, edge.from, plane);
+	var to = copyNodeWithPlane(graph, edge.to, plane);
+	var internalEdge = graph.findEdge(from, rel, to);
+	if (internalEdge) {
+		internalEdge.addPlane(plane); 
+		return internalEdge;
+	}
+	internalEdge = new TRIPTYCH.Edge(from, rel, to);
+	graph.addEdge(internalEdge);
+	internalEdge.addPlane(plane);
+	return internalEdge;
+}
+
+function copyNodeWithPlane(graph, node, plane){
+	var internalNode = findMatchingNode(graph, node);
+	if (internalNode){
+		internalNode.addPlane(plane);
+		return internalNode;
+	}
+	internalNode = new TRIPTYCH.Node(graph.maxId++);
+	internalNode.identifier = node.identifier;
+	internalNode.label = node.label;	
+	graph.addNode(internalNode);
+	internalNode.addPlane(plane);
+	return internalNode;
+}
+
+// later, we can allow for other matching criteria...
+function findMatchingNode(graph, node){
+	return graph.findOrCreateNodeByIdentifier(node.identifier);
+}
+
+TRIPTYCH.Node.prototype.onClick = function(event, role){
+	if (this.selected){
+		this.setSelected(false);
+	} else {
+		this.setSelected(true);
+	}
+	displayDetails(this);
+};
+
+//-------------------------------------
+// Details 
+//-------------------------------------
+
+$("#details").hide();
+
+var detailsDisplayed = false;
+
+function displayDetails(node){
+	if (!detailsDisplayed){
+
+		$("#details").fadeIn(400);
+		detailsDisplayed = true;
+	}
+	detail_node = node;
+	
+	$("#detailsContent").html("<p>" + node.label + "<ul>");
+	
+	$.each(node.literals, function (predicate, value){
+		$("#detailsContent").append("<li>" + predicate + " : " + value + "</li>");
+	});
+	
+	$("#detailsContent").append("</ul></p>");
+	
+}
+
+function hideDetails(){
+	$("#details").fadeOut(400);
+	detailsDisplayed = false;
+	detail_node = null;
+}
+
+$("#hide_details").on("click", function(event){
+	hideDetails();
+});
+
+$("#expand").on("click", function(event){
+	perturbationAnimation(detail_node);
+	hideDetails();
+});
+
+	
+//-------------------------------------
+// Top Right Controls 
+//-------------------------------------
+
+function handleFlyMode(){
+	if (controls.flyMode == true){
+		controls.flyMode = false;
+	} else {
+		controls.flyDestinations = [new THREE.Vector3( 500, 500, 100 ),
+							new THREE.Vector3( -500, 500, 100),
+							new THREE.Vector3( -500, -500, 100 ),
+							new THREE.Vector3( 500, -500, 100 )];
+		controls.flyMode = true;
+		controls.flySpeed = 5;
+		controls.loiterSpeed = null;
+	}
+}
+
+$("#fly").on("click", function(event){
+	//console.log("fly!");
+	handleFlyMode();
+});
+
+$("#zoom_in").mousedown(function(event){
+	//console.log("zooming in");
+	controls.zoom = -1;
+});
+
+$("#zoom_in").mouseleave(function(event){
+	//console.log("stop zooming in");
+	controls.zoom = 0;
+});
+
+$("#zoom_in").mouseup(function(event){
+	//console.log("stop zooming in");
+	controls.zoom = 0;
+});
+
+$("#zoom_out").mousedown(function(event){
+	//console.log("zooming out");
+	controls.zoom = 1;
+});
+
+$("#zoom_out").mouseleave(function(event){
+	//console.log("stop zooming out");
+	controls.zoom = 0;
+});
+
+$("#zoom_out").mouseup(function(event){
+	console.log("stop zooming out");
+	controls.zoom = 0;
+});
+
+var graph1, graph2, tg1, tg2;
+
+function run(){
+				
+	loader = new TRIPTYCH.JDExGraphLoader();
+	tg1 = loader.load(graph1);
+	tg2 = loader.load(graph2);
+
+	graph = createComparisonGraph(tg1, tg2);
+	
+	visualizerSetup();
+	
+	layoutEngineSetup();
+	
+	controlsSetup();
+
+	space = new TRIPTYCH.Space(graph, visualizer, layoutEngine, controls);
+	space.init();
+	
+	setCameraPosition();
+	
+	setFlyParameters();
+	
+	console.log("space initialized");
+	animate();
+
+}
+
+function visualizerSetup(){
+	visualizer = new TRIPTYCH.TwoPlaneVisualizer(); 
+	visualizer.showLabels = false;
+	visualizer.showEdgeLabels = false;
+	visualizer.addTexture("increaseMap", "./textures/increaseDot.png");
+}
+
+function layoutEngineSetup(){
+	layoutEngine = new TRIPTYCH.MP2LayoutEngine();	
+	layoutEngine.updateCount = 400;		
+}
+
+function controlsSetup(){
+	controls = new TRIPTYCH.BasicControls();
+}
+
+function selectNode(identifier){
+	var pNode = graph.nodeByIdentifier(identifier);
+	if (pNode != null) pNode.selected = true;
+}
+		
+function setFlyParameters(){
+	controls.flyToAndLookAt(new THREE.Vector3( 0, 600, 100), controls.target, 5.0, 0.5);
+}
+
+function setCameraPosition(){
+	controls.camera.position.set( 0, 700, 105);
+	controls.camera.up.set(0,0,1);
+}
+			
+function main (){
+	// Check compatibility
+	if ( ! TRIPTYCH.EnvironmentDetector.webgl ) {
+		TRIPTYCH.EnvironmentDetector.addGetWebGLMessage();
+	} else {
+		run();
+	}
+}	
+
+// On load, we get the network, then push it to cytoscape.js on the callback
+$(ndexClient.getNetwork(network1Id, function(data1){
+		graph1 = data1.network;
+		ndexClient.getNetwork(network2Id, function(data2){
+			graph2 = data2.network;
+			main();
+		},
+		// error handler
+    	function(error){
+    		$('#error').append(formatError(error));
+    	});
+	},
+	
+	function(error){
+    		$('#error').append(formatError(error));
+    }
+	
+));
+	
+</script>
+
+<% include foot.ejs %>

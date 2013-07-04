@@ -8,6 +8,17 @@ var graph = jdex.createGraphFromSIF(sif_data);
 
 graph.properties.title = 'The Graph Who Would be King';
 
+for (index in graph.nodes){
+	var node = graph.nodes[index];
+	console.log("node " + node.id);
+	
+}
+
+for (index in graph.edges){
+	var edge = graph.edges[index];
+	console.log("edge" + edge.s.id + " " + edge.o.id);
+}
+
 // Serialize the graph to JSON, using the ORIENTDB mode which specifies
 // That some structures are to be translated to documents and linked.
 var jgraph = graph.toJDEx();
@@ -16,7 +27,7 @@ jgraph.name = "pc sif 1 test2";
 
 jgraph.format = "SIF";
 
-//console.log(jgraph);
+console.log(jgraph);
 
 ndex.createNetwork(jgraph, "fake", function(data){
 		console.log("Created Network");
