@@ -40,8 +40,8 @@
 <script>
 
 // the network id passed from the ejs template
-var network1Id = convertToRID('<%= network1Id %>');
-var network2Id = convertToRID('<%= network2Id %>');
+var network1RID = '<%= network1Id %>';
+var network2RID = '<%= network2Id %>';
 
 function formatError(error){
 
@@ -303,9 +303,9 @@ function main (){
 }	
 
 // On load, we get the network, then push it to cytoscape.js on the callback
-$(ndexClient.getNetwork(network1Id, function(data1){
+$(ndexClient.getNetwork(network1RID, function(data1){
 		graph1 = data1.network;
-		ndexClient.getNetwork(network2Id, function(data2){
+		ndexClient.getNetwork(network2RID, function(data2){
 			graph2 = data2.network;
 			main();
 		},

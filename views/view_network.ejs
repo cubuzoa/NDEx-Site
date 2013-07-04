@@ -7,7 +7,7 @@
 <script>
 
 // the network id passed from the ejs template
-var networkId = convertToRID('<%= networkId %>');
+var networkRID = '<%= networkId %>';
 
 function formatError(error){
 
@@ -55,7 +55,7 @@ function formatNode(node){
 
 
 // On load, we get the network, then push it to cytoscape.js on the callback
-$(ndexClient.getNetwork(networkId, function(data){
+$(ndexClient.getNetwork(networkRID, function(data){
 		console.log("Got results from getNetwork");
 		console.log(data);
 	

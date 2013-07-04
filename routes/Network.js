@@ -4,6 +4,14 @@ exports.init = function(orient, callback) {
     module.db = orient;
 }
 
+module.convertToRID = function(id){
+	return id.replace("C","#").replace("R", ":");
+}
+
+module.convertFromRID = function(RID){
+	return RID.replace("#","C").replace(":", "R");
+}
+
 exports.createInitialDocument = function(networkJDEx){
 		var o_nodes = [],
 		o_namespaces = [],
@@ -84,7 +92,8 @@ exports.createNetworkEdges = function(networkJDEx, network){
 	}
 }
 
-exports.createNetworkEdge = function(networkRID, edge){
+exports.createNetworkEdge = function(networkJID, edge){
+	var networkRID = convertToRID(networkJID);
 	// Get the predicate term
 	var termCmd = "select from (traverse terms from " + networkRID + " while $depth < 2) where $depth = 1 and id = " + edge.p;
 	console.log("index " + index + " edge " + edge.s + " " + edge.o);
@@ -173,7 +182,7 @@ exports.createNetwork = function(networkJDEx, accountURI, callback){
 		
 		exports.createNetworkEdges(networkJDEx, document);
 		
-		callback({networkId: document["@rid"], error : err});
+		callback({networkId: module.convertFromRID(document["@rid"]), error : err});
 /*		
 		function(err){
 		
@@ -216,21 +225,26 @@ exports.findNetworks = function (searchExpression, limit, offset, callback){
 		cmd = "select " + descriptors + " from xNetwork order by creation_date desc limit " + limit;
 	console.log(cmd);
 	module.db.command(cmd, function(err, networks) {
+		for (i in networks){
+			var network = networks[i];
+			network.rid = module.convertFromRID(network.rid);
+		}
 		// for each network, summarize the key facts
         callback({networks : networks, error : err});
     });
 };
 
 // get an entire network
-exports.getNetwork = function(networkId, callback){
-	console.log("calling getNetwork with networkId = '" + networkId + "'");
-	var cmd = "select from " + networkId + "";
+exports.getNetwork = function(networkJID, callback){
+	var networkRID = module.convertToRID(networkJID);
+	console.log("calling getNetwork with networkId = '" + networkRID + "'");
+	var cmd = "select from " + networkRID + "";
 	console.log(cmd);
 	module.db.command(cmd, function(err, networks) {
 		if (exports.checkErr(err, "finding network", callback)){
 			try {
 				if (!networks || networks.length < 1){
-					console.log("found no networks by id = '" + networkId + "'");
+					console.log("found no networks by id = '" + networkRID + "'");
 					callback({status : 404});
 				} else {
 					console.log("found " + networks.length + " networks, first one is " + networks[0]["@rid"]);
@@ -238,47 +252,47 @@ exports.getNetwork = function(networkId, callback){
 					var result = {namespaces : {}, terms: {}, nodes: {}, edges: {}};
 					
 					// get the namespaces
-					var ns_cmd = "select id, prefix, uri, @rid as rid from (traverse namespaces from " + networkId + ") where $depth = 1";
+					var ns_cmd = "select id, prefix, uri, @rid as rid from (traverse namespaces from " + networkRID + ") where $depth = 1";
 					module.db.command(ns_cmd, function(err, namespaces) {
 						if(exports.checkErr(err, "getting namespaces", callback)){
 						
 							// process the namespaces
 							for (i in namespaces){
 								var ns = namespaces[i];
-								result.namespaces[ns.id] = {prefix: ns.prefix, rid: ns.rid, uri: ns.uri};
+								result.namespaces[ns.id] = {prefix: ns.prefix, rid: module.convertFromRID(ns.rid), uri: ns.uri};
 							}
 							
 							// get the terms
-							var term_cmd = "select id, name, ns.id as nsid, @rid as rid from (traverse terms from " + networkId + ") where $depth = 1";
+							var term_cmd = "select id, name, ns.id as nsid, @rid as rid from (traverse terms from " + networkRID + ") where $depth = 1";
 							module.db.command(term_cmd, function(err, terms) {
 								if (exports.checkErr(err, "getting terms", callback)){
 						
 									// process the terms
 									for (i in terms){
 										var term = terms[i];
-										result.terms[term.id] = {name: term.name, rid: term.rid, ns: term.nsid};
+										result.terms[term.id] = {name: term.name, rid: module.convertFromRID(term.rid), ns: term.nsid};
 									}
 							
 									// get the nodes
 									// TODO - get the defining terms...
-									var node_cmd = "select id, name, @rid as rid from (traverse nodes from " + networkId + ") where $depth = 1";
+									var node_cmd = "select id, name, @rid as rid from (traverse nodes from " + networkRID + ") where $depth = 1";
 									module.db.command(node_cmd, function(err, nodes) {
 										if (exports.checkErr(err, "getting nodes", callback)){
 						
 											// process the nodes
 											for (i in nodes){
 												var node = nodes[i];
-												result.nodes[node.id] = {name: node.name, rid: node.rid};
+												result.nodes[node.id] = {name: node.name, rid: module.convertFromRID(node.rid)};
 											}
 											// get the edges
-											var edge_cmd = "select  in.id as s, p.id as p, out.id as o, @rid as rid from (traverse edges from " + networkId + ") where $depth = 1)";
+											var edge_cmd = "select  in.id as s, p.id as p, out.id as o, @rid as rid from (traverse edges from " + networkRID + ") where $depth = 1)";
 											module.db.command(edge_cmd, function(err, edges) {
 												if (exports.checkErr(err, "getting edges", callback)){
 										
 													// process the edges
 													for (i in edges){
 														var edge = edges[i];
-														result.edges[i] = {s: edge.s, p: edge.p, o: edge.o, rid: edge.rid};
+														result.edges[i] = {s: edge.s, p: edge.p, o: edge.o, rid: module.convertFromRID(edge.rid)};
 													}
 										
 													callback({network : result});
@@ -385,9 +399,10 @@ exports.networkToJDEx = function(network){
 }
 
 // delete a network
-exports.deleteNetwork = function (networkId, callback){
-	console.log("calling delete network with id = '" + networkId + "'");
-	var cmd = "delete from Network where id =  '" + id + "'";
+exports.deleteNetwork = function (networkJID, callback){
+	var networkRID = module.convertToRID(networkJID);
+	console.log("calling delete network with id = '" + networkRID + "'");
+	var cmd = "delete from Network where id =  '" + networkRID + "'";
 	console.log(cmd);
 	module.db.command(cmd, function(err) {
         callback({error : err});
