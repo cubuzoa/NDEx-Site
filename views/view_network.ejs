@@ -37,7 +37,8 @@ function formatEdge(edge, network){
 	return edgeDIV;
 }
 
-function formatNode(node){
+function formatNode(node, network){
+		
 	var nodeDIV = document.createElement('div'),
 		idSpan = document.createElement('span'),
 		nameSpan = document.createElement('span');
@@ -48,7 +49,15 @@ function formatNode(node){
 	$(nodeDIV).addClass('node')
 			  .append(idSpan)
 			  .append(nameSpan);
-			  
+
+	console.log(node.represents + " : " + JSON.stringify(network.terms[node.represents]));
+	if (node.represents && network.terms[node.represents]){
+		var term = network.terms[node.represents],
+			representsSpan = document.createElement('span');
+		$(representsSpan).addClass('term').html(term.name);
+		$(nodeDIV).append(representsSpan);
+	}
+	
 	return nodeDIV;
 
 }
@@ -64,7 +73,7 @@ $(ndexClient.getNetwork(networkRID, function(data){
 		$('#edges').html('');
 		
   		$.each(data.network.nodes, function(index, node){
-			$('#nodes').append(formatNode(node));
+			$('#nodes').append(formatNode(node, data.network));
 		});  
 
   		
