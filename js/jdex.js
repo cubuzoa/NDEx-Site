@@ -103,7 +103,7 @@ var DOMParser = require('xmldom').DOMParser;
 ------------------------------------
 */
 
-module.Graph = function(){
+exports.Graph = function(){
 	this.namespaces = {};
 	this.maxNamespaceId = 0;
 	this.namespacePrefixMap = {};
@@ -135,9 +135,9 @@ module.Graph = function(){
 	this.properties = {};
 };
 
-module.Graph.prototype = {
+exports.Graph.prototype = {
 
-	constructor : module.Graph,
+	constructor : exports.Graph,
 
 //---------------Node Methods -------------------------------------------
 	
@@ -168,7 +168,7 @@ module.Graph.prototype = {
 	findOrCreateNodeByIdentifier : function(identifier){
 		var node = this.nodeByIdentifier(identifier);
 		if (node) return node;
-		node = new module.Node(identifier);
+		node = new exports.Node(identifier);
 		this.addNode(node)
 		return node;
 	},
@@ -176,7 +176,7 @@ module.Graph.prototype = {
 	findOrCreateNodeByTerm : function(term, name){
 		var node = this.nodeByIdentifier(term.identifier());
 		if (node) return node;
-		node = new module.Node(name, term);
+		node = new exports.Node(name, term);
 		this.addNode(node)
 		return node;
 	},
@@ -195,7 +195,7 @@ module.Graph.prototype = {
 	copyExternalNode : function (externalNode){
 		var internalNode = this.nodeByIdentifier(externalNode.identifier);
 		if (internalNode) return internalNode;
-		internalNode = new module.Node();
+		internalNode = new exports.Node();
 		internalNode.identifier = externalNode.identifier;
 		internalNode.type = externalNode.type;
 		/*
@@ -287,7 +287,7 @@ module.Graph.prototype = {
 	findOrCreateEdge : function(subjectNode, predicate, objectNode){
 		var edge = this.findEdge(subjectNode, predicate, objectNode);
 		if (edge) return edge;
-		edge = new module.Edge(subjectNode, predicate, objectNode);
+		edge = new exports.Edge(subjectNode, predicate, objectNode);
 		this.addEdge(edge);
 		return edge;
 	},
@@ -298,7 +298,7 @@ module.Graph.prototype = {
 		var objectNode = this.copyExternalNode(edge.o);
 		var internalEdge = this.findEdge(subjectNode, predicate, objectNode);
 		if (internalEdge) return internalEdge;
-		internalEdge = new module.Edge(subjectNode, predicate, objectNode);
+		internalEdge = new exports.Edge(subjectNode, predicate, objectNode);
 		this.addEdge(internalEdge);
 		return internalEdge;
 	},
@@ -332,7 +332,7 @@ module.Graph.prototype = {
 	findOrCreateTerm : function (name, ns){
 		var term = this.termByNameAndNamespace(name, ns);
 		if (term) return term;
-		term = new module.Term(name, ns);
+		term = new exports.Term(name, ns);
 		return this.addTerm(term);
 	},
 
@@ -356,7 +356,7 @@ module.Graph.prototype = {
 	findOrCreateFunctionTerm : function (fn, parameters){
 		var term = this.functionTermByFunctionAndParameters(fn, parameters);
 		if (term) return term;
-		term = new module.FunctionTerm(fn, parameters);
+		term = new exports.FunctionTerm(fn, parameters);
 		return this.addTerm(term);
 	},
 	
@@ -385,7 +385,7 @@ module.Graph.prototype = {
 		var ns = this.namespaceByURI(uri);
 		if (ns) return ns;
 		//console.log("creating namespace for " + uri);
-		ns = new module.Namespace(uri, prefix);
+		ns = new exports.Namespace(uri, prefix);
 		return this.addNamespace(ns)
 	},
 
@@ -444,7 +444,7 @@ module.Graph.prototype = {
 	
 	mappedClone : function(){
 		var originalGraph = this;
-		var mappedGraph = new module.Graph();
+		var mappedGraph = new exports.Graph();
 		$.each(originalGraph.nodes, function(index, node){
 			var mappedNode = mappedGraph.copyExternalNode(node);	
 			mappedNode.mapsTo = node;
@@ -539,7 +539,7 @@ module.Graph.prototype = {
 	
 	serializeJDEx : function(){
 
-		return JSON.stringify(this.toJDEx(mode));
+		return JSON.stringify(this.toJDEx());
 	}
 
 
@@ -553,7 +553,7 @@ module.Graph.prototype = {
 ------------------------------------
 */
 
-module.Node = function(name, representedTerm){
+exports.Node = function(name, representedTerm){
 
 	this.properties = {};
 	this.name = name; 
@@ -564,12 +564,17 @@ module.Node = function(name, representedTerm){
 	
 };
 
-module.Node.prototype = {
+exports.Node.prototype = {
 
-	constructor : module.Node,
+	constructor : exports.Node,
 	
 	serializeJDEx : function(){
 		var jdex = { name: this.name};
+		/*
+		for (property in this.properties){
+			jdex.properties[property] = this.properties[property];
+		}
+		*/
 		if (this.represents) jdex.represents = this.represents.id;
 		return jdex;
 	},
@@ -624,7 +629,7 @@ module.Node.prototype = {
 ------------------------------------
 */
 
-module.Edge = function(subject, predicate, object){
+exports.Edge = function(subject, predicate, object){
 	//console.log("creating edge with " + subject.name + " " + predicate.identifier() + " " + object.name);
 	this.s = subject;
 	this.o = object;
@@ -634,9 +639,9 @@ module.Edge = function(subject, predicate, object){
 
 };
 
-module.Edge.prototype = {
+exports.Edge.prototype = {
 
-	constructor : module.Edge,
+	constructor : exports.Edge,
 
 	serializeJDEx : function(){
 		var s_edge = {s: this.s.id, p: this.p.id, o: this.o.id};
@@ -667,7 +672,7 @@ module.Edge.prototype = {
 ------------------------------------
 */
 
-module.Namespace = function(uri, prefix){
+exports.Namespace = function(uri, prefix){
 
 	this.uri = uri;
 	if (prefix){
@@ -677,9 +682,9 @@ module.Namespace = function(uri, prefix){
 	
 };
 
-module.Namespace.prototype = {
+exports.Namespace.prototype = {
 
-	constructor : module.Namespace,
+	constructor : exports.Namespace,
 	
 	serializeJDEx : function(){
 		if (this.prefix){
@@ -698,7 +703,7 @@ module.Namespace.prototype = {
 ------------------------------------
 */
 
-module.Term = function(name, ns){
+exports.Term = function(name, ns){
 
 	if (name){
 		this.name = name;
@@ -712,9 +717,9 @@ module.Term = function(name, ns){
 	
 };
 
-module.Term.prototype = {
+exports.Term.prototype = {
 
-	constructor : module.Term,
+	constructor : exports.Term,
 	
 	serializeJDEx : function(){
 		if (this.ns){
@@ -739,7 +744,7 @@ module.Term.prototype = {
 
 };
 
-module.FunctionTerm = function(fn, parameters){
+exports.FunctionTerm = function(fn, parameters){
 
 	//console.log("creating function term using " + fn.name);
 	
@@ -747,9 +752,9 @@ module.FunctionTerm = function(fn, parameters){
 	this.parameters = parameters;	
 };
 
-module.FunctionTerm.prototype = {
+exports.FunctionTerm.prototype = {
 
-	constructor : module.Term,
+	constructor : exports.Term,
 	
 	serializeJDEx : function(){
 		var params = {};
@@ -784,7 +789,7 @@ module.FunctionTerm.prototype = {
 ------------------------------------
 */
 
-module.Citation = function(citationType, referenceIdentifier, bibliographicCitation, title){
+exports.Citation = function(citationType, referenceIdentifier, bibliographicCitation, title){
 
 	this.type = citationType;
 	this.identifier = referenceIdentifier;
@@ -801,9 +806,9 @@ module.Citation = function(citationType, referenceIdentifier, bibliographicCitat
 	
 };
 
-module.Citation.prototype = {
+exports.Citation.prototype = {
 
-	constructor : module.Citation,
+	constructor : exports.Citation,
 	
 	addContributor : function(contributor_name){
 		this.contributors.push(contributor_name);
@@ -841,7 +846,7 @@ module.Citation.prototype = {
 ------------------------------------
 */
 
-module.Support = function(text){
+exports.Support = function(text){
 
 	this.text = text;
 	//console.log("creating Support: " + text);
@@ -849,9 +854,9 @@ module.Support = function(text){
 	this.edges = [];
 };
 
-module.Support.prototype = {
+exports.Support.prototype = {
 
-	constructor : module.Support,
+	constructor : exports.Support,
 	
 	addEdge : function(edge) {
 		this.edges.push(edge);
@@ -881,7 +886,7 @@ module.Support.prototype = {
 */
 
 exports.createGraphFromSIF = function (data){
-	var graph = new module.Graph();
+	var graph = new exports.Graph();
 	
 	// data is assumed to be an array of lines
 	$.each(data, function(index, line){
@@ -908,12 +913,12 @@ exports.createGraphFromSIF = function (data){
 */
 
 exports.createGraphFromXBEL = function (xml_text){
-	var graph = new module.Graph();
+	var graph = new exports.Graph();
 	var doc = new DOMParser().parseFromString(xml_text,'text/xml');
 	
 	// Process the header
 	var header = doc.documentElement.getElementsByTagName('bel:header').item(0);
-	module.processXBELHeader(graph, header);
+	exports.processXBELHeader(graph, header);
 
 	// get the BEL relationship namespace
 	graph.belNS = graph.findOrCreateNamespace('http://resource.belframework.org/belframework/1.0/schema/', 'bel');
@@ -921,19 +926,19 @@ exports.createGraphFromXBEL = function (xml_text){
 		
 	// Process the namespace group
 	var namespaceGroup = doc.documentElement.getElementsByTagName('bel:namespaceGroup').item(0);
-	module.processXBELNamespaceGroup(graph, namespaceGroup);
+	exports.processXBELNamespaceGroup(graph, namespaceGroup);
 
 	
 	// Process the annotation definition
 	var annotationDefinitionGroup = doc.documentElement.getElementsByTagName('bel:annotationDefinitionGroup').item(0);
-	module.processXBELAnnotationDefinitionGroup(graph, annotationDefinitionGroup);
+	exports.processXBELAnnotationDefinitionGroup(graph, annotationDefinitionGroup);
 		
 	// Process the statementGroups
 	
 	$.each(doc.documentElement.childNodes, function(index, statementGroup){
 		if (statementGroup.tagName == 'bel:statementGroup'){
 			var context = {annotations: []};
-			module.processXBELStatementGroup(graph, statementGroup, context);
+			exports.processXBELStatementGroup(graph, statementGroup, context);
 		}
 	}); 
 	
@@ -966,7 +971,7 @@ Header Example:
 */
 
 
-module.processXBELHeader = function (graph, header){
+exports.processXBELHeader = function (graph, header){
 	// Add DublinCore namespace
 	var dc_namespace_uri = graph.findOrCreateNamespace("http://purl.org/dc/terms/", "DC");
 
@@ -993,7 +998,7 @@ module.processXBELHeader = function (graph, header){
 	});
 }	
 
-module.processXBELNamespaceGroup = function(graph, namespaceGroup){
+exports.processXBELNamespaceGroup = function(graph, namespaceGroup){
 	$.each(namespaceGroup.getElementsByTagName('bel:namespace'), function(index, ns_info){
 		var uri = ns_info.getAttribute('bel:resourceLocation'),
 			prefix =  ns_info.getAttribute('bel:prefix');
@@ -1001,7 +1006,7 @@ module.processXBELNamespaceGroup = function(graph, namespaceGroup){
 	});
 }
 
-module.processXBELAnnotationDefinitionGroup = function(graph, AnnotationDefinitionGroup){
+exports.processXBELAnnotationDefinitionGroup = function(graph, AnnotationDefinitionGroup){
 	$.each(AnnotationDefinitionGroup.getElementsByTagName('bel:externalAnnotationDefinition'), function(index, extDef_info){
 		var uri = extDef_info.getAttribute('bel:url'),
 			prefix =  extDef_info.getAttribute('bel:id');
@@ -1010,21 +1015,21 @@ module.processXBELAnnotationDefinitionGroup = function(graph, AnnotationDefiniti
 	});
 }
 
-module.processXBELStatementGroup = function(graph, statementGroup, context){
+exports.processXBELStatementGroup = function(graph, statementGroup, context){
 	console.log('\n----------------------\n');
 
 	// process the annotation group		
 	$.each(statementGroup.childNodes, function(index, element){
 		if (element.tagName == 'bel:annotationGroup'){
 			//console.log("processing annotationGroup");
-			module.processXBELAnnotationGroup(graph, element, context);
+			exports.processXBELAnnotationGroup(graph, element, context);
 		}
 	});
 
 	// process statements, using the annotations
 	$.each(statementGroup.childNodes, function(index, statement){
 		if (statement.tagName == 'bel:statement'){
-			module.processXBELStatement(graph, statement, context);
+			exports.processXBELStatement(graph, statement, context);
 		}
 	});
 		
@@ -1035,13 +1040,13 @@ module.processXBELStatementGroup = function(graph, statementGroup, context){
 			$.each(context.annotations, function(index, value){
 				innerContext[index] = value;
 			});
-			module.processXBELStatementGroup(graph, innerGroup, innerContext);
+			exports.processXBELStatementGroup(graph, innerGroup, innerContext);
 		}
 	}); 
 
 }
 
-module.processXBELAnnotationGroup = function(graph, annotationGroup, context){
+exports.processXBELAnnotationGroup = function(graph, annotationGroup, context){
 	$.each(annotationGroup.childNodes, function(index, element){
 		if (element.tagName != undefined){
 			
@@ -1062,11 +1067,11 @@ module.processXBELAnnotationGroup = function(graph, annotationGroup, context){
 			
 			} else if (element.tagName == 'bel:citation'){
 				//console.log("processing citation");
-				context.citation = module.processXBELCitation(graph, element);
+				context.citation = exports.processXBELCitation(graph, element);
 				
 			} else if (element.tagName == 'bel:evidence'){
 				//console.log("processing evidence");
-				context.support = module.processXBELEvidence(graph, element, context.citation);
+				context.support = exports.processXBELEvidence(graph, element, context.citation);
 				
 			} else {
 				console.log("annotationGroup unknown tagname = " + element.tagName + " " + element.tagName.length);
@@ -1075,7 +1080,7 @@ module.processXBELAnnotationGroup = function(graph, annotationGroup, context){
 	});
 }
 
-module.processXBELStatement = function(graph, statement, context){
+exports.processXBELStatement = function(graph, statement, context){
 	//console.log("processing statement with context = " + context);
 
 	// find or create the predicate	
@@ -1086,14 +1091,14 @@ module.processXBELStatement = function(graph, statement, context){
 	$.each(statement.childNodes, function(index, nodeElement){
 		if (nodeElement.tagName == 'bel:subject'){
 			// find or create the subject node
-			s = module.processXBELNodeElement(graph, nodeElement);
+			s = exports.processXBELNodeElement(graph, nodeElement);
 		} else if (nodeElement.tagName == 'bel:object') {
 			// find or create the object node
-			o = module.processXBELNodeElement(graph, nodeElement);
+			o = exports.processXBELNodeElement(graph, nodeElement);
 		}
 	});
 	// create the edge (because this is a BEL document, not a model, each statement creates a unique edge)
-	var edge = new module.Edge(s, p, o);
+	var edge = new exports.Edge(s, p, o);
 	
 	// if there is a citation, add the edge and vice versa
 	if (context.citation){
@@ -1117,7 +1122,7 @@ module.processXBELStatement = function(graph, statement, context){
 	graph.addEdge(edge);
 }
 
-module.processXBELNodeElement = function(graph, nodeElement){
+exports.processXBELNodeElement = function(graph, nodeElement){
 
 	var termElement = nodeElement.childNodes[1];
 	
@@ -1143,7 +1148,7 @@ module.processXBELNodeElement = function(graph, nodeElement){
 	return node;
 }
 
-module.processXBELCitation = function(graph, citationElement){
+exports.processXBELCitation = function(graph, citationElement){
 	var title, bibliographicCitation, authorGroups, authorGroup, 
 		citationType, referenceIdentifier; 
 	// Get the type from the attribute
@@ -1160,7 +1165,7 @@ module.processXBELCitation = function(graph, citationElement){
 	if (nameElements) title = nameElements[0].textContent;
 	
 	// TODO - "find or create"
-	var citation = new module.Citation(citationType, referenceIdentifier, bibliographicCitation, title);
+	var citation = new exports.Citation(citationType, referenceIdentifier, bibliographicCitation, title);
 	
 	graph.addCitation(citation);
 	
@@ -1176,12 +1181,12 @@ module.processXBELCitation = function(graph, citationElement){
 
 }
 
-module.processXBELEvidence = function(graph, evidenceElement, citation){
+exports.processXBELEvidence = function(graph, evidenceElement, citation){
 
 	var text = evidenceElement.textContent;
 	// TODO - "find or create"
 	
-	var support = new module.Support(text);
+	var support = new exports.Support(text);
 	
 	
 	if (citation){
@@ -1204,7 +1209,7 @@ module.processXBELEvidence = function(graph, evidenceElement, citation){
 
 /*
 exports.createGraphFromRDF = function (data){
-	var graph = new module.Graph();
+	var graph = new exports.Graph();
 	
 	// The data elements in the schema are sections and
 	// attributes. 

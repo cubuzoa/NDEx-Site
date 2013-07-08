@@ -7,7 +7,7 @@ var fs = require('fs');
 // get the operations and entities
 specs = require("./api_spec.js");
 
-var sitePath = "../../site/";
+var sitePath = "../";
 
 // read in the base functions for API access
 var lines = fs.readFileSync('./client_api_header.js').toString().split("\n");				

@@ -1,7 +1,7 @@
 exports.resourceTypes = [
 				"System", 
 				"User", 
-				"NPA", 
+				"Agent", 
 				"Group", 
 				"MemberRequest", 
 				"MemberInvitation",  
@@ -61,12 +61,27 @@ exports.User = [
 				"400 invalid password"]
 	},
 
+	{	fn : "updateUserProfile",
+		status : "active",
+		doc : "Add a group account",
+		method : "POST",
+		route : "/users/:userid/profile",
+		postData: {
+				userid : {	doc : "user id", type : "JID", required : true},
+				profile : {	doc : "group profile", type : "JSON"}
+				},
+		response: {
+			},
+		exceptions: ["404 unknown userid",
+					"401 Requester not authorized"]
+	},	
+	
 	{	fn : "setUserPassword",
 		status : "inactive",
 		doc : "Set a user's password",
 		method : "PUT",
-		route : "/users/:username/password",
-		routeParams: {username : "unique username for user"},
+		route : "/users/:userid/password",
+		routeParams: {userid : {doc : "user id", type : "JID"}},
 		queryParams: {
 				newPassword : { doc : "new password",
 								type : "string",
@@ -111,12 +126,11 @@ exports.User = [
 	
 	{	fn : "getUser",
 		status : "active",
-		doc : "Get a user by username",
+		doc : "Get a user by userid",
 		method : "GET",
-		route : "/users/:username",
+		route : "/users/:userid",
 		routeParams: {	
-				username : { doc : "unique username for user",
-							type : "string"}
+				username : { doc : "user id", type : "JID"}
 					},
 		response: {user : "user descriptor"},
 		exceptions: ["404 unknown username",
@@ -127,10 +141,9 @@ exports.User = [
 		status : "active",
 		doc : "Delete a user by username",
 		method : "DELETE",
-		route : "/users/:username",
+		route : "/users/:userid",
 		routeParams: {	
-				username : { doc : "unique username for user",
-							type : "string"}
+				username : { doc : "user id", type : "JID"}
 					},
 		response: {},
 		exceptions: ["404 unknown username",
@@ -139,71 +152,71 @@ exports.User = [
 
 ];
 
-// Note :  NPA parameters may eventually include controls for load management, throttling.	
-exports.NPA = [
+// Note :  Agent parameters may eventually include controls for load management, throttling.	
+exports.Agent = [
 
-	{	fn : "createNPA",
+	{	fn : "createAgent",
 		status : "inactive",
 		doc : "Add a programmatic access account, generate credentials",
 		method : "POST",
-		route : "/NPAs",
+		route : "/agents",
 		routeParams: {},
 		postData: {
-				name : {	doc : "NPA name, will be generated if not supplied",
+				name : {	doc : "Agent name, will be generated if not supplied",
 							type : "string",
 							default : "AUTO",
-					}, 
-				owner : {	doc : "Owner URI",
-							type : "URI"
-						}
+				}, 
+				owner : {	doc : "Owner Id", type : "JID"}
 				},
 		response: { 
-				name : "NPA name",
-				URI : "URI for NPA"
+				name : "Agent name",
+				id : {doc : "id for Agent", type : "JID"}
+				
 				},
 		exceptions: [
-				"400 NPA name already used for this owner", 
+				"400 Agent name already used for this owner", 
 				"400 invalid name",
 				"401 Requester not authorized"]
 	},
 
-	{	fn : "getNPAInfo",
+	{	fn : "getAgent",
 		status : "inactive",
-		doc : "Get information about an NPA",
+		doc : "Get information about an Agent",
 		method : "GET",
-		route : "/NPAs/:npaId",
+		route : "/agents/:agentid",
 		routeParams: {
-						npaId : {	doc : "NPA id",
-									type : "string"
-								}
+						agentid : {	doc : "agent id", type : "JID"}
 					},
 		response: { 
-				name : "NPA name",
-				URI : "URI for NPA",
+				name : "Agent name",
+				id : {doc : "id for Agent", type : "JID"},
 				active : "true or false",
 				credentials : "credential structure"},
-		exceptions: ["404 unknown NPA",
+		exceptions: ["404 unknown Agent",
 					"401 Requester not authorized"]
 	},
 
-	{	fn : "getUserNPAs",
+	{	fn : "getUserAgents",
 		status : "inactive",
-		doc : "Get NPAs belonging to the user",
+		doc : "Get Agents belonging to the user",
 		method : "GET",
-		route : "/users/:username/NPAs",
+		route : "/users/:userid/agents",
+		routeParams: {
+						userid : {	doc : "User id", type : "JID"}
+					},
 		queryParams: {	
-				limit : {	doc : "maximum number of NPAs to return",
+				limit : {	doc : "maximum number of Agents to return",
 							type : "integer",
 							default : 100,
 							min : 0,
 							max : 1000},
-				offset : {	doc : "offset into array of returned NPAs",
+				offset : {	doc : "offset into array of returned Agents",
 							type : "integer",
 							min : 0,
 							default : 0}
 						},
 		response: { 
-				npas : "list of NPA descriptors, may be empty"},
+				agents : "list of Agent descriptors, may be empty"},
 		exceptions: [
 				"404 unknown user",
 				"400 invalid limit", 
@@ -211,24 +224,27 @@ exports.NPA = [
 				"401 Requester not authorized"]
 	},	
 
-	{	fn : "getGroupNPAs",
+	{	fn : "getGroupAgents",
 		status : "inactive",
-		doc : "Get NPAs belonging to the group",
+		doc : "Get Agents belonging to the group",
 		method : "GET",
-		route : "/groups/:groupname/NPAs",
+		route : "/groups/:groupid/agents",
+		routeParams: {
+						groupid : {	doc : "Group id", type : "JID"}
+					},
 		queryParams: {	
-				limit : {	doc : "maximum number of NPAs to return",
+				limit : {	doc : "maximum number of Agents to return",
 							type : "integer",
 							default : 100,
 							min : 0,
 							max : 1000},
-				offset : {	doc : "offset into array of returned NPAs",
+				offset : {	doc : "offset into array of returned Agents",
 							type : "integer",
 							min : 0,
 							default : 0}
 						},
 		response: { 
-				npas : "list of NPA descriptors, may be empty"},
+				agents : "list of Agent descriptors, may be empty"},
 		exceptions: [
 				"404 unknown group",
 				"400 invalid limit", 
@@ -238,17 +254,16 @@ exports.NPA = [
 
 // TODO : add request handler for changing name
 			
-	{	fn : "setNPAActive",
+	{	fn : "setAgentActive",
 		status : "inactive",
-		doc : "Update the activity status for an NPA",
+		doc : "Update the activity status for an Agent",
 		method : "PUT",
-		route : "/NPAs/:npaId/active",
+		route : "/agents/:agentid/active",
 		routeParams: {
-				npaId : {	doc : "NPA id",
-							type : "string"},
+				agentId : {	doc : "Agent id", type : "JID"},
 					},
 		queryData: {
-				npaActive : {	doc : "Whether NPA is active, either true or false",
+				agentActive : {	doc : "Whether Agent is active, either true or false",
 								type : "boolean",
 								default : true
 								}
@@ -256,33 +271,32 @@ exports.NPA = [
 		response: {},
 		exceptions: [
 				"401 Requester not authorized",
-				"404 unknown NPA"]
+				"404 unknown Agent"]
 	},
 
-	{	fn : "updateNPACredentials",
+	{	fn : "updateAgentCredentials",
 		status : "inactive",
-		doc : "Update the credentials for an NPA, default is to reset them",
+		doc : "Update the credentials for an Agent, default is to reset them",
 		method : "POST",
-		route : "/NPAs/:npaId/credentials",
+		route : "/agents/:agentid/credentials",
+		routeParams: {
+				agentId : {	doc : "Agent id", type : "JID"},
+					},
 		postData : {
 					action : { doc : "action to perform on credentials",
 								type : "string",
 								default : "reset"
 								}
 					},
-		routeParams: {
-				npaId : {	doc : "NPA id",
-							type : "string"},
-					},
 		response: {
-				name : "NPA name",
-				URI : "URI for NPA",
+				name : "Agent name",
+				URI : "URI for Agent",
 				active : "true or false",
 				credentials : "credential structure"
 				},
 		exceptions: [
 				"401 Requester not authorized",
-				"404 unknown NPA"]
+				"404 unknown Agent"]
 	}		
 
 ];
@@ -295,15 +309,36 @@ exports.Group = [
 		method : "POST",
 		route : "/groups",
 		postData: {
-				username : {	doc : "groupname", 
-								type : "string",
-							},
+				userid : {		doc : "User Id of the group owner",
+								type : "JID",
+								required : true},
+				groupName : {	doc : "group name", type : "string"}
 				},
-		response: {},
+		response: {
+			jid : {doc : "the id of the new group", type : "JID"}
+			},
 		exceptions: [
 				"400 group name already used", 
 				"400 invalid name"]
 	},	
+
+	{	fn : "updateGroupProfile",
+		status : "active",
+		doc : "Add a group account",
+		method : "POST",
+		route : "/groups/:groupid/profile",
+		postData: {
+				groupid : {		doc : "group id",
+								type : "JID",
+								required : true},
+				profile : {	doc : "group profile", type : "JSON"}
+				},
+		response: {
+			},
+		exceptions: ["404 unknown groupid",
+					"401 Requester not authorized"]
+	},	
+
 
 	{	fn : "findGroups",
 		status : "active",
@@ -331,16 +366,15 @@ exports.Group = [
 				"400 invalid offset"]
 	},	
 	
-	{	fn : "getGroupInfo",
+	{	fn : "getGroup",
 		status : "active",
 		doc : "Get a group by groupname",
 		method : "GET",
-		route : "/groups/:groupname",
+		route : "/groups/:groupid",
 		routeParams: {	
-				username : { doc : "unique groupname for user",
-							type : "string"}
+				groupid : { doc : "group id", type : "JID"}
 					},
-		response: {user : "group descriptor"},
+		response: {group : "group descriptor"},
 		exceptions: ["404 unknown groupname",
 					"401 Requester not authorized"]
 	},	
@@ -349,13 +383,12 @@ exports.Group = [
 		status : "active",
 		doc : "Delete a group by groupname",
 		method : "DELETE",
-		route : "/groups/:groupname",
+		route : "/groups/:groupid",
 		routeParams: {	
-				groupname : { doc : "unique groupname for group",
-							type : "string"}
+				groupid : { doc : "group id", type : "JID"}
 					},
 		response: {},
-		exceptions: ["404 unknown groupname",
+		exceptions: ["404 unknown groupid",
 					"401 Requester not authorized"]
 	},
 	
@@ -363,10 +396,9 @@ exports.Group = [
 		status : "active",
 		doc : "Find Users who are members of a group, optionally filter by search expression",
 		method : "GET",
-		route : "/groups/:groupname/members",
+		route : "/groups/:groupid/members",
 		routeParams: {	
-				groupname : { doc : "unique groupname for group",
-							type : "string"}
+				groupid : { doc : "group id",type : "JID"}
 					},
 		queryParams: {	
 				searchExpression : { doc : "search parameters to match vs users",
@@ -395,14 +427,11 @@ exports.Group = [
 		status : "inactive",
 		doc : "Update a User's membership in a group",
 		method : "POST",
-		route : "/groups/:groupname/members/:username",
+		route : "/groups/:groupid/members/:userid",
 		routeParams: {	
-				groupname : { doc : "groupname of the group",
-								type : "string"
-							},		
-				username : {  doc : "username of the user",
-								type : "string"}
-						},
+				groupname : { doc : "id of the group", type : "JID"},		
+				username : {  doc : "id of the user", type : "JID"}
+					},
 		postData : {
 				active : { doc : "active status of membership",
 							type : "boolean",
@@ -421,14 +450,11 @@ exports.Group = [
 		status : "inactive",
 		doc : "Remove User's membership in a group",
 		method : "DELETE",
-		route : "/groups/:groupname/members/:username",
+		route : "/groups/:groupid/members/:userid",
 		routeParams: {	
-				groupname : { doc : "groupname of the group",
-								type : "string"
-							},		
-				username : {  doc : "username of the user",
-								type : "string"}
-						},
+				groupname : { doc : "id of the group", type : "JID"},		
+				username : {  doc : "id of the user", type : "JID"}
+				},
 		response: {},
 		exceptions: [
 				"400 user is not a member of the group",
@@ -449,14 +475,12 @@ exports.MemberRequest = [
 		method : "POST",
 		route : "/memberRequests",
 		postData: {	
-				groupname : { doc : "groupname of the group",
-								type : "string"
-							},		
-				username : {  doc : "username of the user",
-								type : "string"}
+				groupname : { doc : "id of the group", type : "JID"},		
+				username : {  doc : "id of the user", type : "JID"}
 						},
 		response: { 
-				requestURI : "URI of the request"},
+				id : {doc : "id of the request", type : "JID"}
+				},
 		exceptions: [
 				"400 unknown group",
 				"400 unknown user",
@@ -468,12 +492,12 @@ exports.MemberRequest = [
 		status : "inactive",
 		doc : "Get the parameters and status of a member request",
 		method : "GET",
-		route : "/memberRequests/:memberRequestId",
+		route : "/memberRequests/:memberRequestid",
 		routeParams: {	
-				memberRequestId : "id of the request"},
+				memberRequestid : {doc : "id of the request", type : "JID"}
+				},
 		response: { 
-				request : { doc : "member request",
-							type : "JSON"}
+				request : { doc : "member request", type : "JSON"}
 				},
 		exceptions: [
 				"404 unknown request",
@@ -484,12 +508,12 @@ exports.MemberRequest = [
 		status : "inactive",
 		doc : "group owner approves or denies a request to join a group, has the side effect to update the user's membership",
 		method : "POST",
-		route : "/memberRequests/:memberRequestId",
+		route : "/memberRequests/:memberRequestid",
 		routeParams: {	
-				memberRequestId : "id of the request"},
+				memberRequestid : {doc : "id of the request", type : "JID"}
+				},
 		postData: {		
-				requestStatus : { doc : "deny or approve",
-									type : "string"}
+				requestStatus : { doc : "deny or approve", type : "string"}
 					},							
 		response: {},
 		exceptions: [
@@ -517,7 +541,8 @@ exports.MemberInvitation = [
 								type : "string"}
 						},
 		response: { 
-				invitationURI : "URI of the invitation"},
+				id : {doc : "id of the invitation", type : "JID"}
+				},
 		exceptions: [
 				"400 unknown group",
 				"400 unknown user",
@@ -529,12 +554,12 @@ exports.MemberInvitation = [
 		status : "inactive",
 		doc : "Get the parameters and status of a member invitation",
 		method : "GET",
-		route : "/memberInvitations/:memberInvitationId",
+		route : "/memberInvitations/:memberInvitationid",
 		routeParams: {	
-				memberInvitationId : "id of the invitation"},
+				memberInvitationId : {doc : "id of the invitation", type : "JID"}
+				},
 		response: { 
-				invitation : { doc : "join invitation",
-							type : "JSON"}
+				invitation : { doc : "join invitation", type : "JSON"}
 				},
 		exceptions: [
 				"404 unknown invitation",
@@ -545,12 +570,12 @@ exports.MemberInvitation = [
 		status : "inactive",
 		doc : "User approves or denies a invitation to join a group, has the side effect to update the user's membership",
 		method : "POST",
-		route : "/memberInvitations/:memberinvitationId",
+		route : "/memberInvitations/:memberinvitationid",
 		routeParams: {	
-				memberInvitationId : "id of the invitation"},
+				memberInvitationId : {doc : "id of the invitation", type : "JID"}
+				},
 		postData: {		
-				invitationStatus : { doc : "deny or approve",
-									type : "string"}
+				invitationStatus : { doc : "deny or approve", type : "string"}
 					},							
 		response: {},
 		exceptions: [
@@ -572,15 +597,16 @@ exports.Network = [
 		route : "/networks",
 		postData: {	
 				network : { 	doc : "network structure",
-							  	type : "JSON",
+							  	type : "JDEx",
 							  	required : true}, 
-				accountURI : {		doc : "Account URI - User, Group, NPA",
-									type : "URI",
+				accountid : {		doc : "Account Id - User, Group, Agent",
+									type : "JID",
 									required : true
 							}
 					},
 		response: { 
-				networkURI : "the URI of the new network"},
+				id : {doc : "the Id of the new network", type : "JID"}
+				},
 		exceptions: [
 				"404 unknown account",
 				"400 network content error",
@@ -594,10 +620,9 @@ exports.Network = [
 		status : "active",
 		doc : "delete a network",
 		method : "DELETE",
-		route : "/networks/:networkId",
+		route : "/networks/:networkid",
 		routeParams: {	
-				networkId : { doc : "id of the network",
-							  	type : "string"}
+				networkid : { doc : "id of the network", type : "JID"}
 					},
 		response: {},
 		exceptions: [
@@ -609,9 +634,10 @@ exports.Network = [
 		status : "inactive",
 		doc : "Returns all or part of a Network based on edge parameters",
 		method : "GET",
-		route : "/networks/:networkId/edge",
+		route : "/networks/:networkid/edge",
 		routeParams: {	
-				networkId : "id of the network"},
+				networkid : {doc : "id of the network", type: "JID"}
+				},
 		queryParams: {
 						typeFilter : { doc : "filter expression for Edge type",
 										type : "string"},
@@ -628,7 +654,7 @@ exports.Network = [
 					},
 		response: { 
 				network : { doc : "All or portion of queried Network",
-									type : "JSON"}
+							type : "JDEx"}
 				},
 		exceptions: [
 				"404 unknown network",
@@ -641,9 +667,10 @@ exports.Network = [
 		status : "inactive",
 		doc : "Returns nodes and meta information of a Network based on node parameters",
 		method : "GET",
-		route : "/networks/:networkId/node",
+		route : "/networks/:networkid/node",
 		routeParams: {	
-				networkId : "id of the network"},
+				networkid : {doc : "id of the network", type: "JID"}
+				},
 		queryParams: {
 						typeFilter : { doc : "filter expression for Node type",
 										type : "string"},
@@ -656,7 +683,7 @@ exports.Network = [
 					},
 		response: { 
 				network : { doc : "nodes and meta information of queried Network as a network",
-									type : "JSON"}
+							type : "JDEx"}
 				},
 		exceptions: [
 				"404 unknown network",
@@ -668,12 +695,13 @@ exports.Network = [
 		status : "inactive",
 		doc : "Returns the Network JSON structure with only the meta information",
 		method : "HEAD",
-		route : "/networks/:networkId",
+		route : "/networks/:networkid",
 		routeParams: {	
-				networkId : "id of the network"},
+				networkid : {doc : "id of the network", type : "JID"}
+				},
 		response: { 
 				networkMetadata : { doc : "Network, only containing metadata",
-									type : "JSON"}
+									type : "JDEx"}
 				},
 		exceptions: [
 				"404 unknown network",
@@ -685,12 +713,12 @@ exports.Network = [
 		status : "active",
 		doc : "Returns the Network JDEx",
 		method : "GET",
-		route : "/networks/:networkId",
+		route : "/networks/:networkid",
 		routeParams: {	
-				networkId : "id of the network"},
+				networkid : {doc : "id of the network", type: "JID"}
+				},
 		response: { 
-				network : { doc : "Network",
-							type : "JSON"}
+				network : { doc : "Network", type : "JDEx"}
 				},
 		exceptions: [
 				"404 unknown network",
@@ -732,12 +760,13 @@ exports.Network = [
 		status : "inactive",
 		doc : "Create a new Permission for the Network",
 		method : "POST",
-		route : "/networks/:networkId/permissions",
+		route : "/networks/:networkid/permissions",
 		routeParams: {	
-				networkId : "id of the network"},
+				networkid : { doc : "id of the network", type: "JID"}
+				},
 		postData: {	
-				accountURI : { 	doc : "permitted account",
-							  	type : "URI",
+				accountid : { 	doc : "permitted account",
+							  	type : "JID",
 							  	required : true}, 
 					},
 		response: { },
@@ -751,10 +780,11 @@ exports.Network = [
 		status : "inactive",
 		doc : "Delete a Permission for the Network",
 		method : "DELETE",
-		route : "/networks/:networkId/permissions/:permissionId",
+		route : "/networks/:networkid/permissions/:permissionid",
 		routeParams: {	
-				networkId : "id of the network",
-				permissionId : "id of the permission"},
+				networkid : { doc : "id of the network", type: "JID"},
+				permissionid : {doc: "id of the permission", type: "JID"}
+				},
 		response: { },
 		exceptions: [
 				"404 unknown network",
@@ -766,14 +796,13 @@ exports.Network = [
 		status : "inactive",
 		doc : "Update metadata structure for a network",
 		method : "POST",
-		route : "/network/:networkId/metadata",
+		route : "/network/:networkid/metadata",
 		routeParams: {	
-				networkId : { doc : "id of the network",
-							  	type : "string"}
+				networkid : { doc : "id of the network", type : "JID"}
 					},
 		postData: {
 				network : { doc : "network containing metadata to update in the target network",
-							type : "JSON"}
+							type : "JDEx"}
 					},
 		response: { },
 		exceptions: [
@@ -786,12 +815,15 @@ exports.Network = [
 // This could be used to incrementally create a large network.
 	{	fn : "updateNetwork",
 		status : "inactive",
-		doc : "Update a Network based on the posted network JSON structure.",
+		doc : "Update a Network based on the posted network JDEx structure.",
 		method : "POST",
-		route : "/network/:networkId",
+		route : "/network/:networkid",
+		routeParams: {	
+				networkid : { doc : "id of the network", type : "JID"}
+					},
 		postData: {	
 				network : { 	doc : "Update Network",
-							  	type : "JSON",
+							  	type : "JDEx",
 							  	required : true} 
 					},
 		response: { },
@@ -847,11 +879,12 @@ exports.Task = [
 				task : { doc : "task specification",
 								type : "JSON"
 							},		
-				username : {  doc : "username of the user",
-								type : "string"}
+				userid : {  doc : "Id of the user",
+								type : "JID"}
 						},
 		response: { 
-				taskURI : "URI of the task"},
+				id : {doc : "id of the task", type : "JID"}
+				},
 		exceptions: [
 				"400 error in task specification",
 				"400 unknown user",
@@ -862,9 +895,10 @@ exports.Task = [
 		status : "inactive",
 		doc : "Get the parameters and status of a task",
 		method : "GET",
-		route : "/tasks/:taskId",
+		route : "/tasks/:taskid",
 		routeParams: {	
-				taskId : "id of the task"},
+				taskid : {doc : "id of the task", type : "JID"}
+				},
 		response: { 
 				task : { doc : "parameters and status of the task",
 							type : "JSON"}
@@ -879,9 +913,10 @@ exports.Task = [
 		status : "inactive",
 		doc : "Set the status of a task. Can inactivate an active task or activate an inactive task",
 		method : "PUT",
-		route : "/tasks/:taskId/status",
+		route : "/tasks/:taskid/status",
 		routeParams: {	
-				taskId : "id of the task"},
+				taskid : {doc : "id of the task", type : "JID"}
+				},
 		queryParams: {
 				status : { doc : "activity status, either active or inactive",
 							type : "string"
@@ -902,9 +937,10 @@ exports.Task = [
 		status : "inactive",
 		doc : "Delete an inactive or completed task",
 		method : "Delete",
-		route : "/tasks/:taskId",
+		route : "/tasks/:taskid",
 		routeParams: {	
-				taskId : "id of the task"},
+				taskid : {doc : "id of the task", type : "JID"}
+				},
 		response: { 
 				task : { doc : "parameters and status of the task",
 							type : "JSON"}

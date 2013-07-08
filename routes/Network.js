@@ -4,14 +4,6 @@ exports.init = function(orient, callback) {
     module.db = orient;
 }
 
-module.convertToRID = function(id){
-	return id.replace("C","#").replace("R", ":");
-}
-
-module.convertFromRID = function(RID){
-	return RID.replace("#","C").replace(":", "R");
-}
-
 exports.createInitialDocument = function(networkJDEx){
 		var o_nodes = [],
 		o_namespaces = [],
@@ -92,8 +84,7 @@ exports.createNetworkEdges = function(networkJDEx, network){
 	}
 }
 
-exports.createNetworkEdge = function(networkJID, edge){
-	var networkRID = convertToRID(networkJID);
+exports.createNetworkEdge = function(networkRID, edge){
 	// Get the predicate term
 	var termCmd = "select from (traverse terms from " + networkRID + " while $depth < 2) where $depth = 1 and id = " + edge.p;
 	console.log("index " + index + " edge " + edge.s + " " + edge.o);
@@ -114,6 +105,8 @@ exports.createNetworkEdge = function(networkJID, edge){
 			console.log("ran " + cmd);
 			console.log("got " + Object.keys(results2[0]).join(", "));
 		
+			// TODO:
+			// After each edge is created, link it to its supports (if any)
 		
 			// now link the edge to the network, not just the nodes
 			var newEdge = results2[0],
@@ -133,101 +126,53 @@ exports.linkNodesToTerms = function(networkJDEx, networkRID){
 }
 
 // Create a new network in the specified account
-exports.createNetwork = function(networkJDEx, accountURI, callback){
-	console.log("calling createNetwork " + networkJDEx.name + " currently ignoring account: " + accountURI);
-
-	/*
-	console.log("JDEx keys: " + Object.keys(networkJDEx).join(", "));
-	var propertyNames = [],
-		propertyValues = [];
-		
-	console.log(networkJDEx.properties.title);
-	
-	console.log("properties size = " + Object.keys(networkJDEx.properties).length);
-	
-
-	
-	if (networkJDEx.properties && Object.keys(networkJDEx.properties).length > 0){
-		for (key in networkJDEx.properties){
-			var value = networkJDEx.properties[key];
-			console.log("JDEx has property " + key + " with value " + value);
-			propertyNames.push(key);
-			propertyValues.push(value);
-		}
-	} else {
-		console.log("No properties in JDEx");
-	}
-	*/
+exports.createNetwork = function(networkJDEx, accountRID, callback){
+	console.log("calling createNetwork " + networkJDEx.name + " owned by account: " + accountRID);
 	
 	// First create a document to load which will create all of the Vertices
 	// including their JDEx IDs, but not the cross-links between the objects.
 	// (in some cases, such as functional terms, the JDEx ID is the *only* property they have at this time)
 	
 	var initialDocument = exports.createInitialDocument(networkJDEx);
+	// console.log(JSON.stringify(initialDocument));
+	
 		
 	// The initial network will be created by the db.cascadingSave facility
 	// db.save works for documents without links
 	// where as cascadingSave creates embedded documents and links them
-	console.log(JSON.stringify(initialDocument));
-	
 	module.db.cascadingSave(initialDocument, function (err, document){
 	
 		console.log("Saved initial document: " + JSON.stringify(document));
 		
-		
-		// Then, in the first callback, create all the Edges with their JDEx IDs.
-		// This can be asynchronous because the nodes will exist.
-		// As each edge is created, it is linked to its supports (if any)
-		//exports.createNetworkEdges(networkJDEx, document["@rid"]);
-		
-		exports.createNetworkEdges(networkJDEx, document);
-		
-		callback({networkId: module.convertFromRID(document["@rid"]), error : err});
-/*		
-		function(err){
-		
-			// TODO check for error
-			
-			// Finally, in the third callback, remaining links can be inserted asynchronously, 
-			// selecting the objects via their JDEx IDs
-			// (All the objects should exist by then)
-			exports.linkNodesToTerms(networkJDEx, function(err){
-			
-			});
-*/		
+		// assert ownership of network - can be asynch since both network and account exist
+		var ownsEdgeCMD = "create edge xOwnsNetwork from " + accountRID + " to " + document["@rid"] ;
+		module.db.command(ownsEdgeCMD, function(err){
 		});
 		
-
-/*	
-	// Create the the network with its properties
-	var insertNetworkCmd = "insert into Network (" + propertyNames.join(", ") + ") values('" + propertyValues.join(", ") + "')";
-	console.log(insertNetworkCmd)
-	module.db.command(insertNetworkCmd, function(err) {
-		if (err){
-			console.log("Network insert yields error : " + err);
-		} else {
-			console.log("Network inserted without error");
-			
-			// Create Terms used in the network
-			
-		}
-		callback({error : err});
-	});
-*/
-}	
+		// create all the Edges with their JDEx IDs.
+		// This can be asynchronous because the nodes already exist.	
+		exports.createNetworkEdges(networkJDEx, document);
+		
+		// TODO link nodes to terms via represents
+		
+		callback({jid: document["@rid"], ownedBy: accountRID, error : err});
+		
+		});
+		
+};	
 
 // returns network descriptors - 
 exports.findNetworks = function (searchExpression, limit, offset, callback){
 	console.log("calling findNetworks with arguments: " + searchExpression + " " + limit + " " + offset);
 	// Temporary: ignore search expression and offset, just get the first n networks
 	
-	var descriptors = "properties.title as title, @rid as rid, nodes.size() as nodeCount, edges.size() as edgeCount";
+	var descriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount";
 		cmd = "select " + descriptors + " from xNetwork order by creation_date desc limit " + limit;
 	console.log(cmd);
 	module.db.command(cmd, function(err, networks) {
 		for (i in networks){
 			var network = networks[i];
-			network.rid = module.convertFromRID(network.rid);
+			network.jid = convertFromRID(network.jid);
 		}
 		// for each network, summarize the key facts
         callback({networks : networks, error : err});
@@ -235,9 +180,8 @@ exports.findNetworks = function (searchExpression, limit, offset, callback){
 };
 
 // get an entire network
-exports.getNetwork = function(networkJID, callback){
-	var networkRID = module.convertToRID(networkJID);
-	console.log("calling getNetwork with networkId = '" + networkRID + "'");
+exports.getNetwork = function(networkRID, callback){
+	console.log("calling getNetwork with networkRID = '" + networkRID + "'");
 	var cmd = "select from " + networkRID + "";
 	console.log(cmd);
 	module.db.command(cmd, function(err, networks) {
@@ -324,85 +268,11 @@ exports.checkErr = function(err, where, callback){
 	return true;
 };
 
-exports.networkToJDEx = function(network){
-		var o_nodes = [],
-		o_namespaces = [],
-		//s_nodeTypes = [],
-		o_edges = [],
-		o_terms = [],
-		o_properties = {};
-		//s_supports = {},
-		//s_citations = {};
-		
-		console.log("networkToJDEx: " + network);
-
-		for(index in network.namespaces){
-			var ns = network.namespaces[index];
-			o_namespaces.push({id: ns.id, prefix: ns.prefix, uri: ns.uri, rid: ns['@rid']});
-		}
-
-		// for each base term, create with id and name, link to namespace later
-		for(index in network.terms){
-			var term = network.terms[index];
-			if (term.name){
-				console.log("term: " + term.id);
-				var o_term = {type: "b", id: term.id, name: term.name, rid: term['@rid']};
-				if (term.ns){
-					o_term.ns = term.ns.id;
-				}
-				o_terms.push(o_term);
-			}
-		}
-
-		// just copy the graph properties
-		for(index in network.properties){
-			var value = network.properties[index];
-			o_properties[index] = value;
-		}
-
-		// for each node, create with id and name, link to defining term later									
-		for(index in network.nodes){
-			var node = network.nodes[index],
-				o_node = {id: node.id, rid: node['@rid']};
-			if (node.name) o_node.name = node.name;
-			o_nodes.push(o_node);
-		}
-
-		// for each node, create with id and name, link to defining term later									
-		for(index in network.nodes){
-			var node = network.nodes[index],
-				o_node = {id: node.id, rid: node['@rid']};
-			if (node.name) o_node.name = node.name;
-			o_nodes.push(o_node);
-		}	
-
-		// for each node, create with id and name, link to defining term later									
-		for(index in network.edges){
-			var edge = network.edges[index],
-				o_edge = {id: edge.id, rid: edge['@rid'], s: edge.s.id, o: edge.o.id};
-			if (edge.p) o_edge.p = edge.p.id;
-			o_edges.push(o_edge);
-		}
-			
-		return {
-
-				format: network.format, 
-				namespaces: o_namespaces,
-				terms: o_terms,
-				properties : o_properties,
-				nodes: o_nodes, 
-				edges: o_edges, 
-				//nodeTypes: s_nodeTypes,
-				//citations : s_citations,
-				//supports : s_supports
-			};
-}
 
 // delete a network
-exports.deleteNetwork = function (networkJID, callback){
-	var networkRID = module.convertToRID(networkJID);
+exports.deleteNetwork = function (networkRID, callback){
 	console.log("calling delete network with id = '" + networkRID + "'");
-	var cmd = "delete from Network where id =  '" + networkRID + "'";
+	var cmd = "delete from " + networkRID;
 	console.log(cmd);
 	module.db.command(cmd, function(err) {
         callback({error : err});

@@ -316,4 +316,12 @@ app.get('/visNet/:networkId', function(req, res) {
 //
 //-----------------------------------------------------------
 
+function convertToRID(JID){
+	return JID.replace("C","#").replace("R", ":");
+}
+
+function convertFromRID(RID){
+	return RID.replace("#","C").replace(":", "R");
+}
+
 var routes = require('./routes');

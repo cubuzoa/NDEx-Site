@@ -50,6 +50,10 @@ for (n in specs.resourceTypes){
 			for (n in spec.routeParams){
 				arguments.push(n);
 				argumentLines.push("    var " + n + " = req.params['" + n + "'];");
+				var params = spec.routeParams[n];
+				if (params.type && params.type == "JID"){
+					argumentLines.push("    " + n + " = convertToRID(" + n + ");");
+				}
 			}
 			for (n in spec.queryParams){
 				arguments.push(n);
@@ -64,16 +68,31 @@ for (n in specs.resourceTypes){
 					}
 					argumentLines.push("    " + n + " = " + n + " || " + defaultVal + ";");
 				}
+				if (type == "JID"){
+					argumentLines.push("    " + n + " = convertToRID(" + n + ");");
+				}
 				
 			}
 			for (n in spec.postData){
 				arguments.push(n);
 				argumentLines.push("    var " + n + " = req.body['" + n + "'];");
+				var params = spec.postData[n];
+				if (params.type && params.type == "JID"){
+					argumentLines.push("    " + n + " = convertToRID(" + n + ");");
+				}
 			}
 			
 			var argumentString = "";
 			if (arguments.length > 0){
 				argumentString = arguments.join(", ") + ", ";
+			}
+			
+			var responseModifierLines = [];
+			for (n in spec.response){
+				var responseParams = spec.response[n];
+				if (responseParams.type && responseParams.type == "JID"){
+					responseModifierLines.push("			res." + n + " = convertFromRID(res." + n + ");");
+				}
 			}
 			
 			lines = lines.concat([	
@@ -84,7 +103,12 @@ for (n in specs.resourceTypes){
 						[
 						"	try {",
 						"		" + resourceType + "." + spec.fn + "(" + argumentString + "function(result){",
-						"			var status = result.status || 200;",
+						"			var status = result.status || 200;"
+						],
+						
+						responseModifierLines,
+						
+						[
 						"			res.send(status, result);",
 						"		});",
 						"	}",
