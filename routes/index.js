@@ -33,7 +33,8 @@ function ensureSchemaIsSetup(callback) {
 function ensureClass(className, parentName, callback){
     if (module.db.getClassByName(className) === null) {
     	console.log("creating " + className);
-        module.db.createClass(className, parentName, function(err){
+    	var cmd = "create class " + className + " extends " + parentName;
+        module.db.command(cmd, function(err){
         	if (callback) callback();
         	});
     } else {

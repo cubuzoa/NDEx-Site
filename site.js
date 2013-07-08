@@ -337,9 +337,9 @@ var Task = require('./routes/Task.js');
 // GET server description
 app.get('/', function(req, res) {
 	try {
-		System.index(function(result){
-			var status = result.status || 200;
-			res.send(status, result);
+		System.index(function(data){
+			var status = data.status || 200;
+			res.send(status, data);
 		});
 	}
 	catch (e){
@@ -350,9 +350,9 @@ app.get('/', function(req, res) {
 // GET status
 app.get('/status', function(req, res) {
 	try {
-		System.status(function(result){
-			var status = result.status || 200;
-			res.send(status, result);
+		System.status(function(data){
+			var status = data.status || 200;
+			res.send(status, data);
 		});
 	}
 	catch (e){
@@ -365,9 +365,10 @@ app.post('/users', function(req, res) {
     var username = req.body['username'];
     var password = req.body['password'];
 	try {
-		User.createUser(username, password, function(result){
-			var status = result.status || 200;
-			res.send(status, result);
+		User.createUser(username, password, function(data){
+			var status = data.status || 200;
+			data.jid = convertFromRID(data.jid);
+			res.send(status, data);
 		});
 	}
 	catch (e){
@@ -378,12 +379,12 @@ app.post('/users', function(req, res) {
 // Add a group account
 app.post('/users/:userid/profile', function(req, res) {
     var userid = req.body['userid'];
-    userid = convertToRID(userid);
+    if(userid) userid = convertToRID(userid);
     var profile = req.body['profile'];
 	try {
-		User.updateUserProfile(userid, profile, function(result){
-			var status = result.status || 200;
-			res.send(status, result);
+		User.updateUserProfile(userid, profile, function(data){
+			var status = data.status || 200;
+			res.send(status, data);
 		});
 	}
 	catch (e){
@@ -400,9 +401,9 @@ app.get('/users', function(req, res) {
     var offset = req.query['offset'];
     offset = offset || 0;
 	try {
-		User.findUsers(searchExpression, limit, offset, function(result){
-			var status = result.status || 200;
-			res.send(status, result);
+		User.findUsers(searchExpression, limit, offset, function(data){
+			var status = data.status || 200;
+			res.send(status, data);
 		});
 	}
 	catch (e){
@@ -413,11 +414,11 @@ app.get('/users', function(req, res) {
 // Get a user by userid
 app.get('/users/:userid', function(req, res) {
     var username = req.params['username'];
-    username = convertToRID(username);
+    if(username) username = convertToRID(username);
 	try {
-		User.getUser(username, function(result){
-			var status = result.status || 200;
-			res.send(status, result);
+		User.getUser(username, function(data){
+			var status = data.status || 200;
+			res.send(status, data);
 		});
 	}
 	catch (e){
@@ -428,11 +429,11 @@ app.get('/users/:userid', function(req, res) {
 // Delete a user by username
 app.delete('/users/:userid', function(req, res) {
     var username = req.params['username'];
-    username = convertToRID(username);
+    if(username) username = convertToRID(username);
 	try {
-		User.deleteUser(username, function(result){
-			var status = result.status || 200;
-			res.send(status, result);
+		User.deleteUser(username, function(data){
+			var status = data.status || 200;
+			res.send(status, data);
 		});
 	}
 	catch (e){
@@ -443,13 +444,13 @@ app.delete('/users/:userid', function(req, res) {
 // Add a group account
 app.post('/groups', function(req, res) {
     var userid = req.body['userid'];
-    userid = convertToRID(userid);
+    if(userid) userid = convertToRID(userid);
     var groupName = req.body['groupName'];
 	try {
-		Group.createGroup(userid, groupName, function(result){
-			var status = result.status || 200;
-			res.jid = convertFromRID(res.jid);
-			res.send(status, result);
+		Group.createGroup(userid, groupName, function(data){
+			var status = data.status || 200;
+			data.jid = convertFromRID(data.jid);
+			res.send(status, data);
 		});
 	}
 	catch (e){
@@ -460,12 +461,12 @@ app.post('/groups', function(req, res) {
 // Add a group account
 app.post('/groups/:groupid/profile', function(req, res) {
     var groupid = req.body['groupid'];
-    groupid = convertToRID(groupid);
+    if(groupid) groupid = convertToRID(groupid);
     var profile = req.body['profile'];
 	try {
-		Group.updateGroupProfile(groupid, profile, function(result){
-			var status = result.status || 200;
-			res.send(status, result);
+		Group.updateGroupProfile(groupid, profile, function(data){
+			var status = data.status || 200;
+			res.send(status, data);
 		});
 	}
 	catch (e){
@@ -482,9 +483,9 @@ app.get('/groups', function(req, res) {
     var offset = req.query['offset'];
     offset = offset || 0;
 	try {
-		Group.findGroups(searchExpression, limit, offset, function(result){
-			var status = result.status || 200;
-			res.send(status, result);
+		Group.findGroups(searchExpression, limit, offset, function(data){
+			var status = data.status || 200;
+			res.send(status, data);
 		});
 	}
 	catch (e){
@@ -495,11 +496,11 @@ app.get('/groups', function(req, res) {
 // Get a group by groupname
 app.get('/groups/:groupid', function(req, res) {
     var groupid = req.params['groupid'];
-    groupid = convertToRID(groupid);
+    if(groupid) groupid = convertToRID(groupid);
 	try {
-		Group.getGroup(groupid, function(result){
-			var status = result.status || 200;
-			res.send(status, result);
+		Group.getGroup(groupid, function(data){
+			var status = data.status || 200;
+			res.send(status, data);
 		});
 	}
 	catch (e){
@@ -510,11 +511,11 @@ app.get('/groups/:groupid', function(req, res) {
 // Delete a group by groupname
 app.delete('/groups/:groupid', function(req, res) {
     var groupid = req.params['groupid'];
-    groupid = convertToRID(groupid);
+    if(groupid) groupid = convertToRID(groupid);
 	try {
-		Group.deleteGroup(groupid, function(result){
-			var status = result.status || 200;
-			res.send(status, result);
+		Group.deleteGroup(groupid, function(data){
+			var status = data.status || 200;
+			res.send(status, data);
 		});
 	}
 	catch (e){
@@ -525,7 +526,7 @@ app.delete('/groups/:groupid', function(req, res) {
 // Find Users who are members of a group, optionally filter by search expression
 app.get('/groups/:groupid/members', function(req, res) {
     var groupid = req.params['groupid'];
-    groupid = convertToRID(groupid);
+    if(groupid) groupid = convertToRID(groupid);
     var searchExpression = req.query['searchExpression'];
     searchExpression = searchExpression || '*';
     var limit = req.query['limit'];
@@ -533,9 +534,9 @@ app.get('/groups/:groupid/members', function(req, res) {
     var offset = req.query['offset'];
     offset = offset || 0;
 	try {
-		Group.getGroupMembers(groupid, searchExpression, limit, offset, function(result){
-			var status = result.status || 200;
-			res.send(status, result);
+		Group.getGroupMembers(groupid, searchExpression, limit, offset, function(data){
+			var status = data.status || 200;
+			res.send(status, data);
 		});
 	}
 	catch (e){
@@ -547,12 +548,12 @@ app.get('/groups/:groupid/members', function(req, res) {
 app.post('/networks', function(req, res) {
     var network = req.body['network'];
     var accountid = req.body['accountid'];
-    accountid = convertToRID(accountid);
+    if(accountid) accountid = convertToRID(accountid);
 	try {
-		Network.createNetwork(network, accountid, function(result){
-			var status = result.status || 200;
-			res.id = convertFromRID(res.id);
-			res.send(status, result);
+		Network.createNetwork(network, accountid, function(data){
+			var status = data.status || 200;
+			data.jid = convertFromRID(data.jid);
+			res.send(status, data);
 		});
 	}
 	catch (e){
@@ -563,11 +564,11 @@ app.post('/networks', function(req, res) {
 // delete a network
 app.delete('/networks/:networkid', function(req, res) {
     var networkid = req.params['networkid'];
-    networkid = convertToRID(networkid);
+    if(networkid) networkid = convertToRID(networkid);
 	try {
-		Network.deleteNetwork(networkid, function(result){
-			var status = result.status || 200;
-			res.send(status, result);
+		Network.deleteNetwork(networkid, function(data){
+			var status = data.status || 200;
+			res.send(status, data);
 		});
 	}
 	catch (e){
@@ -578,11 +579,11 @@ app.delete('/networks/:networkid', function(req, res) {
 // Returns the Network JDEx
 app.get('/networks/:networkid', function(req, res) {
     var networkid = req.params['networkid'];
-    networkid = convertToRID(networkid);
+    if(networkid) networkid = convertToRID(networkid);
 	try {
-		Network.getNetwork(networkid, function(result){
-			var status = result.status || 200;
-			res.send(status, result);
+		Network.getNetwork(networkid, function(data){
+			var status = data.status || 200;
+			res.send(status, data);
 		});
 	}
 	catch (e){
@@ -599,9 +600,9 @@ app.get('/networks', function(req, res) {
     var offset = req.query['offset'];
     offset = offset || 0;
 	try {
-		Network.findNetworks(searchExpression, limit, offset, function(result){
-			var status = result.status || 200;
-			res.send(status, result);
+		Network.findNetworks(searchExpression, limit, offset, function(data){
+			var status = data.status || 200;
+			res.send(status, data);
 		});
 	}
 	catch (e){

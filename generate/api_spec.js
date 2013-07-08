@@ -54,7 +54,9 @@ exports.User = [
 								type : "string"
 							}
 				},
-		response: {},
+		response: {
+			jid : {doc : "the id of the new user", type : "JID"}
+			},
 		exceptions: [
 				"400 user name already used", 
 				"400 invalid name", 
@@ -479,7 +481,7 @@ exports.MemberRequest = [
 				username : {  doc : "id of the user", type : "JID"}
 						},
 		response: { 
-				id : {doc : "id of the request", type : "JID"}
+				jid : {doc : "id of the request", type : "JID"}
 				},
 		exceptions: [
 				"400 unknown group",
@@ -541,7 +543,7 @@ exports.MemberInvitation = [
 								type : "string"}
 						},
 		response: { 
-				id : {doc : "id of the invitation", type : "JID"}
+				jid : {doc : "id of the invitation", type : "JID"}
 				},
 		exceptions: [
 				"400 unknown group",
@@ -605,7 +607,7 @@ exports.Network = [
 							}
 					},
 		response: { 
-				id : {doc : "the Id of the new network", type : "JID"}
+				jid : {doc : "the Id of the new network", type : "JID"}
 				},
 		exceptions: [
 				"404 unknown account",

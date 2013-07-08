@@ -4,6 +4,10 @@ exports.init = function(orient, callback) {
     module.db = orient;
 }
 
+function convertFromRID(RID){
+	return RID.replace("#","C").replace(":", "R");
+}
+
 exports.createInitialDocument = function(networkJDEx){
 		var o_nodes = [],
 		o_namespaces = [],
@@ -87,37 +91,45 @@ exports.createNetworkEdges = function(networkJDEx, network){
 exports.createNetworkEdge = function(networkRID, edge){
 	// Get the predicate term
 	var termCmd = "select from (traverse terms from " + networkRID + " while $depth < 2) where $depth = 1 and id = " + edge.p;
-	console.log("index " + index + " edge " + edge.s + " " + edge.o);
+	//console.log("index " + index + " edge " + edge.s + " " + edge.o);
 	
 	module.db.command(termCmd, function(err1, results1){
+	
+			if (err1){
+				console.log("error in finding term for edge: " + err1);
+			} else {
 
-		//
-		// Finding nodes and predicate term referenced by the edge, use traverse to search terms in this network:
-		//
-		// select from (traverse terms from #18:7 while $depth < 2) where $depth = 1 and id = 2
-		//		
-		var	term = results1[0],
-			fromExp = "select from (traverse nodes from " + networkRID + " while $depth < 2) where $depth = 1 and id = " + edge.s,
-			toExp = "select from (traverse nodes from " + networkRID + " while $depth < 2) where $depth = 1 and id = " + edge.o,
-			 cmd = "create edge xEdge from (" + fromExp + ") to (" + toExp + ") set p = " + term["@rid"] + ", n = " + networkRID ;
+			//
+			// Finding nodes and predicate term referenced by the edge, use traverse to search terms in this network:
+			//
+			// select from (traverse terms from #18:7 while $depth < 2) where $depth = 1 and id = 2
+			//		
+			var	term = results1[0],
+				fromExp = "select from (traverse nodes from " + networkRID + " while $depth < 2) where $depth = 1 and id = " + edge.s,
+				toExp = "select from (traverse nodes from " + networkRID + " while $depth < 2) where $depth = 1 and id = " + edge.o,
+				 cmd = "create edge xEdge from (" + fromExp + ") to (" + toExp + ") set p = " + term["@rid"] + ", n = " + networkRID ;
 			 
-		module.db.command(cmd, function (err2, results2){
-			console.log("ran " + cmd);
-			console.log("got " + Object.keys(results2[0]).join(", "));
+			module.db.command(cmd, function (err2, results2){
+				console.log("ran " + cmd);
+				if (err2) {
+					console.log("error in creating edge: " + err2);
+				} else {
+				//console.log("got " + Object.keys(results2[0]).join(", "));
 		
-			// TODO:
-			// After each edge is created, link it to its supports (if any)
+					// TODO:
+					// After each edge is created, link it to its supports (if any)
 		
-			// now link the edge to the network, not just the nodes
-			var newEdge = results2[0],
-				updateCmd = "update " + networkRID + " add edges = " + newEdge["@rid"];
-				module.db.command(updateCmd, function (err3, results3){
-					console.log("ran " + updateCmd);
-					if (err3) console.log("error: " + err3);
-				});
-		
-			if (err2) console.log("error: " + err2);
-		});
+					// now link the edge to the network, not just the nodes
+					var newEdge = results2[0],
+						updateCmd = "update " + networkRID + " add edges = " + newEdge["@rid"];
+						module.db.command(updateCmd, function (err3, results3){
+							console.log("ran " + updateCmd);
+							if (err3) console.log("error: " + err3);
+						});
+				}
+			
+			});
+		}
 	});
 }
 
@@ -127,7 +139,11 @@ exports.linkNodesToTerms = function(networkJDEx, networkRID){
 
 // Create a new network in the specified account
 exports.createNetwork = function(networkJDEx, accountRID, callback){
-	console.log("calling createNetwork " + networkJDEx.name + " owned by account: " + accountRID);
+	var title = "untitled";
+	if (networkJDEx.properties && networkJDEx.properties.title){
+		title = networkJDEx.properties.title;
+	}
+	console.log("calling createNetwork for " + title + " owned by account: " + accountRID);
 	
 	// First create a document to load which will create all of the Vertices
 	// including their JDEx IDs, but not the cross-links between the objects.
@@ -142,7 +158,7 @@ exports.createNetwork = function(networkJDEx, accountRID, callback){
 	// where as cascadingSave creates embedded documents and links them
 	module.db.cascadingSave(initialDocument, function (err, document){
 	
-		console.log("Saved initial document: " + JSON.stringify(document));
+		//console.log("Saved initial document: " + JSON.stringify(document));
 		
 		// assert ownership of network - can be asynch since both network and account exist
 		var ownsEdgeCMD = "create edge xOwnsNetwork from " + accountRID + " to " + document["@rid"] ;
@@ -214,7 +230,7 @@ exports.getNetwork = function(networkRID, callback){
 									// process the terms
 									for (i in terms){
 										var term = terms[i];
-										result.terms[term.id] = {name: term.name, rid: module.convertFromRID(term.rid), ns: term.nsid};
+										result.terms[term.id] = {name: term.name, jid: convertFromRID(term.rid), ns: term.nsid};
 									}
 							
 									// get the nodes
@@ -226,7 +242,7 @@ exports.getNetwork = function(networkRID, callback){
 											// process the nodes
 											for (i in nodes){
 												var node = nodes[i];
-												result.nodes[node.id] = {name: node.name, rid: module.convertFromRID(node.rid)};
+												result.nodes[node.id] = {name: node.name, jid: convertFromRID(node.rid)};
 											}
 											// get the edges
 											var edge_cmd = "select  in.id as s, p.id as p, out.id as o, @rid as rid from (traverse edges from " + networkRID + ") where $depth = 1)";
@@ -236,7 +252,7 @@ exports.getNetwork = function(networkRID, callback){
 													// process the edges
 													for (i in edges){
 														var edge = edges[i];
-														result.edges[i] = {s: edge.s, p: edge.p, o: edge.o, rid: module.convertFromRID(edge.rid)};
+														result.edges[i] = {s: edge.s, p: edge.p, o: edge.o, jid: convertFromRID(edge.rid)};
 													}
 										
 													callback({network : result});

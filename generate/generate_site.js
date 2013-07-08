@@ -52,7 +52,7 @@ for (n in specs.resourceTypes){
 				argumentLines.push("    var " + n + " = req.params['" + n + "'];");
 				var params = spec.routeParams[n];
 				if (params.type && params.type == "JID"){
-					argumentLines.push("    " + n + " = convertToRID(" + n + ");");
+					argumentLines.push("    if(" + n + ") " + n + " = convertToRID(" + n + ");");
 				}
 			}
 			for (n in spec.queryParams){
@@ -69,7 +69,7 @@ for (n in specs.resourceTypes){
 					argumentLines.push("    " + n + " = " + n + " || " + defaultVal + ";");
 				}
 				if (type == "JID"){
-					argumentLines.push("    " + n + " = convertToRID(" + n + ");");
+					argumentLines.push("    if(" + n + ") " + n + " = convertToRID(" + n + ");");
 				}
 				
 			}
@@ -78,7 +78,7 @@ for (n in specs.resourceTypes){
 				argumentLines.push("    var " + n + " = req.body['" + n + "'];");
 				var params = spec.postData[n];
 				if (params.type && params.type == "JID"){
-					argumentLines.push("    " + n + " = convertToRID(" + n + ");");
+					argumentLines.push("    if(" + n + ") " + n + " = convertToRID(" + n + ");");
 				}
 			}
 			
@@ -91,7 +91,7 @@ for (n in specs.resourceTypes){
 			for (n in spec.response){
 				var responseParams = spec.response[n];
 				if (responseParams.type && responseParams.type == "JID"){
-					responseModifierLines.push("			res." + n + " = convertFromRID(res." + n + ");");
+					responseModifierLines.push("			data." + n + " = convertFromRID(data." + n + ");");
 				}
 			}
 			
@@ -102,14 +102,14 @@ for (n in specs.resourceTypes){
 					
 						[
 						"	try {",
-						"		" + resourceType + "." + spec.fn + "(" + argumentString + "function(result){",
-						"			var status = result.status || 200;"
+						"		" + resourceType + "." + spec.fn + "(" + argumentString + "function(data){",
+						"			var status = data.status || 200;"
 						],
 						
 						responseModifierLines,
 						
 						[
-						"			res.send(status, result);",
+						"			res.send(status, data);",
 						"		});",
 						"	}",
 						"	catch (e){",

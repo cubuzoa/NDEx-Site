@@ -20,29 +20,31 @@ exports.createGroup = function(groupname, password, callback){
 			} else {
 				console.log("now inserting the new group");
 				console.log(insertGroupCmd);
-				module.db.command(insertGroupCmd, function(err, results) {
+				module.db.command(insertGroupCmd, function(err, groups) {
 					if (err){
 						console.log("insert of new group yields error : " + err);
+						callback({error : err});
 					} else {
-						console.log("no error on insert");
+						var group = groups[0];
+						callback({error : err, jid: group['@rid'], groupname: group.groupname});
 					}
-					callback({error : err, jid: results['@rid'], groupname: groupname});
+					
 				});
 			}
     	}
     });
 };
 
+
 exports.updateGroupProfile = function(groupRID, profile, callback){
 	var profileStrings = [
-			"firstName = " + profile.firstName,
-			"lastName = " + profile.lastName,
-			"website = " + profile.website,
-			"foregroundImg = " + profile.foregroundImg,
-			"backgroundImg = " + profile.backgroundImg,
-			"description = " + profile.description],
-		setString = profileStrings.join(","),
-		updateCmd = "update " + groupRID + "set " + setString;
+			"organizationName = '" + profile.organizationName + "'",
+			"website = '" + profile.website + "'",
+			"foregroundImg = '" + profile.foregroundImg + "'",
+			"backgroundImg = '" + profile.backgroundImg + "'",
+			"description = '" + profile.description + "'"],
+		setString = profileStrings.join(", "),
+		updateCmd = "update " + groupRID + " set " + setString;
 		console.log(updateCmd);
 	module.db.command(updateCmd, function(err, result){
 	

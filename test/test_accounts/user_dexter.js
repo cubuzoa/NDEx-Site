@@ -13,7 +13,7 @@
 	"networkFilenames" : [
 
 		"CELL_MAP.TGFBR.544338.jdex",
-		"REACTOME.Cell Cycle, Mitotic.485623.jdex"
+		"NCI_NATURE.FoxO family signaling.517135.jdex"
 	],
 	
 	"ownedGroups" : [
@@ -25,12 +25,13 @@
 				"organizationName" : "Triptych.js",
 				"website" : "www.triptychjs.org",
 				"foregroundImg" : "dexterpratt.jpg",
-				"backgroundImg" : "triptychjs.jpg"
+				"backgroundImg" : "triptychjs.jpg",
+				"description" : "Triptych.js is an open-source JavaScript Framework for displaying networks in 3D" 
 			},
 		
 			"networkFilenames" : [
 				"REACTOME.G1 Phase.485618.jdex",
-				"REACTOME.Mitotic G1-G1 S phases.485622.jdex"
+				"REACTOME.G0 and Early G1.485619.jdex"
 			]
 	
 		}

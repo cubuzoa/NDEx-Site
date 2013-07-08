@@ -15,18 +15,20 @@ exports.createUser = function(username, password, callback){
 		} else {
 			console.log("Existing users: " + JSON.stringify(users));
 			if (users && users.length > 0){
-				callback({error : "username '" + username + "' is already in use",
-							status : 500});
+				callback({error : "username '" + username + "' is already in use", status : 500});
 			} else {
 				console.log("now inserting the new user");
 				console.log(insertUserCmd);
 				module.db.command(insertUserCmd, function(err, results) {
 					if (err){
 						console.log("insert of new user yields error : " + err);
+						callback({error : err});
 					} else {
-						console.log("no error on insert");
+						var user = results[0];
+						console.log(JSON.stringify(user));
+						callback({error : err, jid: user['@rid'], username: user['username']});
 					}
-					callback({error : err, jid: results['@rid'], username: username});
+					
 				});
 			}
     	}
@@ -35,14 +37,14 @@ exports.createUser = function(username, password, callback){
 
 exports.updateUserProfile = function(userRID, profile, callback){
 	var profileStrings = [
-			"firstName = " + profile.firstName,
-			"lastName = " + profile.lastName,
-			"website = " + profile.website,
-			"foregroundImg = " + profile.foregroundImg,
-			"backgroundImg = " + profile.backgroundImg,
-			"description = " + profile.description],
-		setString = profileStrings.join(","),
-		updateCmd = "update " + userRID + "set " + setString;
+			"firstName = '" + profile.firstName + "'",
+			"lastName = '" + profile.lastName + "'",
+			"website = '" + profile.website + "'",
+			"foregroundImg = '" + profile.foregroundImg + "'",
+			"backgroundImg = '" + profile.backgroundImg + "'",
+			"description = '" + profile.description + "'"],
+		setString = profileStrings.join(", "),
+		updateCmd = "update " + userRID + " set " + setString;
 		console.log(updateCmd);
 	module.db.command(updateCmd, function(err, result){
 	
