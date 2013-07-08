@@ -8,9 +8,7 @@
 function doSearch(offset) {
 	var searchExpression = $('#searchExpression').serialize(), 
 		limit = 100;
-		
-	ndexClient.test();
-	
+
 	console.log("Calling findNetworks");
 	
 	ndexClient.findNetworks(searchExpression, limit, offset, function(data){
