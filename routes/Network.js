@@ -110,7 +110,7 @@ exports.createNetworkEdge = function(networkRID, edge){
 				 cmd = "create edge xEdge from (" + fromExp + ") to (" + toExp + ") set p = " + term["@rid"] + ", n = " + networkRID ;
 			 
 			module.db.command(cmd, function (err2, results2){
-				console.log("ran " + cmd);
+				//console.log("ran " + cmd);
 				if (err2) {
 					console.log("error in creating edge: " + err2);
 				} else {
@@ -123,7 +123,7 @@ exports.createNetworkEdge = function(networkRID, edge){
 					var newEdge = results2[0],
 						updateCmd = "update " + networkRID + " add edges = " + newEdge["@rid"];
 						module.db.command(updateCmd, function (err3, results3){
-							console.log("ran " + updateCmd);
+							//console.log("ran " + updateCmd);
 							if (err3) console.log("error: " + err3);
 						});
 				}
@@ -133,9 +133,54 @@ exports.createNetworkEdge = function(networkRID, edge){
 	});
 }
 
-exports.linkNodesToTerms = function(networkJDEx, networkRID){
+exports.linkNodesToTerms = function(networkJDEx, network){
+	console.log("------------- link nodes to terms ------------------");
+	var networkRID = network["@rid"];
+	var nodeCmd = "select from (traverse nodes from " + networkRID + " while $depth < 2) where $depth = 1";
+	console.log(nodeCmd);
+	module.db.command(nodeCmd, function(err, nodes){		
+			
+		if (err){
+			console.log("error in finding nodes of network: " + err);
+		} else {
+			for (i in nodes){
+				var node = nodes[i];
+				// look up the term id that the node represents
+				if (node.id){
+					var jnode = networkJDEx.nodes[node.id];
+					if (jnode && jnode.represents){
+						// IF we found the node in the jdex 
+						// AND it has a 'represents' property
+						// THEN link it to the xTerm in orient
+						exports.linkNodeToTerm(node['@rid'], networkRID, jnode.represents);
+						
 
-}
+					}
+				}
+			}
+			
+		}
+	});
+
+};
+
+exports.linkNodeToTerm = function(nodeRID, networkRID, termId){
+	var termCmd= "select from (traverse terms from " + networkRID + " while $depth < 2) where $depth = 1 and id = " + termId;
+	module.db.command(termCmd, function(err, terms){
+		if (err){
+			console.log("error in finding represented term : " + err);
+		} else {
+			var term = terms[0];
+			updateCmd = "update " + nodeRID + " set represents = " + term['@rid'];
+			console.log("Represents: " + updateCmd);
+			module.db.command(updateCmd, function(err2){
+				if (err2){
+					console.log("error in setting represented term : " + err2);
+				}
+			});
+		}
+	});
+};
 
 // Create a new network in the specified account
 exports.createNetwork = function(networkJDEx, accountRID, callback){
@@ -158,22 +203,33 @@ exports.createNetwork = function(networkJDEx, accountRID, callback){
 	// where as cascadingSave creates embedded documents and links them
 	module.db.cascadingSave(initialDocument, function (err, document){
 	
-		//console.log("Saved initial document: " + JSON.stringify(document));
+		if (err){
+			console.log("error saving initial network: " + err);
+		}
 		
-		// assert ownership of network - can be asynch since both network and account exist
-		var ownsEdgeCMD = "create edge xOwnsNetwork from " + accountRID + " to " + document["@rid"] ;
-		module.db.command(ownsEdgeCMD, function(err){
-		});
+		if (document && document["@rid"]){
 		
-		// create all the Edges with their JDEx IDs.
-		// This can be asynchronous because the nodes already exist.	
-		exports.createNetworkEdges(networkJDEx, document);
+			var networkRID = document["@rid"];
+	
+			//console.log("Saved initial document: " + JSON.stringify(document));
 		
-		// TODO link nodes to terms via represents
+			// assert ownership of network - can be asynch since both network and account exist
+			var ownsEdgeCMD = "create edge xOwnsNetwork from " + accountRID + " to " + networkRID;
+			module.db.command(ownsEdgeCMD, function(err){
+			});
 		
-		callback({jid: document["@rid"], ownedBy: accountRID, error : err});
+			// create all the Edges with their JDEx IDs.
+			// This can be asynchronous because the nodes already exist.	
+			exports.createNetworkEdges(networkJDEx, document);
 		
-		});
+			// TODO link nodes to terms via represents
+			exports.linkNodesToTerms(networkJDEx, document);
+		
+			callback({jid: networkRID, ownedBy: accountRID, error : err});
+		} else {
+			console.log("initial document is null, even though no error signaled");
+		}
+	});
 		
 };	
 
@@ -235,14 +291,14 @@ exports.getNetwork = function(networkRID, callback){
 							
 									// get the nodes
 									// TODO - get the defining terms...
-									var node_cmd = "select id, name, @rid as rid from (traverse nodes from " + networkRID + ") where $depth = 1";
+									var node_cmd = "select id, name, represents.id as represents, @rid as rid from (traverse nodes from " + networkRID + ") where $depth = 1";
 									module.db.command(node_cmd, function(err, nodes) {
 										if (exports.checkErr(err, "getting nodes", callback)){
 						
 											// process the nodes
 											for (i in nodes){
 												var node = nodes[i];
-												result.nodes[node.id] = {name: node.name, jid: convertFromRID(node.rid)};
+												result.nodes[node.id] = {name: node.name, jid: convertFromRID(node.rid), represents: node.represents};
 											}
 											// get the edges
 											var edge_cmd = "select  in.id as s, p.id as p, out.id as o, @rid as rid from (traverse edges from " + networkRID + ") where $depth = 1)";

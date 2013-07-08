@@ -8,24 +8,24 @@ exports.createUser = function(username, password, callback){
 	console.log("calling createUser with arguments: '" + username + "' '" + password + "'");
 	var selectUserByUserNameCmd = "select from xUser where username = '" + username + "'";
 	var insertUserCmd = "insert into xUser (username, password) values('" + username + "', '" + password + "')";
-	console.log("first checking that username is not taken");
+	//console.log("first checking that username is not taken");
 	module.db.command(selectUserByUserNameCmd, function(err, users) {
 		if (err) {
 			callback( {error : err, status : 500});
 		} else {
-			console.log("Existing users: " + JSON.stringify(users));
+			//console.log("Existing users: " + JSON.stringify(users));
 			if (users && users.length > 0){
 				callback({error : "username '" + username + "' is already in use", status : 500});
 			} else {
-				console.log("now inserting the new user");
-				console.log(insertUserCmd);
+				//console.log("now inserting the new user");
+				//console.log(insertUserCmd);
 				module.db.command(insertUserCmd, function(err, results) {
 					if (err){
 						console.log("insert of new user yields error : " + err);
 						callback({error : err});
 					} else {
 						var user = results[0];
-						console.log(JSON.stringify(user));
+						//console.log(JSON.stringify(user));
 						callback({error : err, jid: user['@rid'], username: user['username']});
 					}
 					

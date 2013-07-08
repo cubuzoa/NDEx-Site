@@ -8,18 +8,18 @@ exports.createGroup = function(groupname, password, callback){
 	console.log("calling createGroup with arguments: '" + groupname + "' '" + password + "'");
 	var selectGroupByGroupNameCmd = "select from xGroup where groupname = '" + groupname + "'";
 	var insertGroupCmd = "insert into xGroup (groupname, password) values('" + groupname + "', '" + password + "')";
-	console.log("first checking that groupname is not taken");
+	//console.log("first checking that groupname is not taken");
 	module.db.command(selectGroupByGroupNameCmd, function(err, groups) {
 		if (err) {
 			callback( {error : err, status : 500});
 		} else {
-			console.log("Existing groups: " + JSON.stringify(groups));
+			//console.log("Existing groups: " + JSON.stringify(groups));
 			if (groups && groups.length > 0){
 				callback({error : "groupname '" + groupname + "' is already in use",
 							status : 500});
 			} else {
-				console.log("now inserting the new group");
-				console.log(insertGroupCmd);
+				//console.log("now inserting the new group");
+				//console.log(insertGroupCmd);
 				module.db.command(insertGroupCmd, function(err, groups) {
 					if (err){
 						console.log("insert of new group yields error : " + err);
