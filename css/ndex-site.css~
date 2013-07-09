@@ -57,11 +57,11 @@ h4 {
 
 .networkTitle{
 	font-size: 14px;
-	font-weight: 350;
+	font-weight: 150;
 }
 
 .elementCount{
-	font-weight: 500;
+	font-weight: 300;
 }
 
 #cy {

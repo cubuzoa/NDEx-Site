@@ -1,9 +1,21 @@
 <% include head.ejs %>
 <% include nav.ejs %>
 
-<div id="edges"></div>
-<div id="nodes"></div>
-<div id="error"></div>
+<div class="tabbable">
+	<ul class="nav nav-tabs">
+		<li class="active">
+			<a href="#edges" data-toggle="tab" class="span5"> Edges </a>
+		</li>
+		<li>
+			<a href="#nodes" data-toggle="tab" class="span5"> Nodes </a>
+		</li>
+	</ul>
+	<div class="tab-content">
+		<div class="tab-pane active" id="edges"></div>
+		<div class="tab-pane" id="nodes"></div>
+	</div>
+</div>
+	<div id="error"></div>
 <script>
 
 // the network id passed from the ejs template
