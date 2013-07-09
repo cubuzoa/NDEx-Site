@@ -4,6 +4,10 @@ exports.init = function(orient, callback) {
     module.db = orient;
 };
 
+function convertFromRID(RID){
+	return RID.replace("#","C").replace(":", "R");
+}
+
 exports.createGroup = function(groupname, password, callback){
 	console.log("calling createGroup with arguments: '" + groupname + "' '" + password + "'");
 	var selectGroupByGroupNameCmd = "select from xGroup where groupname = '" + groupname + "'";
@@ -96,20 +100,29 @@ exports.getGroup = function(groupRID, callback){
 
 		if (exports.checkErr(err, "finding group", callback)){
 			try {
-				if (!groups || groupss.length < 1){
+				if (!groups || groups.length < 1){
 					console.log("found no groups by id = '" + groupRID + "'");
 					callback({status : 404});
 				} else {
 				
-					var group = groups[0];
+					var group = groups[0],
+						profile = {};
+					
+					if (group.organizationName) profile.organizationName = group.organizationName;  
+					if (group.website) profile.website = group.website; 
+					if (group.foregroundImg) profile.foregroundImg = group.foregroundImg; 
+					if (group.foregroundImg) profile.foregroundImg = group.foregroundImg; 
+					if (group.description) profile.description = group.description;
 					
 					console.log("found " + groups.length + " groups, first one is " + group["@rid"]);
 					
-					var result = {groupname: group.groupname, profile : group.profile, ownedNetworks: {}};
+					var result = {groupname: group.groupname, profile : profile, ownedNetworks: {}};
 					
 					// get owned networks
 					var networkDescriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount";
-					var networks_cmd = "select " + networkDescriptors + " from (traverse ownsNetwork from " + groupRID + ") where $depth = 1";
+					var traverseExpression = "traverse V.out, E.in from " + groupRID + " while $depth <= 2"
+		 
+					var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
 					module.db.command(networks_cmd, function(err, networks) {
 						if(exports.checkErr(err, "getting owned networks", callback)){
 						
@@ -134,6 +147,14 @@ exports.getGroup = function(groupRID, callback){
 
 };
 
+exports.checkErr = function(err, where, callback){
+	if (err){
+			console.log("DB error, " + where + " : " + err);
+			callback({network : null, error : err, status : 500});
+			return false;
+	}
+	return true;
+};
 
 exports.deleteGroup = function (groupRID, callback){
 	console.log("calling delete group with groupRID = '" + groupRID + "'");

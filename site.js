@@ -413,10 +413,10 @@ app.get('/users', function(req, res) {
 
 // Get a user by userid
 app.get('/users/:userid', function(req, res) {
-    var username = req.params['username'];
-    if(username) username = convertToRID(username);
+    var userid = req.params['userid'];
+    if(userid) userid = convertToRID(userid);
 	try {
-		User.getUser(username, function(data){
+		User.getUser(userid, function(data){
 			var status = data.status || 200;
 			res.send(status, data);
 		});

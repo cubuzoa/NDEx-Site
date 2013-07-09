@@ -4,6 +4,10 @@ exports.init = function(orient, callback) {
     module.db = orient;
 };
 
+function convertFromRID(RID){
+	return RID.replace("#","C").replace(":", "R");
+}
+
 exports.createUser = function(username, password, callback){
 	console.log("calling createUser with arguments: '" + username + "' '" + password + "'");
 	var selectUserByUserNameCmd = "select from xUser where username = '" + username + "'";
@@ -96,20 +100,30 @@ exports.getUser = function(userRID, callback){
 
 		if (exports.checkErr(err, "finding user", callback)){
 			try {
-				if (!users || userss.length < 1){
+				if (!users || users.length < 1){
 					console.log("found no users by id = '" + userRID + "'");
 					callback({status : 404});
 				} else {
 				
-					var user = users[0];
+					var user = users[0], 
+						profile = {};
 					
 					console.log("found " + users.length + " users, first one is " + user["@rid"]);
 					
-					var result = {username: user.username, profile : user.profile, ownedNetworks: {}, ownedGroups: {}};
+					if (user.firstName) profile.firstName = user.firstName; 
+					if (user.lastName) profile.lastName = user.lastName; 
+					if (user.website) profile.website = user.website; 
+					if (user.foregroundImg) profile.foregroundImg = user.foregroundImg; 
+					if (user.foregroundImg) profile.foregroundImg = user.foregroundImg; 
+					if (user.description) profile.description = user.description;
+					
+					result = {username: user.username, profile : profile, ownedNetworks: {}, ownedGroups: {}};
 					
 					// get owned networks
 					var networkDescriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount";
-					var networks_cmd = "select " + networkDescriptors + " from (traverse ownsNetwork from " + userRID + ") where $depth = 1";
+					var traverseExpression = "traverse V.out, E.in from " + userRID + " while $depth <= 2"
+		 
+					var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
 					module.db.command(networks_cmd, function(err, networks) {
 						if(exports.checkErr(err, "getting owned networks", callback)){
 						
@@ -122,8 +136,9 @@ exports.getUser = function(userRID, callback){
 						}
 									
 						// get owned groups
-					    var groupDescriptors = "profile.organizationName as organizationName, @rid as jid";
-						var groups_cmd = "select " + networkDescriptors + "from (traverse ownsGroup from " + userRID + ") where $depth = 1";
+						var groupDescriptors = "organizationName as organizationName, @rid as jid";
+						var traverseExpression = "traverse V.out, E.in from " + userRID + " while $depth <= 2"		 
+						var groups_cmd = "select " + groupDescriptors + " from (" + traverseExpression + ") where @class = 'xGroup'";
 						module.db.command(groups_cmd, function(err, groups) {
 							if(exports.checkErr(err, "getting owned groups", callback)){
 						
@@ -149,6 +164,14 @@ exports.getUser = function(userRID, callback){
 
 };
 
+exports.checkErr = function(err, where, callback){
+	if (err){
+			console.log("DB error, " + where + " : " + err);
+			callback({network : null, error : err, status : 500});
+			return false;
+	}
+	return true;
+};
 
 exports.deleteUser = function (userRID, callback){
 	console.log("calling delete user with userRID = '" + userRID + "'");

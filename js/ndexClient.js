@@ -93,7 +93,7 @@ Expected to be a global for the client, expected to be undefined and then requir
 
 
 // Get a user by userid
-    exports.getUser = function(username, callback, errorHandler){
+    exports.getUser = function(userid, callback, errorHandler){
         var mergedRoute = '/users/' + encodeURIComponent(userid) + '';
         exports.ndexGet(mergedRoute, {},callback, errorHandler);
     }

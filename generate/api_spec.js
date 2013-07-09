@@ -132,7 +132,7 @@ exports.User = [
 		method : "GET",
 		route : "/users/:userid",
 		routeParams: {	
-				username : { doc : "user id", type : "JID"}
+				userid : { doc : "user id", type : "JID"}
 					},
 		response: {user : "user descriptor"},
 		exceptions: ["404 unknown username",
