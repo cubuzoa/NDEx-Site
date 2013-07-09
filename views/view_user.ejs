@@ -1,4 +1,43 @@
 <% include head.ejs %>
 <% include nav.ejs %>
-<p>TODO Search Results</p>
-</html>
+
+<p>Profile</p>
+<div id="profile"></div>
+<p>Networks</p>
+<div id="networks"></div>
+<div id="error"></div>
+<script>
+
+// the network id passed from the ejs template
+var userJID = '<%= userId %>';
+
+function formatError(error){
+
+}
+
+$(ndexClient.getUser(userJID, function(data){
+		console.log("Got results from getUser");
+		console.log(data);
+	
+  		// Clears the nodes and edges divs
+		$('#profile').html('');
+		$('#networks').html('');
+		
+  		$.each(data.user.profile, function(index, item){
+			$('#profile').append("<p>" + item + "</p>");
+		});  
+
+  		
+  		$.each(data.user.ownedNetworks, function(index, network){
+  			$('#networks').append("<p>" + network.title + "</p>");
+  		});
+
+    },
+    // error handler
+    function(error){
+    	$('#error').append(formatError(error));
+    })
+);
+</script>
+
+<% include foot.ejs %>

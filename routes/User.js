@@ -149,7 +149,7 @@ exports.getUser = function(userRID, callback){
 								}
 								result.ownedGroups = groups;
 							}
-							callback({group : result, error: err});
+							callback({user : result, error: err});
 							
 						});
 					});	

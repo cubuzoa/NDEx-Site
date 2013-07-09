@@ -269,9 +269,17 @@ app.get('/about', function(req, res) {
 //-----------------------------------------------------------
 
 app.get('/viewUser/:userId', function(req, res) {
-  res.render('search_users', 
-  			{	title: "Users", 
+  res.render('view_user', 
+  			{	title: "User", 
   				userId: req.params['userId'],
+  				user: req.user 
+  			});
+});
+
+app.get('/viewGroup/:groupId', function(req, res) {
+  res.render('view_group', 
+  			{	title: "Group", 
+  				groupId: req.params['groupId'],
   				user: req.user 
   			});
 });
