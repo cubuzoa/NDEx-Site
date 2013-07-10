@@ -11,7 +11,7 @@
 			<% if (user) {%> <%= user.username %><%}%>
 		
 			<div class="nav-collapse">			
-				<ul class="nav pull-left main-nav">   
+				<ul style="font-weight:bold" class="nav pull-left main-nav">   
 				  
 				  <li><a href="/searchNetworks">Networks</a></li>
 				  <li><a href="/searchGroups">Groups</a></li>

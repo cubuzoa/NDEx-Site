@@ -2,9 +2,9 @@
 <% include nav.ejs %>
 
 <div class="tabbable">
-	<ul class="nav nav-tabs tab-title">
+	<ul class="nav nav-tabs">
 		<li class="active">
-			<a href="#edges" data-toggle="tab" class="span5">Edges </a>
+			<a href="#edges" data-toggle="tab" class="span5"> Edges </a>
 		</li>
 		<li>
 			<a href="#nodes" data-toggle="tab" class="span5"> Nodes </a>

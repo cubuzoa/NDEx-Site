@@ -96,7 +96,7 @@ function formatNetworkDescriptor(item){
 	$(buttonLink).attr('id',item.title);
 	$(buttonLink).attr('href','javascript:toggle(this)').attr('onClick', 'toggle(this)').append(divButton);//.html('open');
 	    
-	$(divCell).append(DIV);
+	$(divCell).addClass('background-contrast').append(DIV);
 	$(divRow).append(divCell);
 	  
 	$(networkLink).attr('href','viewNetwork/' + item.jid).attr('target','_blank').append(item.title);
@@ -106,7 +106,7 @@ function formatNetworkDescriptor(item){
 	$(iconSpan).addClass('span1').append(buttonLink);   
 	
 
-	$(cell).append(iconSpan)
+	$(cell).addClass('background-contrast').append(iconSpan)
 		.append(titleSpan)
 		.append(nodeSpan)
 		.append(edgeSpan);
