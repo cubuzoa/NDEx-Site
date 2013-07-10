@@ -1,12 +1,14 @@
 var request = require('request'),
 	assert = require('assert');
- 
+
+var hostAddress =  'http://localhost:3333';
+
 describe('API CALL UNIT TESTING', function () {
  
-  // GET /properties
+  // GET /status
   describe('GET /status', function () {
     it("should respond with status 200", function (done) {
-      request('http://localhost:3333/status', function (err, resp) {
+      request(hostAddress + '/status', function (err, resp) {
         assert.equal(resp.statusCode, 200);
         done();
       });
@@ -16,7 +18,6 @@ describe('API CALL UNIT TESTING', function () {
   
   
 });
-
 
 /*
 
