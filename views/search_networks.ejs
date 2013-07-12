@@ -107,8 +107,7 @@ function formatNetworkDescriptor(item){
 	$(iconSpan).addClass('span1').append(buttonLink);   
 	
 
-	$(cell).addClass('background-contrast');
-	$(mnDiv).addClass('row').append(iconSpan)
+	$(cell).addClass('background-contrast').append(iconSpan)
 		.append(titleSpan)
 		.append(nodeSpan)
 		.append(edgeSpan);
@@ -119,8 +118,7 @@ function formatNetworkDescriptor(item){
 	$(nTable).addClass('table table-bordered table-hover').append(tblBody);
 
 	$(networkDIV).addClass('networkDescriptor')
-                 .append(mnDiv)
-		 .append(Div);//.append(nTable);
+                 .append(nTable);
 
 	return networkDIV;
 

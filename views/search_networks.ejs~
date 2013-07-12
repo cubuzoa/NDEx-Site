@@ -86,7 +86,7 @@ function formatNetworkDescriptor(item){
 		divButton = document.createElement('i'),
 		networkLink = document.createElement('a'),
 		buttonLink = document.createElement('a'),
-		mainDiv = document.createElement('div'),
+		mnDiv = document.createElement('div'),
 		DIV = document.createElement('div'),
 		divCell = document.createElement('td'),
 		divRow = document.createElement('tr');
@@ -107,8 +107,8 @@ function formatNetworkDescriptor(item){
 	$(iconSpan).addClass('span1').append(buttonLink);   
 	
 
-	//$(cell).addClass('background-contrast')
-	$(mainDiv).addClass('row').append(iconSpan)
+	$(cell).addClass('background-contrast');
+	$(mnDiv).addClass('row').append(iconSpan)
 		.append(titleSpan)
 		.append(nodeSpan)
 		.append(edgeSpan);
@@ -119,7 +119,7 @@ function formatNetworkDescriptor(item){
 	$(nTable).addClass('table table-bordered table-hover').append(tblBody);
 
 	$(networkDIV).addClass('networkDescriptor')
-                 .append(mainDiv)
+                 .append(mnDiv)
 		 .append(Div);//.append(nTable);
 
 	return networkDIV;
