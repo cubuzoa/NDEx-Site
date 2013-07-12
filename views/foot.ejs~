@@ -3,11 +3,11 @@
 </body>
 </html>
 
-<div class="footer2"></div>
 
-<hr>
-<footer>
-	
-	<p class="pull-right"> &copy; Cytoscape Consortium 2013</p>
-</footer>
-
+<div class="navbar navbar-fixed-bottom footer">
+	<div class="footer-inner">
+		<footer>
+			<p class="pull-right"> &copy; Cytoscape Consortium 2013</p>
+		</footer>
+	</div>
+</div>

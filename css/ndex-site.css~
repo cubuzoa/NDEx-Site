@@ -10,26 +10,9 @@ html, body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 400
     font-size: 12px;
-    
+    background-color:white; 
    p: 	
 
-/* IE10 Consumer Preview */ 
-background-image: -ms-radial-gradient(center, ellipse farthest-corner, #FFFFFF 0%, #EDF9FF 100%);
-
-/* Mozilla Firefox */ 
-background-image: -moz-radial-gradient(center, ellipse farthest-corner, #FFFFFF 0%, #EDF9FF 100%);
-
-/* Opera */ 
-background-image: -o-radial-gradient(center, ellipse farthest-corner, #FFFFFF 0%, #EDF9FF 100%);
-
-/* Webkit (Safari/Chrome 10) */ 
-background-image: -webkit-gradient(radial, center center, 0, center center, 505, color-stop(0, #FFFFFF), color-stop(1, #EDF9FF));
-
-/* Webkit (Chrome 11+) */ 
-background-image: -webkit-radial-gradient(center, ellipse farthest-corner, #FFFFFF 0%, #EDF9FF 100%);
-
-/* W3C Markup, IE10 Release Preview */ 
-background-image: radial-gradient(ellipse farthest-corner at center, #FFFFFF 0%, #EDF9FF 100%);
 }
 
 body {
@@ -98,8 +81,16 @@ h4 {
 
 /*---------Windows Style Icon Classes---------------*/
 .win8{
-	border-style:solid;
-	border-width:0px;
+	min-height: 20px;
+ 	padding: 19px;
+ 	margin-bottom: 20px;
+  	border: 1px solid #e3e3e3;
+  	-webkit-border-radius: 4px;
+ 	 -moz-border-radius: 4px;
+  	border-radius: 4px;
+  	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  	-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
 	padding:50px;
 	position:relative;
 	height:30em;
@@ -108,7 +99,7 @@ h4 {
 
 
 .lightGray{
-	background-color:#D7FCFF;
+	background-color:#D1E3FF;
 }
 
 .lightGrayBlue{
@@ -116,17 +107,30 @@ h4 {
 }
 
 #mainP{
+	margin-right:8%;
 	position:absolute;
 	top:50%;
 }
 
 .win8 h2{
 	text-align: center;
-	padding-bottom:1em;
 }
 
 .win8 button {
-	position:absolute;
+	width:50%;
+	position:absolute;	/*--setting parent tag to a relative position and target tag to absolue position allows for fixed position to bottom of parent tag.*/
 	bottom: 3em;
+	right:25%;
+	left:25%;
+}
+/*--------------------------------------------------------------------------*/
+.footer-inner{
+
+	background-color:white;
+	width:100%;
+	height:2em;
+}
+.footer{
+	padding-top:2em;
 }
 	
