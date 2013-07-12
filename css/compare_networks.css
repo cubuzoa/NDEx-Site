@@ -23,6 +23,11 @@ background-image: -webkit-radial-gradient(center, circle farthest-corner, #087BF
 background-image: radial-gradient(circle farthest-corner at center, #087BFF 0%, #00142E 100%);
 	}
 
+a:link { color:white; text-decoration:none;}	
+a:visited { color:white; text-decoration:none;}	
+a:hover { color:yellow; text-decoration:none;}	
+a:active { color:gray; text-decoration:none;}	
+
 #controls { 
 	position:absolute; 
 	width: 60px; 
@@ -31,6 +36,17 @@ background-image: radial-gradient(circle farthest-corner at center, #087BFF 0%, 
 	margin:1em 0 -4.5em 0; 
 	z-index:1010; 
 	}
+
+#back { 
+	position:absolute; 
+	color: white;
+	left: 10px;
+	text-align:left; 
+	margin:1em 0 -4.5em 0; 
+	z-index:1010; 
+	}
+
+
 	
 #logo { 
 	float: left;
@@ -64,6 +80,7 @@ background-image: radial-gradient(circle farthest-corner at center, #087BFF 0%, 
 	left: 50%;
 	margin-left: -40%;
 	bottom: 50px;
+
 	
 	text-align:left; 
 	padding: 0.5em;
@@ -76,8 +93,26 @@ background-image: radial-gradient(circle farthest-corner at center, #087BFF 0%, 
 
 	}
 
+table.edgeTable td { padding-top:3px; padding-right:20px; padding-bottom:3px; padding-left:20px; }
+
+.commonEdge { color:rgb(255,255,100)}
+
+
+.network1Edge { color:rgb(255,100,100)}
+
+
+.network2Edge { color:rgb(100,100,255)}
+
 #details ul{
 	list-style-type: square;
+		
+}
+
+#detailsContent {
+	overflow: auto;
+	max-height: 400px;
+
+
 }
 
 #hide_details {

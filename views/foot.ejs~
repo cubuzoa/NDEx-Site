@@ -2,12 +2,16 @@
 </div>
 </body>
 </html>
+<<<<<<< HEAD
 
-
-<div class="navbar navbar-fixed-bottom footer">
-	<div class="footer-inner">
+<br>
+<br>
+<br>
+<div class="navbar navbar-fixed-bottom">
+	<div class="footer">
 		<footer>
 			<p class="pull-right"> &copy; Cytoscape Consortium 2013</p>
 		</footer>
 	</div>
 </div>
+
