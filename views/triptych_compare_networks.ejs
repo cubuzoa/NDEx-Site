@@ -1,25 +1,37 @@
-<% include head.ejs %>
+<!DOCTYPE html>
+<html lang="en">
 
-<link rel="stylesheet" type="text/css" href="/css/BEL_mp_demo.css" />
+<head>
+	<meta charset="utf-8">
+	<title>NDEx:<%= title %></title>
+	<meta name="description" content="">
+	<meta name="author" content="">
 
-<script type="text/javascript" src="/js/three/Three.js"></script>
+	<script src="/js/jquery-1.10.2.min.js"></script>
+	<script src="/js/ndexClient.js"></script>
 
-<script type="text/javascript" src="/js/three/RequestAnimationFrame.js"></script>
+	<link rel="stylesheet" type="text/css" href="/css/compare_networks.css" />
 
-<script type="text/javascript" src="/js/triptych/Core/Triptych-1.1.4.js"></script>
+	<script type="text/javascript" src="/js/three/Three.js"></script>
 
-<script type="text/javascript" src="/js/triptych/GraphLoader/JDExGraphLoader.js"></script>
+	<script type="text/javascript" src="/js/three/RequestAnimationFrame.js"></script>
 
-<script type="text/javascript" src="/js/triptych/Visualizer/WebGLVisualizer-1.1.3.js"></script>
+	<script type="text/javascript" src="/js/triptych/Core/Triptych-1.1.4.js"></script>
 
-<script type="text/javascript" src="/js/triptych/Visualizer/TwoPlaneVisualizer.js"></script>
+	<script type="text/javascript" src="/js/triptych/GraphLoader/JDExGraphLoader.js"></script>
 
-<script type="text/javascript" src="/js/triptych/Controls/BasicControls-1.1.3.js"></script>
+	<script type="text/javascript" src="/js/triptych/Visualizer/WebGLVisualizer-1.1.3.js"></script>
 
-<script type="text/javascript" src="/js/triptych/LayoutEngine/ForceDirectedLayoutEngine-1.1.2.js"></script>
+	<script type="text/javascript" src="/js/triptych/Visualizer/TwoPlaneVisualizer.js"></script>
 
-<script type="text/javascript" src="/js/triptych/LayoutEngine/MP2LayoutEngine-1.1.1.js"></script>
+	<script type="text/javascript" src="/js/triptych/Controls/BasicControls-1.1.3.js"></script>
 
+	<script type="text/javascript" src="/js/triptych/LayoutEngine/ForceDirectedLayoutEngine-1.1.2.js"></script>
+
+	<script type="text/javascript" src="/js/triptych/LayoutEngine/MP3LayoutEngine.js"></script>
+</head>
+
+<body>
 
 <div id="controls">
 	<span id="fly"><img  src="/img/fly_icon.png" height=40></span>
@@ -28,10 +40,7 @@
 </div>
 
 <div id="details">
-	<span id="expand"><img  src="/img/expand_icon.png" height=40>&nbsp;Perturb</span>
-	<div id="hide_details">
-		<img  src="/img/close_icon.png" height=40>
-	</div>
+	<div id="hide_details"><img  src="/img/close_icon.png" height=40></div>
 	<div id="detailsContent"></div>
 </div>
 
@@ -128,7 +137,7 @@ function copyNodeWithPlane(graph, node, plane){
 
 // later, we can allow for other matching criteria...
 function findMatchingNode(graph, node){
-	return graph.findOrCreateNodeByIdentifier(node.identifier);
+	return graph.nodeByIdentifier(node.identifier);
 }
 
 TRIPTYCH.Node.prototype.onClick = function(event, role){
@@ -156,13 +165,48 @@ function displayDetails(node){
 	}
 	detail_node = node;
 	
-	$("#detailsContent").html("<p>" + node.label + "<ul>");
+	$("#detailsContent").html("");
+
+	var nodeSpan = document.createElement('span'),
+		edgeTable = document.createElement('table');
 	
+	$(nodeSpan).addClass("detailsNode").html(node.label);
+	$(edgeTable).addClass("edgeTable");
+	$("#detailsContent").append(nodeSpan);
+
+/*	
 	$.each(node.literals, function (predicate, value){
-		$("#detailsContent").append("<li>" + predicate + " : " + value + "</li>");
+		var listItem = document.createElement('li');
+		$(listItem).html(predicate + " : " + value );
+		$(detailList).append(listItem);
+	});
+*/	
+	$.each(node.getEdges(), function (i, edge){
+		var tableRow = document.createElement('tr'),
+			fromItem = document.createElement('td'),
+			relItem = document.createElement('td'),
+			toItem = document.createElement('td');
+		
+		$(fromItem).html(edge.from.label);
+		$(relItem).html(edge.relationship.type);
+		$(toItem).html(edge.to.label);
+		
+	
+		$(tableRow).append(fromItem).append(relItem).append(toItem);
+		
+		if (edge.planes){
+			if (edge.planes.length == 1){
+				if (edge.planes[0] == "one")$(tableRow).addClass("network1Edge");
+				if (edge.planes[0] == "two")$(tableRow).addClass("network2Edge");		
+			} else {
+				$(tableRow).addClass("commonEdge");
+			}
+		}
+		
+		$(edgeTable).append(tableRow);
 	});
 	
-	$("#detailsContent").append("</ul></p>");
+	$("#detailsContent").append(edgeTable);
 	
 }
 
@@ -267,11 +311,11 @@ function visualizerSetup(){
 	visualizer = new TRIPTYCH.TwoPlaneVisualizer(); 
 	visualizer.showLabels = false;
 	visualizer.showEdgeLabels = false;
-	visualizer.addTexture("increaseMap", "./textures/increaseDot.png");
+	visualizer.addTexture("increaseMap", "/img/increaseDot.png");
 }
 
 function layoutEngineSetup(){
-	layoutEngine = new TRIPTYCH.MP2LayoutEngine();	
+	layoutEngine = new TRIPTYCH.MP3LayoutEngine();	
 	layoutEngine.updateCount = 400;		
 }
 
@@ -323,4 +367,5 @@ $(ndexClient.getNetwork(network1RID, function(data1){
 	
 </script>
 
-<% include foot.ejs %>
+</body>
+</html>

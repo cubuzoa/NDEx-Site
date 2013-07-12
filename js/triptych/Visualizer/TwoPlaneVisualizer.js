@@ -1,7 +1,7 @@
 
 
 TRIPTYCH.TwoPlaneVisualizer = function(){
-	this.planeZ = {one : -150, two : 150};
+	this.planeZ = {one : -100, two : 100};
 	this.showLabels = false;
 	this.showEdgeLabels = false;
 };
@@ -77,8 +77,8 @@ TRIPTYCH.MPNodeDisplayer.prototype = {
 	
 	makeConnector : function(node, toZ){
 		var connector = this.visualizer.makeDotted(this.visualizer.resources.smallParticleMaterial);
-		connector.scale.z = 300/this.visualizer.edgeReferenceLength;
-		connector.position.z = -150;
+		connector.scale.z = 200/this.visualizer.edgeReferenceLength;
+		connector.position.z = -100;
 		return connector;
 	},
 	
@@ -129,7 +129,7 @@ TRIPTYCH.MPNodeDisplayer.prototype = {
 	
 	select : function(node, plane){
 		node.displayList.main[plane].material = this.visualizer.resources[this.selectMaterialName];
-		node.animated = true;
+		node.animated = false;
 	},
 	
 	plain : function(node, plane){
@@ -138,10 +138,13 @@ TRIPTYCH.MPNodeDisplayer.prototype = {
 	},
 	
 	getNodePlainMaterial : function(node, plane){
-		if (plane == "human") return this.visualizer.resources.darkGreenMaterial;
-		if (plane == "mouse") return this.visualizer.resources.darkRedMaterial;
-		if (plane == "rat") return this.visualizer.resources.darkBlueMaterial;
-		return this.visualizer.resources.greenMaterial;
+		if (node.planes && node.planes.length == 1){
+			if (plane == "one") return this.visualizer.resources.darkRedMaterial;
+			if (plane == "two") return this.visualizer.resources.darkBlueMaterial;
+			return this.visualizer.resources.greenMaterial;
+		} else {
+			return this.visualizer.resources.darkYellowMaterial;
+		}
 	},
 	
 	animate : function(node, plane){
@@ -299,7 +302,7 @@ TRIPTYCH.MPEdgeDisplayer.prototype = {
 	},
 	
 	select : function(edge, plane){
-		edge.animated = true;
+		edge.animated = false;
 		edge.displayList.main[plane].material = this.visualizer.resources[this.selectMaterialName];
 	},
 	
@@ -309,9 +312,13 @@ TRIPTYCH.MPEdgeDisplayer.prototype = {
 	},
 	
 	getPlainMaterial : function(edge, plane){
-		if (plane == "one") return this.visualizer.resources.greenMaterial;
-		if (plane == "two") return this.visualizer.resources.redMaterial;
-		return this.visualizer.resources.blueMaterial;
+		if (edge.planes && edge.planes.length == 1){
+			if (plane == "one") return this.visualizer.resources.darkRedMaterial;
+			if (plane == "two") return this.visualizer.resources.darkBlueMaterial;
+			return this.visualizer.resources.greenMaterial;
+		} else {
+			return this.visualizer.resources.yellowMaterial;
+		}
 	},
 		
 	animate : function(edge, plane){
@@ -419,10 +426,13 @@ TRIPTYCH.TwoPlaneVisualizer.prototype.initResources = function(){
 	this.resources.darkRedMaterial = new THREE.MeshPhongMaterial( { color: 0x991100,  specular:0xbbaa99, shininess:50, shading: THREE.SmoothShading } );
 	this.resources.darkBlueMaterial = new THREE.MeshPhongMaterial( { color: 0x1133cc,  specular:0xbbaa99, shininess:50, shading: THREE.SmoothShading } );
 	this.resources.transparentGreenMaterial = new THREE.MeshPhongMaterial( { color: 0x00ff00,  specular:0xbbaa99, shininess:50, opacity: 0.4, shading: THREE.SmoothShading } );
+	this.resources.yellowMaterial = new THREE.MeshPhongMaterial( { color: 0xffff22,  specular:0xbbaa99, shininess:50, shading: THREE.SmoothShading } );
+	this.resources.darkYellowMaterial = new THREE.MeshPhongMaterial( { color: 0x999900,  specular:0xbbaa99, shininess:50, shading: THREE.SmoothShading } );
+
 
 	this.resources.connectorLineMaterial = new THREE.LineBasicMaterial( { color: 0xFF33FF, opacity: 0.5 } );
 
-	this.resources.barGeometry = new THREE.CubeGeometry( 2, 2, this.edgeReferenceLength );
+	this.resources.barGeometry = new THREE.CubeGeometry( 0.5, 0.5, this.edgeReferenceLength );
 	this.resources.smallSphereGeometry = new THREE.SphereGeometry( 1, 0.32, 0.16 );
 /*
 	var sparkMap = THREE.ImageUtils.loadTexture("../../../textures/sliderSpark.png");

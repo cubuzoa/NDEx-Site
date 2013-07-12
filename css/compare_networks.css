@@ -76,6 +76,16 @@ background-image: radial-gradient(circle farthest-corner at center, #087BFF 0%, 
 
 	}
 
+table.edgeTable td { padding-top:3px; padding-right:20px; padding-bottom:3px; padding-left:20px; }
+
+.commonEdge { color:rgb(255,255,100)}
+
+
+.network1Edge { color:rgb(255,100,100)}
+
+
+.network2Edge { color:rgb(100,100,255)}
+
 #details ul{
 	list-style-type: square;
 }
