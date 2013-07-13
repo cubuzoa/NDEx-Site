@@ -73,9 +73,8 @@ function toggle(obj) {
 }
 
 function formatNetworkDescriptor(item){
-	var networkDIV = document.createElement('div');
-	
-    	var nTable = document.createElement('table'),
+	var networkDIV = document.createElement('div'),
+		nTable = document.createElement('table'),
         	tblBody = document.createElement('tbody'),
         	row = document.createElement('tr'),
 		cell = document.createElement('td'),
@@ -86,19 +85,20 @@ function formatNetworkDescriptor(item){
 		divButton = document.createElement('i'),
 		networkLink = document.createElement('a'),
 		buttonLink = document.createElement('a'),
-		mnDiv = document.createElement('div'),
-		DIV = document.createElement('div'),
-		divCell = document.createElement('td'),
-		divRow = document.createElement('tr');
+		infoDiv = document.createElement('div');
 
-	$(divButton).attr('id',item.title + 2).addClass('icon-plus');
+	$(divButton).attr('rel','tooltip')
+			.attr('title','More Info')
+			.attr('id',item.title + 2)
+			.addClass('icon-plus');
 
-	$(DIV).attr('id',item.title + 1).attr('style','display: none').html("This is a test of dropdown DIV. This area will probably hold additonal information for the user to distinguish networks. Or the area may also hold reference materials such as links to external websites or even pages within this website. ");		
-	$(buttonLink).attr('id',item.title);
-	$(buttonLink).attr('href','javascript:toggle(this)').attr('onClick', 'toggle(this)').append(divButton);//.html('open');
-	    
-	$(divCell).addClass('background-contrast').append(DIV);
-	$(divRow).append(divCell);
+	$(infoDiv).addClass('searchInfo').attr('id',item.title + 1)
+					.attr('style','display: none').html("This is a test of dropdown DIV. This area will probably hold additonal information for the user to distinguish networks. Or the area may also hold reference materials such as links to external websites or even pages within this website. ");	
+
+	$(buttonLink).attr('id',item.title)
+			.attr('href','javascript:toggle(this)')
+			.attr('onClick', 'toggle(this)')
+			.append(divButton);
 	  
 	$(networkLink).attr('href','viewNetwork/' + item.jid).append(item.title);
 	$(nodeSpan).addClass('span3 elementCount').append(item.nodeCount + " nodes"); 
@@ -114,11 +114,10 @@ function formatNetworkDescriptor(item){
 	
 	$(row).append(cell);
 	$(tblBody).append(row);
-	$(tblBody).append(divRow);
 	$(nTable).addClass('table table-bordered table-hover').append(tblBody);
 
 	$(networkDIV).addClass('networkDescriptor')
-                 .append(nTable);
+                 .append(nTable).append(infoDiv);
 
 	return networkDIV;
 
