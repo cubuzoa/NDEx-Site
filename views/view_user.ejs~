@@ -56,7 +56,9 @@ function addElements(item, index){
 	}
 
 	if (index == "website") {
-		$(link).append(item);
+		$(link).attr('href','https://' + item)
+			.attr('target','_blank')
+			.append(item);
 	}
 
 	if (index == "description") {
@@ -89,15 +91,22 @@ function formatNetworkDescriptor(item){
 		edgeSpan = document.createElement('span'),
 		titleSpan = document.createElement('span'),
 		iconSpan = document.createElement('span'),
+		visualizeSpan = document.createElement('span'),
 		divButton = document.createElement('i'),
+		visualizeButton = document.createElement('i'),
 		networkLink = document.createElement('a'),
 		buttonLink = document.createElement('a'),
+		visualizeLink = document.createElement('a'),
 		infoDiv = document.createElement('div');
 
 	$(divButton).attr('rel','tooltip')
 			.attr('title','More Info')
 			.attr('id',item.title + 2)
 			.addClass('icon-plus');
+			
+	$(visualizeButton).attr('rel','tooltip')
+			.attr('title','Visualize Network')
+			.addClass('icon-eye-open');
 
 	$(infoDiv).addClass('searchInfo').attr('id',item.title + 1)
 					.attr('style','display: none').html("This is a test of dropdown DIV. This area will probably hold additonal information for the user to distinguish networks. Or the area may also hold reference materials such as links to external websites or even pages within this website. ");	
@@ -105,16 +114,21 @@ function formatNetworkDescriptor(item){
 	$(buttonLink).attr('id',item.title)
 			.attr('onClick', 'toggle(this)')
 			.append(divButton);
+	$(visualizeLink).attr('href','../visualizeNetwork/' + item.jid)
+			.attr('target','_blank')
+			.append(visualizeButton);
 	  
-	$(networkLink).attr('href','../viewNetwork/' + item.jid).append(item.title);
+	$(networkLink).attr('href','viewNetwork/' + item.jid).append(item.title);
 	$(nodeSpan).addClass('span2 elementCount').append(item.nodeCount + " nodes"); 
 	$(edgeSpan).addClass('span2 elementCount').append(item.edgeCount + " edges"); 
-	$(titleSpan).addClass('span5 networkTitle').append(networkLink); 
+	$(titleSpan).addClass('span4 networkTitle').append(networkLink); 
 	$(iconSpan).addClass('span1').append(buttonLink);   
+	$(visualizeSpan).addClass('span1').append(visualizeLink);
 	
 
 	$(cell).addClass('background-contrast').append(iconSpan)
 		.append(titleSpan)
+		.append(visualizeSpan)
 		.append(nodeSpan)
 		.append(edgeSpan);
 	
@@ -126,6 +140,7 @@ function formatNetworkDescriptor(item){
                  .append(nTable).append(infoDiv);
 
 	return networkDIV;
+
 
 }
 

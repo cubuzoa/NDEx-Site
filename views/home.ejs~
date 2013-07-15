@@ -10,20 +10,14 @@
 				<p>NDEx will be an open-source, web-based software system to enable individuals, groups, and 
 				software applications to share, store, manipulate, and publish biological network knowledge. </p>
 
-<<<<<<< HEAD
+
 				<p>NDEx is a project of the <a href="https://www.cytoscape.org" target="_blank">Cytoscape Constortium </a> in conjunction with the <a href="https://www.idekerlab.ucsd.edu" target="_blank">Ideker Lab at the UCSD School of Medicine.</a></p>
 
 				<p>Learn more about NDEx at the <a href="https://ndexbio.org" target="_blank">NDEx Project Site.</a></p>
 
 				<p>Techincal details for NDEx are documented at the <a href="https://www.github.com/cytoscape/NDEx-Site/wiki" target="_blank">NDEx Github Repository Wiki.</a>
-=======
-				<p>NDEx is a project of the <a target="_blank" href="http://www.cytoscape.org">Cytoscape Constortium</a> in conjunction with the <a target="_blank" href="http://www.idekerlab.ucsd.edu">Ideker Lab at the UCSD School of Medicine.</a></p>
 
-				<p>Learn more about NDEx at the <a target="_blank" href="http://www.ndexbio.org">NDEx Project Site.</a></p>
-
-				<p>Techincal details for NDEx are documented at the <a target="_blank" href="https://www.github.com/cytoscape/NDEx-Site/wiki">NDEx Github Repository Wiki.</a>
->>>>>>> 9c1d4abc2657af1cd02056f43a172119f0366667
-		</div>
+	</div>
 		<div class="row-fluid">
 			<div class="span6 win8 lightGrayBlue">
 				<h2>Scientists Can Store and Share Networks on NDEx</h2>
@@ -67,11 +61,8 @@
 					<p>NDEx wil include simple visualization tools to display netowrks.</p>
 					<p><i>(Status: 2D visualization using Cytoscape.js with circular layout)</i></p>
 				</div>
-<<<<<<< HEAD
-				<a href="/visualizeNetwork/C11R1"><button class="btn btn-inverse">Network Visualization Exmaple</button></a>
-=======
 				<a href="/visualizeNetwork/C11R1"><button class="btn btn-inverse">Network Visualization Example</button></a>
->>>>>>> 9c1d4abc2657af1cd02056f43a172119f0366667
+
 			</div>
 			<div class="span6 win8 lightGray">
 				<h2>Users Can Visualize Comparisons of Networks</h2>

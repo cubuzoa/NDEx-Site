@@ -51,12 +51,14 @@ function addElements(item, index){
 		link = document.getElementById('link'),
 		descrip = document.getElementById('descrip');
 
-	if ((index == "firstName") || (index == "lastName")){
+	if (index == "organizationName"){
 		$(header).append(item + ' ');
 	}
 
 	if (index == "website") {
-		$(link).append(item);
+		$(link).attr('href','http://www.triptychjs.com')
+			.attr('target','_blank')
+			.append('Check out our website');
 	}
 
 	if (index == "description") {
