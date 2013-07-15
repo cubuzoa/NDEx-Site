@@ -88,7 +88,7 @@ function formatNetworkDescriptor(item){
 		infoDiv = document.createElement('div');
 
 	$(divButton).attr('rel','tooltip')
-			.attr('data-title','More Info')
+			.attr('title','More Info')
 			.attr('id',item.title + 2)
 			.addClass('icon-plus');
 

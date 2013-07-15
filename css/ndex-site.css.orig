@@ -1,0 +1,138 @@
+@font-face {
+    font-family: Roboto, sans-serif;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Roboto;
+    font-weight: 400;
+    font-size: 12px;
+    background-color:white; 
+   p: 	
+
+}
+
+h1,h2,h3,h4,h5 {
+    "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
+}
+
+h4 {
+    font-weight: 300;
+}
+
+.brand {
+	vertical-align: middle;
+	font-size: 20px;
+  	font-weight: 700;
+}
+
+.main-nav {
+	vertical-align: middle;
+	font-size: 14px;
+  	font-weight: 350;
+}
+
+.ndex-section {
+	font-size: 18px;
+
+}
+
+.networkTitle{
+	font-size: 14px;
+	font-weight: 350;
+}
+
+.elementCount{
+	font-weight: 500;
+}
+
+.tab-title{
+	font-size: 16px;
+	font-weight: 300;
+}
+
+.background-contrast {
+	/* IE10 Consumer Preview */ 
+background-image: -ms-radial-gradient(center, ellipse farthest-corner, #EDF9FF 0%, #EBEFFF 100%);
+
+/* Mozilla Firefox */ 
+background-image: -moz-radial-gradient(center, ellipse farthest-corner, #EDF9FF 0%, #EBEFFF 100%);
+
+<<<<<<< HEAD
+/*---------Windows Style Icon Classes---------------*/
+.win8{
+	min-height: 20px;
+ 	padding: 19px;
+ 	margin-bottom: 20px;
+  	border: 1px solid #e3e3e3;
+  	-webkit-border-radius: 4px;
+ 	 -moz-border-radius: 4px;
+  	border-radius: 4px;
+  	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  	-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+	padding:50px;
+	position:relative;
+	height:30em;
+=======
+/* Opera */ 
+background-image: -o-radial-gradient(center, ellipse farthest-corner, #EDF9FF 0%, #EBEFFF 100%);
+>>>>>>> 9c1d4abc2657af1cd02056f43a172119f0366667
+
+/* Webkit (Safari/Chrome 10) */ 
+background-image: -webkit-gradient(radial, center center, 0, center center, 505, color-stop(0, #EDF9FF), color-stop(1, #EBEFFF));
+
+/* Webkit (Chrome 11+) */ 
+background-image: -webkit-radial-gradient(center, ellipse farthest-corner, #EDF9FF 0%, #EBEFFF 100%);
+
+/* W3C Markup, IE10 Release Preview */ 
+background-image: radial-gradient(ellipse farthest-corner at center, #EDF9FF 0%, #EBEFFF 100%);
+}
+
+
+<<<<<<< HEAD
+#mainP{
+	margin-right:8%;
+	position:absolute;
+	top:50%;
+}
+
+.win8 h2{
+	text-align: center;
+}
+
+.win8 button {
+	width:50%;
+	position:absolute;	/*--setting parent tag to a relative position and target tag to absolue position allows for fixed position to bottom of parent tag.*/
+	bottom: 3em;
+	right:25%;
+	left:25%;
+=======
+
+/*---------Windows Style Icon Classes---------------*/
+p.box-lightblue{
+	border-style:solid;
+	border-width:0px;
+	padding:25px;
+	background-color:#97EBFF;
+}
+
+p.box-lightgrayblue{
+	border-style:solid;
+	border-width:0px;
+	padding:25px;
+	background-color:#E3F7FF;
+>>>>>>> 9c1d4abc2657af1cd02056f43a172119f0366667
+}
+/*--------------------------------------------------------------------------*/
+.footer{
+
+	background-color:white;
+	width:100%;
+	height:2em;
+}
+
+	
