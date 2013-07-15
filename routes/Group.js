@@ -111,7 +111,7 @@ exports.getGroup = function(groupRID, callback){
 					if (group.organizationName) profile.organizationName = group.organizationName;  
 					if (group.website) profile.website = group.website; 
 					if (group.foregroundImg) profile.foregroundImg = group.foregroundImg; 
-					if (group.foregroundImg) profile.foregroundImg = group.foregroundImg; 
+					if (group.backgroundImg) profile.backgroundImg = group.backgroundImg; 
 					if (group.description) profile.description = group.description;
 					
 					console.log("found " + groups.length + " groups, first one is " + group["@rid"]);

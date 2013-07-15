@@ -114,7 +114,7 @@ exports.getUser = function(userRID, callback){
 					if (user.lastName) profile.lastName = user.lastName; 
 					if (user.website) profile.website = user.website; 
 					if (user.foregroundImg) profile.foregroundImg = user.foregroundImg; 
-					if (user.foregroundImg) profile.foregroundImg = user.foregroundImg; 
+					if (user.backgroundImg) profile.backgroundImg = user.backgroundImg; 
 					if (user.description) profile.description = user.description;
 					
 					result = {username: user.username, profile : profile, ownedNetworks: {}, ownedGroups: {}};
