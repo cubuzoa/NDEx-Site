@@ -63,6 +63,16 @@ function formatEdge(edge, network){
 	return edgeDIV;
 }
 
+function findFields(node){
+	var fieldDiv = document.createElement('div');
+
+	for (var key in node){
+		$(fieldDiv).append(key);
+	}
+	
+	return fieldDiv;
+}
+
 function formatNode(node, network){
 		
 	var nodeDIV = document.createElement('div'),

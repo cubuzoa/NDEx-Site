@@ -68,7 +68,6 @@ function addElements(item, index){
 function toggle(obj) {
 	var divDisplay = obj.id +1;
 	var ele = document.getElementById(divDisplay);
-	var text = document.getElementById(obj.id);
 	var but = document.getElementById(obj.id +2);
 	if(ele.style.display == "block") {
 		ele.style.display = "none";
@@ -104,11 +103,10 @@ function formatNetworkDescriptor(item){
 					.attr('style','display: none').html("This is a test of dropdown DIV. This area will probably hold additonal information for the user to distinguish networks. Or the area may also hold reference materials such as links to external websites or even pages within this website. ");	
 
 	$(buttonLink).attr('id',item.title)
-			.attr('href','javascript:toggle(this)')
 			.attr('onClick', 'toggle(this)')
 			.append(divButton);
 	  
-	$(networkLink).attr('href','viewNetwork/' + item.jid).append(item.title);
+	$(networkLink).attr('href','../viewNetwork/' + item.jid).append(item.title);
 	$(nodeSpan).addClass('span2 elementCount').append(item.nodeCount + " nodes"); 
 	$(edgeSpan).addClass('span2 elementCount').append(item.edgeCount + " edges"); 
 	$(titleSpan).addClass('span5 networkTitle').append(networkLink); 
@@ -158,7 +156,7 @@ $(ndexClient.getUser(userJID, function(data){
 		$('#networks').html('');
 		
 		$('#profile').append(formatProfile());
-		$('#networks').append(formatImages());
+		$('#networks').append(formatImages()).append(tableHead());
 
   		$.each(data.user.profile, function(index, item){
 			addElements(item, index);

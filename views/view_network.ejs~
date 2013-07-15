@@ -38,19 +38,19 @@ function formatEdge(edge, network){
 	console.log(subject.represents + " : " + JSON.stringify(network.terms[subject.represents]));
 	if (subject.represents && network.terms[subject.represents]){
 		var term = network.terms[subject.represents];
-		$(subjectSpan).addClass('term span2').html(term.name + ' ');
+		$(subjectSpan).addClass('term').html(term.name + ' ');
 	}
 	
 	console.log(object.represents + " : " + JSON.stringify(network.terms[object.represents]));
 	if (object.represents && network.terms[object.represents]){
 		var term = network.terms[object.represents];
-		$(objectSpan).addClass('term span2').html(' ' + term.name);
+		$(objectSpan).addClass('term').html(' ' + term.name);
 	}
 
 	$(idSpan).addClass('edgeId').html(edge.id);
 	//$(subjectSpan).addClass('nodeName').html(subject.name);
 	//$(objectSpan).addClass('nodeName').html(object.name);
-	$(predicateSpan).addClass('predicateName span2').html(predicate.name);
+	$(predicateSpan).addClass('predicateName').html(predicate.name);
 
 	
 		
@@ -61,6 +61,16 @@ function formatEdge(edge, network){
 			  .append(objectSpan);
 			  
 	return edgeDIV;
+}
+
+function findFields(node){
+	var fieldDiv = document.createElement('div');
+
+	for (var key in node){
+		$(fieldDiv).append(key);
+	}
+	
+	return fieldDiv;
 }
 
 function formatNode(node, network){
@@ -81,7 +91,7 @@ function formatNode(node, network){
 		var term = network.terms[node.represents],
 			representsSpan = document.createElement('span');
 		$(representsSpan).addClass('term').html(term.name);
-		$(nodeDIV).append(representsSpan);
+		$(nodeDIV).append(representsSpan).append(findFields(term));
 	}
 	
 	return nodeDIV;
@@ -99,6 +109,7 @@ $(ndexClient.getNetwork(networkRID, function(data){
 		
   		$.each(data.network.nodes, function(index, node){
 			$('#nodes').append(formatNode(node, data.network));
+			$('#nodes').append(findFields(node));
 		});  
 
   		

@@ -1,11 +1,11 @@
 <% include head.ejs %>
 <% include nav.ejs %>
 
-<p>Profile</p>
-<div id="profile"></div>
-<p>Networks</p>
-<div id="networks"></div>
+<div class="row-fluid">
+<div id="networks" class="span7"></div>
+<div id="profile" class="span3"></div>
 <div id="error"></div>
+</div>
 <script>
 
 // the group id passed from the ejs template
@@ -15,6 +15,152 @@ function formatError(error){
 
 }
 
+
+function formatProfile(){
+	var header = document.createElement('h3'),
+		para1 = document.createElement('p'),
+		para2 = document.createElement('p'),
+		website = document.createElement('a'),
+		proDiv = document.createElement('div');
+
+	$(header).attr('id','name');
+	$(para2).attr('id','descrip');
+	$(website).attr('id','link').attr('target','_blank');
+
+	$(para1).append(website);
+	
+	$(proDiv).addClass('profile')
+		.append(header)
+		.append(para1)
+		.append(para2);
+
+	return proDiv;
+}
+
+function formatImages(){
+	var imageDiv = document.createElement('div');
+	
+	$(imageDiv).attr('id','image');
+	
+	return imageDiv;
+
+}
+
+function addElements(item, index){
+	var header = document.getElementById('name'),
+		link = document.getElementById('link'),
+		descrip = document.getElementById('descrip');
+
+	if ((index == "firstName") || (index == "lastName")){
+		$(header).append(item + ' ');
+	}
+
+	if (index == "website") {
+		$(link).append(item);
+	}
+
+	if (index == "description") {
+		$(descrip).append(item);
+	}
+}
+
+
+function toggle(obj) {
+	var divDisplay = obj.id +1;
+	var ele = document.getElementById(divDisplay);
+	var but = document.getElementById(obj.id +2);
+	if(ele.style.display == "block") {
+		ele.style.display = "none";
+		but.className = 'icon-plus';
+	}
+	else {
+		ele.style.display = "block";
+		but.className = 'icon-remove-circle';
+	}
+}
+
+function formatNetworkDescriptor(item){
+	var networkDIV = document.createElement('div'),
+		nTable = document.createElement('table'),
+        	tblBody = document.createElement('tbody'),
+        	row = document.createElement('tr'),
+		cell = document.createElement('td'),
+		nodeSpan = document.createElement('span'),
+		edgeSpan = document.createElement('span'),
+		titleSpan = document.createElement('span'),
+		iconSpan = document.createElement('span'),
+		visualizeSpan = document.createElement('span'),
+		divButton = document.createElement('i'),
+		visualizeButton = document.createElement('i'),
+		networkLink = document.createElement('a'),
+		buttonLink = document.createElement('a'),
+		visualizeLink = document.createElement('a'),
+		infoDiv = document.createElement('div');
+
+	$(divButton).attr('rel','tooltip')
+			.attr('title','More Info')
+			.attr('id',item.title + 2)
+			.addClass('icon-plus');
+			
+	$(visualizeButton).attr('rel','tooltip')
+			.attr('title','Visualize Network')
+			.addClass('icon-eye-open');
+
+	$(infoDiv).addClass('searchInfo').attr('id',item.title + 1)
+					.attr('style','display: none').html("This is a test of dropdown DIV. This area will probably hold additonal information for the user to distinguish networks. Or the area may also hold reference materials such as links to external websites or even pages within this website. ");	
+
+	$(buttonLink).attr('id',item.title)
+			.attr('onClick', 'toggle(this)')
+			.append(divButton);
+	$(visualizeLink).attr('href','../visualizeNetwork/' + item.jid)
+			.attr('target','_blank')
+			.append(visualizeButton);
+	  
+	$(networkLink).attr('href','viewNetwork/' + item.jid).append(item.title);
+	$(nodeSpan).addClass('span2 elementCount').append(item.nodeCount + " nodes"); 
+	$(edgeSpan).addClass('span2 elementCount').append(item.edgeCount + " edges"); 
+	$(titleSpan).addClass('span4 networkTitle').append(networkLink); 
+	$(iconSpan).addClass('span1').append(buttonLink);   
+	$(visualizeSpan).addClass('span1').append(visualizeLink);
+	
+
+	$(cell).addClass('background-contrast').append(iconSpan)
+		.append(titleSpan)
+		.append(visualizeSpan)
+		.append(nodeSpan)
+		.append(edgeSpan);
+	
+	$(row).append(cell);
+	$(tblBody).append(row);
+	$(nTable).addClass('table table-bordered table-hover').append(tblBody);
+
+	$(networkDIV).addClass('networkDescriptor')
+                 .append(nTable).append(infoDiv);
+
+	return networkDIV;
+
+
+}
+
+function tableHead(){
+    var mainDiv = document.createElement('div'),
+        mainTable = document.createElement('table'),
+        mainTblBody = document.createElement('tbody'),
+        mainRow = document.createElement('tr'),
+        mainCell = document.createElement('th');
+
+    $(mainCell).addClass('span9').html("My Networks");
+
+    $(mainRow).addClass('success').append(mainCell);
+    $(mainTblBody).append(mainRow);
+    $(mainTable).addClass('table').append(mainTblBody);
+    $(mainDiv).append(mainTable);
+
+    return mainDiv;
+
+}
+
+
 $(ndexClient.getGroup(groupJID, function(data){
 		console.log("Got results from getGroup");
 		console.log(data);
@@ -23,13 +169,17 @@ $(ndexClient.getGroup(groupJID, function(data){
 		$('#profile').html('');
 		$('#networks').html('');
 		
+		$('#profile').append(formatProfile());
+		$('#networks').append(formatImages()).append(tableHead());
+		
   		$.each(data.group.profile, function(index, item){
-			$('#profile').append("<p>" + item + "</p>");
+			addElements(item, index);
+			//$('#profile').append(index + ' ' );
 		});  
 
   		
   		$.each(data.group.ownedNetworks, function(index, network){
-  			$('#networks').append("<p>" + network.title + "</p>");
+  			$('#networks').append(formatNetworkDescriptor(network));
   		});
 
     },
