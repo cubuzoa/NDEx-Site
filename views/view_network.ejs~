@@ -38,19 +38,19 @@ function formatEdge(edge, network){
 	console.log(subject.represents + " : " + JSON.stringify(network.terms[subject.represents]));
 	if (subject.represents && network.terms[subject.represents]){
 		var term = network.terms[subject.represents];
-		$(subjectSpan).addClass('term').html(term.name + ' ');
+		$(subjectSpan).addClass('term span2').html(term.name + ' ');
 	}
 	
 	console.log(object.represents + " : " + JSON.stringify(network.terms[object.represents]));
 	if (object.represents && network.terms[object.represents]){
 		var term = network.terms[object.represents];
-		$(objectSpan).addClass('term').html(' ' + term.name);
+		$(objectSpan).addClass('term span2').html(' ' + term.name);
 	}
 
 	$(idSpan).addClass('edgeId').html(edge.id);
 	//$(subjectSpan).addClass('nodeName').html(subject.name);
 	//$(objectSpan).addClass('nodeName').html(object.name);
-	$(predicateSpan).addClass('predicateName').html(predicate.name);
+	$(predicateSpan).addClass('predicateName span2').html(predicate.name);
 
 	
 		

@@ -150,4 +150,19 @@ background-color:white;
 	padding-bottom:1em;
 }
 
+.term{
+	font-size:14px;
+	color:#00B8D9;
+}
+
+.predicateName{
+	color:#FF8E08;
+}
+
+.edge{
+	padding-bottom:1em;
+}
+.node{
+	padding-bottom:1em;
+}
 
