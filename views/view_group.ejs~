@@ -57,7 +57,8 @@ function addElements(item, index){
 
 	if (index == "website") {
 		$(link).attr('href','http://www.triptychjs.com')
-			.append(item);
+			.attr('target','_blank')
+			.append('Check out our website');
 	}
 
 	if (index == "description") {

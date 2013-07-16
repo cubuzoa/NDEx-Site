@@ -105,6 +105,7 @@ function formatNetworkDescriptor(item){
 			.attr('onClick', 'toggle(this)')
 			.append(divButton);
 	$(visualizeLink).attr('href','../visualizeNetwork/' + item.jid)
+			.attr('target','_blank')
 			.append(visualizeButton);
 	  
 	$(networkLink).attr('href','viewNetwork/' + item.jid).append(item.title);
