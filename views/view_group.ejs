@@ -118,7 +118,7 @@ function formatNetworkDescriptor(item){
 			.attr('target','_blank')
 			.append(visualizeButton);
 	  
-	$(networkLink).attr('href','viewNetwork/' + item.jid).append(item.title);
+	$(networkLink).attr('href','../viewNetwork/' + item.jid).append(item.title);
 	$(nodeSpan).addClass('span2 elementCount').append(item.nodeCount + " nodes"); 
 	$(edgeSpan).addClass('span2 elementCount').append(item.edgeCount + " edges"); 
 	$(titleSpan).addClass('span4 networkTitle').append(networkLink); 
