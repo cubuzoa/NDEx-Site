@@ -64,6 +64,21 @@ function addElements(item, index){
 	if (index == "description") {
 		$(descrip).append(item);
 	}
+	
+	
+	if (index =="backgroundImg") {
+		var fImg = document.getElementById("foreground");
+		$(image).attr('src',"../img/background/" + item);
+		$(image).addClass('bckImg');
+		$(imgDiv).append(image).append(fImg);
+	}
+	
+	if (index =="foregroundImg") {
+		$(image).attr('id','foreground')
+			.attr('src',"../img/foreground/" + item);
+		$(image).addClass('foreImg');
+		$(imgDiv).append(image);
+	}
 }
 
 
@@ -118,7 +133,7 @@ function formatNetworkDescriptor(item){
 			.attr('target','_blank')
 			.append(visualizeButton);
 	  
-	$(networkLink).attr('href','viewNetwork/' + item.jid).append(item.title);
+	$(networkLink).attr('href','../viewNetwork/' + item.jid).append(item.title);
 	$(nodeSpan).addClass('span2 elementCount').append(item.nodeCount + " nodes"); 
 	$(edgeSpan).addClass('span2 elementCount').append(item.edgeCount + " edges"); 
 	$(titleSpan).addClass('span4 networkTitle').append(networkLink); 

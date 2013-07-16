@@ -49,7 +49,9 @@ function formatImages(){
 function addElements(item, index){
 	var header = document.getElementById('name'),
 		link = document.getElementById('link'),
-		descrip = document.getElementById('descrip');
+		descrip = document.getElementById('descrip'),
+		imgDiv = document.getElementById('image'),
+		image = document.createElement('img');
 
 	if ((index == "firstName") || (index == "lastName")){
 		$(header).append(item + ' ');
@@ -63,6 +65,20 @@ function addElements(item, index){
 
 	if (index == "description") {
 		$(descrip).append(item);
+	}
+	
+	if (index =="backgroundImg") {
+		var fImg = document.getElementById("foreground");
+		$(image).attr('src',"../img/background/" + item);
+		$(image).addClass('bckImg');
+		$(imgDiv).append(image).append(fImg);
+	}
+	
+	if (index =="foregroundImg") {
+		$(image).attr('id','foreground')
+			.attr('src',"../img/foreground/" + item);
+		$(image).addClass('foreImg');
+		$(imgDiv).append(image);
 	}
 }
 
@@ -175,6 +191,7 @@ $(ndexClient.getUser(userJID, function(data){
 
   		$.each(data.user.profile, function(index, item){
 			addElements(item, index);
+			//$('#profile').append(index + image);
 		});  
 		
   		

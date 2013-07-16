@@ -162,4 +162,34 @@ background-color:white;
 .edge{
 	padding-bottom:1em;
 }
-
+.node{
+	padding-bottom:1em;
+}
+#wrapper{
+	height: 100%;
+        width: 200px;
+        overflow: auto;
+}
+#image{
+	width:100%;
+	min-width:100%;
+	padding:0;
+	margin:0;
+	position:relative;
+	}
+.bckImg{
+	width:100%;
+	height:200px;
+	padding:0;
+	position:relative;
+	left:0;
+	top:0;
+}
+.foreImg{
+	width:15%;
+	position:absolute;
+	left:5%;
+	top:15%;
+	border-width:2px;
+	border-color:blue;
+}
