@@ -63,11 +63,11 @@ function toggle(obj) {
 	var but = document.getElementById(obj.id +2);
 	if(ele.style.display == "block") {
 		ele.style.display = "none";
-		but.className = 'icon-plus';
+		but.className = 'icon-chevron-right';
 	}
 	else {
 		ele.style.display = "block";
-		but.className = 'icon-remove-circle';
+		but.className = 'icon-chevron-down';
 	}
 }
 
@@ -92,7 +92,7 @@ function formatNetworkDescriptor(item){
 	$(divButton).attr('rel','tooltip')
 			.attr('title','More Info')
 			.attr('id',item.title + 2)
-			.addClass('icon-plus');
+			.addClass('icon-chevron-right');
 			
 	$(visualizeButton).attr('rel','tooltip')
 			.attr('title','Visualize Network')

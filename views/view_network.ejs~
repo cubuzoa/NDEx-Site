@@ -91,7 +91,7 @@ function formatNode(node, network){
 		var term = network.terms[node.represents],
 			representsSpan = document.createElement('span');
 		$(representsSpan).addClass('term').html(term.name);
-		$(nodeDIV).append(representsSpan).append(findFields(term));
+		$(nodeDIV).append(representsSpan);
 	}
 	
 	return nodeDIV;
@@ -109,7 +109,6 @@ $(ndexClient.getNetwork(networkRID, function(data){
 		
   		$.each(data.network.nodes, function(index, node){
 			$('#nodes').append(formatNode(node, data.network));
-			$('#nodes').append(findFields(node));
 		});  
 
   		

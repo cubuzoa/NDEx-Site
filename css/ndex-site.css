@@ -166,9 +166,26 @@ background-color:white;
 	padding-bottom:1em;
 }
 #wrapper{
-	height: 100%;
-        width: 200px;
-        overflow: auto;
+	position:absolute;
+	top:0px;
+	right: 0px;
+	bottom:100px;
+        width: 150px;
+        overflow-y: auto;
+        margin:5px;
+}
+#sidebar{
+	position:absolute;
+	top:50px;
+	right:0px;
+	bottom:50px;
+	width:200px;
+	padding:0px;
+}
+#stay{
+	height:100%;
+	width:200px;
+	padding:0;
 }
 #image{
 	width:100%;
