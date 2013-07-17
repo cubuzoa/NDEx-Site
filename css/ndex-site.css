@@ -165,26 +165,32 @@ background-color:white;
 .node{
 	padding-bottom:1em;
 }
+
 #wrapper{
+/*This fixed position along with overflow attribute create constant size for div and add scrollbar*/
 	position:absolute;
-	top:0px;
-	right: 0px;
+	top:10px;
+	right: 5px;
 	bottom:100px;
         width: 150px;
         overflow-y: auto;
         margin:5px;
 }
 #sidebar{
+/*Used to position the sidebar on the side of the page, not sure if so many divs are needed*/
 	position:absolute;
 	top:50px;
 	right:0px;
 	bottom:50px;
 	width:200px;
 	padding:0px;
+	margin:0;
 }
 #stay{
+/*Used to keep the sidebar fixed in the window regardless of the where the scroll is moved*/
 	height:100%;
 	width:200px;
+	margin:0;
 	padding:0;
 }
 #image{

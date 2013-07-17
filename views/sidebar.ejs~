@@ -1,8 +1,28 @@
-<div id= "sidebar">
-<div id="stay" data-spy="affix">
-<div id="wrapper" class="well">
+<script>
+function toggle(obj) {
+	var ele = document.getElementById('wrapper');
+	var prnt = document.getElementById('sidebar');
+	var but = document.getElementById('sidebarButton');
+	if(ele.style.display == "block") {
+		ele.style.display = "none";
+		prnt.style.width = "20px";
+		but.className = 'icon-chevron-left';
+	}
+	else {
+		ele.style.display = "block";
+		prnt.style.width = "200px";
+		but.className = 'icon-chevron-right';
+	}
+}
+</script>
+
+
+<div id= "sidebar" style="dipslay: block">
+<div id="stay" class="well" data-spy="affix">
+	<a onClick="toggle(this)"><i id="sidebarButton" class="icon-chevron-right"></i></a>
+<div id="wrapper" style="dipslay: none">
 	<div>
-	<h3>Work Surface</h3>
+	<h4>Work Surface</h4>
 	beginning
 	<br>
 	test
