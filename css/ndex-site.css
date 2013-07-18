@@ -129,6 +129,9 @@ background-color:white;
 	width:100%;
 	height:2em;
 }
+.footer p{
+	margin:0% 10% 0%;
+}
 .searchInfo{
 	min-height: 20px;
  	padding: 19px;
@@ -169,10 +172,10 @@ background-color:white;
 #wrapper{
 /*This fixed position along with overflow attribute create constant size for div and add scrollbar*/
 	position:absolute;
-	top:10px;
-	right: 5px;
-	bottom:100px;
-        width: 150px;
+	top:75px;
+	right: 10px;
+	bottom:175px;
+        width: 160px;
         overflow-y: auto;
         margin:5px;
 }
@@ -181,8 +184,8 @@ background-color:white;
 	position:absolute;
 	top:50px;
 	right:0px;
-	bottom:50px;
-	width:200px;
+	bottom:150px;
+	width:20px;
 	padding:0px;
 	margin:0;
 }
@@ -192,6 +195,23 @@ background-color:white;
 	width:200px;
 	margin:0;
 	padding:0;
+}
+#tools{
+	position:absolute;
+	height:100px;
+	bottom:50px;
+	right:5px;
+	width:170px;
+
+}
+#circle {
+	 width: 1em; 
+	 height: 1em; 
+	 background: blue; 
+	 -moz-border-radius: 50%; 
+	 -webkit-border-radius: 50%; 
+	 border-radius: 50%; 
+	
 }
 #image{
 	width:100%;
@@ -215,4 +235,14 @@ background-color:white;
 	top:15%;
 	border-width:3px;
 	border-color:blue;
+}
+.thumbText{
+	font-size:10px;
+	font-weight:600;
+	text-align:center;
+}
+.thumbIcon{
+	width:120px;
+	height:100px;
+	background:white;
 }

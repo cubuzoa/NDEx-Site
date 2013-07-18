@@ -14,107 +14,174 @@ function toggle(obj) {
 		but.className = 'icon-chevron-right';
 	}
 }
+
+function addNetworkIcon(ntwkObj,count){
+	var unlst = document.createElement('ul'),
+		lst = document.createElement('li'),
+		cnt = document.createElement('div'),
+		formBox = document.createElement('form'),
+		chckbox = document.createElement('input'),
+		titleSpan = document.createElement('p');
+		
+	$(titleSpan).addClass('thumbText')
+		.append(ntwkObj.title);//
+	$(chckbox).attr('id','selected' + count)
+		.attr('title',ntwkObj.jid)
+		.attr('type','checkbox');
+	$(formBox).append(chckbox);
+	$(cnt).addClass('thumbnail thumbIcon')
+		.append(formBox)
+		.append(titleSpan);
+	$(lst).append(cnt);
+	$(unlst).attr('id','thumbnail' + ntwkObj.jid)
+		.addClass('thumbnails')
+		.append(lst);
+	
+	return unlst;
+}
+
+function viewNtwk(){
+	
+	var Lnk = document.getElementById('viewNet');
+	
+	for(var i=1;i<5;i++){
+		var Chk = document.getElementById('selected' + i);
+		if (Chk.checked){
+			Lnk.href = "../viewNetwork/"+Chk.title;
+			return ;
+		}
+	}
+		Lnk.removeAttribute('href');
+		alert('No Elements Selected');
+
+}
+
+function visualizeNtwk(){
+	
+	var Lnk = document.getElementById('visualizeNet');
+	
+	for(var i=1;i<5;i++){
+		var Chk = document.getElementById('selected' + i);
+		if (Chk.checked){
+			Lnk.href = "../visualizeNetwork/"+Chk.title;
+			return ;
+		}
+	}
+		Lnk.removeAttribute('href');
+		alert('No Elements Selected');
+
+}
+
+function compareNtwks(){
+	
+	var Lnk = document.getElementById('compareNets');
+	var firstNet = 1;
+	
+	for(var i=1;i<5;i++){
+		var Chk = document.getElementById('selected' + i);
+		if (Chk.checked){
+			firstNet = i;//Lnk.href = "../visualizeNetwork/"+Chk.title;
+			break ;
+		}
+	}
+	for(var j=(firstNet+1);j<5;j++){
+		var Chk2 = document.getElementById('selected' + j);
+		var Chk = document.getElementById('selected' + firstNet);
+		if (Chk2.checked){
+			Lnk.href = "../compareNetworks/" + Chk.title + "/" + Chk2.title;
+			return ;
+		}
+	}
+	
+		Lnk.removeAttribute('href');
+		alert('Please Select 2 Elements');
+
+}
+
+function removeNtwk(){
+	var parent = document.getElementById('workSurface');
+	
+	for(var i=1;i<5;i++){
+		var Chk = document.getElementById('selected' + i);
+		if (Chk.checked){
+			var child = document.getElementById('thumbnail' + Chk.title);
+			parent.removeChild(child);
+		}
+	}
+		alert('Removed or None Selected');
+
+}
+
+function formatError(error){
+}
+
 </script>
 
 
-<div id= "sidebar" style="dipslay: block">
-<div id="stay" class="well" data-spy="affix">
-	<a onClick="toggle(this)"><i id="sidebarButton" class="icon-chevron-right"></i></a>
-<div id="wrapper" style="dipslay: block">
-	<div>
-	<h4>Work Surface</h4>
-	beginning
-	<br>
-	test
-	<br><br>
-	test
-	<br><br>
-	test
-	<br>
-	test
-	<br><br>
-	test
-	<br><br>
-	test
-	<br>
-	test
-	<br><br>
-	test
-	<br><br>
-	test
-	<br>
-	test
-	<br><br>
-	test
-	<br><br>
-	test
-	<br>
-	test
-	<br><br>
-	test
-	<br><br>
-	test
-	<br>
-	test
-	<br><br>
-	test
-	<br><br>
-	test
-	<br>
-	test
-	<br><br>
-	test
-	<br><br>
-	test
-	<br>
-	test
-	<br><br>
-	test
-	<br><br>
-	test
-	<br>
-	test
-	<br><br>
-	test
-	<br><br>
-	test
-	<br>
-	test
-	<br><br>
-	test
-	<br><br>
-	test
-	<br>
-	test
-	<br><br>
-	test
-	<br><br>
-	test
-	<br>
-	test
-	<br><br>
-	test
-	<br><br>
-	test
-	<br>
-	test
-	<br><br>
-	test
-	<br><br>
-	test
-	<br>
-	test
-	<br><br>
-	test
-	<br><br>
-	test
-	<br>
-	test
-	<br><br>
-	test
-	<br><br>
-	end
+<div id= "sidebar" >
+	<div id="stay" class="well" data-spy="affix">
+		<a onClick="toggle(this)"><i id="sidebarButton" class="icon-chevron-left"></i></a>
+		<h4 style="text-align:center" >Work Surface</h4>
+		<div id="wrapper" style="dipslay: none">
+			<div id="workSurface">
+		
+			</div>
+		</div>
+		<div id="tools" class="btn-group">
+			<a id="viewNet" onclick="viewNtwk()" target="_blank">
+				<button class="btn btn-primary" rel="tooltip" title="View Network" data-placement="top"> 
+					<i class="icon-folder-open icon-white"> </i> 
+				</button>
+			</a>
+			<a id="visualizeNet" onclick="visualizeNtwk()" target="_blank">
+				<button class="btn btn-primary" rel="tooltip" title="Visualize Network" data-placement="top"> 
+					<i class="icon-eye-open icon-white"> </i> 
+				</button>
+			</a>	
+			<a id="compareNets" onclick="compareNtwks()" target="_blank">
+				<button class="btn btn-primary" rel="tooltip" title="Compare Networks" data-placement="top"> 
+					<i class="icon-retweet icon-white"> </i> 
+				</button>
+			</a>
+			<a onclick="removeNtwk()">
+				<button class="btn btn-primary" rel="tooltip" title="Remove Network"  data-placement="left top"> 
+					<i class="icon-remove-sign icon-white"> </i> 
+				</button>
+			</a>
+		</div>
 	</div>
 </div>
-</div>
-</div>
+<div id= "sideError"></div>
+
+<script>
+var searchExpression = 'C11R1', 
+		limit = 100,
+		count = 1,
+		offset = 0;
+
+	console.log("Calling findNetworks");
+	
+	ndexClient.findNetworks(searchExpression, limit, offset, function(data){
+		console.log("Got results from findNetworks");
+		console.log(data);
+		for (i in data.networks){
+			var network = data.networks[i];
+			console.log(network.title);
+		}
+		
+		// Clears the searchResults div
+		$('#workSurface').html('');
+		
+		if (data.networks){
+			$.each(data.networks, function(index, item){
+				$('#workSurface').append(addNetworkIcon(item,count));
+				count = count + 1;
+			});  
+		}
+    },
+    // error handler
+    function(error){
+    	$('#sideError').append(formatError(error));
+    });
+</script>    
+   
