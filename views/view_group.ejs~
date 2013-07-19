@@ -49,7 +49,9 @@ function formatImages(){
 function addElements(item, index){
 	var header = document.getElementById('name'),
 		link = document.getElementById('link'),
-		descrip = document.getElementById('descrip');
+		descrip = document.getElementById('descrip'),
+		imgDiv = document.getElementById('image'),
+		image = document.createElement('img');
 
 	if (index == "organizationName"){
 		$(header).append(item + ' ');
@@ -207,4 +209,5 @@ $(ndexClient.getGroup(groupJID, function(data){
 );
 </script>
 
+<% include sidebar.ejs %>
 <% include foot.ejs %>

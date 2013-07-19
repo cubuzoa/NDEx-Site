@@ -25,7 +25,7 @@ function addNetworkIcon(ntwkObj,count){
 		
 	$(titleSpan).addClass('thumbText')
 		.append(ntwkObj.title);//
-	$(chckbox).attr('id','checkbox' + ntwObj.jid)
+	$(chckbox).attr('id','checkbox' + ntwkObj.jid)
 		.attr('title',ntwkObj.jid)
 		.attr('type','checkbox');
 	$(formBox).append(chckbox);
@@ -124,7 +124,6 @@ function removeNtwk(){
 		}
 	});
 	
-	alert('Removed or None Selected');
 }
 
 function formatError(error){
@@ -143,17 +142,17 @@ function formatError(error){
 			</div>
 		</div>
 		<div id="tools" class="btn-group">
-			<a id="viewNet" onclick="viewNtwk()" target="_blank">
+			<a id="viewNet" onclick="viewNtwk()" >
 				<button class="btn btn-primary" rel="tooltip" title="View Network" data-placement="top"> 
 					<i class="icon-folder-open icon-white"> </i> 
 				</button>
 			</a>
-			<a id="visualizeNet" onclick="visualizeNtwk()" target="_blank">
+			<a id="visualizeNet" onclick="visualizeNtwk()">
 				<button class="btn btn-primary" rel="tooltip" title="Visualize Network" data-placement="top"> 
 					<i class="icon-eye-open icon-white"> </i> 
 				</button>
 			</a>	
-			<a id="compareNets" onclick="compareNtwks()" target="_blank">
+			<a id="compareNets" onclick="compareNtwks()">
 				<button class="btn btn-primary" rel="tooltip" title="Compare Networks" data-placement="top"> 
 					<i class="icon-retweet icon-white"> </i> 
 				</button>

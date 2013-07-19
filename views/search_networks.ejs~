@@ -38,6 +38,107 @@ function doSearch(offset) {
     return false;
 }
 
+function onWorkspace(jid){
+	var tempLink = document.getElementById('link'+jid);
+	var tempBtn = document.getElementById('button'+jid);
+	var tempIcon = document.getElementById('icon'+jid);
+	var found = false;
+	
+	
+	$("input").each(function(index,value){
+		if($(this).attr('title') == jid) {
+			$(tempLink).attr('onclick','removeFromWorkspace(this)');
+			$(tempBtn).attr('title','Remove from Workspace');
+			tempIcon.className='icon-remove icon-white';
+			found = true;
+		}
+	});
+	
+	if(found)return;
+	
+	$(tempLink).attr('onclick','addToWorkspace(this)');
+	$(tempBtn).attr('title','Add to Workspace');
+	tempIcon.className='icon-plus icon-white';
+}
+
+function removeFromWorkspace(obj){
+	var parent = document.getElementById('workSurface');
+
+	$("input").each(function(index,value){
+		if($(this).attr('title') == $(obj).attr('title')){
+			var child = document.getElementById('thumbnail' + $(this).attr('title'));
+			parent.removeChild(child);
+			onWorkspace($(obj).attr('title'));
+		}
+	});
+	
+}
+
+function toggle(obj) {
+	var divDisplay = obj.id +1;
+	var ele = document.getElementById(divDisplay);
+	var but = document.getElementById(obj.id +2);
+	if(ele.style.display == "block") {
+		ele.style.display = "none";
+		but.className = 'icon-chevron-right';
+	}
+	else {
+		ele.style.display = "block";
+		but.className = 'icon-chevron-down';
+	}
+	
+	onWorkspace($(obj).attr('title'));
+}
+
+function buttonTools(item){
+	var buttonDiv = document.createElement('div'),
+		wkSpaceLink=document.createElement('a'),
+		viewLink=document.createElement('a'),
+		visualizeLink=document.createElement('a'),
+		wkSpaceBtn=document.createElement('button'),
+		viewBtn=document.createElement('button'),
+		visualizeBtn=document.createElement('button'),
+		wkSpaceIcon=document.createElement('i'),
+		viewIcon=document.createElement('i'),
+		visualizeIcon=document.createElement('i');
+		
+	$(wkSpaceIcon).addClass('icon-plus icon-white').attr('id','icon'+item.jid);
+	$(viewIcon).addClass('icon-folder-open icon-white');
+	$(visualizeIcon).addClass('icon-eye-open icon-white');
+	
+	$(wkSpaceBtn).addClass('btn btn-primary')
+		.attr('rel','tooltip')
+		.attr('title','Add to Workspace')
+		.attr('data-placement','bottom')
+		.attr('id','button'+item.jid)
+		.append(wkSpaceIcon);
+	$(viewBtn).addClass('btn btn-primary')
+		.attr('rel','tooltip')
+		.attr('title','View Network')
+		.attr('data-placement','bottom')
+		.append(viewIcon);
+	$(visualizeBtn).addClass('btn btn-primary')
+		.attr('rel','tooltip')
+		.attr('title','VisualizeNetwork')
+		.attr('data-placement','bottom')
+		.append(visualizeIcon);
+	
+	$(wkSpaceLink).attr('onclick','')
+		.attr('id','link'+item.jid)
+		.attr('title',item.jid)
+		.append(wkSpaceBtn);
+	$(viewLink).attr('href','../viewNetwork/' + item.jid)
+		.append(viewBtn);
+	$(visualizeLink).attr('href','../visualizeNetwork/' + item.jid)
+		.append(visualizeBtn);
+		
+	$(buttonDiv).addClass('btn-group')
+		.append(wkSpaceLink)
+		.append(viewLink)
+		.append(visualizeLink);
+		
+	return buttonDiv
+}
 
 function tableHead(){
     var mainDiv = document.createElement('div'),
@@ -57,20 +158,6 @@ function tableHead(){
 
 }
 
-function toggle(obj) {
-	var divDisplay = obj.id +1;
-	var ele = document.getElementById(divDisplay);
-	var but = document.getElementById(obj.id +2);
-	if(ele.style.display == "block") {
-		ele.style.display = "none";
-		but.className = 'icon-chevron-right';
-	}
-	else {
-		ele.style.display = "block";
-		but.className = 'icon-chevron-down';
-	}
-}
-
 function formatNetworkDescriptor(item){
 	var networkDIV = document.createElement('div'),
 		nTable = document.createElement('table'),
@@ -81,44 +168,35 @@ function formatNetworkDescriptor(item){
 		edgeSpan = document.createElement('span'),
 		titleSpan = document.createElement('span'),
 		iconSpan = document.createElement('span'),
-		visualizeSpan = document.createElement('span'),
 		divButton = document.createElement('i'),
-		visualizeButton = document.createElement('i'),
 		networkLink = document.createElement('a'),
 		buttonLink = document.createElement('a'),
-		visualizeLink = document.createElement('a'),
 		infoDiv = document.createElement('div');
 
 	$(divButton).attr('rel','tooltip')
 			.attr('title','More Info')
 			.attr('id',item.title + 2)
 			.addClass('icon-chevron-right');
-			
-	$(visualizeButton).attr('rel','tooltip')
-			.attr('title','Visualize Network')
-			.addClass('icon-eye-open');
 
 	$(infoDiv).addClass('searchInfo').attr('id',item.title + 1)
-					.attr('style','display: none').html("This is a test of dropdown DIV. This area will probably hold additonal information for the user to distinguish networks. Or the area may also hold reference materials such as links to external websites or even pages within this website. ");	
+					.attr('style','display: none')
+					.append(buttonTools(item));	
 
 	$(buttonLink).attr('id',item.title)
+			.attr('title',item.jid)
 			.attr('onClick', 'toggle(this)')
 			.append(divButton);
-	$(visualizeLink).attr('href','../visualizeNetwork/' + item.jid)
-			.attr('target','_blank')
-			.append(visualizeButton);
+
 	  
 	$(networkLink).attr('href','viewNetwork/' + item.jid).append(item.title);
 	$(nodeSpan).addClass('span2 elementCount').append(item.nodeCount + " nodes"); 
 	$(edgeSpan).addClass('span2 elementCount').append(item.edgeCount + " edges"); 
 	$(titleSpan).addClass('span4 networkTitle').append(networkLink); 
 	$(iconSpan).addClass('span1').append(buttonLink);   
-	$(visualizeSpan).addClass('span1').append(visualizeLink);
 	
 
 	$(cell).addClass('background-contrast').append(iconSpan)
 		.append(titleSpan)
-		.append(visualizeSpan)
 		.append(nodeSpan)
 		.append(edgeSpan);
 	
@@ -154,4 +232,5 @@ function formatError(error){
 
 </div>
 
+<% include sidebar.ejs %>
 <% include foot.ejs %>

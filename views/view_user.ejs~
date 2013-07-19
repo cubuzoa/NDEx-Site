@@ -70,14 +70,14 @@ function addElements(item, index){
 	if (index =="backgroundImg") {
 		var fImg = document.getElementById("foreground");
 		$(image).attr('src',"../img/background/" + item);
-		$(image).addClass('bckImg');//.css({width:'100%',height:200});
+		$(image).addClass('bckImg');
 		$(imgDiv).append(image).append(fImg);
 	}
 	
 	if (index =="foregroundImg") {
 		$(image).attr('id','foreground')
 			.attr('src',"../img/foreground/" + item);
-		$(image).addClass('foreImg');//.css({width:'100%',height:200});
+		$(image).addClass('foreImg');
 		$(imgDiv).append(image);
 	}
 }
@@ -207,4 +207,5 @@ $(ndexClient.getUser(userJID, function(data){
 );
 </script>
 
+<% include sidebar.ejs %>
 <% include foot.ejs %>
