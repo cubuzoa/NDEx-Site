@@ -239,9 +239,15 @@ background-color:white;
 .thumbText{
 	font-size:10px;
 	font-weight:600;
+	text-align:center;
 }
 .thumbIcon{
 	width:120px;
 	height:100px;
 	background:white;
+}
+.pageTitle{
+	font-size:18px;
+	font-weight:600;
+	margin:10px;
 }

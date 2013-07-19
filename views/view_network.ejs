@@ -1,7 +1,14 @@
 <% include head.ejs %>
 <% include nav.ejs %>
 
+
+
 <div class="tabbable">
+	<div class="row-fluid">
+		<div class="pageTitle span6" id="viewNetTitle"></div>
+		<div class="span2" id="netStatus"></div>
+		<div class="span2" > <button id="viewNetButton" class="btn">Add to Workspace</button> </div>
+	</div>
 	<ul class="nav nav-tabs tab-title">
 		<li class="active">
 			<a href="#edges" data-toggle="tab" class="span5">Edges </a>
@@ -63,15 +70,6 @@ function formatEdge(edge, network){
 	return edgeDIV;
 }
 
-function findFields(node){
-	var fieldDiv = document.createElement('div');
-
-	for (var key in node){
-		$(fieldDiv).append(key);
-	}
-	
-	return fieldDiv;
-}
 
 function formatNode(node, network){
 		
@@ -98,6 +96,16 @@ function formatNode(node, network){
 
 }
 
+function onWorkspace(){
+	var tempDiv = document.getElementById('netStatus');
+	$(tempDiv).html('');
+	$("input").each(function(index,value){
+		if(true){//$(this).attr('title') == networkRID
+			$(tempDiv).html('on Workspace');
+		}
+	});
+}
+
 
 $(ndexClient.getNetwork(networkRID, function(data){
 		console.log("Got results from getNetwork");
@@ -106,7 +114,9 @@ $(ndexClient.getNetwork(networkRID, function(data){
   		// Clears the nodes and edges divs
 		$('#nodes').html('');
 		$('#edges').html('');
+		$('#viewNetTitle').html('');
 		
+		$('#viewNetTitle').append(networkRID);
   		$.each(data.network.nodes, function(index, node){
 			$('#nodes').append(formatNode(node, data.network));
 		});  
@@ -122,6 +132,8 @@ $(ndexClient.getNetwork(networkRID, function(data){
     	$('#error').append(formatError(error));
     })
 );
+
+onWorkspace();
 </script>
 
 <% include sidebar.ejs %>

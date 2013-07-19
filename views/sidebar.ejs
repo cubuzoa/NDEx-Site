@@ -1,5 +1,5 @@
 <script>
-function toggle(obj) {
+function toggle2(obj) {
 	var ele = document.getElementById('wrapper');
 	var prnt = document.getElementById('sidebar');
 	var but = document.getElementById('sidebarButton');
@@ -25,7 +25,7 @@ function addNetworkIcon(ntwkObj,count){
 		
 	$(titleSpan).addClass('thumbText')
 		.append(ntwkObj.title);//
-	$(chckbox).attr('id','selected' + count)
+	$(chckbox).attr('id','checkbox' + ntwkObj.jid)
 		.attr('title',ntwkObj.jid)
 		.attr('type','checkbox');
 	$(formBox).append(chckbox);
@@ -43,32 +43,44 @@ function addNetworkIcon(ntwkObj,count){
 function viewNtwk(){
 	
 	var Lnk = document.getElementById('viewNet');
+	var found = false;
 	
-	for(var i=1;i<5;i++){
+	$("input").each(function(index,value){
+		if($(this).is(':checked')){
+			Lnk.href = "../viewNetwork/"+$(this).attr('title');
+			found = true;
+			return false ;
+		}
+	});
+	if(found)return;
+	/*for(var i=1;i<5;i++){
 		var Chk = document.getElementById('selected' + i);
 		if (Chk.checked){
 			Lnk.href = "../viewNetwork/"+Chk.title;
 			return ;
 		}
-	}
-		Lnk.removeAttribute('href');
-		alert('No Elements Selected');
+	}*/
+	Lnk.removeAttribute('href');
+	alert('No Elements Selected');
 
 }
 
 function visualizeNtwk(){
 	
 	var Lnk = document.getElementById('visualizeNet');
+	var found = false;
 	
-	for(var i=1;i<5;i++){
-		var Chk = document.getElementById('selected' + i);
-		if (Chk.checked){
-			Lnk.href = "../visualizeNetwork/"+Chk.title;
-			return ;
+	$("input").each(function(index,value){
+		if($(this).is(':checked')){
+			Lnk.href = "../visualizeNetwork/"+$(this).attr('title');
+			found = true;
+			return false ;
 		}
-	}
-		Lnk.removeAttribute('href');
-		alert('No Elements Selected');
+	});
+	if(found)return;
+	
+	Lnk.removeAttribute('href');
+	alert('No Elements Selected');
 
 }
 
@@ -76,40 +88,43 @@ function compareNtwks(){
 	
 	var Lnk = document.getElementById('compareNets');
 	var firstNet = 1;
+	var found = false;
 	
-	for(var i=1;i<5;i++){
-		var Chk = document.getElementById('selected' + i);
-		if (Chk.checked){
-			firstNet = i;//Lnk.href = "../visualizeNetwork/"+Chk.title;
-			break ;
+	$("input").each(function(index,value){
+		if($(this).is(':checked')){
+			firstNet= $(this).attr('title');
+			return false ;
 		}
-	}
-	for(var j=(firstNet+1);j<5;j++){
-		var Chk2 = document.getElementById('selected' + j);
-		var Chk = document.getElementById('selected' + firstNet);
-		if (Chk2.checked){
-			Lnk.href = "../compareNetworks/" + Chk.title + "/" + Chk2.title;
-			return ;
+	});
+
+	$("input").each(function(index,value){
+		if($(this).is(':checked')){
+			if(firstNet != $(this).attr('title')){
+				Lnk.href = "../compareNetworks/" + firstNet + "/" + $(this).attr('title');
+				found = true;
+				return false ;
+			}	
 		}
-	}
+	});
+
+	if(found)return;
 	
-		Lnk.removeAttribute('href');
-		alert('Please Select 2 Elements');
+	Lnk.removeAttribute('href');
+	alert('Please Select 2 Elements');
 
 }
 
 function removeNtwk(){
 	var parent = document.getElementById('workSurface');
-	
-	for(var i=1;i<5;i++){
-		var Chk = document.getElementById('selected' + i);
-		if (Chk.checked){
-			var child = document.getElementById('thumbnail' + Chk.title);
+
+	$("input").each(function(index,value){
+		if($(this).is(':checked')){
+			var child = document.getElementById('thumbnail' + $(this).attr('title'));
 			parent.removeChild(child);
 		}
-	}
-		alert('Removed or None Selected');
-
+	});
+	
+	alert('Removed or None Selected');
 }
 
 function formatError(error){
@@ -120,7 +135,7 @@ function formatError(error){
 
 <div id= "sidebar" >
 	<div id="stay" class="well" data-spy="affix">
-		<a onClick="toggle(this)"><i id="sidebarButton" class="icon-chevron-left"></i></a>
+		<a onClick="toggle2(this)"><i id="sidebarButton" class="icon-chevron-left"></i></a>
 		<h4 style="text-align:center" >Work Surface</h4>
 		<div id="wrapper" style="dipslay: none">
 			<div id="workSurface">
