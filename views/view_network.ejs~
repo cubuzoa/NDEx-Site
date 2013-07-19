@@ -1,13 +1,20 @@
 <% include head.ejs %>
 <% include nav.ejs %>
-
+<% include sidebar.ejs %>
 
 
 <div class="tabbable">
-	<div class="row-fluid">
-		<div class="pageTitle span6" id="viewNetTitle"></div>
-		<div class="span2" id="netStatus"></div>
-		<div class="span2" > <button id="viewNetButton" class="btn">Add to Workspace</button> </div>
+	<div class="title">
+		<div class="btn-group" onclick="onWorkspace()">
+			<button class="btn btn-large " id="viewNetTitle"></button>
+			<button class="btn btn-large  dropdown-toggle" onclick="onWorkspace()" data-toggle="dropdown">
+				<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu">
+				<li id="netStatus"></li>
+			</ul>
+		</div>
+		
 	</div>
 	<ul class="nav nav-tabs tab-title">
 		<li class="active">
@@ -97,15 +104,65 @@ function formatNode(node, network){
 }
 
 function onWorkspace(){
-	var tempDiv = document.getElementById('netStatus');
-	$(tempDiv).html('test');
+	var tempEle = document.getElementById('netStatus');
+	var tempLnk = document.createElement('a');
+	var found = false;
+	
+	
+	$(tempEle).html('');
 	$("input").each(function(index,value){
-		if(true){//$(this).attr('title') == networkRID
-			$(tempDiv).html('on Workspace');
+		if($(this).attr('title') == networkRID) {
+			$(tempLnk).attr('onclick','removeFromWorkspace()').html('Remove from Workspace');
+			$(tempEle).append(tempLnk);
+			found = true;
 		}
 	});
+	
+	if(found)return;
+	
+	$(tempLnk).attr('onclick','addToWorkspace()').html('Add to Workspace');
+	$(tempEle).append(tempLnk);
 }
 
+function addToWorkspace(){
+	var unlst = document.createElement('ul'),
+		lst = document.createElement('li'),
+		cnt = document.createElement('div'),
+		formBox = document.createElement('form'),
+		chckbox = document.createElement('input'),
+		titleSpan = document.createElement('p');
+	var parent = document.getElementById('workSurface');
+		
+	$(titleSpan).addClass('thumbText')
+		.append(networkRID);//
+	$(chckbox).attr('id','checkbox' + networkRID)
+		.attr('title',networkRID)
+		.attr('type','checkbox');
+	$(formBox).append(chckbox);
+	$(cnt).addClass('thumbnail thumbIcon')
+		.append(formBox)
+		.append(titleSpan);
+	$(lst).append(cnt);
+	$(unlst).attr('id','thumbnail' + networkRID)
+		.addClass('thumbnails')
+		.append(lst);
+	
+	$(parent).append(unlst);
+	onWorkspace();
+}
+
+function removeFromWorkspace(){
+	var parent = document.getElementById('workSurface');
+
+	$("input").each(function(index,value){
+		if($(this).attr('title') == networkRID){
+			var child = document.getElementById('thumbnail' + $(this).attr('title'));
+			parent.removeChild(child);
+			onWorkspace();
+		}
+	});
+	
+}
 
 $(ndexClient.getNetwork(networkRID, function(data){
 		console.log("Got results from getNetwork");
@@ -125,6 +182,7 @@ $(ndexClient.getNetwork(networkRID, function(data){
   		$.each(data.network.edges, function(index, edge){
   			$('#edges').append(formatEdge(edge, data.network));
   		});
+  		
 
     },
     // error handler
@@ -133,8 +191,8 @@ $(ndexClient.getNetwork(networkRID, function(data){
     })
 );
 
-onWorkspace();
 </script>
 
-<% include sidebar.ejs %>
+
+
 <% include foot.ejs %>

@@ -246,8 +246,7 @@ background-color:white;
 	height:100px;
 	background:white;
 }
-.pageTitle{
-	font-size:18px;
-	font-weight:600;
-	margin:10px;
+.Title{
+	
+	padding-bottom:10px;
 }
