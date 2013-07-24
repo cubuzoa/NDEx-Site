@@ -42,15 +42,146 @@ function formatNotifications(){
 		head = document.createElement('div'),
 		content = document.createElement('div');
 	
-	$(head).html('Notifications');
-	$(content).addClass('lightGray').html('this is a test');
+	$(head).addClass('notificationsHeader').html('Notifications');
+	$(content).attr('style','background-color:white').attr('id','notifContent').html('Requests');
+	//calls to server that will populate notification
+	//loop
+		$(content).append(addInvite('group1','G1'))
+			.append(createModal('group1','G1'))
+			.append(addInvite('group2','G2'))
+			.append(createModal('group2','G2'));
+	//loop ends
 	
 	$(backDiv).addClass('notifications')
+		.attr('id','notifications')
 		.append(head)
 		.append(content);
+
 	
 	return backDiv;
 }
+
+function addInvite(name,id){
+	var modalTrigger = document.createElement('a');		
+	var list = document.createElement('li');
+	var unlist = document.createElement('ul');
+	
+	$(modalTrigger)
+		.addClass('unread')
+		.attr('href','#modal'+id)
+		.attr('data-toggle','modal')
+		.attr('id','trigger'+id)
+		.append(name);
+	
+	$(list).append(modalTrigger);
+	$(unlist).attr('id','triggerParent'+id).addClass("nav nav-list").append(list);
+	
+	return unlist;
+}
+
+function createModal(name,id){
+	var inviteModal = document.createElement('div'),
+		modalHeader = document.createElement('div'),
+		modalBody = document.createElement('div'),
+		modalFooter = document.createElement('div'),
+		title = document.createElement('h4'),
+		accept = document.createElement('button'),
+		postpone = document.createElement('button'),
+		deny = document.createElement('button');
+		
+	//Modal body
+	var topDiv = document.createElement('div'),
+		infoDiv = document.createElement('div'),
+		infoDiv2 = document.createElement('div'),
+		picDiv = document.createElement('div'),
+		messageDiv = document.createElement('div'),
+		headerSpan = document.createElement('span'),
+		contSpan = document.createElement('span'),
+		subjectSpan = document.createElement('span');
+	
+	//once server-side script is completed, variable declaration and initialization will be done inside of .each(data.request) etc. 
+	$(headerSpan).addClass('span3 requestModalLabel').html('From:');//plan to include from, date, groupname, memberType
+	$(contSpan).addClass('span7').html('Dexter');
+	$(infoDiv2).addClass('row-fluid').append(headerSpan).append(contSpan);
+	
+	
+	$(infoDiv).addClass('span7').append(infoDiv2);
+	$(picDiv).addClass('span5').append('picture here');
+	$(topDiv).addClass('row-fluid').append(infoDiv).append(picDiv);
+	
+	$(subjectSpan).addClass('').append('subject');
+	$(messageDiv).addClass('notifications').append('message');
+	
+	//-----------
+	$(title).attr('id','modal'+id+'Label')
+		.append('Join my Group on NDEx');
+	
+	$(accept).addClass('btn')
+		.attr('title',id)
+		.attr('id','accept')
+		.attr('data-dismiss','modal')
+		.attr('aria-hidden','true')
+		.attr('onclick','respondInvite(this)')
+		.append('Accept');
+	$(postpone).addClass('btn')
+		.attr('title',id)
+		.attr('id','postpone')
+		.attr('onclick','respondInvite(this)')
+		.attr('data-dismiss','modal')
+		.attr('aria-hidden','true')
+		.append('Postpone');
+	$(deny).addClass('btn')
+		.attr('title',id)
+		.attr('id','deny')
+		.attr('data-dismiss','modal')
+		.attr('aria-hidden','true')
+		.attr('onclick','respondInvite(this)')
+		.append('Deny');	
+		
+	$(modalHeader).addClass('modal-header')
+		.append(title);
+	$(modalBody).addClass('modal-body')
+		.append('test'+id)
+		.append(topDiv)
+		.append(subjectSpan)
+		.append(messageDiv);
+		
+	$(modalFooter).addClass('modal-footer')
+		.append(accept)
+		.append(postpone)
+		.append(deny);
+	
+	$(inviteModal).addClass('modal hide fade')
+		.attr('id','modal'+id)
+		.attr('tabindex','-1')
+		.attr('role','dialog')
+		.attr('aria-labelledby','modal' + id + 'label')
+		.attr('aria-hidden','true')
+		.append(modalHeader).append(modalBody).append(modalFooter);
+	
+	return inviteModal;
+	
+}	
+
+function respondInvite(obj){
+	var pageLink = document.getElementById('trigger' + obj.title);
+	var linkParent = document.getElementById('triggerParent' + obj.title);
+	var modal = document.getElementById('modal' + obj.title);
+	var notifContent = document.getElementById('notifContent');
+	
+	if (obj.id == 'postpone'){
+		pageLink.className ='read';
+		//modal.removeChild(obj);
+	}
+	if (obj.id == 'accept'){
+		notifContent.removeChild(linkParent);
+	}
+	if (obj.id == 'deny'){
+		notifContent.removeChild(linkParent);
+	}	
+}
+
+
 
 function formatImages(){
 	var imageDiv = document.createElement('div');
