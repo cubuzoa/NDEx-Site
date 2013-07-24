@@ -52,35 +52,6 @@
 </div>
 
 
-<div class=''>
-	<h3>Create a Group</h3>
-	<hr>
-	<form  class="form-horizontal" action="" method="post" enctype="multiipart/form-data">
-		<div class="control-group">
-				<label class="control-label" for="inputGroupName">Group Name</label>
-				<div class="controls">
-					<input  type="text" id="inputGroupName" name="groupName"></div></div>
-		<div class="control-group">
-				<label class="control-label" for="inputWebsite">Associated Website</label>
-				<div class="controls">
-					<input  type="text" id="inputWebsite" name="website"></div></div>
-		<div class="control-group">
-				<label class="control-label" for="inputDescription">Description</label>
-				<div class="controls">
-					<textarea rows="3" id="inputDescription" name="description" placeholder="A brief description of your group (i.e., mission statement, purpose, etc.)"></textarea></div></div>
-		<div class="control-group">
-				<label class="control-label" for="inputForegroundImg">Profile Picture</label>
-				<div class="controls">
-					<input  type="file" id="inputForegroundImg" name="foregroundImg"></div></div>
-		<div class="control-group">
-				<label class="control-label" for="inputBackgroundImg">Cover Photo</label>
-				<div class="controls">
-					<input  type="file" id="inputBackgroundImg" name="backgroundImg"></div></div>
-		<hr>
-		<input type="submit" value="Submit">
-	</form>
-	
-</div>
 
 
 <% include foot.ejs%>

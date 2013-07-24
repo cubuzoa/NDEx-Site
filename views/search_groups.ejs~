@@ -4,7 +4,6 @@
 
 <div class="" id="holder">
 	<h3>Upload Network</h3>
-	<hr>
 	<form  class="form-horizontal" action="" method="post" enctype="multiipart/form-data" id="groupForm">
 		<div class="row-fluid">
 			<div class="btn-group span2">

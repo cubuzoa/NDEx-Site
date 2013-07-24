@@ -36,6 +36,21 @@ function formatProfile(){
 
 	return proDiv;
 }
+//NOTIFICATIONS SECTION, MAY NOT GO ON THIS PAGE
+function formatNotifications(){
+	var backDiv = document.createElement('div'),
+		head = document.createElement('div'),
+		content = document.createElement('div');
+	
+	$(head).html('Notifications');
+	$(content).addClass('lightGray').html('this is a test');
+	
+	$(backDiv).addClass('notifications')
+		.append(head)
+		.append(content);
+	
+	return backDiv;
+}
 
 function formatImages(){
 	var imageDiv = document.createElement('div');
@@ -291,7 +306,8 @@ $(ndexClient.getUser(userJID, function(data){
 		$('#profile').html('');
 		$('#networks').html('');
 		
-		$('#profile').append(formatProfile());
+		$('#profile').append(formatProfile())
+			.append(formatNotifications());
 		$('#networks').append(formatImages()).append(tableHead());
 
   		$.each(data.user.profile, function(index, item){
