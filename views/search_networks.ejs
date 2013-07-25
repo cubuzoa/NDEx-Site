@@ -222,7 +222,7 @@ function formatNetworkDescriptor(item){
 	$(iconSpan).addClass('span1').append(buttonLink);   
 	
 
-	$(cell).addClass('background-contrast').append(iconSpan)
+	/*$(cell).addClass('background-contrast').append(iconSpan)
 		.append(titleSpan)
 		.append(nodeSpan)
 		.append(edgeSpan);
@@ -232,9 +232,20 @@ function formatNetworkDescriptor(item){
 	$(nTable).addClass('table table-bordered table-hover').append(tblBody);
 
 	$(networkDIV).addClass('networkDescriptor')
-                 .append(nTable).append(infoDiv);
+                 .append(nTable).append(infoDiv);*/
+        
+        var li = document.createElement('li');
+        var ul = document.createElement('ul');
+        var a = document.createElement('a');
+        
+        $(networkDIV).addClass('row-fluid').append(iconSpan).append(titleSpan).append(nodeSpan).append(edgeSpan);
+        $(a).attr('style','color:black').append(networkDIV).append(infoDiv);
+        
+        $(li).append(a);//.append(iconSpan).append(titleSpan).append(nodeSpan).append(edgeSpan);
+        $(ul).addClass("nav nav-list").append(li);
+        //$(networkDIV).append(ul);
 
-	return networkDIV;
+	return ul;//networkDIV;
 
 }
 

@@ -74,6 +74,33 @@ function removeFromWorkspace(obj){
 	
 }
 
+function addToWorkspace(obj){
+	var unlst = document.createElement('ul'),
+		lst = document.createElement('li'),
+		cnt = document.createElement('div'),
+		formBox = document.createElement('form'),
+		chckbox = document.createElement('input'),
+		titleSpan = document.createElement('p');
+	var parent = document.getElementById('workSurface');
+		
+	$(titleSpan).addClass('thumbText')
+		.append($(obj).attr('title'));//
+	$(chckbox).attr('id','checkbox' + $(obj).attr('title'))
+		.attr('title',$(obj).attr('title'))
+		.attr('type','checkbox');
+	$(formBox).append(chckbox);
+	$(cnt).addClass('thumbnail thumbIcon')
+		.append(formBox)
+		.append(titleSpan);
+	$(lst).append(cnt);
+	$(unlst).attr('id','thumbnail' + $(obj).attr('title'))
+		.addClass('thumbnails')
+		.append(lst);
+	
+	$(parent).append(unlst);
+	onWorkspace($(obj).attr('title'));
+}
+
 function toggle(obj) {
 	var divDisplay = obj.id +1;
 	var ele = document.getElementById(divDisplay);
@@ -195,7 +222,7 @@ function formatNetworkDescriptor(item){
 	$(iconSpan).addClass('span1').append(buttonLink);   
 	
 
-	$(cell).addClass('background-contrast').append(iconSpan)
+	/*$(cell).addClass('background-contrast').append(iconSpan)
 		.append(titleSpan)
 		.append(nodeSpan)
 		.append(edgeSpan);
@@ -205,9 +232,20 @@ function formatNetworkDescriptor(item){
 	$(nTable).addClass('table table-bordered table-hover').append(tblBody);
 
 	$(networkDIV).addClass('networkDescriptor')
-                 .append(nTable).append(infoDiv);
+                 .append(nTable).append(infoDiv);*/
+        
+        var li = document.createElement('li');
+        var ul = document.createElement('ul');
+        var a = document.createElement('a');
+        
+        $(networkDIV).addClass('row-fluid').append(iconSpan).append(titleSpan).append(nodeSpan).append(edgeSpan);
+        $(a).attr('style','font-color:black').append(networkDIV).append(infoDiv);
+        
+        $(li).append(a);//.append(iconSpan).append(titleSpan).append(nodeSpan).append(edgeSpan);
+        $(ul).addClass("nav nav-list").append(li);
+        //$(networkDIV).append(ul);
 
-	return networkDIV;
+	return ul;//networkDIV;
 
 }
 
