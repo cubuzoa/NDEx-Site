@@ -200,9 +200,8 @@ exports.getUserWorkspace = function(userRID, callback){
 				var network = workspace_networks[i];
 				network.jid = convertFromRID(network.jid);
 			}
-			result.workspace = workspace_networks;
 		}
-		callback({user : result, error: err});		
+		callback({user : workspace_networks, error: err});		
 	});
 }
 
