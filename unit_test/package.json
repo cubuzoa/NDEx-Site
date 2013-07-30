@@ -1,0 +1,14 @@
+{
+    "name": "test",
+    "description": "Network Database Testing Code",
+    "version": "0.0.2",
+    "private": true,
+    "dependencies": {
+        "mocha": "1.9.x",
+        "should" : "1.2.x",
+        "request" : "2.20.x" 
+    },
+    "scripts": {
+     "test": "mocha *-test.js"
+   }
+}
