@@ -201,7 +201,7 @@ exports.getUserWorkspace = function(userRID, callback){
 				network.jid = convertFromRID(network.jid);
 			}
 		}
-		callback({user : workspace_networks, error: err});		
+		callback({networks : workspace_networks, error: err});		
 	});
 }
 
