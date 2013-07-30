@@ -30,9 +30,7 @@ app.configure(function(){
 
   app.use(express.static(__dirname + '/public'));
 });
-
-
-// 
+ 
 app.configure(function() {
 
   app.set('views', __dirname + '/views');
@@ -62,8 +60,6 @@ app.configure(function() {
   app.use(express.static(__dirname + '/public'));
 });
 
-
-
 //-----------------------------------------------------------
 //
 //				Passport Authentication
@@ -71,10 +67,13 @@ app.configure(function() {
 //-----------------------------------------------------------
 
 // Passport session setup.
+//
 //   To support persistent login sessions, Passport needs to be able to
-//   serialize users into and deserialize users out of the session.  Typically,
-//   this will be as simple as storing the user ID when serializing, and finding
-//   the user by ID when deserializing.
+//   serialize users into and deserialize users out of the session.  
+//
+//   Typically, this will be as simple as storing the user ID when serializing, 
+//   and finding the user by ID when deserializing.
+//
 passport.serializeUser(function(user, done) {
   done(null, user.id);
 });
@@ -100,13 +99,15 @@ passport.deserializeUser(function(id, done) {
 });
 
 
-// Use the LocalStrategy within Passport.
+//   Use the LocalStrategy within Passport.
+//
 //   Strategies in passport require a `verify` function, which accept
 //   credentials (in this case, a username and password), and invoke a callback
-//   with a user object.  In the real world, this would query a database;
-//   however, in this example we are using a baked-in set of users.
+//   with a user object.
+//
 passport.use(new LocalStrategy(
   function(username, password, done) {
+  
     // asynchronous verification, for effect...
     process.nextTick(function () {
       
@@ -133,8 +134,7 @@ passport.use(new LocalStrategy(
 ));
 
 app.get('/', function(req, res){
-  res.render('home', { user: req.user, 
-  						title: "Home"});
+  res.render('home', { user: req.user, title: "Home"});
 });
 
 // example page to use for testing login
@@ -148,12 +148,14 @@ app.get('/login', function(req, res){
 });
 
 // POST /login
+//
 //   Use passport.authenticate() as route middleware to authenticate the
 //   request.  If authentication fails, the user will be redirected back to the
 //   login page.  Otherwise, the primary route function function will be called,
 //   which, in this example, will redirect the user to the home page.
 //
 //   curl -v -d "username=bob&password=secret" http://127.0.0.1:3330/login
+//
 app.post('/login', 
   passport.authenticate('local', { failureRedirect: '/login', failureFlash: true }),
   function(req, res) {
@@ -191,13 +193,28 @@ app.get('/join', function(req, res){
 });
 
 // Simple route middleware to ensure user is authenticated.
-//   Use this route middleware on any resource that needs to be protected.  If
-//   the request is authenticated (typically via a persistent login session),
-//   the request will proceed.  Otherwise, the user will be redirected to the
-//   login page.
+
+//   Use this route middleware on any site resource that needs to be protected.
+//   If the request is authenticated (typically via a persistent login session),
+//   the request will proceed.  
+//
+//   Otherwise, the user will be redirected to the login page.
+//
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
   res.redirect('/login')
+}
+
+//   Use this route middleware on API resources that need to be protected.  
+//
+//   If the request is authenticated (typically via a persistent login session),
+//   the request will proceed.
+//
+//   Otherwise, respond with a 401 indicating that authentication is required
+//
+function apiEnsureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) { return next(); }
+  res.send(401, {error: "authentication required"});
 }
 
 //-----------------------------------------------------------
@@ -314,6 +331,7 @@ app.get('/visNet/:networkId', function(req, res) {
   								 networkId: req.params['networkId'],
   								 user: req.user });
 });
+
 //-----------------------------------------------------------
 //
 //				The REST API
@@ -372,8 +390,9 @@ app.get('/status', function(req, res) {
 app.post('/users', function(req, res) {
     var username = req.body['username'];
     var password = req.body['password'];
+    var recoveryEmail = req.body['recoveryEmail'];
 	try {
-		User.createUser(username, password, function(data){
+		User.createUser(username, password, recoveryEmail, function(data){
 			var status = data.status || 200;
 			data.jid = convertFromRID(data.jid);
 			res.send(status, data);
@@ -384,7 +403,7 @@ app.post('/users', function(req, res) {
 	}
 });
 
-// Add a group account
+// Set new profile for user. Requester must be user or have admin permissions.
 app.post('/users/:userid/profile', function(req, res) {
     var userid = req.body['userid'];
     if(userid) userid = convertToRID(userid);
@@ -419,7 +438,7 @@ app.get('/users', function(req, res) {
 	}
 });
 
-// Get a user by userid
+// Get a user by userid. Content returned depends on requester permissions.
 app.get('/users/:userid', function(req, res) {
     var userid = req.params['userid'];
     if(userid) userid = convertToRID(userid);
@@ -434,12 +453,62 @@ app.get('/users/:userid', function(req, res) {
 	}
 });
 
-// Delete a user by username
+// Delete a user by user id. Requester must be user or have admin permissions.
 app.delete('/users/:userid', function(req, res) {
     var username = req.params['username'];
     if(username) username = convertToRID(username);
 	try {
 		User.deleteUser(username, function(data){
+			var status = data.status || 200;
+			res.send(status, data);
+		});
+	}
+	catch (e){
+		res.send(500, {error : e}); 
+	}
+});
+
+// Get the user's workspace. Requester must be user or have admin permissions.
+app.get('/users/:userid/workspace', function(req, res) {
+    var userid = req.params['userid'];
+    if(userid) userid = convertToRID(userid);
+	try {
+		User.getUserWorkspace(userid, function(data){
+			var status = data.status || 200;
+			res.send(status, data);
+		});
+	}
+	catch (e){
+		res.send(500, {error : e}); 
+	}
+});
+
+// Add a network to the user's workspace. Requester must be user or have admin permissions. User must have permission to access network
+app.post('/users/:userid/workspace', function(req, res) {
+    var userid = req.params['userid'];
+    if(userid) userid = convertToRID(userid);
+    var networkid = req.body['networkid'];
+    if(networkid) networkid = convertToRID(networkid);
+    var profile = req.body['profile'];
+	try {
+		User.addNetworkToUserWorkspace(userid, networkid, profile, function(data){
+			var status = data.status || 200;
+			res.send(status, data);
+		});
+	}
+	catch (e){
+		res.send(500, {error : e}); 
+	}
+});
+
+// Delete a network from the user's workspace. Requester must be user or have admin permissions
+app.delete('/users/:userid/workspace/:networkid', function(req, res) {
+    var userid = req.params['userid'];
+    if(userid) userid = convertToRID(userid);
+    var networkid = req.params['networkid'];
+    if(networkid) networkid = convertToRID(networkid);
+	try {
+		User.deleteNetworkFromUserWorkspace(userid, networkid, function(data){
 			var status = data.status || 200;
 			res.send(status, data);
 		});
@@ -466,7 +535,7 @@ app.post('/groups', function(req, res) {
 	}
 });
 
-// Add a group account
+// Set new group profile information. Requester must be group owner or have admin permissions.
 app.post('/groups/:groupid/profile', function(req, res) {
     var groupid = req.body['groupid'];
     if(groupid) groupid = convertToRID(groupid);
@@ -501,7 +570,7 @@ app.get('/groups', function(req, res) {
 	}
 });
 
-// Get a group by groupname
+// Get a group by group id. Information returned depends on whether requester is group owner.
 app.get('/groups/:groupid', function(req, res) {
     var groupid = req.params['groupid'];
     if(groupid) groupid = convertToRID(groupid);
@@ -516,7 +585,7 @@ app.get('/groups/:groupid', function(req, res) {
 	}
 });
 
-// Delete a group by groupname
+// Delete a group by group id. Requester must be group owner or have admin permissions.
 app.delete('/groups/:groupid', function(req, res) {
     var groupid = req.params['groupid'];
     if(groupid) groupid = convertToRID(groupid);
@@ -531,7 +600,7 @@ app.delete('/groups/:groupid', function(req, res) {
 	}
 });
 
-// Find Users who are members of a group, optionally filter by search expression
+// Find Users who are members of a group, optionally filter by search expression. Group owners see all members, non-owners see only members who allow themselves to be visible.
 app.get('/groups/:groupid/members', function(req, res) {
     var groupid = req.params['groupid'];
     if(groupid) groupid = convertToRID(groupid);
@@ -602,7 +671,7 @@ app.get('/networks/:networkid', function(req, res) {
 // Find Networks by search expression
 app.get('/networks', function(req, res) {
     var searchExpression = req.query['searchExpression'];
-    searchExpression = searchExpression || '*';
+    searchExpression = searchExpression || '';
     var limit = req.query['limit'];
     limit = limit || 100;
     var offset = req.query['offset'];
@@ -646,10 +715,11 @@ db.open(function(err) {
 //-----------------------------------------------------------
 
 function findByUsername(username, fn) {
-	var cmd = "select from NDExUser where username = '" + username + "'";
+	var cmd = "select from xUser where username = '" + username + "'";
 	db.command(cmd, fn);
 }
 
+// TODO - check that result is an instance of xUser
 function findById(id, fn) {
   var cmd = "select from " + id;
   db.command(cmd, fn);

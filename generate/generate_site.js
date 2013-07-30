@@ -95,8 +95,13 @@ for (n in specs.resourceTypes){
 				}
 			}
 			
+			var authenticator = "";
+			if (spec.requiresAuthentication){
+				authenticator = ", apiEnsureAuthentication ";
+			}
+			
 			lines = lines.concat([	
-						"app." + spec.method.toLowerCase() + "('" + spec.route + "', function(req, res) {"],
+						"app." + spec.method.toLowerCase() + "('" + spec.route + "'" + authenticator + ", function(req, res) {"],
 					
 						argumentLines,
 					

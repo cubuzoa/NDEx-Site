@@ -233,20 +233,29 @@ exports.createNetwork = function(networkJDEx, accountRID, callback){
 		
 };	
 
-// returns network descriptors - 
+//
+// Temporary: searchExpression is only used to match substrings in title and description fields of network
+//
 exports.findNetworks = function (searchExpression, limit, offset, callback){
-	console.log("calling findNetworks with arguments: " + searchExpression + " " + limit + " " + offset);
-	// Temporary: ignore search expression and offset, just get the first n networks
+	console.log("calling findNetworks with arguments: '" + searchExpression + "' " + limit + " " + offset);
 	
-	var descriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount";
-		cmd = "select " + descriptors + " from xNetwork order by creation_date desc limit " + limit;
+	var where_clause = "";
+
+	if (searchExpression.length > 0){
+		where_clause = " where properties.title.toUpperCase() like '%" + searchExpression + "%' OR properties.description.toUpperCase() like '%" + searchExpression + "%'";
+	} else {
+		console.log("searchExpression.length = " + searchExpression.length);
+	}
+		
+	var descriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount",
+		cmd = "select " + descriptors + " from xNetwork" + where_clause + " order by creation_date desc limit " + limit;
+		
 	console.log(cmd);
 	module.db.command(cmd, function(err, networks) {
 		for (i in networks){
 			var network = networks[i];
 			network.jid = convertFromRID(network.jid);
 		}
-		// for each network, summarize the key facts
         callback({networks : networks, error : err});
     });
 };

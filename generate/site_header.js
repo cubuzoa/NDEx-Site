@@ -30,9 +30,7 @@ app.configure(function(){
 
   app.use(express.static(__dirname + '/public'));
 });
-
-
-// 
+ 
 app.configure(function() {
 
   app.set('views', __dirname + '/views');
@@ -62,8 +60,6 @@ app.configure(function() {
   app.use(express.static(__dirname + '/public'));
 });
 
-
-
 //-----------------------------------------------------------
 //
 //				Passport Authentication
@@ -71,10 +67,13 @@ app.configure(function() {
 //-----------------------------------------------------------
 
 // Passport session setup.
+//
 //   To support persistent login sessions, Passport needs to be able to
-//   serialize users into and deserialize users out of the session.  Typically,
-//   this will be as simple as storing the user ID when serializing, and finding
-//   the user by ID when deserializing.
+//   serialize users into and deserialize users out of the session.  
+//
+//   Typically, this will be as simple as storing the user ID when serializing, 
+//   and finding the user by ID when deserializing.
+//
 passport.serializeUser(function(user, done) {
   done(null, user.id);
 });
@@ -100,13 +99,15 @@ passport.deserializeUser(function(id, done) {
 });
 
 
-// Use the LocalStrategy within Passport.
+//   Use the LocalStrategy within Passport.
+//
 //   Strategies in passport require a `verify` function, which accept
 //   credentials (in this case, a username and password), and invoke a callback
-//   with a user object.  In the real world, this would query a database;
-//   however, in this example we are using a baked-in set of users.
+//   with a user object.
+//
 passport.use(new LocalStrategy(
   function(username, password, done) {
+  
     // asynchronous verification, for effect...
     process.nextTick(function () {
       
@@ -133,8 +134,7 @@ passport.use(new LocalStrategy(
 ));
 
 app.get('/', function(req, res){
-  res.render('home', { user: req.user, 
-  						title: "Home"});
+  res.render('home', { user: req.user, title: "Home"});
 });
 
 // example page to use for testing login
@@ -148,12 +148,14 @@ app.get('/login', function(req, res){
 });
 
 // POST /login
+//
 //   Use passport.authenticate() as route middleware to authenticate the
 //   request.  If authentication fails, the user will be redirected back to the
 //   login page.  Otherwise, the primary route function function will be called,
 //   which, in this example, will redirect the user to the home page.
 //
 //   curl -v -d "username=bob&password=secret" http://127.0.0.1:3330/login
+//
 app.post('/login', 
   passport.authenticate('local', { failureRedirect: '/login', failureFlash: true }),
   function(req, res) {
@@ -191,13 +193,28 @@ app.get('/join', function(req, res){
 });
 
 // Simple route middleware to ensure user is authenticated.
-//   Use this route middleware on any resource that needs to be protected.  If
-//   the request is authenticated (typically via a persistent login session),
-//   the request will proceed.  Otherwise, the user will be redirected to the
-//   login page.
+
+//   Use this route middleware on any site resource that needs to be protected.
+//   If the request is authenticated (typically via a persistent login session),
+//   the request will proceed.  
+//
+//   Otherwise, the user will be redirected to the login page.
+//
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
   res.redirect('/login')
+}
+
+//   Use this route middleware on API resources that need to be protected.  
+//
+//   If the request is authenticated (typically via a persistent login session),
+//   the request will proceed.
+//
+//   Otherwise, respond with a 401 indicating that authentication is required
+//
+function apiEnsureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) { return next(); }
+  res.send(401, {error: "authentication required"});
 }
 
 //-----------------------------------------------------------
@@ -314,6 +331,7 @@ app.get('/visNet/:networkId', function(req, res) {
   								 networkId: req.params['networkId'],
   								 user: req.user });
 });
+
 //-----------------------------------------------------------
 //
 //				The REST API

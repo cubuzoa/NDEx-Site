@@ -7,10 +7,11 @@
 //-----------------------------------------------------------
 
 function findByUsername(username, fn) {
-	var cmd = "select from NDExUser where username = '" + username + "'";
+	var cmd = "select from xUser where username = '" + username + "'";
 	db.command(cmd, fn);
 }
 
+// TODO - check that result is an instance of xUser
 function findById(id, fn) {
   var cmd = "select from " + id;
   db.command(cmd, fn);

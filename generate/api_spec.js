@@ -52,6 +52,9 @@ exports.User = [
 							},
 				password : {	doc : "password",
 								type : "string"
+							},
+				recoveryEmail : {	doc : "email address for password recovery, default email for account",
+								type : "string"
 							}
 				},
 		response: {
@@ -65,7 +68,7 @@ exports.User = [
 
 	{	fn : "updateUserProfile",
 		status : "active",
-		doc : "Add a group account",
+		doc : "Set new profile for user. Requester must be user or have admin permissions.",
 		method : "POST",
 		route : "/users/:userid/profile",
 		postData: {
@@ -74,13 +77,13 @@ exports.User = [
 				},
 		response: {
 			},
-		exceptions: ["404 unknown userid",
+		exceptions: ["404 unknown user id",
 					"401 Requester not authorized"]
 	},	
 	
 	{	fn : "setUserPassword",
 		status : "inactive",
-		doc : "Set a user's password",
+		doc : "Set a user's password. Requester must be user or have admin permissions.",
 		method : "PUT",
 		route : "/users/:userid/password",
 		routeParams: {userid : {doc : "user id", type : "JID"}},
@@ -94,7 +97,7 @@ exports.User = [
 							},
 		response: {},
 		exceptions: [
-				"400 name already used", 
+				"404 unknown user id", 
 				"400 incorrect old password", 
 				"400 invalid new password",
 				"401 Requester not authorized"]
@@ -128,30 +131,78 @@ exports.User = [
 	
 	{	fn : "getUser",
 		status : "active",
-		doc : "Get a user by userid",
+		doc : "Get a user by userid. Content returned depends on requester permissions.",
 		method : "GET",
 		route : "/users/:userid",
 		routeParams: {	
 				userid : { doc : "user id", type : "JID"}
 					},
 		response: {user : "user descriptor"},
-		exceptions: ["404 unknown username",
+		exceptions: ["404 unknown user id",
 					"401 Requester not authorized"]
 	},	
 	
 	{	fn : "deleteUser",
 		status : "active",
-		doc : "Delete a user by username",
+		doc : "Delete a user by user id. Requester must be user or have admin permissions.",
 		method : "DELETE",
 		route : "/users/:userid",
 		routeParams: {	
 				username : { doc : "user id", type : "JID"}
 					},
 		response: {},
-		exceptions: ["404 unknown username",
+		exceptions: ["404 unknown user id",
 					"401 Requester not authorized"]
 	},
 
+	{	fn : "getUserWorkspace",
+		status : "active",
+		//requiresAuthentication : true,
+		doc : "Get the user's workspace. Requester must be user or have admin permissions.",
+		method : "GET",
+		route : "/users/:userid/workspace",
+		routeParams: {	
+				userid : { doc : "user id", type : "JID"}
+					},
+		response: {user : "user descriptor"},
+		exceptions: ["404 unknown user id",
+					"401 Requester not authorized"]
+	},
+
+	{	fn : "addNetworkToUserWorkspace",
+		status : "active",
+		//requiresAuthentication : true,
+		doc : "Add a network to the user's workspace. Requester must be user or have admin permissions. User must have permission to access network",
+		method : "POST",
+		route : "/users/:userid/workspace",
+		routeParams: {	
+				userid : { doc : "user id", type : "JID"}
+					},
+		postData: {
+				networkid : {	doc : "user id", type : "JID", required : true},
+				profile : {	doc : "group profile", type : "JSON"}
+				},
+		response: {user : "user descriptor"},
+		exceptions: ["404 unknown user id",
+					"401 Requester not authorized"]
+	},
+
+	{	fn : "deleteNetworkFromUserWorkspace",
+		status : "active",
+		//requiresAuthentication : true,
+		doc : "Delete a network from the user's workspace. Requester must be user or have admin permissions",
+		method : "DELETE",
+		route : "/users/:userid/workspace/:networkid",
+		routeParams: {	
+				userid : { doc : "user id", type : "JID"},
+				networkid : { doc : "network id", type : "JID"}
+					},
+		response: {user : "user descriptor"},
+		exceptions: ["404 unknown user id",
+					 "404 unknown network id",
+					"401 Requester not authorized"]
+	},	
+	
 ];
 
 // Note :  Agent parameters may eventually include controls for load management, throttling.	
@@ -314,30 +365,34 @@ exports.Group = [
 				userid : {		doc : "User Id of the group owner",
 								type : "JID",
 								required : true},
+								
 				groupName : {	doc : "group name", type : "string"}
 				},
 		response: {
 			jid : {doc : "the id of the new group", type : "JID"}
 			},
 		exceptions: [
+				"404 unknown user id",
+				"401 Requester not authorized",
 				"400 group name already used", 
-				"400 invalid name"]
+				"400 invalid group name"]
 	},	
 
 	{	fn : "updateGroupProfile",
 		status : "active",
-		doc : "Add a group account",
+		doc : "Set new group profile information. Requester must be group owner or have admin permissions.",
 		method : "POST",
 		route : "/groups/:groupid/profile",
 		postData: {
 				groupid : {		doc : "group id",
 								type : "JID",
 								required : true},
+								
 				profile : {	doc : "group profile", type : "JSON"}
 				},
 		response: {
 			},
-		exceptions: ["404 unknown groupid",
+		exceptions: ["404 unknown group id",
 					"401 Requester not authorized"]
 	},	
 
@@ -370,33 +425,33 @@ exports.Group = [
 	
 	{	fn : "getGroup",
 		status : "active",
-		doc : "Get a group by groupname",
+		doc : "Get a group by group id. Information returned depends on whether requester is group owner.",
 		method : "GET",
 		route : "/groups/:groupid",
 		routeParams: {	
 				groupid : { doc : "group id", type : "JID"}
 					},
 		response: {group : "group descriptor"},
-		exceptions: ["404 unknown groupname",
+		exceptions: ["404 unknown group id",
 					"401 Requester not authorized"]
 	},	
 	
 	{	fn : "deleteGroup",
 		status : "active",
-		doc : "Delete a group by groupname",
+		doc : "Delete a group by group id. Requester must be group owner or have admin permissions.",
 		method : "DELETE",
 		route : "/groups/:groupid",
 		routeParams: {	
 				groupid : { doc : "group id", type : "JID"}
 					},
 		response: {},
-		exceptions: ["404 unknown groupid",
+		exceptions: ["404 unknown group id",
 					"401 Requester not authorized"]
 	},
 	
 	{	fn : "getGroupMembers",
 		status : "active",
-		doc : "Find Users who are members of a group, optionally filter by search expression",
+		doc : "Find Users who are members of a group, optionally filter by search expression. Group owners see all members, non-owners see only members who allow themselves to be visible.",
 		method : "GET",
 		route : "/groups/:groupid/members",
 		routeParams: {	
@@ -740,7 +795,7 @@ exports.Network = [
 		queryParams: {	
 				searchExpression : { doc : "search specification",
 							type : "string",
-							default : "*"}, 
+							default : ""}, 
 				limit : { 	doc : "maximum number of networks to return", 
 							type : "integer",
 							default : 100,

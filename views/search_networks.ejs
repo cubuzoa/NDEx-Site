@@ -6,11 +6,11 @@
 // with a limit of 100.
 
 function doSearch(offset) {
-	var searchExpression = $('#searchExpression').serialize(), 
+	var searchExpression = $('#searchExpression').val().toUpperCase(), 
 		limit = 100
 		count = 1;
 
-	console.log("Calling findNetworks");
+	console.log("Calling findNetworks with '" + searchExpression + "' " + limit + " " + offset);
 	
 	ndexClient.findNetworks(searchExpression, limit, offset, function(data){
 		console.log("Got results from findNetworks");

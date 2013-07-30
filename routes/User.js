@@ -8,6 +8,15 @@ function convertFromRID(RID){
 	return RID.replace("#","C").replace(":", "R");
 }
 
+function contains(a, obj) {
+    for (var i = 0; i < a.length; i++) {
+        if (a[i] === obj) {
+            return true;
+        }
+    }
+    return false;
+}
+
 exports.createUser = function(username, password, callback){
 	console.log("calling createUser with arguments: '" + username + "' '" + password + "'");
 	var selectUserByUserNameCmd = "select from xUser where username = '" + username + "'";
@@ -173,11 +182,116 @@ exports.checkErr = function(err, where, callback){
 	return true;
 };
 
+exports.getUserWorkspace = function(userRID, callback){
+	console.log("calling getUserWorkspace with userRID = '" + userRID + "'");
+	
+	// get workspace networks
+	// need to get network descriptors back for each network ID found
+	var networkDescriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount";
+	var traverseExpression = "traverse workspace from " + userRID + " while $depth <= 2"
+	var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
+	
+	console.log(networks_cmd);
+	module.db.command(networks_cmd, function(err, workspace_networks) {
+		if(exports.checkErr(err, "getting user workspace networks", callback)){
+		
+			// process the workspace_networks
+			for (i in workspace_networks){
+				var network = workspace_networks[i];
+				network.jid = convertFromRID(network.jid);
+			}
+			result.workspace = workspace_networks;
+		}
+		callback({user : result, error: err});		
+	});
+}
+
+exports.addNetworkToUserWorkspace = function(userRID, networkRID, callback){
+	console.log("calling addNetworkToUserWorkspace with userRID = '" + userRID + "' and networkRID = '" + networkRID + "'");
+	// TODO Check permissions
+	// Check that user exists
+	module.db.commmand("select username, workspace from " + userRID + " where @class = 'xUser'", function(err, results){
+		if(exports.checkErr(err, "checking user before adding to workspace ", callback)){
+			if (!results || results.length < 1){
+				console.log("found no users by id = '" + userRID + "'");
+				callback({status : 404, error : "Found no user by id = '" + userRID + "'"});
+			} else {
+				var user_data = results[0];
+			
+				if (contains(user_data.workspace, networkRID)){
+					// skipping, already contains this network
+					callback({status : 500, error : "network " + networkRID + " already in user workspace"});
+				
+				} else {
+					// Check that network exists
+					module.db.command("select @rid as rid from " + networkRID + " where @class = 'xNetwork'", function(err, network_ids){
+						if(exports.checkErr(err, "checking network before adding to workspace ", callback)){
+							if (!network_ids || network_ids.length < 1){
+								callback({status : 404, error : "Found no network by id = '" + networkRID + "'"});
+							} else {
+								//
+								// User and Network exist, do the update:
+								var updateCmd = "update " + userRID + " add workspace = " + networkRID;
+								console.log(updateCmd);
+								module.db.command(updateCmd, function(err, workspace) {
+									exports.checkErr(err, "adding network " + networkRID + " to workspace of user " + userRID, callback)
+								});
+							}
+						
+						}
+					});
+					
+				}
+			}
+					
+		}
+	});	
+
+}
+
+
+exports.deleteNetworkFromUserWorkspace = function(userRID, networkRID, callback){
+	console.log("calling deleteNetworkFromUserWorkspace with userRID = '" + userRID + "' and networkRID = '" + networkRID + "'");
+	// TODO Check permissions
+	// Check that user exists
+	module.db.commmand("select username, workspace from " + userRID + " where @class = 'xUser'", function(err, results){
+		if(exports.checkErr(err, "checking user before adding to workspace ", callback)){
+			if (!results || results.length < 1){
+				console.log("found no users by id = '" + userRID + "'");
+				callback({status : 404, error : "Found no user by id = '" + userRID + "'"});
+			} else {
+				var user_data = results[0];
+			
+				if (!contains(user_data.workspace, networkRID)){
+					// skipping, does not contain this network
+					callback({status : 500, error : "network " + networkRID + " not in user workspace"});
+				
+				} else {
+					// User exists and networkRID is in the workspace, do the update:
+					var updateCmd = "update " + userRID + " remove workspace = " + networkRID;
+					console.log(updateCmd);
+					module.db.command(updateCmd, function(err, workspace) {
+						exports.checkErr(err, "removing network " + networkRID + " from workspace of user " + userRID, callback)
+					});
+				}
+						
+			}
+					
+		}
+	});	
+
+}
+
+//
+// TODO: clean up links from user.
+// This is a hard problem since the user may be the owner of groups and networks
+// What do we want the behavior to be?
+// 
 exports.deleteUser = function (userRID, callback){
 	console.log("calling delete user with userRID = '" + userRID + "'");
-	var cmd = "delete from " + userRID;
+	var cmd = "delete from " + userRID + " where @class = 'xUser'";
 	console.log(cmd);
 	module.db.command(cmd, function(err) {
-        callback({error : err});
+        exports.checkErr(err, "deleting user " + userRID, callback)
     });
 };

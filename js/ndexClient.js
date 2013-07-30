@@ -72,13 +72,13 @@ Expected to be a global for the client, expected to be undefined and then requir
 
 
 // Create a User Account
-    exports.createUser = function(username, password, callback, errorHandler){
+    exports.createUser = function(username, password, recoveryEmail, callback, errorHandler){
         var mergedRoute = '/users';
-        exports.ndexPost(mergedRoute, {username: username, password: password}, callback, errorHandler);
+        exports.ndexPost(mergedRoute, {username: username, password: password, recoveryEmail: recoveryEmail}, callback, errorHandler);
     }
 
 
-// Add a group account
+// Set new profile for user. Requester must be user or have admin permissions.
     exports.updateUserProfile = function(userid, profile, callback, errorHandler){
         var mergedRoute = '/users/' + encodeURIComponent(userid) + '/profile';
         exports.ndexPost(mergedRoute, {userid: userid, profile: profile}, callback, errorHandler);
@@ -92,16 +92,37 @@ Expected to be a global for the client, expected to be undefined and then requir
     }
 
 
-// Get a user by userid
+// Get a user by userid. Content returned depends on requester permissions.
     exports.getUser = function(userid, callback, errorHandler){
         var mergedRoute = '/users/' + encodeURIComponent(userid) + '';
         exports.ndexGet(mergedRoute, {},callback, errorHandler);
     }
 
 
-// Delete a user by username
+// Delete a user by user id. Requester must be user or have admin permissions.
     exports.deleteUser = function(username, callback, errorHandler){
         var mergedRoute = '/users/' + encodeURIComponent(userid) + '';
+        exports.ndexDelete(mergedRoute, callback, errorHandler);
+    }
+
+
+// Get the user's workspace. Requester must be user or have admin permissions.
+    exports.getUserWorkspace = function(userid, callback, errorHandler){
+        var mergedRoute = '/users/' + encodeURIComponent(userid) + '/workspace';
+        exports.ndexGet(mergedRoute, {},callback, errorHandler);
+    }
+
+
+// Add a network to the user's workspace. Requester must be user or have admin permissions. User must have permission to access network
+    exports.addNetworkToUserWorkspace = function(userid, networkid, profile, callback, errorHandler){
+        var mergedRoute = '/users/' + encodeURIComponent(userid) + '/workspace';
+        exports.ndexPost(mergedRoute, {networkid: networkid, profile: profile}, callback, errorHandler);
+    }
+
+
+// Delete a network from the user's workspace. Requester must be user or have admin permissions
+    exports.deleteNetworkFromUserWorkspace = function(userid, networkid, callback, errorHandler){
+        var mergedRoute = '/users/' + encodeURIComponent(userid) + '/workspace/' + encodeURIComponent(networkid) + '';
         exports.ndexDelete(mergedRoute, callback, errorHandler);
     }
 
@@ -113,7 +134,7 @@ Expected to be a global for the client, expected to be undefined and then requir
     }
 
 
-// Add a group account
+// Set new group profile information. Requester must be group owner or have admin permissions.
     exports.updateGroupProfile = function(groupid, profile, callback, errorHandler){
         var mergedRoute = '/groups/' + encodeURIComponent(groupid) + '/profile';
         exports.ndexPost(mergedRoute, {groupid: groupid, profile: profile}, callback, errorHandler);
@@ -127,21 +148,21 @@ Expected to be a global for the client, expected to be undefined and then requir
     }
 
 
-// Get a group by groupname
+// Get a group by group id. Information returned depends on whether requester is group owner.
     exports.getGroup = function(groupid, callback, errorHandler){
         var mergedRoute = '/groups/' + encodeURIComponent(groupid) + '';
         exports.ndexGet(mergedRoute, {},callback, errorHandler);
     }
 
 
-// Delete a group by groupname
+// Delete a group by group id. Requester must be group owner or have admin permissions.
     exports.deleteGroup = function(groupid, callback, errorHandler){
         var mergedRoute = '/groups/' + encodeURIComponent(groupid) + '';
         exports.ndexDelete(mergedRoute, callback, errorHandler);
     }
 
 
-// Find Users who are members of a group, optionally filter by search expression
+// Find Users who are members of a group, optionally filter by search expression. Group owners see all members, non-owners see only members who allow themselves to be visible.
     exports.getGroupMembers = function(groupid, searchExpression, limit, offset, callback, errorHandler){
         var mergedRoute = '/groups/' + encodeURIComponent(groupid) + '/members';
         exports.ndexGet(mergedRoute, {searchExpression: searchExpression, limit: limit, offset: offset}, callback, errorHandler);
