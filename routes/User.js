@@ -17,7 +17,7 @@ function contains(a, obj) {
     return false;
 }
 
-exports.createUser = function(username, password, callback){
+exports.createUser = function(username, password, recoveryEmail, callback){
 	console.log("calling createUser with arguments: '" + username + "' '" + password + "'");
 	var selectUserByUserNameCmd = "select from xUser where username = '" + username + "'";
 	var insertUserCmd = "insert into xUser (username, password) values('" + username + "', '" + password + "')";
@@ -103,7 +103,7 @@ exports.getUserByName = function(username, callback){
 
 exports.getUser = function(userRID, callback){
 	console.log("calling getUser with userRID = '" + userRID + "'");
-	var cmd = "select from " + userRID + "";
+	var cmd = "select from xUser where @rid = " + userRID + "";
 	console.log(cmd);
 	module.db.command(cmd, function(err, users) {
 
