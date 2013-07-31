@@ -2,7 +2,7 @@ var request = require('request'),
 	assert = require('assert')
 	should = require('should');
 	
-var baseURL = 'http://localhost:9999';
+var baseURL = 'http://localhost:3333';
 
 console.log("starting user test");
  
