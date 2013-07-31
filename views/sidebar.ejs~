@@ -159,7 +159,7 @@ function formatError(error){
 			</a>
 			<a onclick="removeNtwk()">
 				<button class="btn btn-primary" rel="tooltip" title="Remove Network"  data-placement="left top"> 
-					<i class="icon-remove-sign icon-white"> </i> 
+					<i class="icon-remove icon-white"> </i> 
 				</button>
 			</a>
 		</div>
@@ -168,12 +168,13 @@ function formatError(error){
 <div id= "sideError"></div>
 
 <script>
-var searchExpression = 'C11R1', 
+var searchExpression = '', 
 		limit = 100,
 		count = 1,
 		offset = 0;
 
 	console.log("Calling findNetworks");
+	
 	
 	ndexClient.findNetworks(searchExpression, limit, offset, function(data){
 		console.log("Got results from findNetworks");
@@ -197,5 +198,35 @@ var searchExpression = 'C11R1',
     function(error){
     	$('#sideError').append(formatError(error));
     });
+    
+    /*ndexClient.addNetworkToUserWorkspace('C21R0', 'C11R2', 
+    	function(data){
+    		for (i in data){	
+    			$('#workSurface').append(i);
+    		}
+    	},
+  	function(error){
+  		for (i in error){	
+    			$('#workSurface').append(i);
+    		}
+  	}
+    );*/
+    
+    ndexClient.getUserWorkspace('C21R0', function(data){
+			
+			if(data.networks){
+				for (i in data.networks){	
+    					$('#workSurface').append(data.networks);
+    				}
+				$.each(data.networks, function(index, item){
+					$('#workSurface').append('item');	
+				});
+			}
+		},
+		function(error){
+		}
+	);
+    
+    
 </script>    
    

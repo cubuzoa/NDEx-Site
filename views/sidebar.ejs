@@ -1,3 +1,39 @@
+<div id= "sidebar" >
+	<div id="stay" class="well" data-spy="affix">
+		<a onClick="toggle2(this)"><i id="sidebarButton" class="icon-chevron-left"></i></a>
+		<h4 style="text-align:center" >Work Surface</h4>
+		<div id="wrapper" style="dipslay: none">
+			<div id="workSurface">
+		
+			</div>
+		</div>
+		<div id="tools" class="btn-group">
+			<a id="viewNet" onclick="viewNtwk()" >
+				<button class="btn btn-primary" rel="tooltip" title="View Network" data-placement="top"> 
+					<i class="icon-folder-open icon-white"> </i> 
+				</button>
+			</a>
+			<a id="visualizeNet" onclick="visualizeNtwk()">
+				<button class="btn btn-primary" rel="tooltip" title="Visualize Network" data-placement="top"> 
+					<i class="icon-eye-open icon-white"> </i> 
+				</button>
+			</a>	
+			<a id="compareNets" onclick="compareNtwks()">
+				<button class="btn btn-primary" rel="tooltip" title="Compare Networks" data-placement="top"> 
+					<i class="icon-retweet icon-white"> </i> 
+				</button>
+			</a>
+			<a onclick="removeNtwk()">
+				<button class="btn btn-primary" rel="tooltip" title="Remove Network"  data-placement="left top"> 
+					<i class="icon-remove icon-white"> </i> 
+				</button>
+			</a>
+		</div>
+	</div>
+</div>
+<div id= "sideError"></div>
+
+
 <script>
 function toggle2(obj) {
 	var ele = document.getElementById('wrapper');
@@ -132,48 +168,16 @@ function formatError(error){
 </script>
 
 
-<div id= "sidebar" >
-	<div id="stay" class="well" data-spy="affix">
-		<a onClick="toggle2(this)"><i id="sidebarButton" class="icon-chevron-left"></i></a>
-		<h4 style="text-align:center" >Work Surface</h4>
-		<div id="wrapper" style="dipslay: none">
-			<div id="workSurface">
-		
-			</div>
-		</div>
-		<div id="tools" class="btn-group">
-			<a id="viewNet" onclick="viewNtwk()" >
-				<button class="btn btn-primary" rel="tooltip" title="View Network" data-placement="top"> 
-					<i class="icon-folder-open icon-white"> </i> 
-				</button>
-			</a>
-			<a id="visualizeNet" onclick="visualizeNtwk()">
-				<button class="btn btn-primary" rel="tooltip" title="Visualize Network" data-placement="top"> 
-					<i class="icon-eye-open icon-white"> </i> 
-				</button>
-			</a>	
-			<a id="compareNets" onclick="compareNtwks()">
-				<button class="btn btn-primary" rel="tooltip" title="Compare Networks" data-placement="top"> 
-					<i class="icon-retweet icon-white"> </i> 
-				</button>
-			</a>
-			<a onclick="removeNtwk()">
-				<button class="btn btn-primary" rel="tooltip" title="Remove Network"  data-placement="left top"> 
-					<i class="icon-remove icon-white"> </i> 
-				</button>
-			</a>
-		</div>
-	</div>
-</div>
-<div id= "sideError"></div>
+
 
 <script>
-var searchExpression = 'C11R1', 
+var searchExpression = '', 
 		limit = 100,
 		count = 1,
 		offset = 0;
 
 	console.log("Calling findNetworks");
+	
 	
 	ndexClient.findNetworks(searchExpression, limit, offset, function(data){
 		console.log("Got results from findNetworks");
@@ -197,5 +201,35 @@ var searchExpression = 'C11R1',
     function(error){
     	$('#sideError').append(formatError(error));
     });
+    
+    /*ndexClient.addNetworkToUserWorkspace('C21R0', 'C11R2', 
+    	function(data){
+    		for (i in data){	
+    			$('#workSurface').append(i);
+    		}
+    	},
+  	function(error){
+  		for (i in error){	
+    			$('#workSurface').append(i);
+    		}
+  	}
+    );*/
+    
+    ndexClient.getUserWorkspace('C21R0', function(data){
+			
+			if(data.networks){
+				for (i in data.networks){	
+    					$('#workSurface').append(data.networks);
+    				}
+				$.each(data.networks, function(index, item){
+					$('#workSurface').append('item');	
+				});
+			}
+		},
+		function(error){
+		}
+	);
+    
+    
 </script>    
    
