@@ -295,7 +295,7 @@ exports.deleteUser = function (userRID, callback){
 	//checking if user exists
 	var cmd = "select from xUser where @rid = " + userRID + "";
 	module.db.command(cmd,function(err,users){
-		if(exports.checkErr(err, "checking existence of user " + userRID, callback)){
+		if(exports.checkErr(err, "checking if user " + userRID " exists ", callback)){
 			console.log("users found " + users.length);
 			if (!users || users.length < 1){
 				console.log("found no users by id = '" + userRID + "'");
