@@ -17,7 +17,7 @@ Expected to be a global for the client, expected to be undefined and then requir
 		$ = require('jQuery');
 	}
 	
-	exports.host = "http://localhost:9999";
+	exports.host = "http://localhost:3333";
 	
 	exports.defaultNDExErrorHandler = function(data){
 		console.log("Error : " + JSON.stringify(data));

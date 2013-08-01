@@ -71,7 +71,7 @@ _Delete a user by user id. Requester must be user or have admin permissions._
 DELETE /users/:userid
 
 Route Parameters:
-* username (JID)
+* userid (JID)
 
 ##### getUserWorkspace
 _Get the user's workspace. Requester must be user or have admin permissions._

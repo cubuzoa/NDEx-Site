@@ -148,7 +148,7 @@ exports.User = [
 		method : "DELETE",
 		route : "/users/:userid",
 		routeParams: {	
-				username : { doc : "user id", type : "JID"}
+				userid : { doc : "user id", type : "JID"}
 					},
 		response: {},
 		exceptions: ["404 unknown user id",

@@ -305,10 +305,10 @@ app.get('/users/:userid', function(req, res) {
 
 // Delete a user by user id. Requester must be user or have admin permissions.
 app.delete('/users/:userid', function(req, res) {
-    var username = req.params['username'];
-    if(username) username = convertToRID(username);
+    var userid = req.params['userid'];
+    if(userid) userid = convertToRID(userid);
 	try {
-		User.deleteUser(username, function(data){
+		User.deleteUser(userid, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
 			}
