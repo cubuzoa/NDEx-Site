@@ -39,7 +39,7 @@ exports.createUser = function(username, password, recoveryEmail, callback){
 					} else {
 						var user = results[0];
 						//console.log(JSON.stringify(user));
-						callback({error : err, jid: user['@rid'], username: user['username']});
+						callback({status: 200, error : err, jid: user['@rid'], username: user['username']});
 					}
 					
 				});
@@ -233,7 +233,9 @@ exports.addNetworkToUserWorkspace = function(userRID, networkRID, callback){
 								var updateCmd = "update " + userRID + " add workspace = " + networkRID;
 								console.log(updateCmd);
 								module.db.command(updateCmd, function(err, workspace) {
-									exports.checkErr(err, "adding network " + networkRID + " to workspace of user " + userRID, callback)
+									if (exports.checkErr(err, "adding network " + networkRID + " to workspace of user " + userRID, callback)){
+										callback({status : 200});
+									}
 								});
 							}
 						
@@ -270,7 +272,9 @@ exports.deleteNetworkFromUserWorkspace = function(userRID, networkRID, callback)
 					var updateCmd = "update " + userRID + " remove workspace = " + networkRID;
 					console.log(updateCmd);
 					module.db.command(updateCmd, function(err, workspace) {
-						exports.checkErr(err, "removing network " + networkRID + " from workspace of user " + userRID, callback)
+						if(exports.checkErr(err, "removing network " + networkRID + " from workspace of user " + userRID, callback)){
+							callback({status : 200});
+						}
 					});
 				}
 						
@@ -291,6 +295,8 @@ exports.deleteUser = function (userRID, callback){
 	var cmd = "delete from " + userRID + " where @class = 'xUser'";
 	console.log(cmd);
 	module.db.command(cmd, function(err) {
-        exports.checkErr(err, "deleting user " + userRID, callback)
+        if (exports.checkErr(err, "deleting user " + userRID, callback)){
+        	callback({status : 200});
+        }
     });
 };
