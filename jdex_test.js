@@ -9,14 +9,9 @@ var DOMParser = require('xmldom').DOMParser;
 
 //console.log(sif_graph.serializeJDEx());
 
-var xml_text = fs.readFileSync('./xbel_test.xbel.xml').toString();
+//var xml_text = fs.readFileSync('./xbel_test.xbel.xml').toString();
 
-var test_string = '<xml xmlns="a" xmlns:c="./lite">\n'+
-        '\t<child>test</child>\n'+
-        '\t<child></child>\n'+
-        '\t<child/>\n'+
-    '</xml>';
-
+var xml_text = fs.readFileSync('./small_corpus.xbel.xml').toString();
 
 var graph = jdex.createGraphFromXBEL(xml_text);
                
@@ -32,6 +27,8 @@ fs.writeFile("/tmp/test", "Hey there!", function(err) {
 }); 
 */
 
-fs.writeFile('./xbel_test.json', graph.serializeJDEx());
+//fs.writeFile('./xbel_test.json', graph.serializeJDEx());
+
+fs.writeFile('./small_corput.json', graph.serializeJDEx());
 
 console.log("done");
