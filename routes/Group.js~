@@ -158,7 +158,6 @@ exports.getGroup = function(groupRID, callback){
 				}
 			}
 		});
-	}
 	else{
 		console.log('could not get group with malformed RID: ' + groupRID);
 		callback({status : 400})

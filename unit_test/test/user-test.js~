@@ -1,5 +1,5 @@
 var request = require('request'),
-	assert = require('assert')
+	assert = require('assert'),
 	should = require('should');
 	
 var baseURL = 'http://localhost:3333';
@@ -44,14 +44,14 @@ describe('NDEx Users: ', function () {
     
   describe('getUserByNonExistantUserId', function(){
   
-  	it("should get 404 for non-existant user adsf", function (done){
+  	it("should get 400 for non-existant user adsf", function (done){
   		request({
   				url: baseURL + '/users/adsf'
   				},
   				function(err, res, body){
   					if(err) { done(err) }  
   					else {
-	  					res.should.have.status(404)
+	  					res.should.have.status(400)
 	  					done();
   					}
   				});	
@@ -72,7 +72,7 @@ describe('NDEx Users: ', function () {
   					if(err) { done(err) }  
   					else {
 	  					res.should.have.status(200)
-	  					console.log('has JID ' + res.body.jid)
+	  					console.log('Henry has JID ' + res.body.jid)
 	  					henryJID = res.body.jid
 	  					done();
   					}
@@ -99,7 +99,7 @@ describe('NDEx Users: ', function () {
   	});
   });
 
-  describe('getHenryByExistingUserId', function(){
+  describe('getUserByExistingUserId', function(){
   
   	it("should get 200 for getting existing user Henry", function (done){
   		request({
@@ -113,7 +113,7 @@ describe('NDEx Users: ', function () {
   					if(err) { done(err) }  
   					else {
 	  					res.should.have.status(200)
-	  					console.log('got user with JID ' + henryJID)
+	  					console.log('got Henry with JID ' + henryJID)
 	  					done();
   					}
   				});	
@@ -138,7 +138,7 @@ describe('NDEx Users: ', function () {
   	});
   });
   
-  describe('deleteUserHenry', function(){
+  describe('deleteUserById', function(){
   
   	it("should get 200 for attempting to delete user", function (done){
   		request({
@@ -154,7 +154,7 @@ describe('NDEx Users: ', function () {
   					if(err) { done(err) }  
   					else {
 	  					res.should.have.status(200)
-	  					console.log('deleted with JID ' + henryJID)
+	  					console.log('deleted ' + henryJID)
 	  					done();
   					}
   				});	
@@ -175,7 +175,7 @@ describe('NDEx Users: ', function () {
   					if(err) { done(err) }  
   					else {
 	  					res.should.have.status(404)
-	  					console.log("JID " + henryJID)
+	  					console.log("could not get " + henryJID)
 	  					done();
   					}
   				});	
@@ -183,9 +183,9 @@ describe('NDEx Users: ', function () {
   });
   
   var bobJID = null
-  describe('createUserBob', function(){
+  describe('createUser2WithNovelName', function(){
   
-  	it("should get 200 for attempting to create new user", function (done){
+  	it("should get 200 for attempting to create new user Bob", function (done){
   		request({
 							method : 'POST',
 							url : baseURL + '/users', 
@@ -195,7 +195,7 @@ describe('NDEx Users: ', function () {
   					if(err) { done(err) }  
   					else {
 	  					res.should.have.status(200)
-	  					console.log('has JID ' + res.body.jid)
+	  					console.log('Bob has JID ' + res.body.jid)
 	  					bobJID = res.body.jid
 	  					done();
   					}
@@ -203,8 +203,8 @@ describe('NDEx Users: ', function () {
   	});
   });
   
-   describe('deleteUserBob', function(){
-  	it("should get 200 for attempting to delete user", function (done){
+   describe('deleteUser2ById', function(){
+  	it("should get 200 for attempting to delete user Bob", function (done){
   		request({
 							method : 'DELETE',
 							url : baseURL + '/users/' + bobJID, 
@@ -218,7 +218,7 @@ describe('NDEx Users: ', function () {
   					if(err) { done(err) }  
   					else {
 	  					res.should.have.status(200)
-	  					console.log('deleted with JID ' + bobJID)
+	  					console.log('deleted ' + bobJID)
 	  					done();
   					}
   				});	
@@ -227,19 +227,21 @@ describe('NDEx Users: ', function () {
   
   describe('getUserByMalformedUserId', function(){
   
-  	it("should get 500 for getting user by malformed JID", function (done){
+  	it("should get 400 for getting user by malformed JID, WC21R3", function (done){
   		request({
   				url: baseURL + '/users/WC21R3' //get 404 if W21R3
   				},
   				function(err, res, body){
   					if(err) { done(err) }  
   					else {
-	  					res.should.have.status(500)
+	  					res.should.have.status(400)
 	  					done();
   					}
   				});	
   	});
   });
+  
+  
   
 });
 
