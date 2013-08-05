@@ -381,11 +381,12 @@ exports.Graph.prototype = {
 		return this.namespacePrefixMap[prefix];
 	},
 	
-	findOrCreateNamespace : function (uri, prefix){
+	findOrCreateNamespace : function (uri, prefix, description){
+		if (!uri) uri = prefix;
 		var ns = this.namespaceByURI(uri);
 		if (ns) return ns;
-		//console.log("creating namespace for " + uri);
-		ns = new exports.Namespace(uri, prefix);
+		console.log("creating namespace for " + prefix + " : " + uri + "  " + description);
+		ns = new exports.Namespace(uri, prefix, description);
 		return this.addNamespace(ns)
 	},
 
@@ -539,7 +540,7 @@ exports.Graph.prototype = {
 	
 	serializeJDEx : function(){
 
-		return JSON.stringify(this.toJDEx());
+		return JSON.stringify(this.toJDEx(), null, 4);
 	}
 
 
@@ -672,11 +673,16 @@ exports.Edge.prototype = {
 ------------------------------------
 */
 
-exports.Namespace = function(uri, prefix){
+exports.Namespace = function(uri, prefix, description){
 
 	this.uri = uri;
 	if (prefix){
 		this.prefix = prefix;
+	}
+	if (description){
+		this.description = description;
+	} else {
+		this.description = "";
 	}
 	this.properties = {};
 	
@@ -688,9 +694,9 @@ exports.Namespace.prototype = {
 	
 	serializeJDEx : function(){
 		if (this.prefix){
-			return {uri: this.uri, prefix: this.prefix};
+			return {uri: this.uri, prefix: this.prefix, description: this.description};
 		} else {
-			return {uri: this.uri};
+			return {uri: this.uri, description: this.description};
 		}
 	
 	}
@@ -974,6 +980,9 @@ Header Example:
 exports.processXBELHeader = function (graph, header){
 	// Add DublinCore namespace
 	var dc_namespace_uri = graph.findOrCreateNamespace("http://purl.org/dc/terms/", "DC");
+	
+	// Add TextLocation namespace
+	var dc_namespace_uri = graph.findOrCreateNamespace("http://purl.org/dc/terms/", "TextLocation");
 
 	// Unary properties mapped from BEL to DC
 	var Unary_Properties_XBEL_to_DC = {
@@ -1013,6 +1022,49 @@ exports.processXBELAnnotationDefinitionGroup = function(graph, AnnotationDefinit
 		graph.findOrCreateNamespace(uri, prefix);
 		graph.findOrCreateTerm(prefix, graph.belNS);
 	});
+	
+/*
+
+        <bel:internalAnnotationDefinition bel:id="TextLocation">
+            <bel:description>indicates which section of text a statement is derived from</bel:description>
+            <bel:usage>indicates which section of text a statement is derived from</bel:usage>
+            <bel:listAnnotation>
+                <bel:listValue>Abstract</bel:listValue>
+                <bel:listValue>Results</bel:listValue>
+                <bel:listValue>Legend</bel:listValue>
+                <bel:listValue>Review</bel:listValue>
+            </bel:listAnnotation>
+        </bel:internalAnnotationDefinition>
+*/
+
+	$.each(AnnotationDefinitionGroup.getElementsByTagName('bel:internalAnnotationDefinition'), function(index, intDefElement){
+	
+		
+		
+		var description = "", 
+			prefix = intDefElement.getAttribute('bel:id'),
+			termElements = [];
+			
+		// process the description element, if present
+		var descriptionElements = intDefElement.getElementsByTagName('bel:description');
+		if (descriptionElements) description = descriptionElements[0].textContent;
+		
+
+		
+		var ns = graph.findOrCreateNamespace("internal", prefix, description);
+		graph.findOrCreateTerm(prefix, graph.belNS);
+		
+		var listAnnotationElements = intDefElement.getElementsByTagName('bel:listAnnotation');
+		if (listAnnotationElements) termElements = listAnnotationElements[0];
+		
+		$.each(termElements.childNodes, function (j, termElement){
+			var termName = termElement.textContent;
+			console.log("creating internal annotation term: " + termName + " in " + ns.prefix);
+			graph.findOrCreateTerm(termName, ns);
+		});
+		
+	});
+
 }
 
 exports.processXBELStatementGroup = function(graph, statementGroup, context){
@@ -1055,11 +1107,16 @@ exports.processXBELAnnotationGroup = function(graph, annotationGroup, context){
 					value = element.textContent,
 					ns = graph.namespaceByPrefix(propertyName);
 				
-				//console.log("processing annotation " + propertyName + " : " + value);	
+				console.log("processing annotation " + propertyName + " : " + value);	
 				if (ns) {
 					var valueTerm = graph.findOrCreateTerm(value, ns),
 						propertyTerm = graph.termByNameAndNamespace(propertyName, graph.belNS);
-					context.annotations.push({property: propertyTerm, value: valueTerm});
+					if (!propertyTerm){
+						console.log("failed to find propertyTerm for " + propertyName + " in " + graph.belNS);
+					} else {
+					
+						context.annotations.push({property: propertyTerm, value: valueTerm});
+					}
 					
 				} else {
 					console.log("did not find namespace for " + propertyName);
@@ -1098,28 +1155,38 @@ exports.processXBELStatement = function(graph, statement, context){
 		}
 	});
 	// create the edge (because this is a BEL document, not a model, each statement creates a unique edge)
-	var edge = new exports.Edge(s, p, o);
+	if (s && p && o){
+		var edge = new exports.Edge(s, p, o);
 	
-	// if there is a citation, add the edge and vice versa
-	if (context.citation){
-		context.citation.addEdge(edge);
-		edge.citation = context.citation;
-	}
+		// if there is a citation, add the edge and vice versa
+		if (context.citation){
+			context.citation.addEdge(edge);
+			edge.citation = context.citation;
+		}
 	
-	// if there is a support, add the edge
-	if (context.support){
-		context.support.addEdge(edge);
-		edge.support = context.support;
-	}
+		// if there is a support, add the edge
+		if (context.support){
+			context.support.addEdge(edge);
+			edge.support = context.support;
+		}
 		
-	// for each annotation, add it to the edge
-	$.each(context.annotations, function(index, pair){
-		//console.log("adding annotation to edge : " + pair.property.identifier() + " = " + pair.value.identifier());
-		edge.properties[pair.property.identifier()] = pair.value;
-	});
+		// for each annotation, add it to the edge
+		$.each(context.annotations, function(index, pair){
+			//console.log("adding annotation to edge : " + pair.property.identifier() + " = " + pair.value.identifier());
+			edge.properties[pair.property.identifier()] = pair.value;
+		});
 		
 	
-	graph.addEdge(edge);
+		graph.addEdge(edge);
+	} else {
+		var sname = s ? s.name : "unknown",
+			pname = p ? p.name : "unknown",
+			oname = o ? o.name : "unknown";
+		console.log("skipping edge creation for " 
+					+ sname + ", "
+					+ pname + ", "
+					+ oname);
+	}
 }
 
 exports.processXBELNodeElement = function(graph, nodeElement){
