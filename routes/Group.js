@@ -21,9 +21,9 @@ exports.createGroup = function(userid, groupname, callback){
 	}
 
 	var password = "password";
-	console.log("calling createGroup with arguments: '" + groupname + "' '" + password + "'");
+	console.log("calling createGroup with arguments: '" + groupname + "' '" + userid + "'");
 	var selectGroupByGroupNameCmd = "select from xGroup where groupname = '" + groupname + "'";
-	var insertGroupCmd = "insert into xGroup (groupname, password) values('" + groupname + "', '" + password + "')";
+	var insertGroupCmd = "insert into xGroup (groupname) values('" + groupname + "')";
 	//console.log("first checking that groupname is not taken");
 	module.db.command(selectGroupByGroupNameCmd, function(err, groups) {
 		if (err) {
@@ -38,11 +38,18 @@ exports.createGroup = function(userid, groupname, callback){
 				//console.log(insertGroupCmd);
 				module.db.command(insertGroupCmd, function(err, groups) {
 					if (err){
-						console.log("insert of new group yields error : " + err);
-						callback({error : err});
+						var description = ("insert of new group (" + groupname + ") owned by " + userid + " yields error : " + err);
+						console.log(description);
+						callback({error : err, description : description});
 					} else {
-						var group = groups[0];
-						callback({error : err, jid: group['@rid'], groupname: group.groupname});
+						var group = groups[0],
+							groupRID = group['@rid'];
+							
+						// assert ownership of group
+						var ownsGroupCMD = "create edge xOwnsGroup from " + userid + " to " + groupRID;
+						module.db.command(ownsGroupCMD, function(err){
+							callback({error : err, jid: groupRID, groupname: group.groupname});
+						});						
 					}
 					
 				});
