@@ -16,7 +16,6 @@ function ensureSchemaIsSetup(callback) {
 	ensureClass("xNode", "V");
 	ensureClass("xEdge", "E");
 	ensureClass("xOwnsNetwork", "E");
-	ensureClass("xOwnsGroup", "E");
 	ensureClass("xTerm", "V", function(){
 		ensureClass("xBaseTerm", "xTerm");
 		ensureClass("xFunctionTerm", "xTerm");
