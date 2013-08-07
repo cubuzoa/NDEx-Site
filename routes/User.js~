@@ -60,7 +60,7 @@ exports.updateUserProfile = function(userRID, profile, callback){
 		updateCmd = "update " + userRID + " set " + setString;
 		console.log(updateCmd);
 	module.db.command(updateCmd, function(err, result){
-	
+		callback({profile : profile, error: err, status : 200})
 	});
 
 };

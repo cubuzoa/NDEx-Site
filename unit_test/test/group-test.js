@@ -24,19 +24,19 @@ console.log("starting group test");
  
 describe('NDEx Groups: ', function () {
 	//preliminary setup
-	var harryJID = null
+	var joshJID = null
 	describe('Setup ', function () {
-		it("should get 200 for creating Harry",function(done){
+		it("should get 200 for creating Josh",function(done){
 			request({
 					method : 'POST',
 					url : baseURL + '/users', 
-					json : {username : "Harry", password : "password"}
+					json : {username : "Josh", password : "password"}
 				},
 				function(err,res,body){
 					if(err) { done(err) }
 					else { 
 						res.should.have.status(200)
-						harryJID = res.body.jid
+						joshJID = res.body.jid
 						done()
 					}
 				}
@@ -45,7 +45,7 @@ describe('NDEx Groups: ', function () {
 	});
 	
 	describe('Testing Group Commands', function(){
-		/*describe("createGroupForNonExistantUser", function(){
+		describe("createGroupForNonExistantUser", function(){
 			it("should get 404 for attempting to create group with non-existent user", function(done){
 				request({
 						method : 'POST',
@@ -61,31 +61,32 @@ describe('NDEx Groups: ', function () {
 					}
 				);
 			});
-		});*/
+		});
 		describe("createGroupWithInvalidGroupname", function(){
 			it("should get 400 for attempting to create group with invalid groupname", function(done){
 				request({
 						method : 'POST',
 						url : baseURL + '/groups/',
-						json : {userid : harryJID , groupName : "$!invalid!"}
+						json : {userid : joshJID , groupName : "$!invalid!"}
 					},
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
 							res.should.have.status(400)
+							console.log(res.body)
 							done()
 						}
 					}
 				);
 			});
 		});
-		var groupJID = null
+		var groupJID = null;
 		describe("createGroupForUser", function(){
-			it("should get 200 for attempting to create group for Harry, returns JID", function(done){
+			it("should get 200 for attempting to create group for Josh, returns JID", function(done){
 				request({
 						method : 'POST',
 						url : baseURL + '/groups/',
-						json : {userid : harryJID , groupName : "ValidName"}
+						json : {userid : joshJID , groupName : "ValidName"}
 					},
 					function(err,res,body){
 						if(err) { done(err) }
@@ -104,7 +105,7 @@ describe('NDEx Groups: ', function () {
 				request({
 						method : 'POST',
 						url : baseURL + '/groups/',
-						json : {userid : harryJID , groupName : "ValidName"}
+						json : {userid : joshJID , groupName : "ValidName"}
 					},
 					function(err,res,body){
 						if(err) { done(err) }
@@ -132,22 +133,23 @@ describe('NDEx Groups: ', function () {
 				);
 			});
 		});
-		/*describe("getUserAndFindGroups", function(){
+		describe("getUserAndFindGroups", function(){
 			it("should get 200 for attempting to get user Harry, find ValidName group", function(done){
 				request({
 						method : 'GET',
-						url : baseURL + '/groups/' 
+						url: baseURL + '/users/' + joshJID
 					},
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
 							res.should.have.status(200)
+							console.log('need to find groupname')
 							done()
 						}
 					}
 				);
 			});
-		});*/
+		});
 		describe("deleteGroupByNonExistantId", function(){
 			it("should get 404 for attempting to delete group by nonexistant jid C22R444444", function(done){
 				request({
@@ -196,29 +198,30 @@ describe('NDEx Groups: ', function () {
 				);
 			});
 		});
-		/*describe("getUserAndFindGroupsNotDeleted", function(){
+		describe("getUserAndFindGroupsNotDeleted", function(){
 			it("should get 200 for attempting to get user Harry, should not find ValidName group", function(done){
 				request({
 						method : 'GET',
-						url : baseURL + '/groups/' 
+						url: baseURL + '/users/' + joshJID
 					},
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
 							res.should.have.status(200)
+							console.log('need to find groupname')
 							done()
 						}
 					}
 				);
 			});
-		});*/
-		var group2JID = null
+		});
+		var group2JID = null;
 		describe("createGroup2ForUser", function(){
-			it("should get 200 for attempting to create another group for Harry, returns JID", function(done){
+			it("should get 200 for attempting to create another group for Josh, returns JID", function(done){
 				request({
 						method : 'POST',
 						url : baseURL + '/groups/',
-						json : {userid : harryJID , groupName : "NameIsValid"}
+						json : {userid : joshJID , groupName : "NameIsValid"}
 					},
 					function(err,res,body){
 						if(err) { done(err) }
@@ -264,14 +267,15 @@ describe('NDEx Groups: ', function () {
 				);
 			});
 		});
+		
 	});
 	
 	//preliminary teardown
 	describe('Teardown ', function () {
-		it("should get 200 for deleting Harry",function(done){
+		it("should get 200 for deleting Josh",function(done){
 			request({
 					method : 'DELETE',
-					url : baseURL + '/users/' + harryJID	
+					url : baseURL + '/users/' + joshJID	
 				},
 	  			function(err, res, body){
 	  				if(err) { done(err) }

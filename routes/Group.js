@@ -10,52 +10,66 @@ function convertFromRID(RID){
 	return RID.replace("#","C").replace(":", "R");
 }
 
-exports.createGroup = function(userid, groupname, callback){
+exports.createGroup = function(userRID, groupname, callback){
 	//checks for invalid group name
 	try{
-		check(groupname,'Invalid groupname, only a-z, 0-9, char allowed, min len of 6').is(/^[A-Za-z0-9]+$/).len(6);
+		check(groupname,'Invalid groupname').is(/^[A-Za-z0-9]+$/).len(6);
 	}
 	catch(e){
 		console.log(e.message);
 		return callback( {error : e.message, status : 400} );
 	}
+	
+	//checking if user exists
+	var cmd = "select from xUser where @rid = " + userRID + "";
+	module.db.command(cmd,function(err,users){
+		if(exports.checkErr(err, "checking existence of user " + userRID, callback)){
+			console.log("users found " + users.length);
+			if (!users || users.length < 1){
+				console.log("found no users by id = '" + userRID + "'");
+				callback({status : 404, error : "Found no user by id = '" + userRID + "'"});
+			} 
+			else {
 
-	var password = "password";
-	console.log("calling createGroup with arguments: '" + groupname + "' '" + userid + "'");
-	var selectGroupByGroupNameCmd = "select from xGroup where groupname = '" + groupname + "'";
-	var insertGroupCmd = "insert into xGroup (groupname) values('" + groupname + "')";
-	//console.log("first checking that groupname is not taken");
-	module.db.command(selectGroupByGroupNameCmd, function(err, groups) {
-		if (err) {
-			callback( {error : err, status : 500});
-		} else {
-			//console.log("Existing groups: " + JSON.stringify(groups));
-			if (groups && groups.length > 0){
-				callback({error : "groupname '" + groupname + "' is already in use",
-							status : 500});
-			} else {
-				//console.log("now inserting the new group");
-				//console.log(insertGroupCmd);
-				module.db.command(insertGroupCmd, function(err, groups) {
-					if (err){
-						var description = ("insert of new group (" + groupname + ") owned by " + userid + " yields error : " + err);
-						console.log(description);
-						callback({error : err, description : description});
+				var password = "password";
+				console.log("calling createGroup with arguments: '" + groupname + "' '" + userRID + "'");
+				var selectGroupByGroupNameCmd = "select from xGroup where groupname = '" + groupname + "'";
+				var insertGroupCmd = "insert into xGroup (groupname) values('" + groupname + "')";
+				//console.log("first checking that groupname is not taken");
+				module.db.command(selectGroupByGroupNameCmd, function(err, groups) {
+					if (err) {
+						callback( {error : err, status : 500});
 					} else {
-						var group = groups[0],
-							groupRID = group['@rid'];
+						//console.log("Existing groups: " + JSON.stringify(groups));
+						if (groups && groups.length > 0 ){
+							callback({error : "groupname '" + groupname + "' is already in use",
+										status : 500});
+						} else {
+							console.log("now inserting the new group");
+							//console.log(insertGroupCmd);
+							module.db.command(insertGroupCmd, function(err, groups) {
+								if (err){
+									var description = ("insert of new group (" + groupname + ") owned by " + userid + " yields error : " + err);
+									console.log(description);
+									callback({error : err, description : description});
+								} else {
+									var group = groups[0],
+										groupRID = group['@rid'];
 							
-						// assert ownership of group
-						var ownsGroupCMD = "create edge xOwnsGroup from " + userid + " to " + groupRID;
-						module.db.command(ownsGroupCMD, function(err){
-							callback({error : err, jid: groupRID, groupname: group.groupname});
-						});						
-					}
+									// assert ownership of group
+									var ownsGroupCMD = "create edge xOwnsGroup from " + userRID + " to " + groupRID;
+									module.db.command(ownsGroupCMD, function(err){
+										callback({error : err, jid: groupRID, groupname: group.groupname});
+									});						
+								}
 					
+							});
+						}
+					}
 				});
 			}
-    	}
-    });
+		}
+	});
 };
 
 

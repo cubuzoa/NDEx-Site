@@ -122,7 +122,7 @@ describe('NDEx User Profile: ', function () {
 		describe("postProfileToUser", function(){
 			it("should get 200 posting different profile to User1, strings include control char", function(done){
 				var harryProfile = {};
-				harryProfile.firstName = "Harry" + '\n';
+				harryProfile.firstName = "Harry\n";
 				harryProfile.lastName = 'Potter\n';
 				harryProfile.website = 'www.harrypotterwizardscollection.com\n‎';
 				harryProfile.foregroundImg = 'harry.jpg\n';

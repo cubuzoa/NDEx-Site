@@ -310,6 +310,7 @@ exports.deleteUser = function (userRID, callback){
 				callback({status : 404, error : "Found no user by id = '" + userRID + "'"});
 			} 
 			else {
+			//deleting user
 				var updateCmd = "delete from " + userRID + " where @class = 'xUser'";
 				console.log(updateCmd);
 				module.db.command(updateCmd, function(err) {
