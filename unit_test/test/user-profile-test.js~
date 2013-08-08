@@ -19,7 +19,7 @@ console.log("starting user profile test");
  
 describe('NDEx User Profile: ', function () {
 	//preliminary setup
-	var harryJID = null
+	var harryJID = null;
 	describe('Setup ', function () {
 		it("should get 200 for creating Harry",function(done){
 			request({
@@ -38,7 +38,6 @@ describe('NDEx User Profile: ', function () {
 			);
 		});
 	});
-	
 	describe('Access User Profile', function(){
 		describe("getProfileOfNonExistentUser", function(){
 			it("should get 404 for getting profile for non-existent User Id", function(done){
@@ -61,23 +60,27 @@ describe('NDEx User Profile: ', function () {
 			it('should get 200 and "" on getting profile of Harry', function(done){
 				request({
 						method : 'GET',
-						url : baseURL + '/users/' + harryJID
-						//get profile?
+						url : baseURL + '/users/' + harryJID,
+						json : true
 					},
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
 							res.should.have.status(200)
-							console.log('\n' + res.body)
+							var profile = res.body.user.profile
+							profile = profile.toString
+							profile.should.have.length(0)
+							//console.log(profile.length)
 							done()
 						}
 					}
 				);
 			});
 		});
+		var harryProfile = {}; //to be used in other test
 		describe("postProfileToUser", function(){
 			it("should get 200 posting profile to User1", function(done){
-				var harryProfile = {};
+				
 				harryProfile.firstName = 'Harry';
 				harryProfile.lastName = 'Potter';
 				harryProfile.website = 'www.harrypotterwizardscollection.com‎';
@@ -94,7 +97,7 @@ describe('NDEx User Profile: ', function () {
 						if(err) { done(err) }
 						else {
 							res.should.have.status(200)
-							console.log('\n' + JSON.stringify(res.body.profile, '\t' , '\t\t'))
+							//console.log(typeof(harryProfile))
 							done()
 						}
 					}
@@ -102,26 +105,32 @@ describe('NDEx User Profile: ', function () {
 			});
 		});
 		describe("getProfileFromUser", function(){
-			it('should get 200 on getting profile of Harry, should match update profile', function(done){
+			it('should get 200 on getting profile of Harry, should match updated profile', function(done){
 				request({
 						method : 'GET',
-						url : baseURL + '/users/' + harryJID
-						//get profile?
+						url : baseURL + '/users/' + harryJID,
+						json : true
 					},
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
 							res.should.have.status(200)
-							console.log('\n' + res.body)
+							var profile = res.body.user.profile
+							//could only compare in string format
+							profile = profile.toString
+							profileAlpha = harryProfile.toString
+							profile.should.equal(profileAlpha)
+							//console.log(harryProfile)
 							done()
 						}
 					}
 				);
 			});
 		});
+		
 		describe("postProfileToUser", function(){
 			it("should get 200 posting different profile to User1, strings include control char", function(done){
-				var harryProfile = {};
+				//var harryProfile = {};
 				harryProfile.firstName = "Harry\n";
 				harryProfile.lastName = 'Potter\n';
 				harryProfile.website = 'www.harrypotterwizardscollection.com\n‎';
@@ -138,7 +147,7 @@ describe('NDEx User Profile: ', function () {
 						if(err) { done(err) }
 						else {
 							res.should.have.status(200)
-							console.log('\n' + JSON.stringify(res.body.profile, '\t' , '\t\t'))
+							console.log(harryProfile.firstName)
 							done()
 						}
 					}
@@ -149,14 +158,18 @@ describe('NDEx User Profile: ', function () {
 			it('should get 200 on getting profile of Harry, should match update profile', function(done){
 				request({
 						method : 'GET',
-						url : baseURL + '/users/' + harryJID
-						//get profile?
+						url : baseURL + '/users/' + harryJID,
+						json : true
 					},
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
 							res.should.have.status(200)
-							console.log('\n' + res.body)
+							var profile = res.body.user.profile
+							//could only compare in string format
+							profile = profile.toString
+							profileAlpha = harryProfile.toString
+							profile.should.equal(profileAlpha)
 							done()
 						}
 					}

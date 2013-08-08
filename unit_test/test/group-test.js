@@ -215,8 +215,8 @@ describe('NDEx Groups: ', function () {
 						else {
 							res.should.have.status(200)
 							var groupData = res.body.user.ownedGroups
-							groupData.should.equal(null)
-							//console.log(groupData)//.jid)
+							groupData.should.be.empty
+							//console.log(groupData.length)//.jid)
 							done()
 						}
 					}

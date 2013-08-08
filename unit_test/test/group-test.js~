@@ -1,14 +1,14 @@
 /*
-    Get 404 on creating group for non-existent user	(NOT IMPLEMENTED YET)
+    Get 404 on creating group for non-existent user	
     Get 400 and appropriate error message on creating group with invalid groupname
     Get 200 on creating group1 owned by user1 with novel groupname, returns JID
     Get 500 and appropriate error message when attempting to create group with groupname already used
     Get 200 getting group1 by JID
-    Get 200 getting user1, should find group1 (including correct JID) in ownedGroups (NOT IMPLEMENTED YET)
+    Get 200 getting user1, should find group1 (including correct JID) in ownedGroups 
     Get 404 on deleting group by non-existent JID
     Get 200 on deleting group1 by JID
     Get 404 on trying to get deleted group1 by JID
-    Get 200 on getting user1, group1 should no longer be in ownedGroups for user1	(NOT IMPLEMENTED YET)
+    Get 200 on getting user1, group1 should no longer be in ownedGroups for user1	
     Get 200 on creating group2 with novel name, returns JID. JID from group1 should NOT be reused.
     Get 200 on deleting group2 by JID
     Get 500 on getting group by malformed JID
@@ -147,7 +147,7 @@ describe('NDEx Groups: ', function () {
 							var groupData = res.body.user.ownedGroups
 							groupData = groupData[0]
 							ValidNameJID.should.equal(groupData.jid)
-							console.log(groupData.jid)
+							//console.log(groupData.jid)
 							done()
 						}
 					}
@@ -215,8 +215,8 @@ describe('NDEx Groups: ', function () {
 						else {
 							res.should.have.status(200)
 							var groupData = res.body.user.ownedGroups
-							groupData.should.equal(null)
-							console.log(groupData)//.jid)
+							groupData.should.be.empty//length.should.equal(0)
+							//console.log(groupData.length)//.jid)
 							done()
 						}
 					}
