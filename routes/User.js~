@@ -145,25 +145,28 @@ exports.getUser = function(userRID, callback){
 									network.jid = convertFromRID(network.jid);
 								}
 								result.ownedNetworks = networks;
-							}
+
 									
-							// get owned groups
-							var groupDescriptors = "organizationName as organizationName, @rid as jid";
-							var traverseExpression = "traverse V.out, E.in from " + userRID + " while $depth <= 2"		 
-							var groups_cmd = "select " + groupDescriptors + " from (" + traverseExpression + ") where @class = 'xGroup'";
-							module.db.command(groups_cmd, function(err, groups) {
-								if(exports.checkErr(err, "getting owned groups", callback)){
+								// get owned groups
+								var groupDescriptors = "organizationName as organizationName, @rid as jid";
+								var traverseExpression = "traverse V.out, E.in from " + userRID + " while $depth <= 2"		 
+								var groups_cmd = "select " + groupDescriptors + " from (" + traverseExpression + ") where @class = 'xGroup'";
+								module.db.command(groups_cmd, function(err, groups) {
+									if(exports.checkErr(err, "getting owned groups", callback)){
 						
-									// process the groups
-									for (i in groups){
-										var group = groups[i];
-										group.jid = convertFromRID(group.jid);
+										// process the groups
+										for (i in groups){
+											var group = groups[i];
+											group.jid = convertFromRID(group.jid);
+										}
+										result.ownedGroups = groups;
 									}
-									result.ownedGroups = groups;
-								}
-								callback({user : result, error: err});
+									
+									callback({userData : 'test', error: err});//({user : result, error: err});
 							
-							});
+								});
+							
+							}
 						});	
 					}
 				}
@@ -310,6 +313,7 @@ exports.deleteUser = function (userRID, callback){
 				callback({status : 404, error : "Found no user by id = '" + userRID + "'"});
 			} 
 			else {
+			//deleting user
 				var updateCmd = "delete from " + userRID + " where @class = 'xUser'";
 				console.log(updateCmd);
 				module.db.command(updateCmd, function(err) {

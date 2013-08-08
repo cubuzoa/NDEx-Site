@@ -19,7 +19,7 @@ console.log("starting user profile test");
  
 describe('NDEx User Profile: ', function () {
 	//preliminary setup
-	var harryJID = null
+	var harryJID = null;
 	describe('Setup ', function () {
 		it("should get 200 for creating Harry",function(done){
 			request({

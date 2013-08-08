@@ -1,14 +1,14 @@
 /*
-    Get 404 on creating group for non-existent user	(NOT IMPLEMENTED YET)
+    Get 404 on creating group for non-existent user	
     Get 400 and appropriate error message on creating group with invalid groupname
     Get 200 on creating group1 owned by user1 with novel groupname, returns JID
     Get 500 and appropriate error message when attempting to create group with groupname already used
     Get 200 getting group1 by JID
-    Get 200 getting user1, should find group1 (including correct JID) in ownedGroups (NOT IMPLEMENTED YET)
+    Get 200 getting user1, should find group1 (including correct JID) in ownedGroups 
     Get 404 on deleting group by non-existent JID
     Get 200 on deleting group1 by JID
     Get 404 on trying to get deleted group1 by JID
-    Get 200 on getting user1, group1 should no longer be in ownedGroups for user1	(NOT IMPLEMENTED YET)
+    Get 200 on getting user1, group1 should no longer be in ownedGroups for user1	
     Get 200 on creating group2 with novel name, returns JID. JID from group1 should NOT be reused.
     Get 200 on deleting group2 by JID
     Get 500 on getting group by malformed JID
@@ -73,14 +73,14 @@ describe('NDEx Groups: ', function () {
 						if(err) { done(err) }
 						else {
 							res.should.have.status(400)
-							console.log(res.body)
+							//console.log(res.body)
 							done()
 						}
 					}
 				);
 			});
 		});
-		var groupJID = null;
+		var ValidNameJID = null;
 		describe("createGroupForUser", function(){
 			it("should get 200 for attempting to create group for Josh, returns JID", function(done){
 				request({
@@ -92,8 +92,8 @@ describe('NDEx Groups: ', function () {
 						if(err) { done(err) }
 						else {
 							res.should.have.status(200)
-							groupJID = res.body.jid
-							console.log(res.body.jid)
+							ValidNameJID = res.body.jid
+							//console.log(res.body.jid)
 							done()
 						}
 					}
@@ -121,7 +121,7 @@ describe('NDEx Groups: ', function () {
 			it("should get 200 for attempting to get group ValidName", function(done){
 				request({
 						method : 'GET',
-						url : baseURL + '/groups/' + groupJID
+						url : baseURL + '/groups/' + ValidNameJID
 					},
 					function(err,res,body){
 						if(err) { done(err) }
@@ -137,13 +137,17 @@ describe('NDEx Groups: ', function () {
 			it("should get 200 for attempting to get user Harry, find ValidName group", function(done){
 				request({
 						method : 'GET',
-						url: baseURL + '/users/' + joshJID
+						url: baseURL + '/users/' + joshJID,
+						json : true
 					},
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
 							res.should.have.status(200)
-							console.log('need to find groupname')
+							var groupData = res.body.user.ownedGroups
+							groupData = groupData[0]
+							ValidNameJID.should.equal(groupData.jid)
+							//console.log(groupData.jid)
 							done()
 						}
 					}
@@ -167,10 +171,10 @@ describe('NDEx Groups: ', function () {
 			});
 		});
 		describe("deleteGroupById", function(){
-			it("should get 200 for attempting to delete group" + groupJID, function(done){
+			it("should get 200 for attempting to delete group" + ValidNameJID, function(done){
 				request({
 						method : 'DELETE',
-						url : baseURL + '/groups/' + groupJID
+						url : baseURL + '/groups/' + ValidNameJID
 					},
 					function(err,res,body){
 						if(err) { done(err) }
@@ -186,7 +190,8 @@ describe('NDEx Groups: ', function () {
 			it("should get 404 for attempting to get deleted group ValidName", function(done){
 				request({
 						method : 'GET',
-						url : baseURL + '/groups/' + groupJID
+						url : baseURL + '/groups/' + ValidNameJID
+						
 					},
 					function(err,res,body){
 						if(err) { done(err) }
@@ -202,13 +207,16 @@ describe('NDEx Groups: ', function () {
 			it("should get 200 for attempting to get user Harry, should not find ValidName group", function(done){
 				request({
 						method : 'GET',
-						url: baseURL + '/users/' + joshJID
+						url: baseURL + '/users/' + joshJID,
+						json: true
 					},
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
 							res.should.have.status(200)
-							console.log('need to find groupname')
+							var groupData = res.body.user.ownedGroups
+							groupData.should.equal(null)
+							//console.log(groupData)//.jid)
 							done()
 						}
 					}
@@ -228,7 +236,7 @@ describe('NDEx Groups: ', function () {
 						else {
 							res.should.have.status(200)
 							group2JID = res.body.jid
-							console.log(res.body.jid)
+							//console.log(res.body.jid)
 							done()
 						}
 					}

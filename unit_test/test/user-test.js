@@ -58,7 +58,7 @@ describe('NDEx Users: ', function () {
   	});
   });
   
-  var henryJID = null
+  var henryJID = null;
   
   describe('createUserWithNovelName', function(){
   
@@ -72,7 +72,7 @@ describe('NDEx Users: ', function () {
   					if(err) { done(err) }  
   					else {
 	  					res.should.have.status(200)
-	  					console.log('Henry has JID ' + res.body.jid)
+	  					//console.log(res.body.jid)
 	  					henryJID = res.body.jid
 	  					done();
   					}
@@ -113,7 +113,7 @@ describe('NDEx Users: ', function () {
   					if(err) { done(err) }  
   					else {
 	  					res.should.have.status(200)
-	  					console.log('got Henry with JID ' + henryJID)
+	  					//console.log('got Henry with JID ' + henryJID)
 	  					done();
   					}
   				});	
@@ -154,7 +154,7 @@ describe('NDEx Users: ', function () {
   					if(err) { done(err) }  
   					else {
 	  					res.should.have.status(200)
-	  					console.log('deleted ' + henryJID)
+	  					//console.log('deleted ' + henryJID)
 	  					done();
   					}
   				});	
@@ -175,14 +175,14 @@ describe('NDEx Users: ', function () {
   					if(err) { done(err) }  
   					else {
 	  					res.should.have.status(404)
-	  					console.log("could not get " + henryJID)
+	  					//console.log("could not get " + henryJID)
 	  					done();
   					}
   				});	
   	});
   });
   
-  var bobJID = null
+  var bobJID = null;
   describe('createUser2WithNovelName', function(){
   
   	it("should get 200 for attempting to create new user Bob", function (done){
@@ -195,7 +195,7 @@ describe('NDEx Users: ', function () {
   					if(err) { done(err) }  
   					else {
 	  					res.should.have.status(200)
-	  					console.log('Bob has JID ' + res.body.jid)
+	  					//console.log('Bob has JID ' + res.body.jid)
 	  					bobJID = res.body.jid
 	  					done();
   					}
@@ -218,7 +218,7 @@ describe('NDEx Users: ', function () {
   					if(err) { done(err) }  
   					else {
 	  					res.should.have.status(200)
-	  					console.log('deleted ' + bobJID)
+	  					//console.log('deleted ' + bobJID)
 	  					done();
   					}
   				});	
