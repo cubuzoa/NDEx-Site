@@ -195,8 +195,12 @@ exports.checkErr = function(err, where, callback){
 exports.getUserWorkspace = function(userRID, callback){
 	console.log("calling getUserWorkspace with userRID = '" + userRID + "'");
 	
-	// get workspace networks
-	// need to get network descriptors back for each network ID found
+	// TODO : check that user exists, that requester has permission
+	
+	// when getting the workspace networks,
+	// we return network descriptors back for each 
+	// network ID found so the interface can display without further queries
+	
 	var networkDescriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount";
 	var traverseExpression = "traverse workspace from " + userRID + " while $depth <= 2"
 	var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
@@ -217,8 +221,9 @@ exports.getUserWorkspace = function(userRID, callback){
 
 exports.addNetworkToUserWorkspace = function(userRID, networkRID, callback){
 	console.log("calling addNetworkToUserWorkspace with userRID = '" + userRID + "' and networkRID = '" + networkRID + "'");
-	// TODO Check permissions
-	// Check that user exists
+	
+	// TODO : check that user exists, that requester has permission
+	
 	module.db.commmand("select username, workspace from " + userRID + " where @class = 'xUser'", function(err, results){
 		if(exports.checkErr(err, "checking user before adding to workspace ", callback)){
 			if (!results || results.length < 1){
@@ -263,8 +268,9 @@ exports.addNetworkToUserWorkspace = function(userRID, networkRID, callback){
 
 exports.deleteNetworkFromUserWorkspace = function(userRID, networkRID, callback){
 	console.log("calling deleteNetworkFromUserWorkspace with userRID = '" + userRID + "' and networkRID = '" + networkRID + "'");
-	// TODO Check permissions
-	// Check that user exists
+	
+	// TODO : check that user exists, that requester has permission
+	
 	module.db.commmand("select username, workspace from " + userRID + " where @class = 'xUser'", function(err, results){
 		if(exports.checkErr(err, "checking user before adding to workspace ", callback)){
 			if (!results || results.length < 1){
