@@ -18,25 +18,25 @@ var baseURL = 'http://localhost:3333';
 console.log("starting user profile test");
  
 describe('NDEx User Profile: ', function () {
-	//preliminary setup
+	//harryJID is to be used in multiple test cases
 	var harryJID = null;
-	describe('Setup ', function () {
-		it("should get 200 for creating Harry",function(done){
-			request({
-					method : 'POST',
-					url : baseURL + '/users', 
-					json : {username : "Harry", password : "password"}
-				},
-				function(err,res,body){
-					if(err) { done(err) }
-					else { 
-						res.should.have.status(200)
-						harryJID = res.body.jid
-						done()
-					}
+	before( function (done) {
+		console.log('\nsetup: user profile test');
+		request({
+				method : 'POST',
+				url : baseURL + '/users', 
+				json : {username : "Harry", password : "password"}
+			},
+			function(err,res,body){
+				if(err) { done(err) }
+				else { 
+					res.should.have.status(200)
+					harryJID = res.body.jid
+					console.log(' -user created')
+					done()
 				}
-			);
-		});
+			}
+		);
 	});
 	describe('Access User Profile', function(){
 		describe("getProfileOfNonExistentUser", function(){
@@ -179,21 +179,21 @@ describe('NDEx User Profile: ', function () {
 		
 	});
 	
-	//preliminary teardown
-	describe('Teardown ', function () {
-		it("should get 200 for deleting Harry",function(done){
-			request({
-					method : 'DELETE',
-					url : baseURL + '/users/' + harryJID	
-				},
-	  			function(err, res, body){
-	  				if(err) { done(err) }
-	  				else { 
-	  					res.should.have.status(200)
-	  					done()
-	  				} 
-	  			}
-	  		);
-	  	});
+	
+	after( function (done) {
+		console.log('\nteardown: user profile test')
+		request({
+				method : 'DELETE',
+				url : baseURL + '/users/' + harryJID	
+			},
+	  		function(err, res, body){
+	  			if(err) { done(err) }
+	  			else { 
+	  				res.should.have.status(200)
+	  				console.log(' -user deleted')
+	  				done()
+	  			} 
+	  		}
+	  	);
 	});
 });

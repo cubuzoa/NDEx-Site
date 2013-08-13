@@ -206,8 +206,8 @@ describe('NDEx Users: ', function () {
    describe('deleteUser2ById', function(){
   	it("should get 200 for attempting to delete user Bob", function (done){
   		request({
-							method : 'DELETE',
-							url : baseURL + '/users/' + bobJID, 
+				method : 'DELETE',
+				url : baseURL + '/users/' + bobJID 
 							
 				},
   				function(err, res, body){

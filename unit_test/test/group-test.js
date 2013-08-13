@@ -23,25 +23,25 @@ var baseURL = 'http://localhost:3333';
 console.log("starting group test");
  
 describe('NDEx Groups: ', function () {
-	//preliminary setup
-	var joshJID = null
-	describe('Setup ', function () {
-		it("should get 200 for creating Josh",function(done){
-			request({
-					method : 'POST',
-					url : baseURL + '/users', 
-					json : {username : "Josh", password : "password"}
-				},
-				function(err,res,body){
-					if(err) { done(err) }
-					else { 
-						res.should.have.status(200)
-						joshJID = res.body.jid
-						done()
-					}
+	//joshJID is to be used in multiple test cases
+	var joshJID = null;
+	before( function (done) {
+		console.log('\nsetup: group test');
+		request({
+				method : 'POST',
+				url : baseURL + '/users', 
+				json : {username : "Josh", password : "password"}
+			},
+			function(err,res,body){
+				if(err) { done(err) }
+				else { 
+					res.should.have.status(200)
+					joshJID = res.body.jid
+					console.log(' -user created')// confirmation of completion
+					done()
 				}
-			);
-		});
+			}
+		);
 	});
 	
 	describe('Testing Group Commands', function(){
@@ -279,20 +279,21 @@ describe('NDEx Groups: ', function () {
 	});
 	
 	//preliminary teardown
-	describe('Teardown ', function () {
-		it("should get 200 for deleting Josh",function(done){
-			request({
-					method : 'DELETE',
-					url : baseURL + '/users/' + joshJID	
-				},
-	  			function(err, res, body){
-	  				if(err) { done(err) }
-	  				else { 
-	  					res.should.have.status(200)
-	  					done()
-	  				} 
-	  			}
-	  		);
-	  	});
+	after( function (done) {
+		console.log('\nteardown: group test')
+		request({
+				method : 'DELETE',
+				url : baseURL + '/users/' + joshJID	
+			},
+	  		function(err, res, body){
+	  			if(err) { done(err) }
+	  			else { 
+	  				res.should.have.status(200)
+	  				console.log(' -user deleted')// confirmation of completion
+	  				done()
+	  			} 
+	  		}
+	  	);
 	});
+	
 });

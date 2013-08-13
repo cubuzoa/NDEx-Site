@@ -12,7 +12,7 @@ describe('Server Status:', function () {
   
     it("should respond with status 200", function (done) {
       request( baseURL + '/status', function (err, res) {
-      	console.log("result = " + res);
+      	//console.log("result = " + res);
         res.should.have.status(200);
         done();
       });

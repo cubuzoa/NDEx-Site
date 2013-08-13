@@ -356,6 +356,6 @@ exports.deleteNetwork = function (networkRID, callback){
 	var cmd = "delete from " + networkRID;
 	console.log(cmd);
 	module.db.command(cmd, function(err) {
-        callback({error : err, status : 200});
+        callback({error : err, staus : 200});
     });
 };

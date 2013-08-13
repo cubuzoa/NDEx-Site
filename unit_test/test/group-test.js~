@@ -25,23 +25,23 @@ console.log("starting group test");
 describe('NDEx Groups: ', function () {
 	//preliminary setup
 	var joshJID = null
-	describe('Setup ', function () {
-		it("should get 200 for creating Josh",function(done){
-			request({
-					method : 'POST',
-					url : baseURL + '/users', 
-					json : {username : "Josh", password : "password"}
-				},
-				function(err,res,body){
-					if(err) { done(err) }
-					else { 
-						res.should.have.status(200)
-						joshJID = res.body.jid
-						done()
-					}
+	before( function (done) {
+		console.log('\nsetup: group test');
+		request({
+				method : 'POST',
+				url : baseURL + '/users', 
+				json : {username : "Josh", password : "password"}
+			},
+			function(err,res,body){
+				if(err) { done(err) }
+				else { 
+					res.should.have.status(200)
+					joshJID = res.body.jid
+					console.log(' -user created')
+					done()
 				}
-			);
-		});
+			}
+		);
 	});
 	
 	describe('Testing Group Commands', function(){
@@ -215,7 +215,7 @@ describe('NDEx Groups: ', function () {
 						else {
 							res.should.have.status(200)
 							var groupData = res.body.user.ownedGroups
-							groupData.should.be.empty//length.should.equal(0)
+							groupData.should.be.empty
 							//console.log(groupData.length)//.jid)
 							done()
 						}
@@ -279,20 +279,21 @@ describe('NDEx Groups: ', function () {
 	});
 	
 	//preliminary teardown
-	describe('Teardown ', function () {
-		it("should get 200 for deleting Josh",function(done){
-			request({
-					method : 'DELETE',
-					url : baseURL + '/users/' + joshJID	
-				},
-	  			function(err, res, body){
-	  				if(err) { done(err) }
-	  				else { 
-	  					res.should.have.status(200)
-	  					done()
-	  				} 
-	  			}
-	  		);
-	  	});
+	after( function (done) {
+		console.log('\nteardown: group test')
+		request({
+				method : 'DELETE',
+				url : baseURL + '/users/' + joshJID	
+			},
+	  		function(err, res, body){
+	  			if(err) { done(err) }
+	  			else { 
+	  				res.should.have.status(200)
+	  				console.log(' -user deleted')
+	  				done()
+	  			} 
+	  		}
+	  	);
 	});
+	
 });

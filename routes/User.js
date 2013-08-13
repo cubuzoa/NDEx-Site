@@ -9,12 +9,15 @@ function convertFromRID(RID){
 }
 
 function contains(a, obj) {
+	
     for (var i = 0; i < a.length; i++) {
         if (a[i] === obj) {
             return true;
         }
     }
     return false;
+    
+  
 }
 
 exports.createUser = function(username, password, recoveryEmail, callback){
@@ -195,43 +198,56 @@ exports.checkErr = function(err, where, callback){
 exports.getUserWorkspace = function(userRID, callback){
 	console.log("calling getUserWorkspace with userRID = '" + userRID + "'");
 	
-	// TODO : check that user exists, that requester has permission
+	// TODO : check that requester has permission
 	
-	// when getting the workspace networks,
-	// we return network descriptors back for each 
-	// network ID found so the interface can display without further queries
+	var cmd = "select from xUser where @rid = " + userRID + "";
+		console.log(cmd);
+	//checking that user exists
+	module.db.command(cmd, function(err, users) {
+		if (exports.checkErr(err, "finding user", callback)){
+			if (!users || users.length < 1){
+				console.log("found no users by id = '" + userRID + "'");
+				callback({status : 404});
+			} else {
+				//user exists
+				// when getting the workspace networks,
+				// we return network descriptors back for each 
+				// network ID found so the interface can display without further queries
 	
-	var networkDescriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount";
-	var traverseExpression = "traverse workspace from " + userRID + " while $depth <= 2"
-	var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
+				var networkDescriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount";
+				var traverseExpression = "traverse workspace from " + userRID + " while $depth <= 2"
+				var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
 	
-	console.log(networks_cmd);
-	module.db.command(networks_cmd, function(err, workspace_networks) {
-		if(exports.checkErr(err, "getting user workspace networks", callback)){
-		
-			// process the workspace_networks
-			for (i in workspace_networks){
-				var network = workspace_networks[i];
-				network.jid = convertFromRID(network.jid);
+				console.log(networks_cmd);
+				module.db.command(networks_cmd, function(err, workspace_networks) {
+					if(exports.checkErr(err, "getting user workspace networks", callback)){	
+						// process the workspace_networks
+						for (i in workspace_networks){
+							var network = workspace_networks[i];
+							network.jid = convertFromRID(network.jid);
+						}
+					}
+					callback({networks : workspace_networks, error: err});		
+				});
 			}
 		}
-		callback({networks : workspace_networks, error: err});		
 	});
 }
 
 exports.addNetworkToUserWorkspace = function(userRID, networkRID, callback){
 	console.log("calling addNetworkToUserWorkspace with userRID = '" + userRID + "' and networkRID = '" + networkRID + "'");
 	
-	// TODO : check that user exists, that requester has permission
+	// TODO : check that requester has permission
 	
 	module.db.commmand("select username, workspace from " + userRID + " where @class = 'xUser'", function(err, results){
+		console.log('passed 1');
 		if(exports.checkErr(err, "checking user before adding to workspace ", callback)){
 			if (!results || results.length < 1){
 				console.log("found no users by id = '" + userRID + "'");
 				callback({status : 404, error : "Found no user by id = '" + userRID + "'"});
 			} else {
 				var user_data = results[0];
-			
+				
 				if (contains(user_data.workspace, networkRID)){
 					// skipping, already contains this network
 					callback({status : 500, error : "network " + networkRID + " already in user workspace"});
