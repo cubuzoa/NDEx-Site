@@ -455,10 +455,10 @@ app.get('/users/:userid', function(req, res) {
 
 // Delete a user by user id. Requester must be user or have admin permissions.
 app.delete('/users/:userid', function(req, res) {
-    var username = req.params['username'];
-    if(username) username = convertToRID(username);
+    var userid = req.params['userid'];
+    if(userid) userid = convertToRID(userid);
 	try {
-		User.deleteUser(username, function(data){
+		User.deleteUser(userid, function(data){
 			var status = data.status || 200;
 			res.send(status, data);
 		});
@@ -509,6 +509,92 @@ app.delete('/users/:userid/workspace/:networkid', function(req, res) {
     if(networkid) networkid = convertToRID(networkid);
 	try {
 		User.deleteNetworkFromUserWorkspace(userid, networkid, function(data){
+			var status = data.status || 200;
+			res.send(status, data);
+		});
+	}
+	catch (e){
+		res.send(500, {error : e}); 
+	}
+});
+
+// Add a programmatic access account, generate credentials
+app.post('/agents', function(req, res) {
+    var name = req.body['name'];
+    var owner = req.body['owner'];
+    if(owner) owner = convertToRID(owner);
+	try {
+		Agent.createAgent(name, owner, function(data){
+			var status = data.status || 200;
+			data.id = convertFromRID(data.id);
+			res.send(status, data);
+		});
+	}
+	catch (e){
+		res.send(500, {error : e}); 
+	}
+});
+
+// Get information about an Agent
+app.get('/agents/:agentid', function(req, res) {
+    var agentid = req.params['agentid'];
+    if(agentid) agentid = convertToRID(agentid);
+	try {
+		Agent.getAgent(agentid, function(data){
+			var status = data.status || 200;
+			data.id = convertFromRID(data.id);
+			res.send(status, data);
+		});
+	}
+	catch (e){
+		res.send(500, {error : e}); 
+	}
+});
+
+// Get Agents belonging to the user
+app.get('/users/:userid/agents', function(req, res) {
+    var userid = req.params['userid'];
+    if(userid) userid = convertToRID(userid);
+    var limit = req.query['limit'];
+    limit = limit || 100;
+    var offset = req.query['offset'];
+    offset = offset || 0;
+	try {
+		Agent.getUserAgents(userid, limit, offset, function(data){
+			var status = data.status || 200;
+			res.send(status, data);
+		});
+	}
+	catch (e){
+		res.send(500, {error : e}); 
+	}
+});
+
+// Get Agents belonging to the group
+app.get('/groups/:groupid/agents', function(req, res) {
+    var groupid = req.params['groupid'];
+    if(groupid) groupid = convertToRID(groupid);
+    var limit = req.query['limit'];
+    limit = limit || 100;
+    var offset = req.query['offset'];
+    offset = offset || 0;
+	try {
+		Agent.getGroupAgents(groupid, limit, offset, function(data){
+			var status = data.status || 200;
+			res.send(status, data);
+		});
+	}
+	catch (e){
+		res.send(500, {error : e}); 
+	}
+});
+
+// Update the activity status for an Agent
+app.put('/agents/:agentid/active', function(req, res) {
+    var agentId = req.params['agentId'];
+    if(agentId) agentId = convertToRID(agentId);
+	try {
+		Agent.setAgentActive(agentId, function(data){
 			var status = data.status || 200;
 			res.send(status, data);
 		});

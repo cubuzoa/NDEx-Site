@@ -209,7 +209,7 @@ exports.User = [
 exports.Agent = [
 
 	{	fn : "createAgent",
-		status : "inactive",
+		status : "active",
 		doc : "Add a programmatic access account, generate credentials",
 		method : "POST",
 		route : "/agents",
@@ -233,7 +233,7 @@ exports.Agent = [
 	},
 
 	{	fn : "getAgent",
-		status : "inactive",
+		status : "active",
 		doc : "Get information about an Agent",
 		method : "GET",
 		route : "/agents/:agentid",
@@ -250,7 +250,7 @@ exports.Agent = [
 	},
 
 	{	fn : "getUserAgents",
-		status : "inactive",
+		status : "active",
 		doc : "Get Agents belonging to the user",
 		method : "GET",
 		route : "/users/:userid/agents",
@@ -278,7 +278,7 @@ exports.Agent = [
 	},	
 
 	{	fn : "getGroupAgents",
-		status : "inactive",
+		status : "active",
 		doc : "Get Agents belonging to the group",
 		method : "GET",
 		route : "/groups/:groupid/agents",
@@ -308,7 +308,7 @@ exports.Agent = [
 // TODO : add request handler for changing name
 			
 	{	fn : "setAgentActive",
-		status : "inactive",
+		status : "active",
 		doc : "Update the activity status for an Agent",
 		method : "PUT",
 		route : "/agents/:agentid/active",

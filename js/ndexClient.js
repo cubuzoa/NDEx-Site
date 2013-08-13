@@ -127,6 +127,41 @@ Expected to be a global for the client, expected to be undefined and then requir
     }
 
 
+// Add a programmatic access account, generate credentials
+    exports.createAgent = function(name, owner, callback, errorHandler){
+        var mergedRoute = '/agents';
+        exports.ndexPost(mergedRoute, {name: name, owner: owner}, callback, errorHandler);
+    }
+
+
+// Get information about an Agent
+    exports.getAgent = function(agentid, callback, errorHandler){
+        var mergedRoute = '/agents/' + encodeURIComponent(agentid) + '';
+        exports.ndexGet(mergedRoute, {},callback, errorHandler);
+    }
+
+
+// Get Agents belonging to the user
+    exports.getUserAgents = function(userid, limit, offset, callback, errorHandler){
+        var mergedRoute = '/users/' + encodeURIComponent(userid) + '/agents';
+        exports.ndexGet(mergedRoute, {limit: limit, offset: offset}, callback, errorHandler);
+    }
+
+
+// Get Agents belonging to the group
+    exports.getGroupAgents = function(groupid, limit, offset, callback, errorHandler){
+        var mergedRoute = '/groups/' + encodeURIComponent(groupid) + '/agents';
+        exports.ndexGet(mergedRoute, {limit: limit, offset: offset}, callback, errorHandler);
+    }
+
+
+// Update the activity status for an Agent
+
+        var mergedRoute = '/agents/' + encodeURIComponent(agentid) + '/active';
+
+    }
+
+
 // Add a group account
     exports.createGroup = function(userid, groupName, callback, errorHandler){
         var mergedRoute = '/groups';
