@@ -128,7 +128,7 @@ describe('NDEx Workspaces: ', function (done) {
 						res.should.have.status(200)
 						var networks = res.body.networks
 						networkArray = networks
-						//console.log(networkArray)
+						console.log(networkArray)
 						done()
 					}
 				}
@@ -137,11 +137,11 @@ describe('NDEx Workspaces: ', function (done) {
 		
 		it("should get 200 adding a network to WorkspaceOwner's workspace; repeat to add all of the test networks.",function(done){
 			//console.log(networkArray);
-			var isFin = function doNothing() {};
+			/*var isFin = function doNothing() {};
 			for(var ii = 0; ii < networkArray.length ; ii ++){
 				if(ii == (networkArray.length -1)) { isFin = done }
-			(function(tempNet, isFinished){
-			
+			(function(tempNet, isFinished){*/
+			var tempNet = networkArray[0];
 			request({
 					method : 'POST',
 					url: baseURL + '/users/'+ workspaceOwnerJID +'/workspace',
@@ -150,19 +150,19 @@ describe('NDEx Workspaces: ', function (done) {
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
-						//res.should.have.status(200)
+						res.should.have.status(200)
 						console.log(body)
-						isFinished()
+						done()
 					}
 				}
 			);	
 			//console.log(tempNet.jid);
 			//isFinished();
 			
-			})(networkArray[ii],isFin);
-			}					
+			//})(networkArray[ii],isFin);
+			//}					
 		});
-		it("should get 200 and empty workspace on getting workspace of new user WorkspaceOwner", function(done){
+		it("should get 200 and workspace on getting workspace of new user WorkspaceOwner", function(done){
 			request({
 					method : 'GET',
 					url: baseURL + '/users/'+ workspaceOwnerJID +'/workspace',

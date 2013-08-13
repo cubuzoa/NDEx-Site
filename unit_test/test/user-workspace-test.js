@@ -80,7 +80,7 @@ describe('NDEx Workspaces: ', function (done) {
 		);
 	});	
 	describe('Should', function() {
-		this.timeout(5000);// occasionally, requests take longer
+		this.timeout(6000);// occasionally, requests take longer
 		it("should get 404 getting workspace for non-existent User Id", function(done){
 			request({
 					method : 'GET',
@@ -128,7 +128,7 @@ describe('NDEx Workspaces: ', function (done) {
 						res.should.have.status(200)
 						var networks = res.body.networks
 						networkArray = networks
-						//console.log(networkArray)
+						console.log(networkArray)
 						done()
 					}
 				}
@@ -162,7 +162,7 @@ describe('NDEx Workspaces: ', function (done) {
 			//})(networkArray[ii],isFin);
 			//}					
 		});
-		it("should get 200 and empty workspace on getting workspace of new user WorkspaceOwner", function(done){
+		it("should get 200 and workspace on getting workspace of new user WorkspaceOwner", function(done){
 			request({
 					method : 'GET',
 					url: baseURL + '/users/'+ workspaceOwnerJID +'/workspace',
