@@ -239,8 +239,8 @@ exports.addNetworkToUserWorkspace = function(userRID, networkRID, callback){
 	
 	// TODO : check that requester has permission
 	
-	module.db.commmand("select username, workspace from " + userRID + " where @class = 'xUser'", function(err, results){
-		console.log('passed 1');
+	module.db.command("select username, workspace from " + userRID + " where @class = 'xUser'", function(err, results){
+		
 		if(exports.checkErr(err, "checking user before adding to workspace ", callback)){
 			if (!results || results.length < 1){
 				console.log("found no users by id = '" + userRID + "'");
@@ -248,9 +248,9 @@ exports.addNetworkToUserWorkspace = function(userRID, networkRID, callback){
 			} else {
 				var user_data = results[0];
 				
-				if (contains(user_data.workspace, networkRID)){
-					// skipping, already contains this network
-					callback({status : 500, error : "network " + networkRID + " already in user workspace"});
+				if (user_data.workspace && contains(user_data.workspace, networkRID)){
+					// aborting, already contains this network
+					callback({status : 400, error : "network " + networkRID + " already in user workspace"});
 				
 				} else {
 					// Check that network exists
@@ -287,7 +287,7 @@ exports.deleteNetworkFromUserWorkspace = function(userRID, networkRID, callback)
 	
 	// TODO : check that user exists, that requester has permission
 	
-	module.db.commmand("select username, workspace from " + userRID + " where @class = 'xUser'", function(err, results){
+	module.db.command("select username, workspace from " + userRID + " where @class = 'xUser'", function(err, results){
 		if(exports.checkErr(err, "checking user before adding to workspace ", callback)){
 			if (!results || results.length < 1){
 				console.log("found no users by id = '" + userRID + "'");
@@ -295,9 +295,9 @@ exports.deleteNetworkFromUserWorkspace = function(userRID, networkRID, callback)
 			} else {
 				var user_data = results[0];
 			
-				if (!contains(user_data.workspace, networkRID)){
-					// skipping, does not contain this network
-					callback({status : 500, error : "network " + networkRID + " not in user workspace"});
+				if (!user_data.workspace || !contains(user_data.workspace, networkRID)){
+					// aborting, does not contain this network
+					callback({status : 404, error : "network " + networkRID + " not in user workspace"});
 				
 				} else {
 					// User exists and networkRID is in the workspace, do the update:

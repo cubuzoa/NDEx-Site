@@ -353,9 +353,18 @@ exports.checkErr = function(err, where, callback){
 // delete a network
 exports.deleteNetwork = function (networkRID, callback){
 	console.log("calling delete network with id = '" + networkRID + "'");
-	var cmd = "delete from " + networkRID;
-	console.log(cmd);
-	module.db.command(cmd, function(err) {
-        callback({error : err, status : 200});
-    });
+	// Check that network exists
+	module.db.command("select @rid as rid from " + networkRID + " where @class = 'xNetwork'", function(err, network_ids){
+		if(exports.checkErr(err, "checking network before adding to workspace ", callback)){
+			if (!network_ids || network_ids.length < 1){
+				callback({status : 404, error : "Found no network by id = '" + networkRID + "'"});
+			} else {
+				var cmd = "delete from " + networkRID;
+				console.log(cmd);
+				module.db.command(cmd, function(err) {
+					callback({error : err, status : 200});
+			    	});
+			 }
+		}
+	});
 };
