@@ -180,7 +180,6 @@ exports.User = [
 					},
 		postData: {
 				networkid : {	doc : "user id", type : "JID", required : true},
-				profile : {	doc : "group profile", type : "JSON"}
 				},
 		response: {user : "user descriptor"},
 		exceptions: ["404 unknown user id",
@@ -310,15 +309,15 @@ exports.Agent = [
 	{	fn : "setAgentActive",
 		status : "active",
 		doc : "Update the activity status for an Agent",
-		method : "PUT",
+		method : "POST",
 		route : "/agents/:agentid/active",
 		routeParams: {
-				agentId : {	doc : "Agent id", type : "JID"},
+				agentid : {	doc : "Agent id", type : "JID"},
 					},
-		queryData: {
-				agentActive : {	doc : "Whether Agent is active, either true or false",
+		postData: {
+				agentActive : {	doc : "Whether Agent is active, either 0 or 1",
 								type : "boolean",
-								default : true
+								default : 1
 								}
 					}, 
 		response: {},
@@ -328,7 +327,7 @@ exports.Agent = [
 	},
 
 	{	fn : "updateAgentCredentials",
-		status : "inactive",
+		status : "active",
 		doc : "Update the credentials for an Agent, default is to reset them",
 		method : "POST",
 		route : "/agents/:agentid/credentials",

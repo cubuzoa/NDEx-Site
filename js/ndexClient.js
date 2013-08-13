@@ -114,9 +114,9 @@ Expected to be a global for the client, expected to be undefined and then requir
 
 
 // Add a network to the user's workspace. Requester must be user or have admin permissions. User must have permission to access network
-    exports.addNetworkToUserWorkspace = function(userid, networkid, profile, callback, errorHandler){
+    exports.addNetworkToUserWorkspace = function(userid, networkid, callback, errorHandler){
         var mergedRoute = '/users/' + encodeURIComponent(userid) + '/workspace';
-        exports.ndexPost(mergedRoute, {networkid: networkid, profile: profile}, callback, errorHandler);
+        exports.ndexPost(mergedRoute, {networkid: networkid}, callback, errorHandler);
     }
 
 
@@ -156,9 +156,16 @@ Expected to be a global for the client, expected to be undefined and then requir
 
 
 // Update the activity status for an Agent
-
+    exports.setAgentActive = function(agentid, agentActive, callback, errorHandler){
         var mergedRoute = '/agents/' + encodeURIComponent(agentid) + '/active';
+        exports.ndexPost(mergedRoute, {agentActive: agentActive}, callback, errorHandler);
+    }
 
+
+// Update the credentials for an Agent, default is to reset them
+    exports.updateAgentCredentials = function(agentId, action, callback, errorHandler){
+        var mergedRoute = '/agents/' + encodeURIComponent(agentid) + '/credentials';
+        exports.ndexPost(mergedRoute, {action: action}, callback, errorHandler);
     }
 
 

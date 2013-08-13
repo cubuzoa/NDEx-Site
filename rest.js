@@ -343,9 +343,8 @@ app.post('/users/:userid/workspace', function(req, res) {
     if(userid) userid = convertToRID(userid);
     var networkid = req.body['networkid'];
     if(networkid) networkid = convertToRID(networkid);
-    var profile = req.body['profile'];
 	try {
-		User.addNetworkToUserWorkspace(userid, networkid, profile, function(data){
+		User.addNetworkToUserWorkspace(userid, networkid, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
 			}
@@ -456,11 +455,30 @@ app.get('/groups/:groupid/agents', function(req, res) {
 });
 
 // Update the activity status for an Agent
-app.put('/agents/:agentid/active', function(req, res) {
+app.post('/agents/:agentid/active', function(req, res) {
+    var agentid = req.params['agentid'];
+    if(agentid) agentid = convertToRID(agentid);
+    var agentActive = req.body['agentActive'];
+	try {
+		Agent.setAgentActive(agentid, agentActive, function(data){
+			var status = data.status || 200;
+			if(status && status == 200){
+			}
+			res.send(status, data);
+		});
+	}
+	catch (e){
+		res.send(500, {error : e}); 
+	}
+});
+
+// Update the credentials for an Agent, default is to reset them
+app.post('/agents/:agentid/credentials', function(req, res) {
     var agentId = req.params['agentId'];
     if(agentId) agentId = convertToRID(agentId);
+    var action = req.body['action'];
 	try {
-		Agent.setAgentActive(agentId, function(data){
+		Agent.updateAgentCredentials(agentId, action, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
 			}
