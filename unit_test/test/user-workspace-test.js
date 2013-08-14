@@ -53,32 +53,29 @@ describe('NDEx Workspaces: ', function (done) {
 				else { 
 					res.should.have.status(200)
 					workspaceOwnerJID = res.body.jid
-					console.log(' -user created')//ensures completion
-					done()
+					console.log('...user created...creating network...')//ensures completion
+					var data = fs.readFileSync('../test_db/test_networks/pc_sif/testNetwork.jdex', 'utf8'); 
+					data = JSON.parse(data);	
+					request({
+							method : 'POST',
+							url: baseURL + '/networks',
+							json : {network : data, accountid : workspaceOwnerJID}
+						},
+						function(err, res, body){
+							if(err) { done(err) }
+							else {
+								res.should.have.status(200)
+								newNetworkJID = res.body.jid
+								console.log('...complete')//ensures completion
+								done()
+							}
+						}
+					);
 				}
 			}
 		);
 	});
-	before( function (done) {
-		console.log('setup: user workspace test');
-		var data = fs.readFileSync('../test_db/test_networks/pc_sif/testNetwork.jdex', 'utf8'); 
-		data = JSON.parse(data);	
-		request({
-				method : 'POST',
-				url: baseURL + '/networks',
-				json : {network : data, accountid : workspaceOwnerJID}
-			},
-			function(err, res, body){
-				if(err) { done(err) }
-				else {
-					res.should.have.status(200)
-					newNetworkJID = res.body.jid
-					console.log(' -network created')//ensures completion
-					done()
-				}
-			}
-		);
-	});	
+		
 	describe('Should', function() {
 		this.timeout(10000);// occasionally, requests take longer
 		it("should get 404 getting workspace for non-existent User Id", function(done){
@@ -115,7 +112,7 @@ describe('NDEx Workspaces: ', function (done) {
 			);							
 				
 		});
-		var networkArray = []; //searchExpression currently not working
+		var networkArray = []; 
 		it("should get 200 and network descriptors finding existing networks by name that will be added to workspace.", function(done){
 			request({
 					method : 'GET',
@@ -336,30 +333,23 @@ describe('NDEx Workspaces: ', function (done) {
 				if(err) { done(err) }
 				else {
 					res.should.have.status(404);
-					console.log(' -network deletion confirmed');// ensures completion
-					done();
+					console.log('...network deletion comfirmed...deleting user...');// ensures completion
+					request({
+						method : 'DELETE',
+						url : baseURL + '/users/' + workspaceOwnerJID	
+						},
+				  		function(err, res, body){
+				  			if(err) { done(err) }
+				  			else { 
+				  				res.should.have.status(200);
+				  				console.log('...complete');//ensures completion
+				  				done();
+				  			} 
+				  		}
+				  	);
 				}
 			}
 		);
-	});
-	after(function (done) {
-		console.log('teardown: user workspace test');
-		request({
-				method : 'DELETE',
-				url : baseURL + '/users/' + workspaceOwnerJID	
-			},
-	  		function(err, res, body){
-	  			if(!workspaceOwnerJID){
-  					console.log(' -failed because setup failed');
-  				}
-	  			if(err) { console.log(err) }
-	  			else { 
-	  				res.should.have.status(200);
-	  				console.log(' -user deleted');//ensures completion
-	  				done();
-	  			} 
-	  		}
-	  	);
 	});
 
 });

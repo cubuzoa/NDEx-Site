@@ -29,6 +29,7 @@ var baseURL = 'http://localhost:3333';
 console.log("starting networks test");
  
 describe('NDEx Networks: ', function (done) {
+	this.timeout(10000);
 	var networkOwnerJID = null;
 	var network1JID = null;
 	before( function(done){
@@ -51,7 +52,6 @@ describe('NDEx Networks: ', function (done) {
 	});
 	
 	describe('Should: ', function(done) {
-		this.timeout(6000);// occasionally, requests take longer
 		it("should get 404 getting non-existent Network Id", function(done){
 			request({
 					method : 'GET',

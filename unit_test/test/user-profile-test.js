@@ -32,7 +32,7 @@ describe('NDEx User Profile: ', function () {
 				else { 
 					res.should.have.status(200)
 					harryJID = res.body.jid
-					console.log(' -user created')
+					console.log('...complete')
 					done()
 				}
 			}
@@ -190,7 +190,7 @@ describe('NDEx User Profile: ', function () {
 	  			if(err) { done(err) }
 	  			else { 
 	  				res.should.have.status(200)
-	  				console.log(' -user deleted')
+	  				console.log('...complete')
 	  				done()
 	  			} 
 	  		}
