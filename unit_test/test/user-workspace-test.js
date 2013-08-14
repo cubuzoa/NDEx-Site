@@ -80,7 +80,7 @@ describe('NDEx Workspaces: ', function (done) {
 		);
 	});	
 	describe('Should', function() {
-		this.timeout(6000);// occasionally, requests take longer
+		this.timeout(10000);// occasionally, requests take longer
 		it("should get 404 getting workspace for non-existent User Id", function(done){
 			request({
 					method : 'GET',
@@ -90,8 +90,8 @@ describe('NDEx Workspaces: ', function (done) {
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
-						res.should.have.status(404)
-						done()
+						res.should.have.status(404);
+						done();
 					}
 				}
 			);
@@ -106,10 +106,10 @@ describe('NDEx Workspaces: ', function (done) {
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
-						res.should.have.status(200)
-						var networks = res.body.networks
-						networks.should.have.length
-						done()
+						res.should.have.status(200);
+						var networks = res.body.networks;
+						networks.should.have.length(0);
+						done();
 					}
 				}
 			);							
@@ -289,7 +289,7 @@ describe('NDEx Workspaces: ', function (done) {
 				}
 			);		
 		});
-		it("should get 200 and network descriptors including new network when getting workspace", function(done){
+		it("should get 200 deleting new network", function(done){
 			request({
 					method : 'DELETE',
 					url : baseURL + '/networks/' + newNetworkJID

@@ -8,6 +8,25 @@ function convertFromRID(RID){
 	return RID.replace("#","C").replace(":", "R");
 }
 
+function checkAccountExistance(accountRID, callback, proceed){
+	//going to have check user/group
+	//userRID should be string, proceed should be a function
+	//var cmd = "select from " + accountRID + " where @class = 'xUser' or @class = 'xGroup'";
+	var cmd = "select from xAccount where @RID = '" + accountRID + "'";
+	module.db.command(cmd,function(err,users){
+		if(exports.checkErr(err, "checking existence of user " + accountRID, callback)){
+			console.log("users found " + users.length);
+			if (!users || users.length < 1){
+				console.log("found no accounts by id = '" + accountRID + "'");
+				callback({status : 404, error : "Found no accounts by id = '" + accountRID + "'"});
+			} 
+			else {
+				proceed();
+			}
+		}
+	});
+}
+
 exports.createInitialDocument = function(networkJDEx){
 		var o_nodes = [],
 		o_namespaces = [],
@@ -184,51 +203,54 @@ exports.linkNodeToTerm = function(nodeRID, networkRID, termId){
 
 // Create a new network in the specified account
 exports.createNetwork = function(networkJDEx, accountRID, callback){
-	var title = "untitled";
-	if (networkJDEx.properties && networkJDEx.properties.title){
-		title = networkJDEx.properties.title;
-	}
-	console.log("calling createNetwork for " + title + " owned by account: " + accountRID);
 	
-	// First create a document to load which will create all of the Vertices
-	// including their JDEx IDs, but not the cross-links between the objects.
-	// (in some cases, such as functional terms, the JDEx ID is the *only* property they have at this time)
-	
-	var initialDocument = exports.createInitialDocument(networkJDEx);
-	// console.log(JSON.stringify(initialDocument));
-	
-		
-	// The initial network will be created by the db.cascadingSave facility
-	// db.save works for documents without links
-	// where as cascadingSave creates embedded documents and links them
-	module.db.cascadingSave(initialDocument, function (err, document){
-	
-		if (err){
-			console.log("error saving initial network: " + err);
+	checkAccountExistance(accountRID, callback, function(){
+		var title = "untitled";
+		if (networkJDEx.properties && networkJDEx.properties.title){
+			title = networkJDEx.properties.title;
 		}
-		
-		if (document && document["@rid"]){
-		
-			var networkRID = document["@rid"];
+		console.log("calling createNetwork for " + title + " owned by account: " + accountRID);
 	
-			//console.log("Saved initial document: " + JSON.stringify(document));
+		// First create a document to load which will create all of the Vertices
+		// including their JDEx IDs, but not the cross-links between the objects.
+		// (in some cases, such as functional terms, the JDEx ID is the *only* property they have at this time)
+	
+		var initialDocument = exports.createInitialDocument(networkJDEx);
+		// console.log(JSON.stringify(initialDocument));
+	
 		
-			// assert ownership of network - can be asynch since both network and account exist
-			var ownsEdgeCMD = "create edge xOwnsNetwork from " + accountRID + " to " + networkRID;
-			module.db.command(ownsEdgeCMD, function(err){
-			});
+		// The initial network will be created by the db.cascadingSave facility
+		// db.save works for documents without links
+		// where as cascadingSave creates embedded documents and links them
+		module.db.cascadingSave(initialDocument, function (err, document){
+	
+			if (err){
+				console.log("error saving initial network: " + err);
+			}
 		
-			// create all the Edges with their JDEx IDs.
-			// This can be asynchronous because the nodes already exist.	
-			exports.createNetworkEdges(networkJDEx, document);
+			if (document && document["@rid"]){
 		
-			// TODO link nodes to terms via represents
-			exports.linkNodesToTerms(networkJDEx, document);
+				var networkRID = document["@rid"];
+	
+				//console.log("Saved initial document: " + JSON.stringify(document));
 		
-			callback({jid: networkRID, ownedBy: accountRID, error : err, status : 200});
-		} else {
-			console.log("initial document is null, even though no error signaled");
-		}
+				// assert ownership of network - can be asynch since both network and account exist
+				var ownsEdgeCMD = "create edge xOwnsNetwork from " + accountRID + " to " + networkRID;
+				module.db.command(ownsEdgeCMD, function(err){
+				});
+		
+				// create all the Edges with their JDEx IDs.
+				// This can be asynchronous because the nodes already exist.	
+				exports.createNetworkEdges(networkJDEx, document);
+		
+				// TODO link nodes to terms via represents
+				exports.linkNodesToTerms(networkJDEx, document);
+		
+				callback({jid: networkRID, title: title, ownedBy: accountRID, error : err, status : 200});
+			} else {
+				console.log("initial document is null, even though no error signaled");
+			}
+		});
 	});
 		
 };	
@@ -274,62 +296,69 @@ exports.getNetwork = function(networkRID, callback){
 				} else {
 					console.log("found " + networks.length + " networks, first one is " + networks[0]["@rid"]);
 					
-					var result = {namespaces : {}, terms: {}, nodes: {}, edges: {}};
+					var result = {title: '',jid: convertFromRID(networkRID),namespaces : {}, terms: {}, nodes: {}, edges: {}};
 					
-					// get the namespaces
-					var ns_cmd = "select id, prefix, uri, @rid as rid from (traverse namespaces from " + networkRID + ") where $depth = 1";
-					module.db.command(ns_cmd, function(err, namespaces) {
-						if(exports.checkErr(err, "getting namespaces", callback)){
-						
-							// process the namespaces
-							for (i in namespaces){
-								var ns = namespaces[i];
-								result.namespaces[ns.id] = {prefix: ns.prefix, rid: module.convertFromRID(ns.rid), uri: ns.uri};
-							}
+					//get the title
+					var title_cmd = "select properties.title as title from " + networkRID;
+					module.db.command(title_cmd, function(err, title) {
+						if(exports.checkErr(err, "getting title", callback)){
+							result.title = title[0].title;
 							
-							// get the terms
-							var term_cmd = "select id, name, ns.id as nsid, @rid as rid from (traverse terms from " + networkRID + ") where $depth = 1";
-							module.db.command(term_cmd, function(err, terms) {
-								if (exports.checkErr(err, "getting terms", callback)){
+							// get the namespaces
+							var ns_cmd = "select id, prefix, uri, @rid as rid from (traverse namespaces from " + networkRID + ") where $depth = 1";
+							module.db.command(ns_cmd, function(err, namespaces) {
+								if(exports.checkErr(err, "getting namespaces", callback)){
 						
-									// process the terms
-									for (i in terms){
-										var term = terms[i];
-										result.terms[term.id] = {name: term.name, jid: convertFromRID(term.rid), ns: term.nsid};
+									// process the namespaces
+									for (i in namespaces){
+										var ns = namespaces[i];
+										result.namespaces[ns.id] = {prefix: ns.prefix, rid: module.convertFromRID(ns.rid), uri: ns.uri};
 									}
 							
-									// get the nodes
-									// TODO - get the defining terms...
-									var node_cmd = "select id, name, represents.id as represents, @rid as rid from (traverse nodes from " + networkRID + ") where $depth = 1";
-									module.db.command(node_cmd, function(err, nodes) {
-										if (exports.checkErr(err, "getting nodes", callback)){
+									// get the terms
+									var term_cmd = "select id, name, ns.id as nsid, @rid as rid from (traverse terms from " + networkRID + ") where $depth = 1";
+									module.db.command(term_cmd, function(err, terms) {
+										if (exports.checkErr(err, "getting terms", callback)){
 						
-											// process the nodes
-											for (i in nodes){
-												var node = nodes[i];
-												result.nodes[node.id] = {name: node.name, jid: convertFromRID(node.rid), represents: node.represents};
+											// process the terms
+											for (i in terms){
+												var term = terms[i];
+												result.terms[term.id] = {name: term.name, jid: convertFromRID(term.rid), ns: term.nsid};
 											}
-											// get the edges
-											var edge_cmd = "select  in.id as s, p.id as p, out.id as o, @rid as rid from (traverse edges from " + networkRID + ") where $depth = 1)";
-											module.db.command(edge_cmd, function(err, edges) {
-												if (exports.checkErr(err, "getting edges", callback)){
-										
-													// process the edges
-													for (i in edges){
-														var edge = edges[i];
-														result.edges[i] = {s: edge.s, p: edge.p, o: edge.o, jid: convertFromRID(edge.rid)};
+							
+											// get the nodes
+											// TODO - get the defining terms...
+											var node_cmd = "select id, name, represents.id as represents, @rid as rid from (traverse nodes from " + networkRID + ") where $depth = 1";
+											module.db.command(node_cmd, function(err, nodes) {
+												if (exports.checkErr(err, "getting nodes", callback)){
+						
+													// process the nodes
+													for (i in nodes){
+														var node = nodes[i];
+														result.nodes[node.id] = {name: node.name, jid: convertFromRID(node.rid), represents: node.represents};
 													}
+													// get the edges
+													var edge_cmd = "select  in.id as s, p.id as p, out.id as o, @rid as rid from (traverse edges from " + networkRID + ") where $depth = 1)";
+													module.db.command(edge_cmd, function(err, edges) {
+														if (exports.checkErr(err, "getting edges", callback)){
 										
-													callback({network : result});
+															// process the edges
+															for (i in edges){
+																var edge = edges[i];
+																result.edges[i] = {s: edge.s, p: edge.p, o: edge.o, jid: convertFromRID(edge.rid)};
+															}
+										
+															callback({network : result});
+														}
+													}); // close edge query
 												}
-											}); // close edge query
+											}); // close node query
 										}
-									}); // close node query
+									}); // close term query
 								}
-							}); // close term query
+							}); // close namespace query
 						}
-					}); // close namespace query
-					
+					}); // close title query
 				}
 			}
 			catch (e){
