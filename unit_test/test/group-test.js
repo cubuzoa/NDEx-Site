@@ -35,10 +35,10 @@ describe('NDEx Groups: ', function () {
 			function(err,res,body){
 				if(err) { done(err) }
 				else { 
-					res.should.have.status(200)
-					joshJID = res.body.jid
-					console.log(' -user created')// confirmation of completion
-					done()
+					res.should.have.status(200);
+					joshJID = res.body.jid;
+					console.log('...complete');// confirmation of completion
+					done();
 				}
 			}
 		);
@@ -55,8 +55,8 @@ describe('NDEx Groups: ', function () {
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
-							res.should.have.status(404)
-							done()
+							res.should.have.status(404);
+							done();
 						}
 					}
 				);
@@ -72,9 +72,9 @@ describe('NDEx Groups: ', function () {
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
-							res.should.have.status(400)
+							res.should.have.status(400);
 							//console.log(res.body)
-							done()
+							done();
 						}
 					}
 				);
@@ -91,10 +91,10 @@ describe('NDEx Groups: ', function () {
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
-							res.should.have.status(200)
-							ValidNameJID = res.body.jid
+							res.should.have.status(200);
+							ValidNameJID = res.body.jid;
 							//console.log(res.body.jid)
-							done()
+							done();
 						}
 					}
 				);
@@ -110,8 +110,8 @@ describe('NDEx Groups: ', function () {
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
-							res.should.have.status(500)
-							done()
+							res.should.have.status(500);
+							done();
 						}
 					}
 				);
@@ -126,8 +126,8 @@ describe('NDEx Groups: ', function () {
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
-							res.should.have.status(200)
-							done()
+							res.should.have.status(200);
+							done();
 						}
 					}
 				);
@@ -143,12 +143,12 @@ describe('NDEx Groups: ', function () {
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
-							res.should.have.status(200)
-							var groupData = res.body.user.ownedGroups
-							groupData = groupData[0]
-							ValidNameJID.should.equal(groupData.jid)
+							res.should.have.status(200);
+							var groupData = res.body.user.ownedGroups;
+							groupData = groupData[0];
+							ValidNameJID.should.equal(groupData.jid);
 							//console.log(groupData.jid)
-							done()
+							done();
 						}
 					}
 				);
@@ -163,8 +163,8 @@ describe('NDEx Groups: ', function () {
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
-							res.should.have.status(404)
-							done()
+							res.should.have.status(404);
+							done();
 						}
 					}
 				);
@@ -179,8 +179,8 @@ describe('NDEx Groups: ', function () {
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
-							res.should.have.status(200)
-							done()
+							res.should.have.status(200);
+							done();
 						}
 					}
 				);
@@ -196,8 +196,8 @@ describe('NDEx Groups: ', function () {
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
-							res.should.have.status(404)
-							done()
+							res.should.have.status(404);
+							done();
 						}
 					}
 				);
@@ -213,11 +213,11 @@ describe('NDEx Groups: ', function () {
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
-							res.should.have.status(200)
-							var groupData = res.body.user.ownedGroups
-							groupData.should.be.empty
+							res.should.have.status(200);
+							var groupData = res.body.user.ownedGroups;
+							groupData.should.be.empty;
 							//console.log(groupData.length)//.jid)
-							done()
+							done();
 						}
 					}
 				);
@@ -234,10 +234,10 @@ describe('NDEx Groups: ', function () {
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
-							res.should.have.status(200)
-							group2JID = res.body.jid
+							res.should.have.status(200);
+							group2JID = res.body.jid;
 							//console.log(res.body.jid)
-							done()
+							done();
 						}
 					}
 				);
@@ -252,8 +252,8 @@ describe('NDEx Groups: ', function () {
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
-							res.should.have.status(200)
-							done()
+							res.should.have.status(200);
+							done();
 						}
 					}
 				);
@@ -268,8 +268,8 @@ describe('NDEx Groups: ', function () {
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
-							res.should.have.status(400)
-							done()
+							res.should.have.status(400);
+							done();
 						}
 					}
 				);
@@ -288,9 +288,9 @@ describe('NDEx Groups: ', function () {
 	  		function(err, res, body){
 	  			if(err) { done(err) }
 	  			else { 
-	  				res.should.have.status(200)
-	  				console.log(' -user deleted')// confirmation of completion
-	  				done()
+	  				res.should.have.status(200);
+	  				console.log('...complete');// confirmation of completion
+	  				done();
 	  			} 
 	  		}
 	  	);
