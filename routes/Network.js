@@ -251,7 +251,7 @@ exports.findNetworks = function (searchExpression, limit, offset, callback){
 	module.db.command(cmd, function(err, networks) {
 		for (i in networks){
 			var network = networks[i];
-			network.jid = module.common.module.common.convertFRomRID(network.jid);
+			network.jid = module.common.convertFRomRID(network.jid);
 		}
         callback({networks : networks, error : err});
     });
@@ -281,7 +281,7 @@ exports.getNetwork = function(networkRID, callback){
 							// process the namespaces
 							for (i in namespaces){
 								var ns = namespaces[i];
-								result.namespaces[ns.id] = {prefix: ns.prefix, rid: module.module.common.module.common.convertFRomRID(ns.rid), uri: ns.uri};
+								result.namespaces[ns.id] = {prefix: ns.prefix, rid: module.module.common.convertFRomRID(ns.rid), uri: ns.uri};
 							}
 							
 							// get the terms
@@ -292,7 +292,7 @@ exports.getNetwork = function(networkRID, callback){
 									// process the terms
 									for (i in terms){
 										var term = terms[i];
-										result.terms[term.id] = {name: term.name, jid: module.common.module.common.convertFRomRID(term.rid), ns: term.nsid};
+										result.terms[term.id] = {name: term.name, jid: module.common.convertFRomRID(term.rid), ns: term.nsid};
 									}
 							
 									// get the nodes
@@ -304,7 +304,7 @@ exports.getNetwork = function(networkRID, callback){
 											// process the nodes
 											for (i in nodes){
 												var node = nodes[i];
-												result.nodes[node.id] = {name: node.name, jid: module.common.module.common.convertFRomRID(node.rid), represents: node.represents};
+												result.nodes[node.id] = {name: node.name, jid: module.common.convertFRomRID(node.rid), represents: node.represents};
 											}
 											// get the edges
 											var edge_cmd = "select  in.id as s, p.id as p, out.id as o, @rid as rid from (traverse edges from " + networkRID + ") where $depth = 1)";
@@ -314,7 +314,7 @@ exports.getNetwork = function(networkRID, callback){
 													// process the edges
 													for (i in edges){
 														var edge = edges[i];
-														result.edges[i] = {s: edge.s, p: edge.p, o: edge.o, jid: module.common.module.common.convertFRomRID(edge.rid)};
+														result.edges[i] = {s: edge.s, p: edge.p, o: edge.o, jid: module.common.convertFRomRID(edge.rid)};
 													}
 										
 													callback({network : result});
@@ -336,16 +336,6 @@ exports.getNetwork = function(networkRID, callback){
 		}
     }); // close find network query
 };
-
-module.common.checkErr = function(err, where, callback){
-	if (err){
-			console.log("DB error, " + where + " : " + err);
-			callback({network : null, error : err, status : 500});
-			return false;
-	}
-	return true;
-};
-
 
 // delete a network
 exports.deleteNetwork = function (networkRID, callback){

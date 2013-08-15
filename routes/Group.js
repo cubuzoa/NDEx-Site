@@ -183,15 +183,6 @@ exports.getGroup = function(groupRID, callback){
 	}
 };
 
-module.common.checkErr = function(err, where, callback){
-	if (err){
-			console.log("DB error, " + where + " : " + err);
-			callback({network : null, error : err, status : 500});
-			return false;
-	}
-	return true;
-};
-
 exports.deleteGroup = function (groupRID, callback){
 	console.log("calling delete group with groupRID = '" + groupRID + "'");
 	var cmd = "select from " + groupRID + "";
