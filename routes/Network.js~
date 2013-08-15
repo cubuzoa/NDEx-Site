@@ -183,11 +183,14 @@ exports.linkNodeToTerm = function(nodeRID, networkRID, termId){
 // Create a new network in the specified account
 exports.createNetwork = function(networkJDEx, accountRID, callback){
 	var title = "untitled";
-
+	try {
 	if (networkJDEx.properties && networkJDEx.properties.title){
 		title = networkJDEx.properties.title;
 	}
-	
+	}
+	catch(e) {
+		console.log('error for jdex');
+	}
 	console.log("calling createNetwork for " + title + " owned by account: " + accountRID);
 	
 	// First create a document to load which will create all of the Vertices

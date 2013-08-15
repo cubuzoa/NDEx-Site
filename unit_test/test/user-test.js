@@ -87,7 +87,7 @@ describe('NDEx Users: ', function () {
   		request({
 							method : 'POST',
 							url : baseURL + '/users', 
-							json : {username : "fred", password : "bird"}
+							json : {username : "Henry", password : "password"}
 				},
   				function(err, res, body){
   					if(err) { done(err) }  

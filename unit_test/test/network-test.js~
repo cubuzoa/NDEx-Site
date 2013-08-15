@@ -52,7 +52,7 @@ describe('NDEx Networks: ', function (done) {
 	});
 	
 	describe('Should: ', function(done) {
-		/*it("should get 404 getting non-existent Network Id", function(done){
+		it("should get 404 getting non-existent Network Id", function(done){
 			request({
 					method : 'GET',
 					url: baseURL + '/networks/C11R44444',
@@ -84,7 +84,7 @@ describe('NDEx Networks: ', function (done) {
 					}
 				}
 			);
-		});*/
+		});
 		var network1Title = '';
 		it("should get 200 creating Network1 owned by NetworkOwner", function(done){
 			var data = fs.readFileSync('../test_db/test_networks/pc_sif/testNetwork.jdex', 'utf8'); 
@@ -99,13 +99,13 @@ describe('NDEx Networks: ', function (done) {
 					else {
 						res.should.have.status(200);
 						network1JID = res.body.jid;
-						//network1Title=res.body.title;
+						network1Title=res.body.title;
 						done();
 					}
 				}
 			);
 		});
-		/*it("should get 200 getting Network1 and verifying title and description", function(done){
+		it("should get 200 getting Network1 and verifying title and description", function(done){
 			request({
 					method : 'GET',
 					url: baseURL + '/networks/' + network1JID,
@@ -136,7 +136,7 @@ describe('NDEx Networks: ', function (done) {
   					}
   				}
   			);	
-  		});*/
+  		});
 		it("should get 200 deleting network", function(done){
 			request({
 					method : 'DELETE',
