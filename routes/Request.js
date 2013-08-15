@@ -35,19 +35,16 @@ requestDescription
 /*
 exports.createRequest = function(fromAccountRID, toAccountRID, requestDescription, callback){
 	console.log("calling createRequest with arguments fromAccountRID = '" + fromAccountRID + "' toAccountRID = '" + toAccountRID + "'");
-	module.common.checkAccount(
-	var selectUserByUserNameCmd = "select from xUser where username = '" + username + "'";
+	// account RID checking will be handled with new standard methods
+	
+	// OK now just adapt this insert for xRequest instead of xUser
+	
+	// xRequest needs to have fields for toAccount, fromAccount, requestType, message, and group
+	
+	// we will extract the last 3 from requestDescription
+	
 	var insertUserCmd = "insert into xUser (username, password) values('" + username + "', '" + password + "')";
-	//console.log("first checking that username is not taken");
-	module.db.command(selectUserByUserNameCmd, function(err, users) {
-		if (err) {
-			callback( {error : err, status : 500});
-		} else {
-			//console.log("Existing users: " + JSON.stringify(users));
-			if (users && users.length > 0){
-				callback({error : "username '" + username + "' is already in use", status : 500});
-			} else {
-				//console.log("now inserting the new user");
+
 				//console.log(insertUserCmd);
 				module.db.command(insertUserCmd, function(err, results) {
 					if (err){
@@ -60,9 +57,7 @@ exports.createRequest = function(fromAccountRID, toAccountRID, requestDescriptio
 					}
 					
 				});
-			}
-    	}
-    });
+
 };
 */
 

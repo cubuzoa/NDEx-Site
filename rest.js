@@ -269,6 +269,9 @@ app.post('/users/:userid/profile', function(req, res) {
     if(userid) userid = convertToRID(userid);
     var profile = req.body['profile'];
 	try {
+    common.ridCheck([
+       { rid: userid, class: undefined},
+		]);
 		User.updateUserProfile(userid, profile, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
@@ -307,6 +310,9 @@ app.get('/users/:userid', function(req, res) {
     var userid = req.params['userid'];
     if(userid) userid = convertToRID(userid);
 	try {
+    common.ridCheck([
+       { rid: userid, class: undefined},
+		]);
 		User.getUser(userid, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
@@ -324,6 +330,9 @@ app.delete('/users/:userid', function(req, res) {
     var userid = req.params['userid'];
     if(userid) userid = convertToRID(userid);
 	try {
+    common.ridCheck([
+       { rid: userid, class: undefined},
+		]);
 		User.deleteUser(userid, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
@@ -341,6 +350,9 @@ app.get('/users/:userid/workspace', function(req, res) {
     var userid = req.params['userid'];
     if(userid) userid = convertToRID(userid);
 	try {
+    common.ridCheck([
+       { rid: userid, class: undefined},
+		]);
 		User.getUserWorkspace(userid, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
@@ -360,6 +372,10 @@ app.post('/users/:userid/workspace', function(req, res) {
     var networkid = req.body['networkid'];
     if(networkid) networkid = convertToRID(networkid);
 	try {
+    common.ridCheck([
+       { rid: userid, class: undefined},
+       { rid: networkid, class: undefined},
+		]);
 		User.addNetworkToUserWorkspace(userid, networkid, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
@@ -379,6 +395,10 @@ app.delete('/users/:userid/workspace/:networkid', function(req, res) {
     var networkid = req.params['networkid'];
     if(networkid) networkid = convertToRID(networkid);
 	try {
+    common.ridCheck([
+       { rid: userid, class: undefined},
+       { rid: networkid, class: undefined},
+		]);
 		User.deleteNetworkFromUserWorkspace(userid, networkid, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
@@ -397,6 +417,9 @@ app.post('/agents', function(req, res) {
     var owner = req.body['owner'];
     if(owner) owner = convertToRID(owner);
 	try {
+    common.ridCheck([
+       { rid: owner, class: undefined},
+		]);
 		Agent.createAgent(name, owner, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
@@ -415,6 +438,9 @@ app.get('/agents/:agentid', function(req, res) {
     var agentid = req.params['agentid'];
     if(agentid) agentid = convertToRID(agentid);
 	try {
+    common.ridCheck([
+       { rid: agentid, class: undefined},
+		]);
 		Agent.getAgent(agentid, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
@@ -436,6 +462,9 @@ app.post('/agents/:agentid', function(req, res) {
     var status = req.body['status'];
     var name = req.body['name'];
 	try {
+    common.ridCheck([
+       { rid: agentId, class: undefined},
+		]);
 		Agent.updateAgent(agentId, credentials, status, name, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
@@ -454,6 +483,9 @@ app.post('/groups', function(req, res) {
     if(userid) userid = convertToRID(userid);
     var groupName = req.body['groupName'];
 	try {
+    common.ridCheck([
+       { rid: userid, class: undefined},
+		]);
 		Group.createGroup(userid, groupName, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
@@ -473,6 +505,9 @@ app.post('/groups/:groupid/profile', function(req, res) {
     if(groupid) groupid = convertToRID(groupid);
     var profile = req.body['profile'];
 	try {
+    common.ridCheck([
+       { rid: groupid, class: undefined},
+		]);
 		Group.updateGroupProfile(groupid, profile, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
@@ -511,6 +546,9 @@ app.get('/groups/:groupid', function(req, res) {
     var groupid = req.params['groupid'];
     if(groupid) groupid = convertToRID(groupid);
 	try {
+    common.ridCheck([
+       { rid: groupid, class: undefined},
+		]);
 		Group.getGroup(groupid, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
@@ -528,6 +566,9 @@ app.delete('/groups/:groupid', function(req, res) {
     var groupid = req.params['groupid'];
     if(groupid) groupid = convertToRID(groupid);
 	try {
+    common.ridCheck([
+       { rid: groupid, class: undefined},
+		]);
 		Group.deleteGroup(groupid, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
@@ -551,6 +592,9 @@ app.get('/groups/:groupid/members', function(req, res) {
     var offset = req.query['offset'];
     offset = offset || 0;
 	try {
+    common.ridCheck([
+       { rid: groupid, class: undefined},
+		]);
 		Group.getGroupMembers(groupid, searchExpression, limit, offset, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
@@ -570,6 +614,10 @@ app.post('/requests', function(req, res) {
     var fromid = req.body['fromid'];
     if(fromid) fromid = convertToRID(fromid);
 	try {
+    common.ridCheck([
+       { rid: toid, class: undefined},
+       { rid: fromid, class: undefined},
+		]);
 		Request.createRequest(toid, fromid, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
@@ -588,6 +636,9 @@ app.get('/requests/:requestid', function(req, res) {
     var requestid = req.params['requestid'];
     if(requestid) requestid = convertToRID(requestid);
 	try {
+    common.ridCheck([
+       { rid: requestid, class: undefined},
+		]);
 		Request.getRequest(requestid, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
@@ -606,6 +657,9 @@ app.post('/requests/:requestid', function(req, res) {
     if(requestid) requestid = convertToRID(requestid);
     var approval = req.body['approval'];
 	try {
+    common.ridCheck([
+       { rid: requestid, class: undefined},
+		]);
 		Request.processRequest(requestid, approval, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
@@ -623,6 +677,9 @@ app.get('/users/:userid/requests', function(req, res) {
     var userid = req.params['userid'];
     if(userid) userid = convertToRID(userid);
 	try {
+    common.ridCheck([
+       { rid: userid, class: undefined},
+		]);
 		Request.findRequests(userid, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
@@ -641,6 +698,9 @@ app.post('/networks', function(req, res) {
     var accountid = req.body['accountid'];
     if(accountid) accountid = convertToRID(accountid);
 	try {
+    common.ridCheck([
+       { rid: accountid, class: undefined},
+		]);
 		Network.createNetwork(network, accountid, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
@@ -659,6 +719,9 @@ app.delete('/networks/:networkid', function(req, res) {
     var networkid = req.params['networkid'];
     if(networkid) networkid = convertToRID(networkid);
 	try {
+    common.ridCheck([
+       { rid: networkid, class: undefined},
+		]);
 		Network.deleteNetwork(networkid, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
@@ -676,6 +739,9 @@ app.get('/networks/:networkid', function(req, res) {
     var networkid = req.params['networkid'];
     if(networkid) networkid = convertToRID(networkid);
 	try {
+    common.ridCheck([
+       { rid: networkid, class: undefined},
+		]);
 		Network.getNetwork(networkid, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){

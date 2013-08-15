@@ -47,19 +47,22 @@ for (n in specs.resourceTypes){
 			}
 			var arguments = [];
 			var argumentLines = [];
+			var ridCheckLines = ["    common.ridCheck(["];
 			for (n in spec.routeParams){
 				arguments.push(n);
 				argumentLines.push("    var " + n + " = req.params['" + n + "'];");
-				var params = spec.routeParams[n];
-				if (params.type && params.type == "JID"){
+				var param = spec.routeParams[n];
+				if (param.type && param.type == "JID"){
 					argumentLines.push("    if(" + n + ") " + n + " = convertToRID(" + n + ");");
+					ridCheckLines.push("       { rid: " + n + ", class: '" + param.class + "'},");
 				}
 			}
 			for (n in spec.queryParams){
 				arguments.push(n);
 				argumentLines.push("    var " + n + " = req.query['" + n + "'];");
-				var defaultVal = spec.queryParams[n].default;
-				var type = spec.queryParams[n].type;
+				var param = spec.queryParams[n];
+				var defaultVal = param.default;
+				var type = param.type;
 				if (defaultVal === undefined){
 					argumentLines.push("    if(" + n + " === undefined){res.send(500, { error: 'value for " + n + " is required' });");
 				} else {
@@ -70,21 +73,29 @@ for (n in specs.resourceTypes){
 				}
 				if (type == "JID"){
 					argumentLines.push("    if(" + n + ") " + n + " = convertToRID(" + n + ");");
+					ridCheckLines.push("       { rid: " + n + ", class: '" + param.class + "'},");
 				}
 				
 			}
 			for (n in spec.postData){
 				arguments.push(n);
 				argumentLines.push("    var " + n + " = req.body['" + n + "'];");
-				var params = spec.postData[n];
-				if (params.type && params.type == "JID"){
+				var param = spec.postData[n];
+				if (param.type && param.type == "JID"){
 					argumentLines.push("    if(" + n + ") " + n + " = convertToRID(" + n + ");");
+					ridCheckLines.push("       { rid: " + n + ", class: '" + param.class + "'},");
 				}
 			}
 			
 			var argumentString = "";
 			if (arguments.length > 0){
 				argumentString = arguments.join(", ") + ", ";
+			}
+			
+			if (ridCheckLines.length > 1){
+				ridCheckLines.push("		]);");
+			} else {
+				ridCheckLines = [];
 			}
 			
 			var responseModifierLines = [];
@@ -108,7 +119,11 @@ for (n in specs.resourceTypes){
 						argumentLines,
 					
 						[
-						"	try {",
+						"	try {"],
+						
+						ridCheckLines,
+						
+						[
 						"		" + resourceType + "." + spec.fn + "(" + argumentString + "function(data){",
 						"			var status = data.status || 200;"
 						],
