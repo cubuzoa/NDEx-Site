@@ -3,8 +3,7 @@ exports.resourceTypes = [
 				"User", 
 				"Agent", 
 				"Group", 
-				"MemberRequest", 
-				"MemberInvitation",  
+				"Request",  
 				"Network", 
 				"Task"
 ];
@@ -249,7 +248,7 @@ exports.Agent = [
 	},
 
 	{	fn : "getUserAgents",
-		status : "active",
+		status : "inactive",
 		doc : "Get Agents belonging to the user",
 		method : "GET",
 		route : "/users/:userid/agents",
@@ -277,7 +276,7 @@ exports.Agent = [
 	},	
 
 	{	fn : "getGroupAgents",
-		status : "active",
+		status : "inactive",
 		doc : "Get Agents belonging to the group",
 		method : "GET",
 		route : "/groups/:groupid/agents",
@@ -304,40 +303,25 @@ exports.Agent = [
 				"401 Requester not authorized"]
 	},	
 
-// TODO : add request handler for changing name
-			
-	{	fn : "setAgentActive",
+	{	fn : "updateAgent",
 		status : "active",
-		doc : "Update the activity status for an Agent",
+		doc : "Update the credentials and/or status for an Agent",
 		method : "POST",
-		route : "/agents/:agentid/active",
-		routeParams: {
-				agentid : {	doc : "Agent id", type : "JID"},
-					},
-		postData: {
-				agentActive : {	doc : "Whether Agent is active, either 0 or 1",
-								type : "boolean",
-								default : 1
-								}
-					}, 
-		response: {},
-		exceptions: [
-				"401 Requester not authorized",
-				"404 unknown Agent"]
-	},
-
-	{	fn : "updateAgentCredentials",
-		status : "active",
-		doc : "Update the credentials for an Agent, default is to reset them",
-		method : "POST",
-		route : "/agents/:agentid/credentials",
+		route : "/agents/:agentid",
 		routeParams: {
 				agentId : {	doc : "Agent id", type : "JID"},
 					},
 		postData : {
-					action : { doc : "action to perform on credentials",
+					credentials : { doc : "action to perform on credentials",
 								type : "string",
 								default : "reset"
+								},
+					status : { doc : "status to set for agent",
+								type : "string",
+								default : "active"
+								},
+					name : { doc : "name for for agent",
+								type : "string"
 								}
 					},
 		response: {
@@ -523,53 +507,52 @@ exports.Group = [
 	
 ];
 
-exports.MemberRequest = [
+exports.Request = [
 
-	{	fn : "createMemberRequest",
-		status : "inactive",
-		doc : "User creates a request to join a group.",
+	{	fn : "createRequest",
+		status : "active",
+		doc : "toAccount creates a request to fromAccount.",
 		method : "POST",
-		route : "/memberRequests",
+		route : "/requests",
 		postData: {	
-				groupname : { doc : "id of the group", type : "JID"},		
-				username : {  doc : "id of the user", type : "JID"}
+				toid : { doc : "id of the recipient", type : "JID"},		
+				fromid : {  doc : "id of the requester", type : "JID"}
 						},
 		response: { 
 				jid : {doc : "id of the request", type : "JID"}
 				},
 		exceptions: [
-				"400 unknown group",
-				"400 unknown user",
-				"400 user already member",
+				"400 unknown account",
+				"400 request already satisfied",
 				"401 Requester not authorized - requester must match user"]
 	},		
 
-	{	fn : "getMemberRequestInfo",
-		status : "inactive",
-		doc : "Get the parameters and status of a member request",
+	{	fn : "getRequest",
+		status : "active",
+		doc : "Get the parameters of a request",
 		method : "GET",
-		route : "/memberRequests/:memberRequestid",
+		route : "/requests/:requestid",
 		routeParams: {	
-				memberRequestid : {doc : "id of the request", type : "JID"}
+				requestid : {doc : "id of the request", type : "JID"}
 				},
 		response: { 
-				request : { doc : "member request", type : "JSON"}
+				request : { doc : "request parameters", type : "JSON"}
 				},
 		exceptions: [
 				"404 unknown request",
 				"401 Requester not authorized - requester must match user or be group owner"]
 	},	
 	
-	{	fn : "processMemberRequest",
-		status : "inactive",
-		doc : "group owner approves or denies a request to join a group, has the side effect to update the user's membership",
+	{	fn : "processRequest",
+		status : "active",
+		doc : "toAccount approves or disapproves a request. Approval causes requested action. Processing deletes request",
 		method : "POST",
-		route : "/memberRequests/:memberRequestid",
+		route : "/requests/:requestid",
 		routeParams: {	
-				memberRequestid : {doc : "id of the request", type : "JID"}
+				requestid : {doc : "id of the request", type : "JID"}
 				},
 		postData: {		
-				requestStatus : { doc : "deny or approve", type : "string"}
+				approval : { doc : "yes or no", type : "string"}
 					},							
 		response: {},
 		exceptions: [
@@ -578,71 +561,25 @@ exports.MemberRequest = [
 				"400 requestStatus already set"]
 	},
 	
-	// TODO - find requests for a group or for a user
+	{	fn : "findRequests",
+		status : "active",
+		doc : "find requests that were made by the user or can be processed by the user",
+		method : "GET",
+		route : "/users/:userid/requests",
+		routeParams: {	
+				userid : {doc : "id of the user", type : "JID"}
+				},
+		response: { 
+				requests : { doc : "set of request descriptors where each descriptor includes the id and parameters of the request", type : "JSON"}
+				},
+		exceptions: [
+				"404 unknown request",
+				"401 Requester not authorized - requester must match account or be account owner"]
+	},	
 		
 ];			
 
-exports.MemberInvitation = [
-
-	{	fn : "createMemberinvitation",
-		status : "inactive",
-		doc : "Group owner creates a invitation for a User to join the group.",
-		method : "POST",
-		route : "/memberInvitations",
-		postData: {	
-				groupname : { doc : "groupname of the group",
-								type : "string"
-							},		
-				username : {  doc : "username of the user",
-								type : "string"}
-						},
-		response: { 
-				jid : {doc : "id of the invitation", type : "JID"}
-				},
-		exceptions: [
-				"400 unknown group",
-				"400 unknown user",
-				"400 user already member",
-				"401 requester not authorized - requester must be group owner"]
-	},		
-
-	{	fn : "getMemberInvitationInfo",
-		status : "inactive",
-		doc : "Get the parameters and status of a member invitation",
-		method : "GET",
-		route : "/memberInvitations/:memberInvitationid",
-		routeParams: {	
-				memberInvitationId : {doc : "id of the invitation", type : "JID"}
-				},
-		response: { 
-				invitation : { doc : "join invitation", type : "JSON"}
-				},
-		exceptions: [
-				"404 unknown invitation",
-				"401 requester not authorized - requester must match invited user or be group owner"]
-	},	
 	
-	{	fn : "processMemberInvitation",
-		status : "inactive",
-		doc : "User approves or denies a invitation to join a group, has the side effect to update the user's membership",
-		method : "POST",
-		route : "/memberInvitations/:memberinvitationid",
-		routeParams: {	
-				memberInvitationId : {doc : "id of the invitation", type : "JID"}
-				},
-		postData: {		
-				invitationStatus : { doc : "deny or approve", type : "string"}
-					},							
-		response: {},
-		exceptions: [
-				"404 unknown invitation",
-				"401 requester not authorized - requester must match invited user",
-				"400 invitationStatus already set"]
-	},
-
-	// TODO - find invitations for a group or for a user
-			
-];		
 	
 exports.Network = [
 
@@ -965,15 +902,15 @@ exports.Task = [
 	},	
 
 
-	{	fn : "setTaskStatus",
+	{	fn : "updateTask",
 		status : "inactive",
-		doc : "Set the status of a task. Can inactivate an active task or activate an inactive task",
-		method : "PUT",
-		route : "/tasks/:taskid/status",
+		doc : "Set the parameters (such as status) of a task. Can inactivate an active task or activate an inactive task",
+		method : "POST",
+		route : "/tasks/:taskid",
 		routeParams: {	
 				taskid : {doc : "id of the task", type : "JID"}
 				},
-		queryParams: {
+		postData: {
 				status : { doc : "activity status, either active or inactive",
 							type : "string"
 						}
@@ -992,7 +929,7 @@ exports.Task = [
 	{	fn : "deleteTask",
 		status : "inactive",
 		doc : "Delete an inactive or completed task",
-		method : "Delete",
+		method : "DELETE",
 		route : "/tasks/:taskid",
 		routeParams: {	
 				taskid : {doc : "id of the task", type : "JID"}

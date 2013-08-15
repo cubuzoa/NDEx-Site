@@ -141,31 +141,10 @@ Expected to be a global for the client, expected to be undefined and then requir
     }
 
 
-// Get Agents belonging to the user
-    exports.getUserAgents = function(userid, limit, offset, callback, errorHandler){
-        var mergedRoute = '/users/' + encodeURIComponent(userid) + '/agents';
-        exports.ndexGet(mergedRoute, {limit: limit, offset: offset}, callback, errorHandler);
-    }
-
-
-// Get Agents belonging to the group
-    exports.getGroupAgents = function(groupid, limit, offset, callback, errorHandler){
-        var mergedRoute = '/groups/' + encodeURIComponent(groupid) + '/agents';
-        exports.ndexGet(mergedRoute, {limit: limit, offset: offset}, callback, errorHandler);
-    }
-
-
-// Update the activity status for an Agent
-    exports.setAgentActive = function(agentid, agentActive, callback, errorHandler){
-        var mergedRoute = '/agents/' + encodeURIComponent(agentid) + '/active';
-        exports.ndexPost(mergedRoute, {agentActive: agentActive}, callback, errorHandler);
-    }
-
-
-// Update the credentials for an Agent, default is to reset them
-    exports.updateAgentCredentials = function(agentId, action, callback, errorHandler){
-        var mergedRoute = '/agents/' + encodeURIComponent(agentid) + '/credentials';
-        exports.ndexPost(mergedRoute, {action: action}, callback, errorHandler);
+// Update the credentials and/or status for an Agent
+    exports.updateAgent = function(agentId, credentials, status, name, callback, errorHandler){
+        var mergedRoute = '/agents/' + encodeURIComponent(agentid) + '';
+        exports.ndexPost(mergedRoute, {credentials: credentials, status: status, name: name}, callback, errorHandler);
     }
 
 
@@ -208,6 +187,34 @@ Expected to be a global for the client, expected to be undefined and then requir
     exports.getGroupMembers = function(groupid, searchExpression, limit, offset, callback, errorHandler){
         var mergedRoute = '/groups/' + encodeURIComponent(groupid) + '/members';
         exports.ndexGet(mergedRoute, {searchExpression: searchExpression, limit: limit, offset: offset}, callback, errorHandler);
+    }
+
+
+// toAccount creates a request to fromAccount.
+    exports.createRequest = function(toid, fromid, callback, errorHandler){
+        var mergedRoute = '/requests';
+        exports.ndexPost(mergedRoute, {toid: toid, fromid: fromid}, callback, errorHandler);
+    }
+
+
+// Get the parameters of a request
+    exports.getRequest = function(requestid, callback, errorHandler){
+        var mergedRoute = '/requests/' + encodeURIComponent(requestid) + '';
+        exports.ndexGet(mergedRoute, {},callback, errorHandler);
+    }
+
+
+// toAccount approves or disapproves a request. Approval causes requested action. Processing deletes request
+    exports.processRequest = function(requestid, approval, callback, errorHandler){
+        var mergedRoute = '/requests/' + encodeURIComponent(requestid) + '';
+        exports.ndexPost(mergedRoute, {approval: approval}, callback, errorHandler);
+    }
+
+
+// find requests that were made by the user or can be processed by the user
+    exports.findRequests = function(userid, callback, errorHandler){
+        var mergedRoute = '/users/' + encodeURIComponent(userid) + '/requests';
+        exports.ndexGet(mergedRoute, {},callback, errorHandler);
     }
 
 

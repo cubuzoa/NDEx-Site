@@ -209,8 +209,7 @@ var System = require('./routes/System.js');
 var User = require('./routes/User.js');
 var Agent = require('./routes/Agent.js');
 var Group = require('./routes/Group.js');
-var MemberRequest = require('./routes/MemberRequest.js');
-var MemberInvitation = require('./routes/MemberInvitation.js');
+var Request = require('./routes/Request.js');
 var Network = require('./routes/Network.js');
 var Task = require('./routes/Task.js');
 
@@ -428,73 +427,15 @@ app.get('/agents/:agentid', function(req, res) {
 	}
 });
 
-// Get Agents belonging to the user
-app.get('/users/:userid/agents', function(req, res) {
-    var userid = req.params['userid'];
-    if(userid) userid = convertToRID(userid);
-    var limit = req.query['limit'];
-    limit = limit || 100;
-    var offset = req.query['offset'];
-    offset = offset || 0;
-	try {
-		Agent.getUserAgents(userid, limit, offset, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
-
-// Get Agents belonging to the group
-app.get('/groups/:groupid/agents', function(req, res) {
-    var groupid = req.params['groupid'];
-    if(groupid) groupid = convertToRID(groupid);
-    var limit = req.query['limit'];
-    limit = limit || 100;
-    var offset = req.query['offset'];
-    offset = offset || 0;
-	try {
-		Agent.getGroupAgents(groupid, limit, offset, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
-
-// Update the activity status for an Agent
-app.post('/agents/:agentid/active', function(req, res) {
-    var agentid = req.params['agentid'];
-    if(agentid) agentid = convertToRID(agentid);
-    var agentActive = req.body['agentActive'];
-	try {
-		Agent.setAgentActive(agentid, agentActive, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
-
-// Update the credentials for an Agent, default is to reset them
-app.post('/agents/:agentid/credentials', function(req, res) {
+// Update the credentials and/or status for an Agent
+app.post('/agents/:agentid', function(req, res) {
     var agentId = req.params['agentId'];
     if(agentId) agentId = convertToRID(agentId);
-    var action = req.body['action'];
+    var credentials = req.body['credentials'];
+    var status = req.body['status'];
+    var name = req.body['name'];
 	try {
-		Agent.updateAgentCredentials(agentId, action, function(data){
+		Agent.updateAgent(agentId, credentials, status, name, function(data){
 			var status = data.status || 200;
 			if(status && status == 200){
 			}
@@ -621,6 +562,78 @@ app.get('/groups/:groupid/members', function(req, res) {
 	}
 });
 
+// toAccount creates a request to fromAccount.
+app.post('/requests', function(req, res) {
+    var toid = req.body['toid'];
+    if(toid) toid = convertToRID(toid);
+    var fromid = req.body['fromid'];
+    if(fromid) fromid = convertToRID(fromid);
+	try {
+		Request.createRequest(toid, fromid, function(data){
+			var status = data.status || 200;
+			if(status && status == 200){
+			    data.jid = convertFromRID(data.jid);
+			}
+			res.send(status, data);
+		});
+	}
+	catch (e){
+		res.send(500, {error : e}); 
+	}
+});
+
+// Get the parameters of a request
+app.get('/requests/:requestid', function(req, res) {
+    var requestid = req.params['requestid'];
+    if(requestid) requestid = convertToRID(requestid);
+	try {
+		Request.getRequest(requestid, function(data){
+			var status = data.status || 200;
+			if(status && status == 200){
+			}
+			res.send(status, data);
+		});
+	}
+	catch (e){
+		res.send(500, {error : e}); 
+	}
+});
+
+// toAccount approves or disapproves a request. Approval causes requested action. Processing deletes request
+app.post('/requests/:requestid', function(req, res) {
+    var requestid = req.params['requestid'];
+    if(requestid) requestid = convertToRID(requestid);
+    var approval = req.body['approval'];
+	try {
+		Request.processRequest(requestid, approval, function(data){
+			var status = data.status || 200;
+			if(status && status == 200){
+			}
+			res.send(status, data);
+		});
+	}
+	catch (e){
+		res.send(500, {error : e}); 
+	}
+});
+
+// find requests that were made by the user or can be processed by the user
+app.get('/users/:userid/requests', function(req, res) {
+    var userid = req.params['userid'];
+    if(userid) userid = convertToRID(userid);
+	try {
+		Request.findRequests(userid, function(data){
+			var status = data.status || 200;
+			if(status && status == 200){
+			}
+			res.send(status, data);
+		});
+	}
+	catch (e){
+		res.send(500, {error : e}); 
+	}
+});
+
 // Create a new network in the specified account
 app.post('/networks', function(req, res) {
     var network = req.body['network'];
@@ -709,8 +722,7 @@ db.open(function(err) {
 	User.init(db, function(err) {if (err) {throw err;}});
 	Agent.init(db, function(err) {if (err) {throw err;}});
 	Group.init(db, function(err) {if (err) {throw err;}});
-	MemberRequest.init(db, function(err) {if (err) {throw err;}});
-	MemberInvitation.init(db, function(err) {if (err) {throw err;}});
+	Request.init(db, function(err) {if (err) {throw err;}});
 	Network.init(db, function(err) {if (err) {throw err;}});
 	Task.init(db, function(err) {if (err) {throw err;}});
 });

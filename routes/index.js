@@ -10,10 +10,13 @@ function ensureSchemaIsSetup(callback) {
 	ensureClass("xAccount", "V", function(){
 		ensureClass("xUser", "xAccount");
 		ensureClass("xGroup", "xAccount");
+		ensureClass("xAgent", "xAccount");
 	});
 	
 	ensureClass("xNetwork", "V");
 	ensureClass("xNode", "V");
+	ensureClass("xTask", "V");
+	ensureClass("xRequest", "V");
 	ensureClass("xEdge", "E");
 	ensureClass("xOwnsNetwork", "E");
 	ensureClass("xTerm", "V", function(){
@@ -26,6 +29,7 @@ function ensureSchemaIsSetup(callback) {
 	ensureClass("xPermission", "V");
 	ensureClass("xRequest", "V");
 	ensureClass("xOwnsGroup", "E");
+	ensureClass("xOwnsAgent", "E");
 	callback();
 }
 

@@ -135,7 +135,7 @@ lines = lines.concat(connect_to_db_lines);
 // init the resource types
 for (n in specs.resourceTypes){
 	resourceType = specs.resourceTypes[n];
-	lines.push("	" + resourceType + ".init(db, function(err) {if (err) {throw err;}});");
+	lines.push("	" + resourceType + ".init(db, common, function(err) {if (err) {throw err;}});");
 }
 
 // close off the initialization

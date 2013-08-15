@@ -90,7 +90,6 @@ Route Parameters:
 * userid (JID)
 Post Data Parameters:
 * networkid (JID)
-* profile (JSON)
 
 ##### deleteNetworkFromUserWorkspace
 _Delete a network from the user's workspace. Requester must be user or have admin permissions_
@@ -143,23 +142,17 @@ Query Parameters:
 * limit (integer)
 * offset (integer)
 
-##### setAgentActive
-_Update the activity status for an Agent_
+##### updateAgent
+_Update the credentials and/or status for an Agent_
 
-PUT /agents/:agentid/active
-
-Route Parameters:
-* agentId (JID)
-
-##### updateAgentCredentials
-_Update the credentials for an Agent, default is to reset them_
-
-POST /agents/:agentid/credentials
+POST /agents/:agentid
 
 Route Parameters:
 * agentId (JID)
 Post Data Parameters:
-* action (string)
+* credentials (string)
+* status (string)
+* name (string)
 
 ###Group
 
@@ -239,63 +232,42 @@ Route Parameters:
 * groupname (JID)
 * username (JID)
 
-###MemberRequest
+###Request
 
-##### createMemberRequest
-_User creates a request to join a group._
+##### createRequest
+_toAccount creates a request to fromAccount._
 
-POST /memberRequests
-
-Post Data Parameters:
-* groupname (JID)
-* username (JID)
-
-##### getMemberRequestInfo
-_Get the parameters and status of a member request_
-
-GET /memberRequests/:memberRequestid
-
-Route Parameters:
-* memberRequestid (JID)
-
-##### processMemberRequest
-_group owner approves or denies a request to join a group, has the side effect to update the user's membership_
-
-POST /memberRequests/:memberRequestid
-
-Route Parameters:
-* memberRequestid (JID)
-Post Data Parameters:
-* requestStatus (string)
-
-###MemberInvitation
-
-##### createMemberinvitation
-_Group owner creates a invitation for a User to join the group._
-
-POST /memberInvitations
+POST /requests
 
 Post Data Parameters:
-* groupname (string)
-* username (string)
+* toid (JID)
+* fromid (JID)
 
-##### getMemberInvitationInfo
-_Get the parameters and status of a member invitation_
+##### getRequest
+_Get the parameters of a request_
 
-GET /memberInvitations/:memberInvitationid
-
-Route Parameters:
-* memberInvitationId (JID)
-
-##### processMemberInvitation
-_User approves or denies a invitation to join a group, has the side effect to update the user's membership_
-
-POST /memberInvitations/:memberinvitationid
+GET /requests/:requestid
 
 Route Parameters:
-* memberInvitationId (JID)
+* requestid (JID)
+
+##### processRequest
+_toAccount approves or disapproves a request. Approval causes requested action. Processing deletes request_
+
+POST /requests/:requestid
+
+Route Parameters:
+* requestid (JID)
 Post Data Parameters:
-* invitationStatus (string)
+* approval (string)
+
+##### findRequests
+_find requests that were made by the user or can be processed by the user_
+
+GET /users/:userid/requests
+
+Route Parameters:
+* userid (JID)
 
 ###Network
 
@@ -428,14 +400,14 @@ GET /tasks/:taskid
 Route Parameters:
 * taskid (JID)
 
-##### setTaskStatus
-_Set the status of a task. Can inactivate an active task or activate an inactive task_
+##### updateTask
+_Set the parameters (such as status) of a task. Can inactivate an active task or activate an inactive task_
 
-PUT /tasks/:taskid/status
+POST /tasks/:taskid
 
 Route Parameters:
 * taskid (JID)
-Query Parameters:
+Post Data Parameters:
 * status (string)
 
 ##### deleteTask

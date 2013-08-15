@@ -2,12 +2,9 @@ var check = require('validator').check;
 
 module.db = null;
 
-exports.init = function(orient, callback) {
+exports.init = function(orient, common, callback) {
     module.db = orient;
-};
-
-function convertFromRID(RID){
-	return RID.replace("#","C").replace(":", "R");
+    module.common = common;
 }
 
 exports.createGroup = function(userRID, groupname, callback){
@@ -23,7 +20,7 @@ exports.createGroup = function(userRID, groupname, callback){
 	//checking if user exists
 	var cmd = "select from xUser where @rid = " + userRID + "";
 	module.db.command(cmd,function(err,users){
-		if(exports.checkErr(err, "checking existence of user " + userRID, callback)){
+		if(module.common.checkErr(err, "checking existence of user " + userRID, callback)){
 			console.log("users found " + users.length);
 			if (!users || users.length < 1){
 				console.log("found no users by id = '" + userRID + "'");
@@ -133,7 +130,7 @@ exports.getGroup = function(groupRID, callback){
 		console.log(cmd);
 		module.db.command(cmd, function(err, groups) {
 
-			if (exports.checkErr(err, "finding group", callback)){
+			if (module.common.checkErr(err, "finding group", callback)){
 				try {
 					if (!groups || groups.length < 1){
 						console.log("found no groups by id = '" + groupRID + "'");
@@ -159,12 +156,12 @@ exports.getGroup = function(groupRID, callback){
 			 
 						var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
 						module.db.command(networks_cmd, function(err, networks) {
-							if(exports.checkErr(err, "getting owned networks", callback)){
+							if(module.common.checkErr(err, "getting owned networks", callback)){
 						
 								// process the networks
 								for (i in networks){
 									var network = networks[i];
-									network.jid = convertFromRID(network.jid);
+									network.jid = module.common.convertFromRID(network.jid);
 								}
 								result.ownedNetworks = networks;
 							}
@@ -186,7 +183,7 @@ exports.getGroup = function(groupRID, callback){
 	}
 };
 
-exports.checkErr = function(err, where, callback){
+module.common.checkErr = function(err, where, callback){
 	if (err){
 			console.log("DB error, " + where + " : " + err);
 			callback({network : null, error : err, status : 500});
@@ -201,7 +198,7 @@ exports.deleteGroup = function (groupRID, callback){
 	console.log(cmd);
 	module.db.command(cmd, function(err, groups) {
 
-		if (exports.checkErr(err, "finding group", callback)){
+		if (module.common.checkErr(err, "finding group", callback)){
 			try {
 				if (!groups || groups.length < 1){
 					console.log("found no groups by id = '" + groupRID + "'");

@@ -1,11 +1,8 @@
 module.db = null;
 
-exports.init = function(orient, callback) {
+exports.init = function(orient, common, callback) {
     module.db = orient;
-}
-
-function convertFromRID(RID){
-	return RID.replace("#","C").replace(":", "R");
+    module.common = common;
 }
 
 exports.createInitialDocument = function(networkJDEx){
@@ -254,7 +251,7 @@ exports.findNetworks = function (searchExpression, limit, offset, callback){
 	module.db.command(cmd, function(err, networks) {
 		for (i in networks){
 			var network = networks[i];
-			network.jid = convertFromRID(network.jid);
+			network.jid = module.common.convertFromRID(network.jid);
 		}
         callback({networks : networks, error : err});
     });
@@ -284,7 +281,7 @@ exports.getNetwork = function(networkRID, callback){
 							// process the namespaces
 							for (i in namespaces){
 								var ns = namespaces[i];
-								result.namespaces[ns.id] = {prefix: ns.prefix, rid: module.convertFromRID(ns.rid), uri: ns.uri};
+								result.namespaces[ns.id] = {prefix: ns.prefix, rid: module.module.common.convertFromRID(ns.rid), uri: ns.uri};
 							}
 							
 							// get the terms
@@ -295,7 +292,7 @@ exports.getNetwork = function(networkRID, callback){
 									// process the terms
 									for (i in terms){
 										var term = terms[i];
-										result.terms[term.id] = {name: term.name, jid: convertFromRID(term.rid), ns: term.nsid};
+										result.terms[term.id] = {name: term.name, jid: module.common.convertFromRID(term.rid), ns: term.nsid};
 									}
 							
 									// get the nodes
@@ -307,7 +304,7 @@ exports.getNetwork = function(networkRID, callback){
 											// process the nodes
 											for (i in nodes){
 												var node = nodes[i];
-												result.nodes[node.id] = {name: node.name, jid: convertFromRID(node.rid), represents: node.represents};
+												result.nodes[node.id] = {name: node.name, jid: module.common.convertFromRID(node.rid), represents: node.represents};
 											}
 											// get the edges
 											var edge_cmd = "select  in.id as s, p.id as p, out.id as o, @rid as rid from (traverse edges from " + networkRID + ") where $depth = 1)";
@@ -317,7 +314,7 @@ exports.getNetwork = function(networkRID, callback){
 													// process the edges
 													for (i in edges){
 														var edge = edges[i];
-														result.edges[i] = {s: edge.s, p: edge.p, o: edge.o, jid: convertFromRID(edge.rid)};
+														result.edges[i] = {s: edge.s, p: edge.p, o: edge.o, jid: module.common.convertFromRID(edge.rid)};
 													}
 										
 													callback({network : result});
