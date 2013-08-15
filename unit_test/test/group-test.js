@@ -35,6 +35,7 @@ describe('NDEx Groups: ', function () {
 			function(err,res,body){
 				if(err) { done(err) }
 				else { 
+					console.log(JSON.stringify(body));
 					res.should.have.status(200);
 					joshJID = res.body.jid;
 					console.log('...complete');// confirmation of completion

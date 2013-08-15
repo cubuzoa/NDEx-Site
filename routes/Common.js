@@ -27,3 +27,6 @@ exports.checkErr = function(err, where, callback){
 };
 
 
+exports.ridCheck = function (checkList, callback){
+	return callback();
+}

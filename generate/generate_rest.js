@@ -121,7 +121,7 @@ for (n in specs.resourceTypes){
 						[
 						"	try {"],
 						
-						ridCheckLines,
+						//ridCheckLines,
 						
 						[
 						"		" + resourceType + "." + spec.fn + "(" + argumentString + "function(data){",
