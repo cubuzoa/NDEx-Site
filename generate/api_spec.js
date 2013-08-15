@@ -57,7 +57,7 @@ exports.User = [
 							}
 				},
 		response: {
-			jid : {doc : "the id of the new user", type : "JID"}
+			jid : {doc : "the id of the new user", type : "JID", class : "xUser"}
 			},
 		exceptions: [
 				"400 user name already used", 
@@ -71,7 +71,7 @@ exports.User = [
 		method : "POST",
 		route : "/users/:userid/profile",
 		postData: {
-				userid : {	doc : "user id", type : "JID", required : true},
+				userid : {	doc : "user id", type : "JID", required : true, class : "xUser"},
 				profile : {	doc : "group profile", type : "JSON"}
 				},
 		response: {
@@ -85,7 +85,7 @@ exports.User = [
 		doc : "Set a user's password. Requester must be user or have admin permissions.",
 		method : "PUT",
 		route : "/users/:userid/password",
-		routeParams: {userid : {doc : "user id", type : "JID"}},
+		routeParams: {userid : {doc : "user id", type : "JID", class : "xUser"}},
 		queryParams: {
 				newPassword : { doc : "new password",
 								type : "string",
@@ -134,7 +134,7 @@ exports.User = [
 		method : "GET",
 		route : "/users/:userid",
 		routeParams: {	
-				userid : { doc : "user id", type : "JID"}
+				userid : { doc : "user id", type : "JID", class : "xUser"}
 					},
 		response: {user : "user descriptor"},
 		exceptions: ["404 unknown user id",
@@ -147,7 +147,7 @@ exports.User = [
 		method : "DELETE",
 		route : "/users/:userid",
 		routeParams: {	
-				userid : { doc : "user id", type : "JID"}
+				userid : { doc : "user id", type : "JID", class : "xUser"}
 					},
 		response: {},
 		exceptions: ["404 unknown user id",
@@ -161,7 +161,7 @@ exports.User = [
 		method : "GET",
 		route : "/users/:userid/workspace",
 		routeParams: {	
-				userid : { doc : "user id", type : "JID"}
+				userid : { doc : "user id", type : "JID", class : "xUser"}
 					},
 		response: {user : "user descriptor"},
 		exceptions: ["404 unknown user id",
@@ -175,10 +175,10 @@ exports.User = [
 		method : "POST",
 		route : "/users/:userid/workspace",
 		routeParams: {	
-				userid : { doc : "user id", type : "JID"}
+				userid : { doc : "user id", type : "JID", class : "xUser"}
 					},
 		postData: {
-				networkid : {	doc : "user id", type : "JID", required : true},
+				networkid : {	doc : "user id", type : "JID", required : true, class : "xNetwork"},
 				},
 		response: {user : "user descriptor"},
 		exceptions: ["404 unknown user id",
@@ -192,8 +192,8 @@ exports.User = [
 		method : "DELETE",
 		route : "/users/:userid/workspace/:networkid",
 		routeParams: {	
-				userid : { doc : "user id", type : "JID"},
-				networkid : { doc : "network id", type : "JID"}
+				userid : { doc : "user id", type : "JID", class : "xUser"},
+				networkid : { doc : "network id", type : "JID", class : "xNetwork"}
 					},
 		response: {user : "user descriptor"},
 		exceptions: ["404 unknown user id",
@@ -217,11 +217,11 @@ exports.Agent = [
 							type : "string",
 							default : "AUTO",
 				}, 
-				owner : {	doc : "Owner Id", type : "JID"}
+				owner : {	doc : "Owner Id", type : "JID", class : "xAccount"}
 				},
 		response: { 
 				name : "Agent name",
-				id : {doc : "id for Agent", type : "JID"}
+				id : {doc : "id for Agent", type : "JID", class : "xAgent"}
 				
 				},
 		exceptions: [
@@ -236,7 +236,7 @@ exports.Agent = [
 		method : "GET",
 		route : "/agents/:agentid",
 		routeParams: {
-						agentid : {	doc : "agent id", type : "JID"}
+						agentid : {	doc : "agent id", type : "JID", class : "xAgent"}
 					},
 		response: { 
 				name : "Agent name",
@@ -253,7 +253,7 @@ exports.Agent = [
 		method : "GET",
 		route : "/users/:userid/agents",
 		routeParams: {
-						userid : {	doc : "User id", type : "JID"}
+						userid : {	doc : "User id", type : "JID", class : "xUser"}
 					},
 		queryParams: {	
 				limit : {	doc : "maximum number of Agents to return",
@@ -281,7 +281,7 @@ exports.Agent = [
 		method : "GET",
 		route : "/groups/:groupid/agents",
 		routeParams: {
-						groupid : {	doc : "Group id", type : "JID"}
+						groupid : {	doc : "Group id", type : "JID", class : "xGroup"}
 					},
 		queryParams: {	
 				limit : {	doc : "maximum number of Agents to return",
@@ -309,7 +309,7 @@ exports.Agent = [
 		method : "POST",
 		route : "/agents/:agentid",
 		routeParams: {
-				agentId : {	doc : "Agent id", type : "JID"},
+				agentId : {	doc : "Agent id", type : "JID", class : "xAgent"},
 					},
 		postData : {
 					credentials : { doc : "action to perform on credentials",
@@ -347,12 +347,13 @@ exports.Group = [
 		postData: {
 				userid : {		doc : "User Id of the group owner",
 								type : "JID",
+								class : "xUser",
 								required : true},
 								
 				groupName : {	doc : "group name", type : "string"}
 				},
 		response: {
-			jid : {doc : "the id of the new group", type : "JID"}
+			jid : {doc : "the id of the new group", type : "JID", class : "xGroup"}
 			},
 		exceptions: [
 				"404 unknown user id",
@@ -369,6 +370,7 @@ exports.Group = [
 		postData: {
 				groupid : {		doc : "group id",
 								type : "JID",
+								class : "xGroup",
 								required : true},
 								
 				profile : {	doc : "group profile", type : "JSON"}
@@ -412,7 +414,7 @@ exports.Group = [
 		method : "GET",
 		route : "/groups/:groupid",
 		routeParams: {	
-				groupid : { doc : "group id", type : "JID"}
+				groupid : { doc : "group id", type : "JID", class : "xGroup"}
 					},
 		response: {group : "group descriptor"},
 		exceptions: ["404 unknown group id",
@@ -425,7 +427,7 @@ exports.Group = [
 		method : "DELETE",
 		route : "/groups/:groupid",
 		routeParams: {	
-				groupid : { doc : "group id", type : "JID"}
+				groupid : { doc : "group id", type : "JID", class : "xGroup"}
 					},
 		response: {},
 		exceptions: ["404 unknown group id",
@@ -438,7 +440,7 @@ exports.Group = [
 		method : "GET",
 		route : "/groups/:groupid/members",
 		routeParams: {	
-				groupid : { doc : "group id",type : "JID"}
+				groupid : { doc : "group id",type : "JID", class : "xGroup"}
 					},
 		queryParams: {	
 				searchExpression : { doc : "search parameters to match vs users",
@@ -469,8 +471,8 @@ exports.Group = [
 		method : "POST",
 		route : "/groups/:groupid/members/:userid",
 		routeParams: {	
-				groupname : { doc : "id of the group", type : "JID"},		
-				username : {  doc : "id of the user", type : "JID"}
+				groupname : { doc : "id of the group", type : "JID", class : "xGroup" },		
+				username : {  doc : "id of the user", type : "JID", class : "xUser"}
 					},
 		postData : {
 				active : { doc : "active status of membership",
@@ -492,8 +494,8 @@ exports.Group = [
 		method : "DELETE",
 		route : "/groups/:groupid/members/:userid",
 		routeParams: {	
-				groupname : { doc : "id of the group", type : "JID"},		
-				username : {  doc : "id of the user", type : "JID"}
+				groupid : { doc : "id of the group", type : "JID", class : "xGroup"},		
+				userid : {  doc : "id of the user", type : "JID", class : "xUser"}
 				},
 		response: {},
 		exceptions: [
@@ -515,11 +517,11 @@ exports.Request = [
 		method : "POST",
 		route : "/requests",
 		postData: {	
-				toid : { doc : "id of the recipient", type : "JID"},		
-				fromid : {  doc : "id of the requester", type : "JID"}
+				toid : { doc : "id of the recipient", type : "JID", class: "xAccount"},		
+				fromid : {  doc : "id of the requester", type : "JID", class: "xAccount"}
 						},
 		response: { 
-				jid : {doc : "id of the request", type : "JID"}
+				jid : {doc : "id of the request", type : "JID", class: "xRequest"}
 				},
 		exceptions: [
 				"400 unknown account",
@@ -533,7 +535,7 @@ exports.Request = [
 		method : "GET",
 		route : "/requests/:requestid",
 		routeParams: {	
-				requestid : {doc : "id of the request", type : "JID"}
+				requestid : {doc : "id of the request", type : "JID", class : "xRequest"}
 				},
 		response: { 
 				request : { doc : "request parameters", type : "JSON"}
@@ -549,7 +551,7 @@ exports.Request = [
 		method : "POST",
 		route : "/requests/:requestid",
 		routeParams: {	
-				requestid : {doc : "id of the request", type : "JID"}
+				requestid : {doc : "id of the request", type : "JID", class : "xRequest"}
 				},
 		postData: {		
 				approval : { doc : "yes or no", type : "string"}
@@ -567,7 +569,7 @@ exports.Request = [
 		method : "GET",
 		route : "/users/:userid/requests",
 		routeParams: {	
-				userid : {doc : "id of the user", type : "JID"}
+				userid : {doc : "id of the user", type : "JID", class : "xUser"}
 				},
 		response: { 
 				requests : { doc : "set of request descriptors where each descriptor includes the id and parameters of the request", type : "JSON"}
@@ -598,7 +600,7 @@ exports.Network = [
 							}
 					},
 		response: { 
-				jid : {doc : "the Id of the new network", type : "JID"}
+				jid : {doc : "the Id of the new network", type : "JID", class: "xNetwork"}
 				},
 		exceptions: [
 				"404 unknown account",
@@ -615,7 +617,7 @@ exports.Network = [
 		method : "DELETE",
 		route : "/networks/:networkid",
 		routeParams: {	
-				networkid : { doc : "id of the network", type : "JID"}
+				networkid : { doc : "id of the network", type : "JID", class: "xNetwork"}
 					},
 		response: {},
 		exceptions: [
@@ -629,7 +631,7 @@ exports.Network = [
 		method : "GET",
 		route : "/networks/:networkid/edge",
 		routeParams: {	
-				networkid : {doc : "id of the network", type: "JID"}
+				networkid : {doc : "id of the network", type: "JID", class: "xNetwork"}
 				},
 		queryParams: {
 						typeFilter : { doc : "filter expression for Edge type",
@@ -662,7 +664,7 @@ exports.Network = [
 		method : "GET",
 		route : "/networks/:networkid/node",
 		routeParams: {	
-				networkid : {doc : "id of the network", type: "JID"}
+				networkid : {doc : "id of the network", type: "JID", class: "xNetwork"}
 				},
 		queryParams: {
 						typeFilter : { doc : "filter expression for Node type",
@@ -690,7 +692,7 @@ exports.Network = [
 		method : "HEAD",
 		route : "/networks/:networkid",
 		routeParams: {	
-				networkid : {doc : "id of the network", type : "JID"}
+				networkid : {doc : "id of the network", type : "JID", class: "xNetwork"}
 				},
 		response: { 
 				networkMetadata : { doc : "Network, only containing metadata",
@@ -708,7 +710,7 @@ exports.Network = [
 		method : "GET",
 		route : "/networks/:networkid",
 		routeParams: {	
-				networkid : {doc : "id of the network", type: "JID"}
+				networkid : {doc : "id of the network", type: "JID", class: "xNetwork"}
 				},
 		response: { 
 				network : { doc : "Network", type : "JDEx"}
@@ -873,10 +875,10 @@ exports.Task = [
 								type : "JSON"
 							},		
 				userid : {  doc : "Id of the user",
-								type : "JID"}
+								type : "JID", class : "xUser"}
 						},
 		response: { 
-				id : {doc : "id of the task", type : "JID"}
+				id : {doc : "id of the task", type : "JID", class : "xTask"}
 				},
 		exceptions: [
 				"400 error in task specification",
@@ -890,7 +892,7 @@ exports.Task = [
 		method : "GET",
 		route : "/tasks/:taskid",
 		routeParams: {	
-				taskid : {doc : "id of the task", type : "JID"}
+				taskid : {doc : "id of the task", type : "JID", class : "xTask"}
 				},
 		response: { 
 				task : { doc : "parameters and status of the task",
@@ -908,7 +910,7 @@ exports.Task = [
 		method : "POST",
 		route : "/tasks/:taskid",
 		routeParams: {	
-				taskid : {doc : "id of the task", type : "JID"}
+				taskid : {doc : "id of the task", type : "JID", class : "xTask"}
 				},
 		postData: {
 				status : { doc : "activity status, either active or inactive",
@@ -932,7 +934,7 @@ exports.Task = [
 		method : "DELETE",
 		route : "/tasks/:taskid",
 		routeParams: {	
-				taskid : {doc : "id of the task", type : "JID"}
+				taskid : {doc : "id of the task", type : "JID", class : "xTask"}
 				},
 		response: { 
 				task : { doc : "parameters and status of the task",

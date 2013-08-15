@@ -34,6 +34,7 @@ for (n in specs.resourceTypes){
 	lines.push("var " + resourceType + " = require('./routes/" + resourceType + ".js');");
 }
 
+
 // create the handlers
 for (n in specs.resourceTypes){
 	resourceType = specs.resourceTypes[n];
@@ -47,15 +48,21 @@ for (n in specs.resourceTypes){
 			}
 			var arguments = [];
 			var argumentLines = [];
-			var ridCheckLines = ["    common.ridCheck(["];
+			var ridCheckLines = [];
+			var handleJIDParam = function(param){
+				if (param.type && param.type == "JID"){
+					argumentLines.push("    if(!common.checkJID(" + n + ")) res.send(400, { error: 'bad JID : ' + " + n + "});");
+
+					argumentLines.push("    " + n + " = convertToRID(" + n + ");");
+					ridCheckLines.push("            { rid: " + n + ", class: '" + param.class + "'},");
+				}				
+			};
+			
 			for (n in spec.routeParams){
 				arguments.push(n);
 				argumentLines.push("    var " + n + " = req.params['" + n + "'];");
 				var param = spec.routeParams[n];
-				if (param.type && param.type == "JID"){
-					argumentLines.push("    if(" + n + ") " + n + " = convertToRID(" + n + ");");
-					ridCheckLines.push("       { rid: " + n + ", class: '" + param.class + "'},");
-				}
+				handleJIDParam(param);
 			}
 			for (n in spec.queryParams){
 				arguments.push(n);
@@ -64,27 +71,21 @@ for (n in specs.resourceTypes){
 				var defaultVal = param.default;
 				var type = param.type;
 				if (defaultVal === undefined){
-					argumentLines.push("    if(" + n + " === undefined){res.send(500, { error: 'value for " + n + " is required' });");
+					argumentLines.push("    if(" + n + " === undefined){res.send(400, { error: 'value for " + n + " is required' });");
 				} else {
 					if (type == "string"){
 						defaultVal = "'" + defaultVal + "'";
 					}
 					argumentLines.push("    " + n + " = " + n + " || " + defaultVal + ";");
 				}
-				if (type == "JID"){
-					argumentLines.push("    if(" + n + ") " + n + " = convertToRID(" + n + ");");
-					ridCheckLines.push("       { rid: " + n + ", class: '" + param.class + "'},");
-				}
+				handleJIDParam(param);
 				
 			}
 			for (n in spec.postData){
 				arguments.push(n);
 				argumentLines.push("    var " + n + " = req.body['" + n + "'];");
 				var param = spec.postData[n];
-				if (param.type && param.type == "JID"){
-					argumentLines.push("    if(" + n + ") " + n + " = convertToRID(" + n + ");");
-					ridCheckLines.push("       { rid: " + n + ", class: '" + param.class + "'},");
-				}
+				handleJIDParam(param);
 			}
 			
 			var argumentString = "";
@@ -92,52 +93,62 @@ for (n in specs.resourceTypes){
 				argumentString = arguments.join(", ") + ", ";
 			}
 			
-			if (ridCheckLines.length > 1){
-				ridCheckLines.push("		]);");
-			} else {
-				ridCheckLines = [];
-			}
-			
 			var responseModifierLines = [];
-			responseModifierLines.push("			if(status && status == 200){");
+			responseModifierLines.push("          if(status && status == 200){");
 			for (n in spec.response){
 				var responseParams = spec.response[n];
 				if (responseParams.type && responseParams.type == "JID"){
-					responseModifierLines.push("			    data." + n + " = convertFromRID(data." + n + ");");
+					responseModifierLines.push("            data." + n + " = convertFromRID(data." + n + ");");
 				}
 			}
-			responseModifierLines.push("			}");
+			responseModifierLines.push("          }");
 			
 			var authenticator = "";
 			if (spec.requiresAuthentication){
 				authenticator = ", apiEnsureAuthentication ";
 			}
 			
-			lines = lines.concat([	
-						"app." + spec.method.toLowerCase() + "('" + spec.route + "'" + authenticator + ", function(req, res) {"],
-					
+			lines = lines.concat(
+								
+						[
+						"app." + spec.method.toLowerCase() + "('" + spec.route + "'" + authenticator + ", function(req, res) {",
+						"  try {",
+						],
+						
 						argumentLines,
 					
 						[
-						"	try {"],
+						"    common.ridCheck(",
+						"      ["
+						],
 						
-						//ridCheckLines,
+						ridCheckLines,
 						
 						[
-						"		" + resourceType + "." + spec.fn + "(" + argumentString + "function(data){",
-						"			var status = data.status || 200;"
+						"      ], ",
+						"      function(){",
+						"        " + resourceType + "." + spec.fn + "(" + argumentString + "function(data){",
+						"            var status = data.status || 200;"
 						],
 						
 						responseModifierLines,
 						
 						[
-						"			res.send(status, data);",
-						"		});",
-						"	}",
-						"	catch (e){",
-						"		res.send(500, {error : e}); ",
-						"	}",
-						"});"
+						"            res.send(status, data);",
+						"",
+						"        }) // close the route function", 						
+						"",
+						"      } // close the ridCheck callback", 
+						"",
+						"    ); // close the ridCheck",
+						"",
+						"  // now catch random errors",
+						"  }",
+						"  catch (e){",
+						"          res.send(500, {error : 'error in handler for " + spec.fn + " : ' + e}); ",
+						"  }",
+						
+						"}); // close handler"
 						]);
 		}
 	}

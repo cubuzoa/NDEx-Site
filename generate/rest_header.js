@@ -198,6 +198,7 @@ function convertFromRID(RID){
 
 var routes = require('./routes');
 
+var common = require('./routes/Common.js');
 
 //-----------------------------------------------------------
 //

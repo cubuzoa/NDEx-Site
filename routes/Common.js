@@ -13,8 +13,6 @@ exports.contains = function (a, obj) {
         }
     }
     return false;
-    
-  
 }
 
 exports.checkErr = function(err, where, callback){
@@ -28,5 +26,14 @@ exports.checkErr = function(err, where, callback){
 
 
 exports.ridCheck = function (checkList, callback){
-	return callback();
+	callback();
+	return true;
 }
+
+exports.checkJID = function(jid){
+	if (jid){
+		var jidPattern=/C[0-9]+R[0-9]+/g;
+		return jidPattern.test(jid);
+	}
+	return false;
+};

@@ -198,6 +198,7 @@ function convertFromRID(RID){
 
 var routes = require('./routes');
 
+var common = require('./routes/Common.js');
 
 //-----------------------------------------------------------
 //
@@ -216,498 +217,843 @@ var Task = require('./routes/Task.js');
 
 // GET server description
 app.get('/', function(req, res) {
-	try {
-		System.index(function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+  try {
+    common.ridCheck(
+      [
+      ], 
+      function(){
+        System.index(function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for index : ' + e}); 
+  }
+}); // close handler
 
 // GET status
 app.get('/status', function(req, res) {
-	try {
-		System.status(function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+  try {
+    common.ridCheck(
+      [
+      ], 
+      function(){
+        System.status(function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for status : ' + e}); 
+  }
+}); // close handler
 
 // Create a User Account
 app.post('/users', function(req, res) {
+  try {
     var username = req.body['username'];
     var password = req.body['password'];
     var recoveryEmail = req.body['recoveryEmail'];
-	try {
-		User.createUser(username, password, recoveryEmail, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			    data.jid = convertFromRID(data.jid);
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    common.ridCheck(
+      [
+      ], 
+      function(){
+        User.createUser(username, password, recoveryEmail, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+            data.jid = convertFromRID(data.jid);
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for createUser : ' + e}); 
+  }
+}); // close handler
 
 // Set new profile for user. Requester must be user or have admin permissions.
 app.post('/users/:userid/profile', function(req, res) {
+  try {
     var userid = req.body['userid'];
-    if(userid) userid = convertToRID(userid);
+    if(!common.checkJID(userid)) res.send(400, { error: 'bad JID : ' + userid});
+    userid = convertToRID(userid);
     var profile = req.body['profile'];
-	try {
-		User.updateUserProfile(userid, profile, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    common.ridCheck(
+      [
+            { rid: userid, class: 'xUser'},
+      ], 
+      function(){
+        User.updateUserProfile(userid, profile, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for updateUserProfile : ' + e}); 
+  }
+}); // close handler
 
 // Find users matching search expression
 app.get('/users', function(req, res) {
+  try {
     var searchExpression = req.query['searchExpression'];
     searchExpression = searchExpression || '*';
     var limit = req.query['limit'];
     limit = limit || 100;
     var offset = req.query['offset'];
     offset = offset || 0;
-	try {
-		User.findUsers(searchExpression, limit, offset, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    common.ridCheck(
+      [
+      ], 
+      function(){
+        User.findUsers(searchExpression, limit, offset, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for findUsers : ' + e}); 
+  }
+}); // close handler
 
 // Get a user by userid. Content returned depends on requester permissions.
 app.get('/users/:userid', function(req, res) {
+  try {
     var userid = req.params['userid'];
-    if(userid) userid = convertToRID(userid);
-	try {
-		User.getUser(userid, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    if(!common.checkJID(userid)) res.send(400, { error: 'bad JID : ' + userid});
+    userid = convertToRID(userid);
+    common.ridCheck(
+      [
+            { rid: userid, class: 'xUser'},
+      ], 
+      function(){
+        User.getUser(userid, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for getUser : ' + e}); 
+  }
+}); // close handler
 
 // Delete a user by user id. Requester must be user or have admin permissions.
 app.delete('/users/:userid', function(req, res) {
+  try {
     var userid = req.params['userid'];
-    if(userid) userid = convertToRID(userid);
-	try {
-		User.deleteUser(userid, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    if(!common.checkJID(userid)) res.send(400, { error: 'bad JID : ' + userid});
+    userid = convertToRID(userid);
+    common.ridCheck(
+      [
+            { rid: userid, class: 'xUser'},
+      ], 
+      function(){
+        User.deleteUser(userid, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for deleteUser : ' + e}); 
+  }
+}); // close handler
 
 // Get the user's workspace. Requester must be user or have admin permissions.
 app.get('/users/:userid/workspace', function(req, res) {
+  try {
     var userid = req.params['userid'];
-    if(userid) userid = convertToRID(userid);
-	try {
-		User.getUserWorkspace(userid, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    if(!common.checkJID(userid)) res.send(400, { error: 'bad JID : ' + userid});
+    userid = convertToRID(userid);
+    common.ridCheck(
+      [
+            { rid: userid, class: 'xUser'},
+      ], 
+      function(){
+        User.getUserWorkspace(userid, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for getUserWorkspace : ' + e}); 
+  }
+}); // close handler
 
 // Add a network to the user's workspace. Requester must be user or have admin permissions. User must have permission to access network
 app.post('/users/:userid/workspace', function(req, res) {
+  try {
     var userid = req.params['userid'];
-    if(userid) userid = convertToRID(userid);
+    if(!common.checkJID(userid)) res.send(400, { error: 'bad JID : ' + userid});
+    userid = convertToRID(userid);
     var networkid = req.body['networkid'];
-    if(networkid) networkid = convertToRID(networkid);
-	try {
-		User.addNetworkToUserWorkspace(userid, networkid, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    if(!common.checkJID(networkid)) res.send(400, { error: 'bad JID : ' + networkid});
+    networkid = convertToRID(networkid);
+    common.ridCheck(
+      [
+            { rid: userid, class: 'xUser'},
+            { rid: networkid, class: 'xNetwork'},
+      ], 
+      function(){
+        User.addNetworkToUserWorkspace(userid, networkid, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for addNetworkToUserWorkspace : ' + e}); 
+  }
+}); // close handler
 
 // Delete a network from the user's workspace. Requester must be user or have admin permissions
 app.delete('/users/:userid/workspace/:networkid', function(req, res) {
+  try {
     var userid = req.params['userid'];
-    if(userid) userid = convertToRID(userid);
+    if(!common.checkJID(userid)) res.send(400, { error: 'bad JID : ' + userid});
+    userid = convertToRID(userid);
     var networkid = req.params['networkid'];
-    if(networkid) networkid = convertToRID(networkid);
-	try {
-		User.deleteNetworkFromUserWorkspace(userid, networkid, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    if(!common.checkJID(networkid)) res.send(400, { error: 'bad JID : ' + networkid});
+    networkid = convertToRID(networkid);
+    common.ridCheck(
+      [
+            { rid: userid, class: 'xUser'},
+            { rid: networkid, class: 'xNetwork'},
+      ], 
+      function(){
+        User.deleteNetworkFromUserWorkspace(userid, networkid, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for deleteNetworkFromUserWorkspace : ' + e}); 
+  }
+}); // close handler
 
 // Add a programmatic access account, generate credentials
 app.post('/agents', function(req, res) {
+  try {
     var name = req.body['name'];
     var owner = req.body['owner'];
-    if(owner) owner = convertToRID(owner);
-	try {
-		Agent.createAgent(name, owner, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			    data.id = convertFromRID(data.id);
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    if(!common.checkJID(owner)) res.send(400, { error: 'bad JID : ' + owner});
+    owner = convertToRID(owner);
+    common.ridCheck(
+      [
+            { rid: owner, class: 'xAccount'},
+      ], 
+      function(){
+        Agent.createAgent(name, owner, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+            data.id = convertFromRID(data.id);
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for createAgent : ' + e}); 
+  }
+}); // close handler
 
 // Get information about an Agent
 app.get('/agents/:agentid', function(req, res) {
+  try {
     var agentid = req.params['agentid'];
-    if(agentid) agentid = convertToRID(agentid);
-	try {
-		Agent.getAgent(agentid, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			    data.id = convertFromRID(data.id);
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    if(!common.checkJID(agentid)) res.send(400, { error: 'bad JID : ' + agentid});
+    agentid = convertToRID(agentid);
+    common.ridCheck(
+      [
+            { rid: agentid, class: 'xAgent'},
+      ], 
+      function(){
+        Agent.getAgent(agentid, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+            data.id = convertFromRID(data.id);
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for getAgent : ' + e}); 
+  }
+}); // close handler
 
 // Update the credentials and/or status for an Agent
 app.post('/agents/:agentid', function(req, res) {
+  try {
     var agentId = req.params['agentId'];
-    if(agentId) agentId = convertToRID(agentId);
+    if(!common.checkJID(agentId)) res.send(400, { error: 'bad JID : ' + agentId});
+    agentId = convertToRID(agentId);
     var credentials = req.body['credentials'];
     var status = req.body['status'];
     var name = req.body['name'];
-	try {
-		Agent.updateAgent(agentId, credentials, status, name, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    common.ridCheck(
+      [
+            { rid: agentId, class: 'xAgent'},
+      ], 
+      function(){
+        Agent.updateAgent(agentId, credentials, status, name, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for updateAgent : ' + e}); 
+  }
+}); // close handler
 
 // Add a group account
 app.post('/groups', function(req, res) {
+  try {
     var userid = req.body['userid'];
-    if(userid) userid = convertToRID(userid);
+    if(!common.checkJID(userid)) res.send(400, { error: 'bad JID : ' + userid});
+    userid = convertToRID(userid);
     var groupName = req.body['groupName'];
-	try {
-		Group.createGroup(userid, groupName, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			    data.jid = convertFromRID(data.jid);
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    common.ridCheck(
+      [
+            { rid: userid, class: 'xUser'},
+      ], 
+      function(){
+        Group.createGroup(userid, groupName, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+            data.jid = convertFromRID(data.jid);
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for createGroup : ' + e}); 
+  }
+}); // close handler
 
 // Set new group profile information. Requester must be group owner or have admin permissions.
 app.post('/groups/:groupid/profile', function(req, res) {
+  try {
     var groupid = req.body['groupid'];
-    if(groupid) groupid = convertToRID(groupid);
+    if(!common.checkJID(groupid)) res.send(400, { error: 'bad JID : ' + groupid});
+    groupid = convertToRID(groupid);
     var profile = req.body['profile'];
-	try {
-		Group.updateGroupProfile(groupid, profile, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    common.ridCheck(
+      [
+            { rid: groupid, class: 'xGroup'},
+      ], 
+      function(){
+        Group.updateGroupProfile(groupid, profile, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for updateGroupProfile : ' + e}); 
+  }
+}); // close handler
 
 // Find groups by search expression
 app.get('/groups', function(req, res) {
+  try {
     var searchExpression = req.query['searchExpression'];
     searchExpression = searchExpression || '*';
     var limit = req.query['limit'];
     limit = limit || 100;
     var offset = req.query['offset'];
     offset = offset || 0;
-	try {
-		Group.findGroups(searchExpression, limit, offset, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    common.ridCheck(
+      [
+      ], 
+      function(){
+        Group.findGroups(searchExpression, limit, offset, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for findGroups : ' + e}); 
+  }
+}); // close handler
 
 // Get a group by group id. Information returned depends on whether requester is group owner.
 app.get('/groups/:groupid', function(req, res) {
+  try {
     var groupid = req.params['groupid'];
-    if(groupid) groupid = convertToRID(groupid);
-	try {
-		Group.getGroup(groupid, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    if(!common.checkJID(groupid)) res.send(400, { error: 'bad JID : ' + groupid});
+    groupid = convertToRID(groupid);
+    common.ridCheck(
+      [
+            { rid: groupid, class: 'xGroup'},
+      ], 
+      function(){
+        Group.getGroup(groupid, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for getGroup : ' + e}); 
+  }
+}); // close handler
 
 // Delete a group by group id. Requester must be group owner or have admin permissions.
 app.delete('/groups/:groupid', function(req, res) {
+  try {
     var groupid = req.params['groupid'];
-    if(groupid) groupid = convertToRID(groupid);
-	try {
-		Group.deleteGroup(groupid, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    if(!common.checkJID(groupid)) res.send(400, { error: 'bad JID : ' + groupid});
+    groupid = convertToRID(groupid);
+    common.ridCheck(
+      [
+            { rid: groupid, class: 'xGroup'},
+      ], 
+      function(){
+        Group.deleteGroup(groupid, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for deleteGroup : ' + e}); 
+  }
+}); // close handler
 
 // Find Users who are members of a group, optionally filter by search expression. Group owners see all members, non-owners see only members who allow themselves to be visible.
 app.get('/groups/:groupid/members', function(req, res) {
+  try {
     var groupid = req.params['groupid'];
-    if(groupid) groupid = convertToRID(groupid);
+    if(!common.checkJID(groupid)) res.send(400, { error: 'bad JID : ' + groupid});
+    groupid = convertToRID(groupid);
     var searchExpression = req.query['searchExpression'];
     searchExpression = searchExpression || '*';
     var limit = req.query['limit'];
     limit = limit || 100;
     var offset = req.query['offset'];
     offset = offset || 0;
-	try {
-		Group.getGroupMembers(groupid, searchExpression, limit, offset, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    common.ridCheck(
+      [
+            { rid: groupid, class: 'xGroup'},
+      ], 
+      function(){
+        Group.getGroupMembers(groupid, searchExpression, limit, offset, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for getGroupMembers : ' + e}); 
+  }
+}); // close handler
 
 // toAccount creates a request to fromAccount.
 app.post('/requests', function(req, res) {
+  try {
     var toid = req.body['toid'];
-    if(toid) toid = convertToRID(toid);
+    if(!common.checkJID(toid)) res.send(400, { error: 'bad JID : ' + toid});
+    toid = convertToRID(toid);
     var fromid = req.body['fromid'];
-    if(fromid) fromid = convertToRID(fromid);
-	try {
-		Request.createRequest(toid, fromid, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			    data.jid = convertFromRID(data.jid);
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    if(!common.checkJID(fromid)) res.send(400, { error: 'bad JID : ' + fromid});
+    fromid = convertToRID(fromid);
+    common.ridCheck(
+      [
+            { rid: toid, class: 'xAccount'},
+            { rid: fromid, class: 'xAccount'},
+      ], 
+      function(){
+        Request.createRequest(toid, fromid, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+            data.jid = convertFromRID(data.jid);
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for createRequest : ' + e}); 
+  }
+}); // close handler
 
 // Get the parameters of a request
 app.get('/requests/:requestid', function(req, res) {
+  try {
     var requestid = req.params['requestid'];
-    if(requestid) requestid = convertToRID(requestid);
-	try {
-		Request.getRequest(requestid, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    if(!common.checkJID(requestid)) res.send(400, { error: 'bad JID : ' + requestid});
+    requestid = convertToRID(requestid);
+    common.ridCheck(
+      [
+            { rid: requestid, class: 'xRequest'},
+      ], 
+      function(){
+        Request.getRequest(requestid, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for getRequest : ' + e}); 
+  }
+}); // close handler
 
 // toAccount approves or disapproves a request. Approval causes requested action. Processing deletes request
 app.post('/requests/:requestid', function(req, res) {
+  try {
     var requestid = req.params['requestid'];
-    if(requestid) requestid = convertToRID(requestid);
+    if(!common.checkJID(requestid)) res.send(400, { error: 'bad JID : ' + requestid});
+    requestid = convertToRID(requestid);
     var approval = req.body['approval'];
-	try {
-		Request.processRequest(requestid, approval, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    common.ridCheck(
+      [
+            { rid: requestid, class: 'xRequest'},
+      ], 
+      function(){
+        Request.processRequest(requestid, approval, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for processRequest : ' + e}); 
+  }
+}); // close handler
 
 // find requests that were made by the user or can be processed by the user
 app.get('/users/:userid/requests', function(req, res) {
+  try {
     var userid = req.params['userid'];
-    if(userid) userid = convertToRID(userid);
-	try {
-		Request.findRequests(userid, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    if(!common.checkJID(userid)) res.send(400, { error: 'bad JID : ' + userid});
+    userid = convertToRID(userid);
+    common.ridCheck(
+      [
+            { rid: userid, class: 'xUser'},
+      ], 
+      function(){
+        Request.findRequests(userid, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for findRequests : ' + e}); 
+  }
+}); // close handler
 
 // Create a new network in the specified account
 app.post('/networks', function(req, res) {
+  try {
     var network = req.body['network'];
     var accountid = req.body['accountid'];
-    if(accountid) accountid = convertToRID(accountid);
-	try {
-		Network.createNetwork(network, accountid, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			    data.jid = convertFromRID(data.jid);
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    if(!common.checkJID(accountid)) res.send(400, { error: 'bad JID : ' + accountid});
+    accountid = convertToRID(accountid);
+    common.ridCheck(
+      [
+            { rid: accountid, class: 'undefined'},
+      ], 
+      function(){
+        Network.createNetwork(network, accountid, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+            data.jid = convertFromRID(data.jid);
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for createNetwork : ' + e}); 
+  }
+}); // close handler
 
 // delete a network
 app.delete('/networks/:networkid', function(req, res) {
+  try {
     var networkid = req.params['networkid'];
-    if(networkid) networkid = convertToRID(networkid);
-	try {
-		Network.deleteNetwork(networkid, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    if(!common.checkJID(networkid)) res.send(400, { error: 'bad JID : ' + networkid});
+    networkid = convertToRID(networkid);
+    common.ridCheck(
+      [
+            { rid: networkid, class: 'xNetwork'},
+      ], 
+      function(){
+        Network.deleteNetwork(networkid, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for deleteNetwork : ' + e}); 
+  }
+}); // close handler
 
 // Returns the Network JDEx
 app.get('/networks/:networkid', function(req, res) {
+  try {
     var networkid = req.params['networkid'];
-    if(networkid) networkid = convertToRID(networkid);
-	try {
-		Network.getNetwork(networkid, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    if(!common.checkJID(networkid)) res.send(400, { error: 'bad JID : ' + networkid});
+    networkid = convertToRID(networkid);
+    common.ridCheck(
+      [
+            { rid: networkid, class: 'xNetwork'},
+      ], 
+      function(){
+        Network.getNetwork(networkid, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for getNetwork : ' + e}); 
+  }
+}); // close handler
 
 // Find Networks by search expression
 app.get('/networks', function(req, res) {
+  try {
     var searchExpression = req.query['searchExpression'];
     searchExpression = searchExpression || '';
     var limit = req.query['limit'];
     limit = limit || 100;
     var offset = req.query['offset'];
     offset = offset || 0;
-	try {
-		Network.findNetworks(searchExpression, limit, offset, function(data){
-			var status = data.status || 200;
-			if(status && status == 200){
-			}
-			res.send(status, data);
-		});
-	}
-	catch (e){
-		res.send(500, {error : e}); 
-	}
-});
+    common.ridCheck(
+      [
+      ], 
+      function(){
+        Network.findNetworks(searchExpression, limit, offset, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          res.send(500, {error : 'error in handler for findNetworks : ' + e}); 
+  }
+}); // close handler
 
 
 var server = new orientdb.Server(serverConfig);
