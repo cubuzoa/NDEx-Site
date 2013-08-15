@@ -1,9 +1,10 @@
 module.db = null;
 
-exports.init = function(orient, common, callback) {
-    module.db = orient;
-    module.common = common;
-}
+var common = require("./Common.js");
+
+exports.init = function(orient, callback) {
+    module.db = orient;   
+};
 
 /*
 

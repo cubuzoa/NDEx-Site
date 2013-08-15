@@ -1,8 +1,9 @@
 module.db = null;
 
-exports.init = function(orient, common, callback) {
-    module.db = orient;
-    module.common = common;
+var common = require("./Common.js");
+
+exports.init = function(orient, callback) {
+    module.db = orient;   
 };
 
 exports.createUser = function(username, password, recoveryEmail, callback){
@@ -98,7 +99,7 @@ exports.getUser = function(userRID, callback){
 		console.log(cmd);
 		module.db.command(cmd, function(err, users) {
 
-			if (module.common.checkErr(err, "finding user", callback)){
+			if (common.checkErr(err, "finding user", callback)){
 				try {
 					if (!users || users.length < 1){
 						console.log("found no users by id = '" + userRID + "'");
@@ -125,12 +126,12 @@ exports.getUser = function(userRID, callback){
 			 
 						var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
 						module.db.command(networks_cmd, function(err, networks) {
-							if(module.common.checkErr(err, "getting owned networks", callback)){
+							if(common.checkErr(err, "getting owned networks", callback)){
 						
 								// process the networks
 								for (i in networks){
 									var network = networks[i];
-									network.jid = module.common.convertFromRID(network.jid);
+									network.jid = common.convertFromRID(network.jid);
 								}
 								result.ownedNetworks = networks;
 
@@ -140,12 +141,12 @@ exports.getUser = function(userRID, callback){
 								var traverseExpression = "traverse V.out, E.in from " + userRID + " while $depth <= 2"		 
 								var groups_cmd = "select " + groupDescriptors + " from (" + traverseExpression + ") where @class = 'xGroup'";
 								module.db.command(groups_cmd, function(err, groups) {
-									if(module.common.checkErr(err, "getting owned groups", callback)){
+									if(common.checkErr(err, "getting owned groups", callback)){
 						
 										// process the groups
 										for (i in groups){
 											var group = groups[i];
-											group.jid = module.common.convertFromRID(group.jid);
+											group.jid = common.convertFromRID(group.jid);
 										}
 										result.ownedGroups = groups;
 									}
@@ -180,7 +181,7 @@ exports.getUserWorkspace = function(userRID, callback){
 		console.log(cmd);
 	//checking that user exists
 	module.db.command(cmd, function(err, users) {
-		if (module.commmon.checkErr(err, "finding user", callback)){
+		if (common.checkErr(err, "finding user", callback)){
 			if (!users || users.length < 1){
 				console.log("found no users by id = '" + userRID + "'");
 				callback({status : 404});
@@ -196,11 +197,11 @@ exports.getUserWorkspace = function(userRID, callback){
 	
 				console.log(networks_cmd);
 				module.db.command(networks_cmd, function(err, workspace_networks) {
-					if(module.common.checkErr(err, "getting user workspace networks", callback)){	
+					if(common.checkErr(err, "getting user workspace networks", callback)){	
 						// process the workspace_networks
 						for (i in workspace_networks){
 							var network = workspace_networks[i];
-							network.jid = module.common.convertFromRID(network.jid);
+							network.jid = common.convertFromRID(network.jid);
 						}
 					}
 					callback({networks : workspace_networks, error: err});		
@@ -217,21 +218,21 @@ exports.addNetworkToUserWorkspace = function(userRID, networkRID, callback){
 	
 	module.db.command("select username, workspace from " + userRID + " where @class = 'xUser'", function(err, results){
 		
-		if(module.common.checkErr(err, "checking user before adding to workspace ", callback)){
+		if(common.checkErr(err, "checking user before adding to workspace ", callback)){
 			if (!results || results.length < 1){
 				console.log("found no users by id = '" + userRID + "'");
 				callback({status : 404, error : "Found no user by id = '" + userRID + "'"});
 			} else {
 				var user_data = results[0];
 				
-				if (user_data.workspace && module.common.contains(user_data.workspace, networkRID)){
+				if (user_data.workspace && common.contains(user_data.workspace, networkRID)){
 					// aborting, already contains this network
 					callback({status : 400, error : "network " + networkRID + " already in user workspace"});
 				
 				} else {
 					// Check that network exists
 					module.db.command("select @rid as rid from " + networkRID + " where @class = 'xNetwork'", function(err, network_ids){
-						if(module.common.checkErr(err, "checking network before adding to workspace ", callback)){
+						if(common.checkErr(err, "checking network before adding to workspace ", callback)){
 							if (!network_ids || network_ids.length < 1){
 								callback({status : 404, error : "Found no network by id = '" + networkRID + "'"});
 							} else {
@@ -240,7 +241,7 @@ exports.addNetworkToUserWorkspace = function(userRID, networkRID, callback){
 								var updateCmd = "update " + userRID + " add workspace = " + networkRID;
 								console.log(updateCmd);
 								module.db.command(updateCmd, function(err, workspace) {
-									if (module.common.checkErr(err, "adding network " + networkRID + " to workspace of user " + userRID, callback)){
+									if (common.checkErr(err, "adding network " + networkRID + " to workspace of user " + userRID, callback)){
 										callback({status : 200});
 									}
 								});
@@ -264,14 +265,14 @@ exports.deleteNetworkFromUserWorkspace = function(userRID, networkRID, callback)
 	// TODO : check that user exists, that requester has permission
 	
 	module.db.command("select username, workspace from " + userRID + " where @class = 'xUser'", function(err, results){
-		if(module.common.checkErr(err, "checking user before adding to workspace ", callback)){
+		if(common.checkErr(err, "checking user before adding to workspace ", callback)){
 			if (!results || results.length < 1){
 				console.log("found no users by id = '" + userRID + "'");
 				callback({status : 404, error : "Found no user by id = '" + userRID + "'"});
 			} else {
 				var user_data = results[0];
 			
-				if (!user_data.workspace || !module.common.contains(user_data.workspace, networkRID)){
+				if (!user_data.workspace || !common.contains(user_data.workspace, networkRID)){
 					// aborting, does not contain this network
 					callback({status : 404, error : "network " + networkRID + " not in user workspace"});
 				
@@ -280,7 +281,7 @@ exports.deleteNetworkFromUserWorkspace = function(userRID, networkRID, callback)
 					var updateCmd = "update " + userRID + " remove workspace = " + networkRID;
 					console.log(updateCmd);
 					module.db.command(updateCmd, function(err, workspace) {
-						if(module.common.checkErr(err, "removing network " + networkRID + " from workspace of user " + userRID, callback)){
+						if(common.checkErr(err, "removing network " + networkRID + " from workspace of user " + userRID, callback)){
 							callback({status : 200});
 						}
 					});
@@ -304,7 +305,7 @@ exports.deleteUser = function (userRID, callback){
 	//checking if user exists
 	var cmd = "select from xUser where @rid = " + userRID + "";
 	module.db.command(cmd,function(err,users){
-		if(module.common.checkErr(err, "checking existence of user " + userRID, callback)){
+		if(common.checkErr(err, "checking existence of user " + userRID, callback)){
 			console.log("users found " + users.length);
 			if (!users || users.length < 1){
 				console.log("found no users by id = '" + userRID + "'");
@@ -315,7 +316,7 @@ exports.deleteUser = function (userRID, callback){
 				var updateCmd = "delete from " + userRID + " where @class = 'xUser'";
 				console.log(updateCmd);
 				module.db.command(updateCmd, function(err) {
-					if (module.common.checkErr(err, "deleting user " + userRID, callback)){
+					if (common.checkErr(err, "deleting user " + userRID, callback)){
 						callback({status : 200});
 					}
 			    	});

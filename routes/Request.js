@@ -1,9 +1,10 @@
 module.db = null;
 
-exports.init = function(orient, common, callback) {
-    module.db = orient;
-    module.common = common;
-}
+var common = require("./Common.js");
+
+exports.init = function(orient, callback) {
+    module.db = orient;   
+};
 
 /*
 
@@ -31,7 +32,39 @@ toAccountId (JID)
 requestDescription
 
 */
-
+/*
+exports.createRequest = function(fromAccountRID, toAccountRID, requestDescription, callback){
+	console.log("calling createRequest with arguments fromAccountRID = '" + fromAccountRID + "' toAccountRID = '" + toAccountRID + "'");
+	module.common.checkAccount(
+	var selectUserByUserNameCmd = "select from xUser where username = '" + username + "'";
+	var insertUserCmd = "insert into xUser (username, password) values('" + username + "', '" + password + "')";
+	//console.log("first checking that username is not taken");
+	module.db.command(selectUserByUserNameCmd, function(err, users) {
+		if (err) {
+			callback( {error : err, status : 500});
+		} else {
+			//console.log("Existing users: " + JSON.stringify(users));
+			if (users && users.length > 0){
+				callback({error : "username '" + username + "' is already in use", status : 500});
+			} else {
+				//console.log("now inserting the new user");
+				//console.log(insertUserCmd);
+				module.db.command(insertUserCmd, function(err, results) {
+					if (err){
+						console.log("insert of new user yields error : " + err);
+						callback({error : err});
+					} else {
+						var user = results[0];
+						//console.log(JSON.stringify(user));
+						callback({status: 200, error : err, jid: user['@rid'], username: user['username']});
+					}
+					
+				});
+			}
+    	}
+    });
+};
+*/
 
 /*
 

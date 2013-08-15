@@ -1,9 +1,10 @@
 module.db = null;
 
-exports.init = function(orient, common, callback) {
-    module.db = orient;
-    module.common = common;
-}
+var common = require("./Common.js");
+
+exports.init = function(orient, callback) {
+    module.db = orient;   
+};
 
 exports.createInitialDocument = function(networkJDEx){
 		var o_nodes = [],
@@ -251,7 +252,7 @@ exports.findNetworks = function (searchExpression, limit, offset, callback){
 	module.db.command(cmd, function(err, networks) {
 		for (i in networks){
 			var network = networks[i];
-			network.jid = module.common.convertFRomRID(network.jid);
+			network.jid = common.convertFromRID(network.jid);
 		}
         callback({networks : networks, error : err});
     });
@@ -263,7 +264,7 @@ exports.getNetwork = function(networkRID, callback){
 	var cmd = "select from " + networkRID + "";
 	console.log(cmd);
 	module.db.command(cmd, function(err, networks) {
-		if (module.common.checkErr(err, "finding network", callback)){
+		if (common.checkErr(err, "finding network", callback)){
 			try {
 				if (!networks || networks.length < 1){
 					console.log("found no networks by id = '" + networkRID + "'");
@@ -276,45 +277,45 @@ exports.getNetwork = function(networkRID, callback){
 					// get the namespaces
 					var ns_cmd = "select id, prefix, uri, @rid as rid from (traverse namespaces from " + networkRID + ") where $depth = 1";
 					module.db.command(ns_cmd, function(err, namespaces) {
-						if(module.common.checkErr(err, "getting namespaces", callback)){
+						if(common.checkErr(err, "getting namespaces", callback)){
 						
 							// process the namespaces
 							for (i in namespaces){
 								var ns = namespaces[i];
-								result.namespaces[ns.id] = {prefix: ns.prefix, rid: module.module.common.convertFRomRID(ns.rid), uri: ns.uri};
+								result.namespaces[ns.id] = {prefix: ns.prefix, rid: module.common.convertFromRID(ns.rid), uri: ns.uri};
 							}
 							
 							// get the terms
 							var term_cmd = "select id, name, ns.id as nsid, @rid as rid from (traverse terms from " + networkRID + ") where $depth = 1";
 							module.db.command(term_cmd, function(err, terms) {
-								if (module.common.checkErr(err, "getting terms", callback)){
+								if (common.checkErr(err, "getting terms", callback)){
 						
 									// process the terms
 									for (i in terms){
 										var term = terms[i];
-										result.terms[term.id] = {name: term.name, jid: module.common.convertFRomRID(term.rid), ns: term.nsid};
+										result.terms[term.id] = {name: term.name, jid: common.convertFromRID(term.rid), ns: term.nsid};
 									}
 							
 									// get the nodes
 									// TODO - get the defining terms...
 									var node_cmd = "select id, name, represents.id as represents, @rid as rid from (traverse nodes from " + networkRID + ") where $depth = 1";
 									module.db.command(node_cmd, function(err, nodes) {
-										if (module.common.checkErr(err, "getting nodes", callback)){
+										if (common.checkErr(err, "getting nodes", callback)){
 						
 											// process the nodes
 											for (i in nodes){
 												var node = nodes[i];
-												result.nodes[node.id] = {name: node.name, jid: module.common.convertFRomRID(node.rid), represents: node.represents};
+												result.nodes[node.id] = {name: node.name, jid: common.convertFromRID(node.rid), represents: node.represents};
 											}
 											// get the edges
 											var edge_cmd = "select  in.id as s, p.id as p, out.id as o, @rid as rid from (traverse edges from " + networkRID + ") where $depth = 1)";
 											module.db.command(edge_cmd, function(err, edges) {
-												if (module.common.checkErr(err, "getting edges", callback)){
+												if (common.checkErr(err, "getting edges", callback)){
 										
 													// process the edges
 													for (i in edges){
 														var edge = edges[i];
-														result.edges[i] = {s: edge.s, p: edge.p, o: edge.o, jid: module.common.convertFRomRID(edge.rid)};
+														result.edges[i] = {s: edge.s, p: edge.p, o: edge.o, jid: common.convertFromRID(edge.rid)};
 													}
 										
 													callback({network : result});
@@ -342,7 +343,7 @@ exports.deleteNetwork = function (networkRID, callback){
 	console.log("calling delete network with id = '" + networkRID + "'");
 	// Check that network exists
 	module.db.command("select @rid as rid from " + networkRID + " where @class = 'xNetwork'", function(err, network_ids){
-		if(module.common.checkErr(err, "checking network before adding to workspace ", callback)){
+		if(common.checkErr(err, "checking network before adding to workspace ", callback)){
 			if (!network_ids || network_ids.length < 1){
 				callback({status : 404, error : "Found no network by id = '" + networkRID + "'"});
 			} else {
