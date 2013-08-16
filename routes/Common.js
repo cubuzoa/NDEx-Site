@@ -25,7 +25,12 @@ exports.checkErr = function(err, where, callback){
 };
 
 
-exports.ridCheck = function (checkList, callback){
+exports.ridCheck = function (checkList, res, callback){
+	// query about all ids on checklist
+	// scan results for errors
+	// if errors, summarize and respond
+	// otherwise continue with callback
+	
 	callback();
 	return true;
 }
