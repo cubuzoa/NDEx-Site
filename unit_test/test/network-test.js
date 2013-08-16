@@ -31,7 +31,7 @@ console.log("starting networks test");
 describe('NDEx Networks: ', function (done) {
 	this.timeout(10000);
 	var networkOwnerJID = null;
-	var network1JID = null;
+	var network1 = {title : '', jid : ''};
 	before( function(done){
 		console.log('\nsetup: network test');
 		request({
@@ -52,7 +52,7 @@ describe('NDEx Networks: ', function (done) {
 	});
 	
 	describe('Should: ', function(done) {
-		/*it("should get 404 getting non-existent Network Id", function(done){
+		it("should get 404 getting non-existent Network Id", function(done){
 			request({
 					method : 'GET',
 					url: baseURL + '/networks/C11R44444',
@@ -84,8 +84,7 @@ describe('NDEx Networks: ', function (done) {
 					}
 				}
 			);
-		});*/
-		var network1Title = '';
+		});
 		it("should get 200 creating Network1 owned by NetworkOwner", function(done){
 			var data = fs.readFileSync('../test_db/test_networks/pc_sif/testNetwork.jdex', 'utf8'); 
 			data = JSON.parse(data);	
@@ -98,24 +97,24 @@ describe('NDEx Networks: ', function (done) {
 					if(err) { done(err) }
 					else {
 						res.should.have.status(200);
-						network1JID = res.body.jid;
-						//network1Title=res.body.title;
+						network1.jid = res.body.jid;
+						network1.title = data.properties.title;
 						done();
 					}
 				}
 			);
 		});
-		/*it("should get 200 getting Network1 and verifying title and description", function(done){
+		it("should get 200 getting Network1 and verifying title and description", function(done){
 			request({
 					method : 'GET',
-					url: baseURL + '/networks/' + network1JID,
+					url: baseURL + '/networks/' + network1.jid,
 					json: true
 				},
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
 						res.should.have.status(200);
-						network1Title.should.equal(res.body.network.title);
+						network1.title.should.equal(res.body.network.title);
 						done();
 					}
 				}
@@ -131,16 +130,16 @@ describe('NDEx Networks: ', function (done) {
   					if(err) { done(err) }  
   					else {
 	  					res.should.have.status(200);
-	  					network1Title.should.equal(res.body.user.ownedNetworks[0].title);
+	  					network1.title.should.equal(res.body.user.ownedNetworks[0].title);
 	  					done();
   					}
   				}
   			);	
-  		});*/
+  		});
 		it("should get 200 deleting network", function(done){
 			request({
 					method : 'DELETE',
-					url : baseURL + '/networks/' + network1JID
+					url : baseURL + '/networks/' + network1.jid
 				},
 				function(err, res, body){
 					if(err) { done(err) }
@@ -154,7 +153,7 @@ describe('NDEx Networks: ', function (done) {
 		it("should get 404 deleting network", function(done){
 			request({
 					method : 'DELETE',
-					url : baseURL + '/networks/' + network1JID
+					url : baseURL + '/networks/' + network1.jid
 				},
 				function(err, res, body){
 					if(err) { done(err) }
@@ -183,7 +182,7 @@ describe('NDEx Networks: ', function (done) {
   		it("should get 404 getting Network1", function(done){
 			request({
 					method : 'GET',
-					url: baseURL + '/networks/' + network1JID,
+					url: baseURL + '/networks/' + network1.jid,
 					json: true
 				},
 				function(err,res,body){

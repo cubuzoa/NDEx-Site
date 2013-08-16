@@ -2,6 +2,20 @@ module.db = null;
 
 var common = require("./Common.js");
 
+function requestAccount(accountRID, callback, proceed) {
+	var cmd = "select from xAccount where @RID = '" + accountRID + "'";
+	module.db.command(cmd, function(err, results) {
+		if (common.checkErr(err, "checking account existence", callback)){
+			if (!results || results.length < 1){
+				console.log("found no accounts by id = '" + accountRID + "'");
+				callback({status : 404});
+			} else {
+				proceed(results[0]);
+			}
+		}
+	});
+}
+
 exports.init = function(orient, callback) {
     module.db = orient;   
 };
@@ -182,6 +196,9 @@ exports.linkNodeToTerm = function(nodeRID, networkRID, termId){
 
 // Create a new network in the specified account
 exports.createNetwork = function(networkJDEx, accountRID, callback){
+	
+	requestAccount(accountRID, callback, function(){
+	//temporay check so not indented, will return account if its own callback is given a var
 	var title = "untitled";
 
 	if (networkJDEx.properties && networkJDEx.properties.title){
@@ -230,7 +247,7 @@ exports.createNetwork = function(networkJDEx, accountRID, callback){
 			console.log("initial document is null, even though no error signaled");
 		}
 	});
-		
+	});//request account closure	
 };	
 
 //
@@ -273,8 +290,8 @@ exports.getNetwork = function(networkRID, callback){
 					callback({status : 404});
 				} else {
 					console.log("found " + networks.length + " networks, first one is " + networks[0]["@rid"]);
-					
-					var result = {namespaces : {}, terms: {}, nodes: {}, edges: {}};
+					var properties = networks[0]["properties"];
+					var result = {title : properties.title, namespaces : {}, terms: {}, nodes: {}, edges: {}};
 					
 					// get the namespaces
 					var ns_cmd = "select id, prefix, uri, @rid as rid from (traverse namespaces from " + networkRID + ") where $depth = 1";

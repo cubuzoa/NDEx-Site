@@ -50,10 +50,9 @@ describe('NDEx Find Networks: ', function (done) {
 						function(err, res, body){
 							if(err) { done(err) }
 							else {
-								console.log(res.body.error);
 								res.should.have.status(200);
 								testNetwork.jid = res.body.jid;
-								//testNetwork.title = res.body.title;
+								testNetwork.title = data.properties.title;
 								console.log('...complete');//ensures completion
 								done();
 							}
@@ -82,7 +81,7 @@ describe('NDEx Find Networks: ', function (done) {
 				}
 			);	
 		});
-		/*it("should get 200 and network descriptors including expected network searching on known TestNetwork title", function(done){
+		it("should get 200 and network descriptors including expected network searching on known TestNetwork title", function(done){
 			request({
 					method : 'GET',
 					url: baseURL + '/networks/',
@@ -98,7 +97,7 @@ describe('NDEx Find Networks: ', function (done) {
 					}
 				}
 			);	
-		});*/
+		});
 		it("should get 200 and only 2 results searching on '' with limit = 2", function(done){
 			request({
 					method : 'GET',

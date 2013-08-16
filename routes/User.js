@@ -92,84 +92,77 @@ exports.getUserByName = function(username, callback){
 
 exports.getUser = function(userRID, callback){
 	console.log("calling getUser with userRID = '" + userRID + "'");
-	
-	//checking for malformed RID
-	if( ( userRID.substr(0,4) == '#21:') &&  !isNaN(userRID.substr(4) ) ){
-		var cmd = "select from xUser where @rid = " + userRID + "";
-		console.log(cmd);
-		module.db.command(cmd, function(err, users) {
+	var cmd = "select from xUser where @rid = " + userRID + "";
+	console.log(cmd);
+	module.db.command(cmd, function(err, users) {
 
-			if (common.checkErr(err, "finding user", callback)){
-				try {
-					if (!users || users.length < 1){
-						console.log("found no users by id = '" + userRID + "'");
-						callback({status : 404});
-					} else {
+		if (common.checkErr(err, "finding user", callback)){
+			try {
+				if (!users || users.length < 1){
+					console.log("found no users by id = '" + userRID + "'");
+					callback({status : 404});
+				} else {
 				
-						var user = users[0], 
-							profile = {};
+					var user = users[0], 
+						profile = {};
 					
-						console.log("found " + users.length + " users, first one is " + user["@rid"]);
+					console.log("found " + users.length + " users, first one is " + user["@rid"]);
 					
-						if (user.firstName) profile.firstName = user.firstName; 
-						if (user.lastName) profile.lastName = user.lastName; 
-						if (user.website) profile.website = user.website; 
-						if (user.foregroundImg) profile.foregroundImg = user.foregroundImg; 
-						if (user.backgroundImg) profile.backgroundImg = user.backgroundImg; 
-						if (user.description) profile.description = user.description;
+					if (user.firstName) profile.firstName = user.firstName; 
+					if (user.lastName) profile.lastName = user.lastName; 
+					if (user.website) profile.website = user.website; 
+					if (user.foregroundImg) profile.foregroundImg = user.foregroundImg; 
+					if (user.backgroundImg) profile.backgroundImg = user.backgroundImg; 
+					if (user.description) profile.description = user.description;
 					
-						result = {username: user.username, profile : profile, ownedNetworks: {}, ownedGroups: {}};
+					result = {username: user.username, profile : profile, ownedNetworks: {}, ownedGroups: {}};
 					
-						// get owned networks
-						var networkDescriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount";
-						var traverseExpression = "traverse V.out, E.in from " + userRID + " while $depth <= 2"
+					// get owned networks
+					var networkDescriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount";
+					var traverseExpression = "traverse V.out, E.in from " + userRID + " while $depth <= 2"
 			 
-						var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
-						module.db.command(networks_cmd, function(err, networks) {
-							if(common.checkErr(err, "getting owned networks", callback)){
+					var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
+					module.db.command(networks_cmd, function(err, networks) {
+						if(common.checkErr(err, "getting owned networks", callback)){
 						
 								// process the networks
-								for (i in networks){
-									var network = networks[i];
-									network.jid = common.convertFromRID(network.jid);
-								}
-								result.ownedNetworks = networks;
+							for (i in networks){
+								var network = networks[i];
+								network.jid = common.convertFromRID(network.jid);
+							}
+							result.ownedNetworks = networks;
 
 									
-								// get owned groups
-								var groupDescriptors = "organizationName as organizationName, @rid as jid";
-								var traverseExpression = "traverse V.out, E.in from " + userRID + " while $depth <= 2"		 
-								var groups_cmd = "select " + groupDescriptors + " from (" + traverseExpression + ") where @class = 'xGroup'";
-								module.db.command(groups_cmd, function(err, groups) {
-									if(common.checkErr(err, "getting owned groups", callback)){
+							// get owned groups
+							var groupDescriptors = "organizationName as organizationName, @rid as jid";
+							var traverseExpression = "traverse V.out, E.in from " + userRID + " while $depth <= 2"		 
+							var groups_cmd = "select " + groupDescriptors + " from (" + traverseExpression + ") where @class = 'xGroup'";
+							module.db.command(groups_cmd, function(err, groups) {
+								if(common.checkErr(err, "getting owned groups", callback)){
 						
-										// process the groups
-										for (i in groups){
-											var group = groups[i];
-											group.jid = common.convertFromRID(group.jid);
-										}
-										result.ownedGroups = groups;
+									// process the groups
+									for (i in groups){
+										var group = groups[i];
+										group.jid = common.convertFromRID(group.jid);
 									}
+									result.ownedGroups = groups;
+								}
 									
-									callback({user : result, error: err});
+								callback({user : result, error: err});
 							
-								});
+							});
 							
-							}
-						});	
-					}
-				}
-				catch (e){
-					console.log("caught error " + e);
-					callback({network : null, error : e.toString(), status : 500});	
+						}
+					});	
 				}
 			}
-		});
-	}
-	else{
-		console.log('could not get user with malformed RID: ' + userRID);
-		callback({status : 400})
-	}
+			
+			catch (e){
+					console.log("caught error " + e);
+					callback({network : null, error : e.toString(), status : 500});	
+			}
+		}
+	});
 };
 
 exports.getUserWorkspace = function(userRID, callback){

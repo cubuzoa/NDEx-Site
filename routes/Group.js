@@ -82,7 +82,7 @@ exports.updateGroupProfile = function(groupRID, profile, callback){
 		updateCmd = "update " + groupRID + " set " + setString;
 		console.log(updateCmd);
 	module.db.command(updateCmd, function(err, result){
-	
+		callback({profile : profile, error: err, status : 200})
 	});
 
 };
@@ -125,63 +125,54 @@ exports.getGroupByName = function(groupname, callback){
 
 exports.getGroup = function(groupRID, callback){
 	console.log("calling getGroup with groupRID = '" + groupRID + "'");
-	//checking for malformed RID
-	if( ( groupRID.substr(0,4) == '#22:') &&  !isNaN(groupRID.substr(4) ) ){
-		var cmd = "select from " + groupRID + "";
-		console.log(cmd);
-		module.db.command(cmd, function(err, groups) {
-
-			if (common.checkErr(err, "finding group", callback)){
-				try {
-					if (!groups || groups.length < 1){
+	var cmd = "select from " + groupRID + "";
+	console.log(cmd);
+	module.db.command(cmd, function(err, groups) {
+		if (common.checkErr(err, "finding group", callback)){
+			try {
+				if (!groups || groups.length < 1){
 						console.log("found no groups by id = '" + groupRID + "'");
 						callback({status : 404});
-					} else {
+				} else {
 				
-						var group = groups[0],
-							profile = {};
+					var group = groups[0],
+						profile = {};
 					
-						if (group.organizationName) profile.organizationName = group.organizationName;  
-						if (group.website) profile.website = group.website; 
-						if (group.foregroundImg) profile.foregroundImg = group.foregroundImg; 
-						if (group.backgroundImg) profile.backgroundImg = group.backgroundImg; 
-						if (group.description) profile.description = group.description;
+					if (group.organizationName) profile.organizationName = group.organizationName;  
+					if (group.website) profile.website = group.website; 
+					if (group.foregroundImg) profile.foregroundImg = group.foregroundImg; 
+					if (group.backgroundImg) profile.backgroundImg = group.backgroundImg; 
+					if (group.description) profile.description = group.description;
 					
-						console.log("found " + groups.length + " groups, first one is " + group["@rid"]);
+					console.log("found " + groups.length + " groups, first one is " + group["@rid"]);
 					
-						var result = {groupname: group.groupname, profile : profile, ownedNetworks: {}};
+					var result = {groupname: group.groupname, profile : profile, ownedNetworks: {}};
 					
-						// get owned networks
-						var networkDescriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount";
-						var traverseExpression = "traverse V.out, E.in from " + groupRID + " while $depth <= 2"
+					// get owned networks
+					var networkDescriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount";
+					var traverseExpression = "traverse V.out, E.in from " + groupRID + " while $depth <= 2"
 			 
-						var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
-						module.db.command(networks_cmd, function(err, networks) {
-							if(common.checkErr(err, "getting owned networks", callback)){
-						
-								// process the networks
-								for (i in networks){
-									var network = networks[i];
-									network.jid = common.convertFromRID(network.jid);
-								}
-								result.ownedNetworks = networks;
+					var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
+					module.db.command(networks_cmd, function(err, networks) {
+						if(common.checkErr(err, "getting owned networks", callback)){
+					
+						// process the networks
+							for (i in networks){
+								var network = networks[i];
+								network.jid = common.convertFromRID(network.jid);
 							}
-						
-							callback({error : err, group : result});			
-						});	
-					}
-				}
-				catch (e){
-					console.log("caught error " + e);
-					callback({network : null, error : e.toString(), status : 500});	
+							result.ownedNetworks = networks;
+						}
+						callback({error : err, group : result});			
+					});	
 				}
 			}
-		});
-	}
-	else{
-		console.log('could not get group with malformed RID: ' + groupRID);
-		callback({status : 400})
-	}
+			catch (e){
+					console.log("caught error " + e);
+					callback({network : null, error : e.toString(), status : 500});	
+			}
+		}
+	});
 };
 
 exports.deleteGroup = function (groupRID, callback){

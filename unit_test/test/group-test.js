@@ -35,7 +35,7 @@ describe('NDEx Groups: ', function () {
 			function(err,res,body){
 				if(err) { done(err) }
 				else { 
-					console.log(JSON.stringify(body));
+					//console.log(JSON.stringify(body));
 					res.should.have.status(200);
 					joshJID = res.body.jid;
 					console.log('...complete');// confirmation of completion
@@ -261,10 +261,10 @@ describe('NDEx Groups: ', function () {
 			});
 		});
 		describe("getGroupByMalformedId", function(){
-			it("should get 400 for attempting to get group with malformed JID C21R0", function(done){
+			it("should get 400 for attempting to get group with malformed JID CC21R0", function(done){
 				request({
 						method : 'GET',
-						url : baseURL + '/groups/C21R0'
+						url : baseURL + '/groups/CC21R0'
 					},
 					function(err,res,body){
 						if(err) { done(err) }
@@ -279,7 +279,6 @@ describe('NDEx Groups: ', function () {
 		
 	});
 	
-	//preliminary teardown
 	after( function (done) {
 		console.log('\nteardown: group test')
 		request({

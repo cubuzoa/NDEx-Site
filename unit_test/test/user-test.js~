@@ -87,7 +87,7 @@ describe('NDEx Users: ', function () {
   		request({
 							method : 'POST',
 							url : baseURL + '/users', 
-							json : {username : "fred", password : "bird"}
+							json : {username : "Henry", password : "password"}
 				},
   				function(err, res, body){
   					if(err) { done(err) }  
@@ -227,14 +227,14 @@ describe('NDEx Users: ', function () {
   
   describe('getUserByMalformedUserId', function(){
   
-  	it("should get 400 for getting user by malformed JID, WC21R3", function (done){
+  	it("should get 404 for getting user by malformed JID, WC21R3", function (done){
   		request({
   				url: baseURL + '/users/WC21R3' //get 404 if W21R3
   				},
   				function(err, res, body){
   					if(err) { done(err) }  
   					else {
-	  					res.should.have.status(400)
+	  					res.should.have.status(404)
 	  					done();
   					}
   				});	
