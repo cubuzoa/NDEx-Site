@@ -32,34 +32,33 @@ toAccountId (JID)
 requestDescription
 
 */
-/*
-exports.createRequest = function(fromAccountRID, toAccountRID, requestDescription, callback){
-	console.log("calling createRequest with arguments fromAccountRID = '" + fromAccountRID + "' toAccountRID = '" + toAccountRID + "'");
-	// account RID checking will be handled with new standard methods
-	
-	// OK now just adapt this insert for xRequest instead of xUser
-	
-	// xRequest needs to have fields for toAccount, fromAccount, requestType, message, and group
-	
-	// we will extract the last 3 from requestDescription
-	
-	var insertUserCmd = "insert into xUser (username, password) values('" + username + "', '" + password + "')";
 
-				//console.log(insertUserCmd);
-				module.db.command(insertUserCmd, function(err, results) {
-					if (err){
-						console.log("insert of new user yields error : " + err);
-						callback({error : err});
-					} else {
-						var user = results[0];
-						//console.log(JSON.stringify(user));
-						callback({status: 200, error : err, jid: user['@rid'], username: user['username']});
-					}
+exports.createRequest = function(fromAccountRID, toAccountRID, requestType, message, aboutRID, callback){
+	console.log("calling createRequest with arguments fromAccountRID = '" + fromAccountRID + "' toAccountRID = '" + toAccountRID + "'");
+	
+	var msg = message || "";
+	
+	// TODO:	
+	// Check that requestType is one of known types
+	// Ensure that message is properly escaped for storage	
+	// Ensure that aboutRID is non-null when required
+	
+
+	var cmd = "insert into xRequest (toAccount, fromAccount, requestType, message, about) " 
+						+ "values('" + toAccountRID + "', '" + fromAccountRID + "', '" + requestType + "', '" + aboutRID + "', '" + message + "')";
+
+	//console.log(cmd);
+	module.db.command(cmd, function(err, results) {
+		if (common.checkErr(err, "insert of new request causes : " + err, callback)){
+			var request = results[0];
+			//console.log(JSON.stringify(request));
+			callback({status: 200, error : err, jid: request['@rid']});
+		}
 					
-				});
+	});  // close insert command
 
 };
-*/
+
 
 /*
 
@@ -76,6 +75,28 @@ Route Parameters:
 requestid (JID)
 
 */
+
+exports.getRequest = function(requestRID, callback){
+	console.log("calling getRequest with userRID = '" + requestRID + "'");
+	var cmd = "select from xRequest where @rid = " + requestRID + "";
+	console.log(cmd);
+	module.db.command(cmd, function(err, requests) {
+
+		if (common.checkErr(err, "finding request", callback)){
+			var request = requests[0];
+			//console.log(JSON.stringify(request));
+			callback({	status: 200, 
+						error : err, 
+						jid: request['@rid'], 
+						fromAccount: request.fromAccount,
+						toAccount: request.toAccount,
+						requestType: request.requestType,
+						about: request.about,
+						message: request.message
+					});
+		}
+	});
+};
 
 /*
 
