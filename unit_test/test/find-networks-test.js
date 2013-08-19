@@ -39,6 +39,7 @@ describe('NDEx Find Networks: ', function (done) {
 			function(err, res, body){
 				if(err) { done(err) }
 				else {
+					//console.log(res.body.error);
 					res.should.have.status(200);
 					networkOwnerJID = res.body.jid;
 					console.log('...user created...creating network...');
