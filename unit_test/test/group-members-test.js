@@ -20,7 +20,10 @@ var baseURL = 'http://localhost:3333';
 console.log("starting group members test");
  
 describe('NDEx Group Members: ', function () {
-	var jid = {groupOwner : '', groupMember : '', group1 : ''};
+	//var jid = {groupOwner : '', groupMember : '', group1 : ''};
+	var groupOwnerJID = null;
+	var groupMemberJID = null;
+	var group1JID = null;
 	before( function (done) {
 		console.log('\nsetup: group members test');
 		request({
@@ -33,7 +36,7 @@ describe('NDEx Group Members: ', function () {
 				else { 
 					//console.log(JSON.stringify(body));
 					res.should.have.status(200);
-					jid.groupOwner = res.body.jid;
+					groupOwnerJID = res.body.jid;
 					console.log('...1 user created...creating second user...');
 					request({
 							method : 'POST',
@@ -45,18 +48,18 @@ describe('NDEx Group Members: ', function () {
 							else { 
 								//console.log(JSON.stringify(body));
 								res.should.have.status(200);
-								jid.groupMember = res.body.jid;
+								groupMemberJID = res.body.jid;
 								console.log('...2 users created...creating group...');
 								request({
 										method : 'POST',
 										url : baseURL + '/groups/',
-										json : {userid : jid.groupOwner , groupName : "Group1"}
+										json : {userid : groupOwnerJID , groupName : "Group1"}
 									},
 									function(err,res,body){
 										if(err) { done(err) }
 										else {
 											res.should.have.status(200);
-											jid.group1 = res.body.jid;
+											group1JID = res.body.jid;
 											done();
 										}
 									}
@@ -69,11 +72,28 @@ describe('NDEx Group Members: ', function () {
 		);//close create group owner
 	});
 	describe("Should : ", function(){
+		var request1JID = null;
 		it("should get 200 for creating request from group owner to group member", function(done){
 			request({
 					method : 'POST',
 					url : baseURL + '/requests',
-					json : {toid : jid.groupMember, fromid : jid.groupOwner}
+					json : {toid : groupMemberJID, fromid : groupOwnerJID, requestType: 'groupInvitation', message: 'this is a test', aboutid: group1JID}
+				},
+				function(err,res,body){
+					if(err) { done(err) }
+					else {
+						res.should.have.status(200);
+						request1JID = res.body.jid;
+						done();
+					}
+				}
+			);
+		});
+		it("should get 200 for deleting request1", function(done){
+			request({
+					method : 'POST',
+					url : baseURL + '/requests/' + request1JID,
+					json : {approval : "approve"}
 				},
 				function(err,res,body){
 					if(err) { done(err) }
@@ -90,7 +110,7 @@ describe('NDEx Group Members: ', function () {
 		console.log('\nteardown: group members test')
 		request({
 				method : 'DELETE',
-				url : baseURL + '/groups/' + jid.group1	
+				url : baseURL + '/groups/' + group1JID	
 			},
 	  		function(err, res, body){
 	  			if(err) { done(err) }
@@ -99,7 +119,7 @@ describe('NDEx Group Members: ', function () {
 	  				console.log('...group deleted...deleting group member...');
 	  				request({
 							method : 'DELETE',
-							url : baseURL + '/users/' + jid.groupMember	
+							url : baseURL + '/users/' + groupMemberJID	
 						},
 				  		function(err, res, body){
 				  			if(err) { done(err) }
@@ -108,7 +128,7 @@ describe('NDEx Group Members: ', function () {
 				  				console.log('...group member deleted...deleting group owner...');
 				  				request({
 										method : 'DELETE',
-										url : baseURL + '/users/' + jid.groupOwner	
+										url : baseURL + '/users/' + groupOwnerJID	
 									},
 							  		function(err, res, body){
 							  			if(err) { done(err) }

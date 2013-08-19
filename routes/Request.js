@@ -98,6 +98,17 @@ exports.getRequest = function(requestRID, callback){
 	});
 };
 
+exports.processRequest = function(requestid, approval, callback, errorHandler){
+	console.log("calling processRequest for request " + requestid);
+	var cmd = "delete from " +  requestid + " where @class = 'xRequest' ";
+	console.log(cmd);
+	module.db.command(cmd, function(err, requests) {
+		if (common.checkErr(err, "deleting request", callback)){
+			callback({	status: 200, error : err});
+		}
+	});
+};
+
 /*
 
 findRequest
