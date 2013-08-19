@@ -26,11 +26,13 @@ exports.checkErr = function(err, where, callback){
 
 
 exports.ridCheck = function (checkList, res, callback){
-	// query about all ids on checklist
-	// scan results for errors
-	// if errors, summarize and respond
-	// otherwise continue with callback
-	
+	// query about all ids on checklist. IDs have already been converted to RID format
+/*
+	var queryIds = [];
+	for (i in checklist){
+	module.db.command(cmd, function(err, results){
+		
+*/	
 	callback();
 	return true;
 }

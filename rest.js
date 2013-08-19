@@ -852,14 +852,20 @@ app.post('/requests', function(req, res) {
     var fromid = req.body['fromid'];
     if(!common.checkJID(fromid)) res.send(400, { error: 'bad JID : ' + fromid});
     fromid = convertToRID(fromid);
+    var requestType = req.body['requestType'];
+    var message = req.body['message'];
+    var aboutid = req.body['aboutid'];
+    if(!common.checkJID(aboutid)) res.send(400, { error: 'bad JID : ' + aboutid});
+    aboutid = convertToRID(aboutid);
     common.ridCheck(
       [
             { rid: toid, class: 'xAccount'},
             { rid: fromid, class: 'xAccount'},
+            { rid: aboutid, class: 'xGroup'},
       ], 
       res,
       function(){
-        Request.createRequest(toid, fromid, function(data){
+        Request.createRequest(toid, fromid, requestType, message, aboutid, function(data){
             var status = data.status || 200;
           if(status && status == 200){
             data.jid = convertFromRID(data.jid);

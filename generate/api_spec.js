@@ -509,6 +509,7 @@ exports.Group = [
 	
 ];
 
+// fromAccountRID, toAccountRID, requestType, message, aboutRID, callback
 exports.Request = [
 
 	{	fn : "createRequest",
@@ -518,7 +519,10 @@ exports.Request = [
 		route : "/requests",
 		postData: {	
 				toid : { doc : "id of the recipient", type : "JID", class: "xAccount"},		
-				fromid : {  doc : "id of the requester", type : "JID", class: "xAccount"}
+				fromid : {  doc : "id of the requester", type : "JID", class: "xAccount"},
+				requestType : { doc : "type of the request", type : "string"},
+				message : { doc : "a human-readable text message to accompany the request", type: "string"},
+				aboutid : { doc : "id of the resource that the request is about", type : "JID", class: "xGroup"}
 						},
 		response: { 
 				jid : {doc : "id of the request", type : "JID", class: "xRequest"}

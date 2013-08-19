@@ -191,9 +191,9 @@ Expected to be a global for the client, expected to be undefined and then requir
 
 
 // toAccount creates a request to fromAccount.
-    exports.createRequest = function(toid, fromid, callback, errorHandler){
+    exports.createRequest = function(toid, fromid, requestType, message, aboutid, callback, errorHandler){
         var mergedRoute = '/requests';
-        exports.ndexPost(mergedRoute, {toid: toid, fromid: fromid}, callback, errorHandler);
+        exports.ndexPost(mergedRoute, {toid: toid, fromid: fromid, requestType: requestType, message: message, aboutid: aboutid}, callback, errorHandler);
     }
 
 
