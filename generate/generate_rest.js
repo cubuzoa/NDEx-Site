@@ -126,6 +126,7 @@ for (n in specs.resourceTypes){
 						
 						[
 						"      ], ",
+						"      res,",
 						"      function(){",
 						"        " + resourceType + "." + spec.fn + "(" + argumentString + "function(data){",
 						"            var status = data.status || 200;"
@@ -145,6 +146,7 @@ for (n in specs.resourceTypes){
 						"  // now catch random errors",
 						"  }",
 						"  catch (e){",
+						"          console.log('error in handler for " + spec.fn + " : ' + e); ",
 						"          res.send(500, {error : 'error in handler for " + spec.fn + " : ' + e}); ",
 						"  }",
 						

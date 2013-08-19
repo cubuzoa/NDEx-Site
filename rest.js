@@ -221,6 +221,7 @@ app.get('/', function(req, res) {
     common.ridCheck(
       [
       ], 
+      res,
       function(){
         System.index(function(data){
             var status = data.status || 200;
@@ -237,6 +238,7 @@ app.get('/', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for index : ' + e); 
           res.send(500, {error : 'error in handler for index : ' + e}); 
   }
 }); // close handler
@@ -247,6 +249,7 @@ app.get('/status', function(req, res) {
     common.ridCheck(
       [
       ], 
+      res,
       function(){
         System.status(function(data){
             var status = data.status || 200;
@@ -263,6 +266,7 @@ app.get('/status', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for status : ' + e); 
           res.send(500, {error : 'error in handler for status : ' + e}); 
   }
 }); // close handler
@@ -276,6 +280,7 @@ app.post('/users', function(req, res) {
     common.ridCheck(
       [
       ], 
+      res,
       function(){
         User.createUser(username, password, recoveryEmail, function(data){
             var status = data.status || 200;
@@ -293,6 +298,7 @@ app.post('/users', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for createUser : ' + e); 
           res.send(500, {error : 'error in handler for createUser : ' + e}); 
   }
 }); // close handler
@@ -308,6 +314,7 @@ app.post('/users/:userid/profile', function(req, res) {
       [
             { rid: userid, class: 'xUser'},
       ], 
+      res,
       function(){
         User.updateUserProfile(userid, profile, function(data){
             var status = data.status || 200;
@@ -324,6 +331,7 @@ app.post('/users/:userid/profile', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for updateUserProfile : ' + e); 
           res.send(500, {error : 'error in handler for updateUserProfile : ' + e}); 
   }
 }); // close handler
@@ -340,6 +348,7 @@ app.get('/users', function(req, res) {
     common.ridCheck(
       [
       ], 
+      res,
       function(){
         User.findUsers(searchExpression, limit, offset, function(data){
             var status = data.status || 200;
@@ -356,6 +365,7 @@ app.get('/users', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for findUsers : ' + e); 
           res.send(500, {error : 'error in handler for findUsers : ' + e}); 
   }
 }); // close handler
@@ -370,6 +380,7 @@ app.get('/users/:userid', function(req, res) {
       [
             { rid: userid, class: 'xUser'},
       ], 
+      res,
       function(){
         User.getUser(userid, function(data){
             var status = data.status || 200;
@@ -386,6 +397,7 @@ app.get('/users/:userid', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for getUser : ' + e); 
           res.send(500, {error : 'error in handler for getUser : ' + e}); 
   }
 }); // close handler
@@ -400,6 +412,7 @@ app.delete('/users/:userid', function(req, res) {
       [
             { rid: userid, class: 'xUser'},
       ], 
+      res,
       function(){
         User.deleteUser(userid, function(data){
             var status = data.status || 200;
@@ -416,6 +429,7 @@ app.delete('/users/:userid', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for deleteUser : ' + e); 
           res.send(500, {error : 'error in handler for deleteUser : ' + e}); 
   }
 }); // close handler
@@ -430,6 +444,7 @@ app.get('/users/:userid/workspace', function(req, res) {
       [
             { rid: userid, class: 'xUser'},
       ], 
+      res,
       function(){
         User.getUserWorkspace(userid, function(data){
             var status = data.status || 200;
@@ -446,6 +461,7 @@ app.get('/users/:userid/workspace', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for getUserWorkspace : ' + e); 
           res.send(500, {error : 'error in handler for getUserWorkspace : ' + e}); 
   }
 }); // close handler
@@ -464,6 +480,7 @@ app.post('/users/:userid/workspace', function(req, res) {
             { rid: userid, class: 'xUser'},
             { rid: networkid, class: 'xNetwork'},
       ], 
+      res,
       function(){
         User.addNetworkToUserWorkspace(userid, networkid, function(data){
             var status = data.status || 200;
@@ -480,6 +497,7 @@ app.post('/users/:userid/workspace', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for addNetworkToUserWorkspace : ' + e); 
           res.send(500, {error : 'error in handler for addNetworkToUserWorkspace : ' + e}); 
   }
 }); // close handler
@@ -498,6 +516,7 @@ app.delete('/users/:userid/workspace/:networkid', function(req, res) {
             { rid: userid, class: 'xUser'},
             { rid: networkid, class: 'xNetwork'},
       ], 
+      res,
       function(){
         User.deleteNetworkFromUserWorkspace(userid, networkid, function(data){
             var status = data.status || 200;
@@ -514,6 +533,7 @@ app.delete('/users/:userid/workspace/:networkid', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for deleteNetworkFromUserWorkspace : ' + e); 
           res.send(500, {error : 'error in handler for deleteNetworkFromUserWorkspace : ' + e}); 
   }
 }); // close handler
@@ -529,6 +549,7 @@ app.post('/agents', function(req, res) {
       [
             { rid: owner, class: 'xAccount'},
       ], 
+      res,
       function(){
         Agent.createAgent(name, owner, function(data){
             var status = data.status || 200;
@@ -546,6 +567,7 @@ app.post('/agents', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for createAgent : ' + e); 
           res.send(500, {error : 'error in handler for createAgent : ' + e}); 
   }
 }); // close handler
@@ -560,6 +582,7 @@ app.get('/agents/:agentid', function(req, res) {
       [
             { rid: agentid, class: 'xAgent'},
       ], 
+      res,
       function(){
         Agent.getAgent(agentid, function(data){
             var status = data.status || 200;
@@ -577,6 +600,7 @@ app.get('/agents/:agentid', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for getAgent : ' + e); 
           res.send(500, {error : 'error in handler for getAgent : ' + e}); 
   }
 }); // close handler
@@ -594,6 +618,7 @@ app.post('/agents/:agentid', function(req, res) {
       [
             { rid: agentId, class: 'xAgent'},
       ], 
+      res,
       function(){
         Agent.updateAgent(agentId, credentials, status, name, function(data){
             var status = data.status || 200;
@@ -610,6 +635,7 @@ app.post('/agents/:agentid', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for updateAgent : ' + e); 
           res.send(500, {error : 'error in handler for updateAgent : ' + e}); 
   }
 }); // close handler
@@ -625,6 +651,7 @@ app.post('/groups', function(req, res) {
       [
             { rid: userid, class: 'xUser'},
       ], 
+      res,
       function(){
         Group.createGroup(userid, groupName, function(data){
             var status = data.status || 200;
@@ -642,6 +669,7 @@ app.post('/groups', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for createGroup : ' + e); 
           res.send(500, {error : 'error in handler for createGroup : ' + e}); 
   }
 }); // close handler
@@ -657,6 +685,7 @@ app.post('/groups/:groupid/profile', function(req, res) {
       [
             { rid: groupid, class: 'xGroup'},
       ], 
+      res,
       function(){
         Group.updateGroupProfile(groupid, profile, function(data){
             var status = data.status || 200;
@@ -673,6 +702,7 @@ app.post('/groups/:groupid/profile', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for updateGroupProfile : ' + e); 
           res.send(500, {error : 'error in handler for updateGroupProfile : ' + e}); 
   }
 }); // close handler
@@ -689,6 +719,7 @@ app.get('/groups', function(req, res) {
     common.ridCheck(
       [
       ], 
+      res,
       function(){
         Group.findGroups(searchExpression, limit, offset, function(data){
             var status = data.status || 200;
@@ -705,6 +736,7 @@ app.get('/groups', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for findGroups : ' + e); 
           res.send(500, {error : 'error in handler for findGroups : ' + e}); 
   }
 }); // close handler
@@ -719,6 +751,7 @@ app.get('/groups/:groupid', function(req, res) {
       [
             { rid: groupid, class: 'xGroup'},
       ], 
+      res,
       function(){
         Group.getGroup(groupid, function(data){
             var status = data.status || 200;
@@ -735,6 +768,7 @@ app.get('/groups/:groupid', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for getGroup : ' + e); 
           res.send(500, {error : 'error in handler for getGroup : ' + e}); 
   }
 }); // close handler
@@ -749,6 +783,7 @@ app.delete('/groups/:groupid', function(req, res) {
       [
             { rid: groupid, class: 'xGroup'},
       ], 
+      res,
       function(){
         Group.deleteGroup(groupid, function(data){
             var status = data.status || 200;
@@ -765,6 +800,7 @@ app.delete('/groups/:groupid', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for deleteGroup : ' + e); 
           res.send(500, {error : 'error in handler for deleteGroup : ' + e}); 
   }
 }); // close handler
@@ -785,6 +821,7 @@ app.get('/groups/:groupid/members', function(req, res) {
       [
             { rid: groupid, class: 'xGroup'},
       ], 
+      res,
       function(){
         Group.getGroupMembers(groupid, searchExpression, limit, offset, function(data){
             var status = data.status || 200;
@@ -801,6 +838,7 @@ app.get('/groups/:groupid/members', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for getGroupMembers : ' + e); 
           res.send(500, {error : 'error in handler for getGroupMembers : ' + e}); 
   }
 }); // close handler
@@ -819,6 +857,7 @@ app.post('/requests', function(req, res) {
             { rid: toid, class: 'xAccount'},
             { rid: fromid, class: 'xAccount'},
       ], 
+      res,
       function(){
         Request.createRequest(toid, fromid, function(data){
             var status = data.status || 200;
@@ -836,6 +875,7 @@ app.post('/requests', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for createRequest : ' + e); 
           res.send(500, {error : 'error in handler for createRequest : ' + e}); 
   }
 }); // close handler
@@ -850,6 +890,7 @@ app.get('/requests/:requestid', function(req, res) {
       [
             { rid: requestid, class: 'xRequest'},
       ], 
+      res,
       function(){
         Request.getRequest(requestid, function(data){
             var status = data.status || 200;
@@ -866,6 +907,7 @@ app.get('/requests/:requestid', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for getRequest : ' + e); 
           res.send(500, {error : 'error in handler for getRequest : ' + e}); 
   }
 }); // close handler
@@ -881,6 +923,7 @@ app.post('/requests/:requestid', function(req, res) {
       [
             { rid: requestid, class: 'xRequest'},
       ], 
+      res,
       function(){
         Request.processRequest(requestid, approval, function(data){
             var status = data.status || 200;
@@ -897,6 +940,7 @@ app.post('/requests/:requestid', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for processRequest : ' + e); 
           res.send(500, {error : 'error in handler for processRequest : ' + e}); 
   }
 }); // close handler
@@ -911,6 +955,7 @@ app.get('/users/:userid/requests', function(req, res) {
       [
             { rid: userid, class: 'xUser'},
       ], 
+      res,
       function(){
         Request.findRequests(userid, function(data){
             var status = data.status || 200;
@@ -927,6 +972,7 @@ app.get('/users/:userid/requests', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for findRequests : ' + e); 
           res.send(500, {error : 'error in handler for findRequests : ' + e}); 
   }
 }); // close handler
@@ -942,6 +988,7 @@ app.post('/networks', function(req, res) {
       [
             { rid: accountid, class: 'undefined'},
       ], 
+      res,
       function(){
         Network.createNetwork(network, accountid, function(data){
             var status = data.status || 200;
@@ -959,6 +1006,7 @@ app.post('/networks', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for createNetwork : ' + e); 
           res.send(500, {error : 'error in handler for createNetwork : ' + e}); 
   }
 }); // close handler
@@ -973,6 +1021,7 @@ app.delete('/networks/:networkid', function(req, res) {
       [
             { rid: networkid, class: 'xNetwork'},
       ], 
+      res,
       function(){
         Network.deleteNetwork(networkid, function(data){
             var status = data.status || 200;
@@ -989,6 +1038,7 @@ app.delete('/networks/:networkid', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for deleteNetwork : ' + e); 
           res.send(500, {error : 'error in handler for deleteNetwork : ' + e}); 
   }
 }); // close handler
@@ -1003,6 +1053,7 @@ app.get('/networks/:networkid', function(req, res) {
       [
             { rid: networkid, class: 'xNetwork'},
       ], 
+      res,
       function(){
         Network.getNetwork(networkid, function(data){
             var status = data.status || 200;
@@ -1019,6 +1070,7 @@ app.get('/networks/:networkid', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for getNetwork : ' + e); 
           res.send(500, {error : 'error in handler for getNetwork : ' + e}); 
   }
 }); // close handler
@@ -1035,6 +1087,7 @@ app.get('/networks', function(req, res) {
     common.ridCheck(
       [
       ], 
+      res,
       function(){
         Network.findNetworks(searchExpression, limit, offset, function(data){
             var status = data.status || 200;
@@ -1051,6 +1104,7 @@ app.get('/networks', function(req, res) {
   // now catch random errors
   }
   catch (e){
+          console.log('error in handler for findNetworks : ' + e); 
           res.send(500, {error : 'error in handler for findNetworks : ' + e}); 
   }
 }); // close handler
