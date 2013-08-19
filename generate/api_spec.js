@@ -586,7 +586,7 @@ exports.Request = [
 ];			
 
 	
-	
+// TODO : error checking has to cope with networks owned by Groups	
 exports.Network = [
 
 	{	fn : "createNetwork",
@@ -600,7 +600,8 @@ exports.Network = [
 							  	required : true}, 
 				accountid : {		doc : "Account Id - User, Group, Agent",
 									type : "JID",
-									required : true
+									required : true,
+									class : "xUser"
 							}
 					},
 		response: { 

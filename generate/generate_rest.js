@@ -54,7 +54,7 @@ for (n in specs.resourceTypes){
 					argumentLines.push("    if(!common.checkJID(" + n + ")) res.send(400, { error: 'bad JID : ' + " + n + "});");
 
 					argumentLines.push("    " + n + " = convertToRID(" + n + ");");
-					ridCheckLines.push("            { rid: " + n + ", class: '" + param.class + "'},");
+					ridCheckLines.push("            { rid: " + n + " , objectClass: '" + param.class + "'},");
 				}				
 			};
 			
@@ -161,6 +161,8 @@ var connect_to_db_lines = fs.readFileSync('./generate_connect_to_db.js').toStrin
 lines = lines.concat(connect_to_db_lines);
 
 // init the resource types
+
+lines.push("common.init(db, function(err) {if (err) {throw err;}});");
 for (n in specs.resourceTypes){
 	resourceType = specs.resourceTypes[n];
 	lines.push("	" + resourceType + ".init(db, function(err) {if (err) {throw err;}});");

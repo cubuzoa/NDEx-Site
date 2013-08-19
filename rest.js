@@ -312,7 +312,7 @@ app.post('/users/:userid/profile', function(req, res) {
     var profile = req.body['profile'];
     common.ridCheck(
       [
-            { rid: userid, class: 'xUser'},
+            { rid: userid , objectClass: 'xUser'},
       ], 
       res,
       function(){
@@ -378,7 +378,7 @@ app.get('/users/:userid', function(req, res) {
     userid = convertToRID(userid);
     common.ridCheck(
       [
-            { rid: userid, class: 'xUser'},
+            { rid: userid , objectClass: 'xUser'},
       ], 
       res,
       function(){
@@ -410,7 +410,7 @@ app.delete('/users/:userid', function(req, res) {
     userid = convertToRID(userid);
     common.ridCheck(
       [
-            { rid: userid, class: 'xUser'},
+            { rid: userid , objectClass: 'xUser'},
       ], 
       res,
       function(){
@@ -442,7 +442,7 @@ app.get('/users/:userid/workspace', function(req, res) {
     userid = convertToRID(userid);
     common.ridCheck(
       [
-            { rid: userid, class: 'xUser'},
+            { rid: userid , objectClass: 'xUser'},
       ], 
       res,
       function(){
@@ -477,8 +477,8 @@ app.post('/users/:userid/workspace', function(req, res) {
     networkid = convertToRID(networkid);
     common.ridCheck(
       [
-            { rid: userid, class: 'xUser'},
-            { rid: networkid, class: 'xNetwork'},
+            { rid: userid , objectClass: 'xUser'},
+            { rid: networkid , objectClass: 'xNetwork'},
       ], 
       res,
       function(){
@@ -513,8 +513,8 @@ app.delete('/users/:userid/workspace/:networkid', function(req, res) {
     networkid = convertToRID(networkid);
     common.ridCheck(
       [
-            { rid: userid, class: 'xUser'},
-            { rid: networkid, class: 'xNetwork'},
+            { rid: userid , objectClass: 'xUser'},
+            { rid: networkid , objectClass: 'xNetwork'},
       ], 
       res,
       function(){
@@ -547,7 +547,7 @@ app.post('/agents', function(req, res) {
     owner = convertToRID(owner);
     common.ridCheck(
       [
-            { rid: owner, class: 'xAccount'},
+            { rid: owner , objectClass: 'xAccount'},
       ], 
       res,
       function(){
@@ -580,7 +580,7 @@ app.get('/agents/:agentid', function(req, res) {
     agentid = convertToRID(agentid);
     common.ridCheck(
       [
-            { rid: agentid, class: 'xAgent'},
+            { rid: agentid , objectClass: 'xAgent'},
       ], 
       res,
       function(){
@@ -616,7 +616,7 @@ app.post('/agents/:agentid', function(req, res) {
     var name = req.body['name'];
     common.ridCheck(
       [
-            { rid: agentId, class: 'xAgent'},
+            { rid: agentId , objectClass: 'xAgent'},
       ], 
       res,
       function(){
@@ -649,7 +649,7 @@ app.post('/groups', function(req, res) {
     var groupName = req.body['groupName'];
     common.ridCheck(
       [
-            { rid: userid, class: 'xUser'},
+            { rid: userid , objectClass: 'xUser'},
       ], 
       res,
       function(){
@@ -683,7 +683,7 @@ app.post('/groups/:groupid/profile', function(req, res) {
     var profile = req.body['profile'];
     common.ridCheck(
       [
-            { rid: groupid, class: 'xGroup'},
+            { rid: groupid , objectClass: 'xGroup'},
       ], 
       res,
       function(){
@@ -749,7 +749,7 @@ app.get('/groups/:groupid', function(req, res) {
     groupid = convertToRID(groupid);
     common.ridCheck(
       [
-            { rid: groupid, class: 'xGroup'},
+            { rid: groupid , objectClass: 'xGroup'},
       ], 
       res,
       function(){
@@ -781,7 +781,7 @@ app.delete('/groups/:groupid', function(req, res) {
     groupid = convertToRID(groupid);
     common.ridCheck(
       [
-            { rid: groupid, class: 'xGroup'},
+            { rid: groupid , objectClass: 'xGroup'},
       ], 
       res,
       function(){
@@ -819,7 +819,7 @@ app.get('/groups/:groupid/members', function(req, res) {
     offset = offset || 0;
     common.ridCheck(
       [
-            { rid: groupid, class: 'xGroup'},
+            { rid: groupid , objectClass: 'xGroup'},
       ], 
       res,
       function(){
@@ -859,9 +859,9 @@ app.post('/requests', function(req, res) {
     aboutid = convertToRID(aboutid);
     common.ridCheck(
       [
-            { rid: toid, class: 'xAccount'},
-            { rid: fromid, class: 'xAccount'},
-            { rid: aboutid, class: 'xGroup'},
+            { rid: toid , objectClass: 'xAccount'},
+            { rid: fromid , objectClass: 'xAccount'},
+            { rid: aboutid , objectClass: 'xGroup'},
       ], 
       res,
       function(){
@@ -894,7 +894,7 @@ app.get('/requests/:requestid', function(req, res) {
     requestid = convertToRID(requestid);
     common.ridCheck(
       [
-            { rid: requestid, class: 'xRequest'},
+            { rid: requestid , objectClass: 'xRequest'},
       ], 
       res,
       function(){
@@ -927,7 +927,7 @@ app.post('/requests/:requestid', function(req, res) {
     var approval = req.body['approval'];
     common.ridCheck(
       [
-            { rid: requestid, class: 'xRequest'},
+            { rid: requestid , objectClass: 'xRequest'},
       ], 
       res,
       function(){
@@ -959,7 +959,7 @@ app.get('/users/:userid/requests', function(req, res) {
     userid = convertToRID(userid);
     common.ridCheck(
       [
-            { rid: userid, class: 'xUser'},
+            { rid: userid , objectClass: 'xUser'},
       ], 
       res,
       function(){
@@ -992,7 +992,7 @@ app.post('/networks', function(req, res) {
     accountid = convertToRID(accountid);
     common.ridCheck(
       [
-            { rid: accountid, class: 'undefined'},
+            { rid: accountid , objectClass: 'xUser'},
       ], 
       res,
       function(){
@@ -1025,7 +1025,7 @@ app.delete('/networks/:networkid', function(req, res) {
     networkid = convertToRID(networkid);
     common.ridCheck(
       [
-            { rid: networkid, class: 'xNetwork'},
+            { rid: networkid , objectClass: 'xNetwork'},
       ], 
       res,
       function(){
@@ -1057,7 +1057,7 @@ app.get('/networks/:networkid', function(req, res) {
     networkid = convertToRID(networkid);
     common.ridCheck(
       [
-            { rid: networkid, class: 'xNetwork'},
+            { rid: networkid , objectClass: 'xNetwork'},
       ], 
       res,
       function(){
@@ -1125,6 +1125,7 @@ db.open(function(err) {
     }
 	console.log('Successfully connected to OrientDB');
 	routes.init(db, function(err) {if (err) {throw err;}});
+common.init(db, function(err) {if (err) {throw err;}});
 	System.init(db, function(err) {if (err) {throw err;}});
 	User.init(db, function(err) {if (err) {throw err;}});
 	Agent.init(db, function(err) {if (err) {throw err;}});

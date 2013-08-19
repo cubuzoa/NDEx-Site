@@ -1,5 +1,7 @@
 
-
+exports.init = function(orient, callback) {
+    module.db = orient;   
+};
 
 exports.convertFromRID = function (RID){
 	return RID.replace("#","C").replace(":", "R");
@@ -24,17 +26,63 @@ exports.checkErr = function(err, where, callback){
 	return true;
 };
 
-
-exports.ridCheck = function (checkList, res, callback){
-	// query about all ids on checklist. IDs have already been converted to RID format
-/*
-	var queryIds = [];
-	for (i in checklist){
-	module.db.command(cmd, function(err, results){
+exports.ridCheck = function (checklist, res, callback){
+	if (checklist && checklist.length > 0){
+		// query about all ids on checklist. IDs have already been converted to RID format
+		var queryIds = [];
+		for (k in checklist){
+			var spec = checklist[k];
+			queryIds.push(spec.rid);
+		}
+		var cmd = "select @rid as rid, @class as objectClass from [" + queryIds.join(", ") + "];";
+		console.log("ridCheck : " + cmd);
+		module.db.command(cmd, function(err, results){
+			if (err){
+				console.log('error verifying ids : ' + err);
+				res.send(500, {error : 'error verifying ids : ' + err});
+			} else {
 		
-*/	
-	callback();
-	return true;
+				var errors = [];
+			
+				for (i in results){
+					var result = results[i];
+					for (j in checklist){
+						spec = checklist[j];
+						if (result.rid == spec.rid){
+							// ok, found an object by that RID
+							if (spec.objectClass == result.objectClass){
+								spec.status = "ok";
+							} else {
+								spec.status = "for " + result.rid + ", unexpected class " + result.objectClass + " instead of expected class " + spec.objectClass;
+							}
+						}
+					}
+				}
+
+				for (j in checklist){
+					var spec = checklist[j];
+					if (typeof(spec.status) == 'undefined'){
+						// not found
+						errors.push(spec.rid + " not found");
+					} else if (spec.status != "ok"){
+						errors.push(spec.status);
+					}
+				}
+			
+				if (errors.length > 0){
+					console.log("Error(s) in ID verification: "  + errors.join(", "));
+					res.send(404, {error : "Error(s) in ID verification: "  + errors.join(", ")});
+				} else {
+					console.log("passed ridCheck, going to callback");
+					callback();
+					return true;
+				}
+			}
+		});
+	} else {
+				callback();
+				return true;
+	}
 }
 
 exports.checkJID = function(jid){
