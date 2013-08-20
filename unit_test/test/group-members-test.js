@@ -82,7 +82,7 @@ describe('NDEx Group Members: ', function () {
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
-						console.log(body.error);
+						//console.log(body.error);
 						res.should.have.status(200);
 						request1JID = res.body.jid;
 						done();

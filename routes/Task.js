@@ -18,20 +18,24 @@ Post Data Parameters:
 task (JSON)
 userid (JID)
 */
-exports.createTask = function( task, userid ) {
-	console.log("calling createTask with arguments '" + task + "' '" + userid + "'";
+exports.createTask = function( task, userid, callback, errorHandler ) {
+	console.log("calling createTask with arguments '" + task + "' '" + userid + "'");
 	
-	var cmd = "insert into xTask;
+	var cmd = "insert into xTask (owner, status, startTime) values( '" + userid + "', '" + "'active'" + "', '" + "'August'" + ")";
 	
 	module.db.command(cmd, function(err, results) {
 		if (common.checkErr(err, "insert of new task causes : " + err, callback)){
 			var task = results[0];
-			//console.log(JSON.stringify(request));
-			callback({status: 200, error : err, jid: task['@rid']});
+			var updateCmd = "update " + userid + " add task = " + task['@rid'];
+			module.db.command(updateCmd, function(err, results) {
+				if (common.checkErr(err, "update of task causes : " + err, callback)){
+					callback({status: 200, error : err, jid: task['@rid']});
+				}
+			});//close update command
 		}
 					
 	});  // close insert command
-});
+};
 
 /*
 getTask
@@ -44,7 +48,7 @@ Route Parameters:
 
 taskid (JID)
 */
-exports.getTask = function( taskid ) {
+exports.getTask = function( taskid, callback, errorHandler ) {
 	console.log("calling getTask with RID = '" + taskid + "'");
 	var cmd = "select from xTask where @rid = " + taskid + "";
 	console.log(cmd);
@@ -55,10 +59,10 @@ exports.getTask = function( taskid ) {
 			//console.log(JSON.stringify(request));
 			callback({	status: 200, 
 					error : err, 
-					jid: task['@rid']	});
+					task : task	});
 		}
 	});
-});
+};
 
 /*
 updateTask
@@ -75,14 +79,17 @@ Post data Parameters:
 status (string)
 
 */
-exports.updateTask = function( taskid, taskStatus ) {
-	var setString = 'status = inactive';
+exports.updateTask = function( taskid, taskStatus, callback, errorHandler ) {
+	console.log("calling updateTask with arguments " + "'" + taskid + "' " + "'" + taskStatus + "'");
+	var setString = "status = '" + taskStatus + "'";
 	var updateCmd = "update " + taskid + " set " + setString;
 	
 	module.db.command(updateCmd, function(err, result){
-		callback({error: err, status : 200})
+		if (common.checkErr(err, "updating task", callback)){
+			callback({error: err, status : 200});
+		}
 	});
-});
+};
 
 /*
 deleteTask
@@ -96,13 +103,13 @@ Route Parameters:
 taskid (JID)
 
 */
-exports.deleteTask = function( taskid ) {
+exports.deleteTask = function( taskid, callback, errorHandler ) {
 	console.log("calling deleteTask for  " + taskid);
 	var cmd = "delete from " + taskid + " where @class = 'xTask' ";
 	console.log(cmd);
 	module.db.command(cmd, function(err, requests) {
 		if (common.checkErr(err, "deleting task", callback)){
-			callback({	status: 200, error : err});
+			callback({status: 200, error : err});
 		}
 	});
-});
+};
