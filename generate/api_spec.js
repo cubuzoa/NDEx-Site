@@ -876,14 +876,15 @@ exports.Task = [
 		method : "POST",
 		route : "/tasks",
 		postData: {	
-				task : { doc : "task specification",
-								type : "JSON"
-							},		
-				userid : {  doc : "Id of the user",
-								type : "JID", class : "xUser"}
+				task : { 	doc : "task specification",
+							type : "JSON"
+						},		
+				userid : {  	doc : "Id of the user",
+								type : "JID", 
+								class : "xUser"}
 						},
 		response: { 
-				id : {doc : "id of the task", type : "JID", class : "xTask"}
+				jid : {doc : "id of the task", type : "JID", class : "xTask"}
 				},
 		exceptions: [
 				"400 error in task specification",
@@ -900,7 +901,7 @@ exports.Task = [
 				taskid : {doc : "id of the task", type : "JID", class : "xTask"}
 				},
 		response: { 
-				task : { doc : "parameters and status of the task",
+				task : { 	doc : "parameters and status of the task",
 							type : "JSON"}
 				},
 		exceptions: [
@@ -918,12 +919,12 @@ exports.Task = [
 				taskid : {doc : "id of the task", type : "JID", class : "xTask"}
 				},
 		postData: {
-				status : { doc : "activity status, either active or inactive",
+				status : { 	doc : "activity status, either active or inactive",
 							type : "string"
 						}
 					},
 		response: { 
-				task : { doc : "parameters and status of the task",
+				task : { 	doc : "parameters and status of the task",
 							type : "JSON"}
 				},
 		exceptions: [
