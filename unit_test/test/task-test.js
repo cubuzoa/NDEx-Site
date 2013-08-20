@@ -89,7 +89,7 @@ describe('NDEx Tasks: ', function () {
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
-						console.log("\n"body.task);
+						console.log("\n" + body.task);
 						res.should.have.status(200);
 						done();
 					}
