@@ -1131,7 +1131,7 @@ app.post('/tasks', function(req, res) {
         Task.createTask(task, userid, function(data){
             var status = data.status || 200;
           if(status && status == 200){
-            data.id = convertFromRID(data.id);
+            data.jid = convertFromRID(data.jid);
           }
             res.send(status, data);
 
