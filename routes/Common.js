@@ -26,6 +26,13 @@ exports.checkErr = function(err, where, callback){
 	return true;
 };
 
+exports.classMatch = function(specifiedClass, actualClass){
+	if (specifiedClass == actualClass) return true;
+	//  workaround to deal with superclasses used in the API
+	if (specifiedClass == "xAccount" && (actualClass == "xUser" || actualClass == "xGroup")) return true;
+	return false;
+}
+
 exports.ridCheck = function (checklist, res, callback){
 	if (checklist && checklist.length > 0){
 		// query about all ids on checklist. IDs have already been converted to RID format
@@ -50,7 +57,7 @@ exports.ridCheck = function (checklist, res, callback){
 						spec = checklist[j];
 						if (result.rid == spec.rid){
 							// ok, found an object by that RID
-							if (spec.objectClass == result.objectClass){
+							if (exports.classMatch(spec.objectClass,result.objectClass)){
 								spec.status = "ok";
 							} else {
 								spec.status = "for " + result.rid + ", unexpected class " + result.objectClass + " instead of expected class " + spec.objectClass;
