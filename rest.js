@@ -1115,6 +1115,137 @@ app.get('/networks', function(req, res) {
   }
 }); // close handler
 
+// User creates a Task
+app.post('/tasks', function(req, res) {
+  try {
+    var task = req.body['task'];
+    var userid = req.body['userid'];
+    if(!common.checkJID(userid)) res.send(400, { error: 'bad JID : ' + userid});
+    userid = convertToRID(userid);
+    common.ridCheck(
+      [
+            { rid: userid , objectClass: 'xUser'},
+      ], 
+      res,
+      function(){
+        Task.createTask(task, userid, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+            data.id = convertFromRID(data.id);
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          console.log('error in handler for createTask : ' + e); 
+          res.send(500, {error : 'error in handler for createTask : ' + e}); 
+  }
+}); // close handler
+
+// Get the parameters and status of a task
+app.get('/tasks/:taskid', function(req, res) {
+  try {
+    var taskid = req.params['taskid'];
+    if(!common.checkJID(taskid)) res.send(400, { error: 'bad JID : ' + taskid});
+    taskid = convertToRID(taskid);
+    common.ridCheck(
+      [
+            { rid: taskid , objectClass: 'xTask'},
+      ], 
+      res,
+      function(){
+        Task.getTask(taskid, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          console.log('error in handler for getTask : ' + e); 
+          res.send(500, {error : 'error in handler for getTask : ' + e}); 
+  }
+}); // close handler
+
+// Set the parameters (such as status) of a task. Can inactivate an active task or activate an inactive task
+app.post('/tasks/:taskid', function(req, res) {
+  try {
+    var taskid = req.params['taskid'];
+    if(!common.checkJID(taskid)) res.send(400, { error: 'bad JID : ' + taskid});
+    taskid = convertToRID(taskid);
+    var status = req.body['status'];
+    common.ridCheck(
+      [
+            { rid: taskid , objectClass: 'xTask'},
+      ], 
+      res,
+      function(){
+        Task.updateTask(taskid, status, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          console.log('error in handler for updateTask : ' + e); 
+          res.send(500, {error : 'error in handler for updateTask : ' + e}); 
+  }
+}); // close handler
+
+// Delete an inactive or completed task
+app.delete('/tasks/:taskid', function(req, res) {
+  try {
+    var taskid = req.params['taskid'];
+    if(!common.checkJID(taskid)) res.send(400, { error: 'bad JID : ' + taskid});
+    taskid = convertToRID(taskid);
+    common.ridCheck(
+      [
+            { rid: taskid , objectClass: 'xTask'},
+      ], 
+      res,
+      function(){
+        Task.deleteTask(taskid, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          console.log('error in handler for deleteTask : ' + e); 
+          res.send(500, {error : 'error in handler for deleteTask : ' + e}); 
+  }
+}); // close handler
+
 
 var server = new orientdb.Server(serverConfig);
 var db = new orientdb.GraphDb('ndex', server, dbConfig);

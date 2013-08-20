@@ -246,6 +246,34 @@ Expected to be a global for the client, expected to be undefined and then requir
     }
 
 
+// User creates a Task
+    exports.createTask = function(task, userid, callback, errorHandler){
+        var mergedRoute = '/tasks';
+        exports.ndexPost(mergedRoute, {task: task, userid: userid}, callback, errorHandler);
+    }
+
+
+// Get the parameters and status of a task
+    exports.getTask = function(taskid, callback, errorHandler){
+        var mergedRoute = '/tasks/' + encodeURIComponent(taskid) + '';
+        exports.ndexGet(mergedRoute, {},callback, errorHandler);
+    }
+
+
+// Set the parameters (such as status) of a task. Can inactivate an active task or activate an inactive task
+    exports.updateTask = function(taskid, status, callback, errorHandler){
+        var mergedRoute = '/tasks/' + encodeURIComponent(taskid) + '';
+        exports.ndexPost(mergedRoute, {status: status}, callback, errorHandler);
+    }
+
+
+// Delete an inactive or completed task
+    exports.deleteTask = function(taskid, callback, errorHandler){
+        var mergedRoute = '/tasks/' + encodeURIComponent(taskid) + '';
+        exports.ndexDelete(mergedRoute, callback, errorHandler);
+    }
+
+
 
 })(typeof exports === 'undefined'? this['ndexClient']={}: exports);
 

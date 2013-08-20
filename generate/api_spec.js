@@ -871,7 +871,7 @@ exports.Network = [
 exports.Task = [
 
 	{	fn : "createTask",
-		status : "inactive",
+		status : "active",
 		doc : "User creates a Task",
 		method : "POST",
 		route : "/tasks",
@@ -892,7 +892,7 @@ exports.Task = [
 	},		
 
 	{	fn : "getTask",
-		status : "inactive",
+		status : "active",
 		doc : "Get the parameters and status of a task",
 		method : "GET",
 		route : "/tasks/:taskid",
@@ -910,7 +910,7 @@ exports.Task = [
 
 
 	{	fn : "updateTask",
-		status : "inactive",
+		status : "active",
 		doc : "Set the parameters (such as status) of a task. Can inactivate an active task or activate an inactive task",
 		method : "POST",
 		route : "/tasks/:taskid",
@@ -934,7 +934,7 @@ exports.Task = [
 	},	
 	
 	{	fn : "deleteTask",
-		status : "inactive",
+		status : "active",
 		doc : "Delete an inactive or completed task",
 		method : "DELETE",
 		route : "/tasks/:taskid",
