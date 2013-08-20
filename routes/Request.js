@@ -77,7 +77,7 @@ requestid (JID)
 */
 
 exports.getRequest = function(requestRID, callback){
-	console.log("calling getRequest with userRID = '" + requestRID + "'");
+	console.log("calling getRequest with RID = '" + requestRID + "'");
 	var cmd = "select from xRequest where @rid = " + requestRID + "";
 	console.log(cmd);
 	module.db.command(cmd, function(err, requests) {
