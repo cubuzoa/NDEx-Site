@@ -56,6 +56,7 @@ app.configure(function() {
   //
   app.use('/css', express.static(__dirname + '/css'));
   app.use('/img', express.static(__dirname + '/img'));
+  app.use('/account_img', express.static(__dirname + '/account_img'));
   app.use('/js', express.static(__dirname + '/js'));
   app.use(express.static(__dirname + '/public'));
 });
