@@ -21,7 +21,7 @@ userid (JID)
 exports.createTask = function( task, userid, callback, errorHandler ) {
 	console.log("calling createTask with arguments '" + task + "' '" + userid + "'");
 	
-	var cmd = "insert into xTask (owner, status, startTime) values( '" + userid + "', '" + "'active'" + "', '" + "'August'" + ")";
+	var cmd = "insert into xTask (owner, status, startTime) values( '" + userid + "', '" + "'active'" + "', sysdate('yyMMddHHmmssSSS'))";
 	
 	module.db.command(cmd, function(err, results) {
 		if (common.checkErr(err, "insert of new task causes : " + err, callback)){

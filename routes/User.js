@@ -1,6 +1,41 @@
 module.db = null;
 
 var common = require("./Common.js");
+var fs = require('fs');
+
+function uploadImg( path, destination, name, callback) {
+	//TODO read comments on here and where used
+	//add name check for filename to avoid overwrite, maybe include jid?
+	//fs.readFile and fs.writeFile may be replaced by fs.rename
+	var tempPath = path; //hardwired for now
+	var targetPath =  destination + name + '.jpg';
+	var results = { name : name + '.jpg', filesize : ''};
+	fs.readFile('img/foreground/treyideker.jpg', function (err, data) {
+		// ...
+		if (err){
+        	callback(err);
+        } else {
+			fs.writeFile(targetPath, data, function (err) {
+				if (err){
+					callback(err);
+				} else {
+					// delete the temporary file, so that the explicitly set temporary upload dir does not get filled with unwanted files
+					fs.unlink(tempPath, function() {
+						if (err) {
+							callback( err);
+						} else {
+							fs.stat(targetPath, function (err, stats) {
+								results.filesize = stats.size;
+					 			console.log('File uploaded to: ' + targetPath + ' - ' + stats.size + ' bytes');
+					 			callback(err, results);
+							});
+						}
+					});
+				}
+			});
+		}
+	});
+}
 
 exports.init = function(orient, callback) {
     module.db = orient;   
@@ -38,20 +73,25 @@ exports.createUser = function(username, password, recoveryEmail, callback){
 };
 
 exports.updateUserProfile = function(userRID, profile, callback){
-	var profileStrings = [
-			"firstName = '" + profile.firstName + "'",
-			"lastName = '" + profile.lastName + "'",
-			"website = '" + profile.website + "'",
-			"foregroundImg = '" + profile.foregroundImg + "'",
-			"backgroundImg = '" + profile.backgroundImg + "'",
-			"description = '" + profile.description + "'"],
-		setString = profileStrings.join(", "),
-		updateCmd = "update " + userRID + " set " + setString;
-		console.log(updateCmd);
-	module.db.command(updateCmd, function(err, result){
-		callback({profile : profile, error: err, status : 200})
+	uploadImg(profile.foregroundImg,'img/foreground/', 'name', function(err, results){
+		if (common.checkErr(err, "uploading foreground image", callback)){
+			profile.foregroundImg = results.name;
+			//TODO add uploader for background img
+			var profileStrings = [
+					"firstName = '" + profile.firstName + "'",
+					"lastName = '" + profile.lastName + "'",
+					"website = '" + profile.website + "'",
+					"foregroundImg = '" + profile.foregroundImg + "'",
+					"backgroundImg = '" + profile.backgroundImg + "'",
+					"description = '" + profile.description + "'"],
+				setString = profileStrings.join(", "),
+				updateCmd = "update " + userRID + " set " + setString;
+				console.log(updateCmd);
+			module.db.command(updateCmd, function(err, result){
+				callback({profile : profile, error: err, status : 200})
+			});
+		}
 	});
-
 };
 
 exports.findUsersByUserName = function (nameExpression, limit, offset, callback){

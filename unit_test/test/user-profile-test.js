@@ -66,12 +66,12 @@ describe('NDEx User Profile: ', function () {
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
-							res.should.have.status(200)
-							var profile = res.body.user.profile
-							profile = profile.toString
-							profile.should.have.length(0)
+							res.should.have.status(200);
+							var profile = res.body.user.profile;
+							profile = profile.toString;
+							profile.should.have.length(0);
 							//console.log(profile.length)
-							done()
+							done();
 						}
 					}
 				);
@@ -84,7 +84,7 @@ describe('NDEx User Profile: ', function () {
 				harryProfile.firstName = 'Harry';
 				harryProfile.lastName = 'Potter';
 				harryProfile.website = 'www.harrypotterwizardscollection.com‎';
-				harryProfile.foregroundImg = 'harry.jpg';
+				harryProfile.foregroundImg ='../img/foreground/treyideker.jpg';
 				harryProfile.backgroundImg = 'wizard.jpg';
 				harryProfile.description = 'I am a wizard';
 				
@@ -96,9 +96,9 @@ describe('NDEx User Profile: ', function () {
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
-							res.should.have.status(200)
-							//console.log(typeof(harryProfile))
-							done()
+							res.should.have.status(200);
+							//console.log(res.body);
+							done();
 						}
 					}
 				);
@@ -120,7 +120,7 @@ describe('NDEx User Profile: ', function () {
 							profile = profile.toString
 							profileAlpha = harryProfile.toString
 							profile.should.equal(profileAlpha)
-							//console.log(harryProfile)
+							//console.log(res.body)
 							done()
 						}
 					}
