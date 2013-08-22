@@ -2,6 +2,10 @@
 node_modules/*
 test_db/test_networks/*
 test_db/test_accounts/*
+account_img/users/foreground/*
+account_img/users/background/*
+account_img/groups/foreground/*
+account_img/groups/background/*
 views/*~
 routes/*~
 js/*~
