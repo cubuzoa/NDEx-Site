@@ -73,22 +73,38 @@ exports.createUser = function(username, password, recoveryEmail, callback){
 };
 
 exports.updateUserProfile = function(userRID, profile, callback){
-	uploadImg(profile.foregroundImg,'img/foreground/', 'name', function(err, results){
-		if (common.checkErr(err, "uploading foreground image", callback)){
-			profile.foregroundImg = results.name;
-			//TODO add uploader for background img
-			var profileStrings = [
-					"firstName = '" + profile.firstName + "'",
-					"lastName = '" + profile.lastName + "'",
-					"website = '" + profile.website + "'",
-					"foregroundImg = '" + profile.foregroundImg + "'",
-					"backgroundImg = '" + profile.backgroundImg + "'",
-					"description = '" + profile.description + "'"],
-				setString = profileStrings.join(", "),
-				updateCmd = "update " + userRID + " set " + setString;
-				console.log(updateCmd);
-			module.db.command(updateCmd, function(err, result){
-				callback({profile : profile, error: err, status : 200})
+	//TODO add uploader for background img 
+	var cmd = "select from xUser where @rid = " + userRID + "";
+	console.log(cmd);
+	module.db.command(cmd, function(err, users) {
+		if (common.checkErr(err, "finding user", callback)){
+			var user = users[0];
+			
+			uploadImg(profile.foregroundImg,'account_img/users/foreground/', user.username, function(err, results){
+				if (common.checkErr(err, "uploading foreground image", callback)){
+					profile.foregroundImg = results.name;
+					
+					uploadImg(profile.backgroundImg,'account_img/users/background/', user.username, function(err, results){
+						if (common.checkErr(err, "uploading foreground image", callback)){
+							profile.backgroundImg = results.name;
+							
+							var profileStrings = [
+									"firstName = '" + profile.firstName + "'",
+									"lastName = '" + profile.lastName + "'",
+									"website = '" + profile.website + "'",
+									"foregroundImg = '" + profile.foregroundImg + "'",
+									"backgroundImg = '" + profile.backgroundImg + "'",
+									"description = '" + profile.description + "'"],
+								setString = profileStrings.join(", "),
+								updateCmd = "update " + userRID + " set " + setString;
+								
+							console.log(updateCmd);
+							module.db.command(updateCmd, function(err, result){
+								callback({profile : profile, error: err, status : 200})
+							});
+						}
+					});
+				}
 			});
 		}
 	});

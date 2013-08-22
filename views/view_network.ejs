@@ -5,16 +5,19 @@
 
 <div class="tabbable">
 	<div class="pageTitle">
-		<div class="btn-group" onclick="onWorkspace()">
-			<button class="btn btn-large " id="viewNetTitle"></button>
-			<button class="btn btn-large  dropdown-toggle" onclick="onWorkspace()" data-toggle="dropdown">
-				<span class="caret"></span>
+		<div class="btn-group" > 
+			<h4 id = "viewNetTitle"> Network Title </h4>
+		</div>
+		<div class="btn-group pull-right">
+			<button class = "btn btn-large dropdown-toggle" onclick="onWorkspace()" data-toggle="dropdown"> 
+				<i class="icon-cog icon-large"></i> 
 			</button>
 			<ul class="dropdown-menu">
 				<li id="netStatus"></li>
+				<li> <a href = "#networkDisplay" data-toggle="modal"> Network Display </a></li>
 			</ul>
 		</div>
-		
+			
 	</div>
 	<ul class="nav nav-tabs tab-title">
 		<li class="active">
@@ -30,6 +33,25 @@
 	</div>
 </div>
 	<div id="error"></div>
+	
+	
+<!-- //network display modal -->
+
+<div id = "networkDisplay" class = " modal hide fade" tabindex = "-1" role = "dialog" aria-labelledby = "myModalLabel" aria-hidden = "true">
+	<div class = "modal-header">
+		<h4 id = "myModalLabel"> Network Display Options </h4>
+	</div>
+	<div class="modal-body">
+		<strong> Nodes </strong> <br>
+		Nodes per page: <input type = "text" class = "span1" pattern = "" min = "1"> <br>
+		<strong> Edges </strong> <br>
+		Edges per page: <input type = "text" class = "span1" pattern = "" min = "1"> <br>
+	</div>
+	<div class = "modal-footer">
+		<button class = "btn" onclick = "" data-dismiss = "modal" aria-hidden = "true"> Save Changes </button>
+		<button class = "btn" data-dismiss = "modal" aria-hidden = "true"> Cancel </button>
+	</div>
+</div>
 <script>
 
 // the network id passed from the ejs template
@@ -164,6 +186,11 @@ function removeFromWorkspace(){
 	
 }
 
+//prevent settings dropdown from closing when an input form is clicked
+$('.dropdown-menu input, .dropdown-menu label').click(function(e) {
+	e.stopPropagation();
+});
+
 $(ndexClient.getNetwork(networkRID, function(data){
 		console.log("Got results from getNetwork");
 		console.log(data);
@@ -173,7 +200,7 @@ $(ndexClient.getNetwork(networkRID, function(data){
 		$('#edges').html('');
 		$('#viewNetTitle').html('');
 		
-		$('#viewNetTitle').append(networkRID);
+		$('#viewNetTitle').append(data.network.title);
   		$.each(data.network.nodes, function(index, node){
 			$('#nodes').append(formatNode(node, data.network));
 		});  
