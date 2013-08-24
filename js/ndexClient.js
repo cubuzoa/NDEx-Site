@@ -85,6 +85,13 @@ Expected to be a global for the client, expected to be undefined and then requir
     }
 
 
+// Set a new foreground image for user. Requester must be user or have admin permissions.
+    exports.uploadUserImage = function(userid, type, callback, errorHandler){
+        var mergedRoute = '/users/' + encodeURIComponent(userid) + '/images';
+        exports.ndexPost(mergedRoute, {userid: userid, type: type}, callback, errorHandler);
+    }
+
+
 // Find users matching search expression
     exports.findUsers = function(searchExpression, limit, offset, callback, errorHandler){
         var mergedRoute = '/users';
@@ -162,6 +169,13 @@ Expected to be a global for the client, expected to be undefined and then requir
     }
 
 
+// Set a new foreground image for group. Requester must be group owner or have admin permissions.
+    exports.uploadGroupImage = function(groupid, type, callback, errorHandler){
+        var mergedRoute = '/groups/' + encodeURIComponent(groupid) + '/images';
+        exports.ndexPost(mergedRoute, {groupid: groupid, type: type}, callback, errorHandler);
+    }
+
+
 // Find groups by search expression
     exports.findGroups = function(searchExpression, limit, offset, callback, errorHandler){
         var mergedRoute = '/groups';
@@ -229,6 +243,20 @@ Expected to be a global for the client, expected to be undefined and then requir
     exports.deleteNetwork = function(networkid, callback, errorHandler){
         var mergedRoute = '/networks/' + encodeURIComponent(networkid) + '';
         exports.ndexDelete(mergedRoute, callback, errorHandler);
+    }
+
+
+// Returns all or part of a Network based on edge parameters
+    exports.getNetworkByEdges = function(networkid, typeFilter, propertyFilter, subjectNodeFilter, objectNodeFilter, limit, offset, callback, errorHandler){
+        var mergedRoute = '/networks/' + encodeURIComponent(networkid) + '/edge';
+        exports.ndexGet(mergedRoute, {typeFilter: typeFilter, propertyFilter: propertyFilter, subjectNodeFilter: subjectNodeFilter, objectNodeFilter: objectNodeFilter, limit: limit, offset: offset}, callback, errorHandler);
+    }
+
+
+// Returns nodes and meta information of a Network based on node parameters
+    exports.getNetworkByNodes = function(networkid, typeFilter, propertyFilter, limit, offset, callback, errorHandler){
+        var mergedRoute = '/networks/' + encodeURIComponent(networkid) + '/node';
+        exports.ndexGet(mergedRoute, {typeFilter: typeFilter, propertyFilter: propertyFilter, limit: limit, offset: offset}, callback, errorHandler);
     }
 
 

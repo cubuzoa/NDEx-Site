@@ -336,6 +336,41 @@ app.post('/users/:userid/profile', function(req, res) {
   }
 }); // close handler
 
+// Set a new foreground image for user. Requester must be user or have admin permissions.
+app.post('/users/:userid/images', function(req, res) {
+  try {
+    var userid = req.body['userid'];
+    if(!common.checkJID(userid)) res.send(400, { error: 'bad JID : ' + userid});
+    userid = convertToRID(userid);
+    var type = req.body['type'];
+    var file_image = req.files['image'];
+    var image_path = file_image.path;
+    common.ridCheck(
+      [
+            { rid: userid , objectClass: 'xUser'},
+      ], 
+      res,
+      function(){
+        User.uploadUserImage(userid, type, image_path, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          console.log('error in handler for uploadUserImage : ' + e); 
+          res.send(500, {error : 'error in handler for uploadUserImage : ' + e}); 
+  }
+}); // close handler
+
 // Find users matching search expression
 app.get('/users', function(req, res) {
   try {
@@ -707,6 +742,41 @@ app.post('/groups/:groupid/profile', function(req, res) {
   }
 }); // close handler
 
+// Set a new foreground image for group. Requester must be group owner or have admin permissions.
+app.post('/groups/:groupid/images', function(req, res) {
+  try {
+    var groupid = req.body['groupid'];
+    if(!common.checkJID(groupid)) res.send(400, { error: 'bad JID : ' + groupid});
+    groupid = convertToRID(groupid);
+    var type = req.body['type'];
+    var file_image = req.files['image'];
+    var image_path = file_image.path;
+    common.ridCheck(
+      [
+            { rid: groupid , objectClass: 'xGroup'},
+      ], 
+      res,
+      function(){
+        Group.uploadGroupImage(groupid, type, image_path, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          console.log('error in handler for uploadGroupImage : ' + e); 
+          res.send(500, {error : 'error in handler for uploadGroupImage : ' + e}); 
+  }
+}); // close handler
+
 // Find groups by search expression
 app.get('/groups', function(req, res) {
   try {
@@ -1046,6 +1116,90 @@ app.delete('/networks/:networkid', function(req, res) {
   catch (e){
           console.log('error in handler for deleteNetwork : ' + e); 
           res.send(500, {error : 'error in handler for deleteNetwork : ' + e}); 
+  }
+}); // close handler
+
+// Returns all or part of a Network based on edge parameters
+app.get('/networks/:networkid/edge', function(req, res) {
+  try {
+    var networkid = req.params['networkid'];
+    if(!common.checkJID(networkid)) res.send(400, { error: 'bad JID : ' + networkid});
+    networkid = convertToRID(networkid);
+    var typeFilter = req.query['typeFilter'];
+    typeFilter = typeFilter || {};
+    var propertyFilter = req.query['propertyFilter'];
+    propertyFilter = propertyFilter || {};
+    var subjectNodeFilter = req.query['subjectNodeFilter'];
+    subjectNodeFilter = subjectNodeFilter || {};
+    var objectNodeFilter = req.query['objectNodeFilter'];
+    objectNodeFilter = objectNodeFilter || {};
+    var limit = req.query['limit'];
+    limit = limit || 100;
+    var offset = req.query['offset'];
+    offset = offset || 0;
+    common.ridCheck(
+      [
+            { rid: networkid , objectClass: 'xNetwork'},
+      ], 
+      res,
+      function(){
+        Network.getNetworkByEdges(networkid, typeFilter, propertyFilter, subjectNodeFilter, objectNodeFilter, limit, offset, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          console.log('error in handler for getNetworkByEdges : ' + e); 
+          res.send(500, {error : 'error in handler for getNetworkByEdges : ' + e}); 
+  }
+}); // close handler
+
+// Returns nodes and meta information of a Network based on node parameters
+app.get('/networks/:networkid/node', function(req, res) {
+  try {
+    var networkid = req.params['networkid'];
+    if(!common.checkJID(networkid)) res.send(400, { error: 'bad JID : ' + networkid});
+    networkid = convertToRID(networkid);
+    var typeFilter = req.query['typeFilter'];
+    typeFilter = typeFilter || {};
+    var propertyFilter = req.query['propertyFilter'];
+    propertyFilter = propertyFilter || {};
+    var limit = req.query['limit'];
+    limit = limit || 100;
+    var offset = req.query['offset'];
+    offset = offset || 0;
+    common.ridCheck(
+      [
+            { rid: networkid , objectClass: 'xNetwork'},
+      ], 
+      res,
+      function(){
+        Network.getNetworkByNodes(networkid, typeFilter, propertyFilter, limit, offset, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          console.log('error in handler for getNetworkByNodes : ' + e); 
+          res.send(500, {error : 'error in handler for getNetworkByNodes : ' + e}); 
   }
 }); // close handler
 

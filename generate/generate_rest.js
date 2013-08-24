@@ -71,7 +71,7 @@ for (n in specs.resourceTypes){
 				var defaultVal = param.default;
 				var type = param.type;
 				if (defaultVal === undefined){
-					argumentLines.push("    if(" + n + " === undefined){res.send(400, { error: 'value for " + n + " is required' });");
+					argumentLines.push("    if(" + n + " === undefined){res.send(400, { error: 'value for " + n + " is required' })};");
 				} else {
 					if (type == "string"){
 						defaultVal = "'" + defaultVal + "'";
@@ -87,7 +87,16 @@ for (n in specs.resourceTypes){
 				var param = spec.postData[n];
 				handleJIDParam(param);
 			}
-			
+
+			for (n in spec.files){
+				arguments.push(n + "_path");
+				argumentLines.push("    var file_" + n + " = req.files['" + n + "'];");
+				if(spec.maxsize){
+					argumentLines.push("     if (file_" + n + ".size > " + spec.maxsize + "){res.send(400, { error: 'file size too large, max allowed = " + spec.maxsize + "' });");
+				}		
+				argumentLines.push("    var " + n + "_path = file_" + n + ".path;");
+			}
+						
 			var argumentString = "";
 			if (arguments.length > 0){
 				argumentString = arguments.join(", ") + ", ";

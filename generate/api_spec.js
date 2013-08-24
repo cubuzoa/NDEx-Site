@@ -78,6 +78,26 @@ exports.User = [
 			},
 		exceptions: ["404 unknown user id",
 					"401 Requester not authorized"]
+	},
+	
+	{	fn : "uploadUserImage",
+		status : "active",
+		doc : "Set a new foreground image for user. Requester must be user or have admin permissions.",
+		method : "POST",
+		route : "/users/:userid/images",
+		postData: {
+				userid : {	doc : "user id", type : "JID", required : true, class : "xUser"},
+				type : {	doc : "type of image", 
+							type : "string", 
+							oneOf: ["foreground", "background"]}
+				},
+		files: {
+				image : { doc : "image uploaded by user", filetypes : ["jpg", "gif", "png"], maxsize : 2000000}
+				},
+		response: {
+			},
+		exceptions: ["404 unknown user id",
+					"401 Requester not authorized"]
 	},	
 	
 	{	fn : "setUserPassword",
@@ -381,6 +401,25 @@ exports.Group = [
 					"401 Requester not authorized"]
 	},	
 
+	{	fn : "uploadGroupImage",
+		status : "active",
+		doc : "Set a new foreground image for group. Requester must be group owner or have admin permissions.",
+		method : "POST",
+		route : "/groups/:groupid/images",
+		postData: {
+				groupid : {	doc : "group id", type : "JID", required : true, class : "xGroup"},
+				type : {	doc : "type of image", 
+							type : "string", 
+							oneOf: ["foreground", "background"]}
+				},
+		files: {
+				image : { doc : "image uploaded by user", filetypes : ["jpg", "gif", "png"], maxSize : 2000000}
+				},
+		response: {
+			},
+		exceptions: ["404 unknown group id",
+					"401 Requester not authorized"]
+	},
 
 	{	fn : "findGroups",
 		status : "active",
@@ -631,7 +670,7 @@ exports.Network = [
 	},	
 			
 	{	fn : "getNetworkByEdges",
-		status : "inactive",
+		status : "active",
 		doc : "Returns all or part of a Network based on edge parameters",
 		method : "GET",
 		route : "/networks/:networkid/edge",
@@ -639,18 +678,24 @@ exports.Network = [
 				networkid : {doc : "id of the network", type: "JID", class: "xNetwork"}
 				},
 		queryParams: {
-						typeFilter : { doc : "filter expression for Edge type",
-										type : "string"},
-						propertyFilter : { doc : "filter expression for Edge properties",
-											type : "string"},
-						sourceFilter : { doc : "filter expression for source Nodes",
-										type : "string"},
-						targetFilter : { doc : "filter expression for target Nodes",
-											type : "string"},
-						limit : { doc : "number of edges to return",
-									type : "integer"},
-						offset : { doc : "offset into edges by internal ordering",
-									type : "integer"}
+						typeFilter : { 	doc : "filter expression for Edge type",
+										type : "JSON",
+										default: "{}"},
+						propertyFilter : { 	doc : "filter expression for Edge properties",
+											type : "JSON",
+											default: "{}"},
+						subjectNodeFilter : { 	doc : "filter expression for subject Nodes",
+												type : "JSON",
+												default: "{}"},
+						objectNodeFilter : { 	doc : "filter expression for object Nodes",
+												type : "JSON",
+												default: "{}"},
+						limit : { 	doc : "number of edges to return",
+									type : "integer",
+									default : 100},
+						offset : { 	doc : "offset into edges by internal ordering",
+									type : "integer",
+									default : 0}
 					},
 		response: { 
 				network : { doc : "All or portion of queried Network",
@@ -664,7 +709,7 @@ exports.Network = [
 
 
 	{	fn : "getNetworkByNodes",
-		status : "inactive",
+		status : "active",
 		doc : "Returns nodes and meta information of a Network based on node parameters",
 		method : "GET",
 		route : "/networks/:networkid/node",
@@ -672,14 +717,18 @@ exports.Network = [
 				networkid : {doc : "id of the network", type: "JID", class: "xNetwork"}
 				},
 		queryParams: {
-						typeFilter : { doc : "filter expression for Node type",
-										type : "string"},
-						propertyFilter : { doc : "filter expression for Node properties",
-											type : "string"},
-						limit : { doc : "number of nodes to return",
-									type : "integer"},
-						offset : { doc : "offset into nodes by internal ordering",
-									type : "integer"}
+						typeFilter : { 	doc : "filter expression for Node type",
+										type : "JSON",
+										default: "{}"},
+						propertyFilter : { 	doc : "filter expression for Node properties",
+											type : "JSON",
+											default: "{}"},
+						limit : { 	doc : "number of nodes to return",
+									type : "integer",
+									default : 100},
+						offset : { 	doc : "offset into nodes by internal ordering",
+									type : "integer",
+									default : 0}
 					},
 		response: { 
 				network : { doc : "nodes and meta information of queried Network as a network",
