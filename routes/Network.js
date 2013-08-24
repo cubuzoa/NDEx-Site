@@ -327,7 +327,7 @@ exports.getNetwork = function(networkRID, callback){
 												result.nodes[node.id] = {name: node.name, jid: common.convertFromRID(node.rid), represents: node.represents};
 											}
 											// get the edges
-											var edge_cmd = "select  in.id as s, p.id as p, out.id as o, @rid as rid from (traverse edges from " + networkRID + ") where $depth = 1)";
+											var edge_cmd = "select  in.id as s, p.id as p, out.id as o, @rid as rid from (traverse edges from " + networkRID + ") where $depth = 1";
 											module.db.command(edge_cmd, function(err, edges) {
 												if (common.checkErr(err, "getting edges", callback)){
 										

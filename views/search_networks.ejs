@@ -4,7 +4,9 @@
 <script>
 // On form submit, send the search expression to findNetworks
 // with a limit of 100.
-//TODO DOM Elements depend on object JID for identification, consider using names instead.
+//TODO 
+//DOM Elements depend on object JID for identification, consider using names instead.
+//copy code to view group and view user
 
 function doSearch(offset) {
 	var searchExpression = $('#searchExpression').val().toUpperCase(), 
@@ -43,7 +45,7 @@ function onWorkspace(jid){
 	//check if network is on the user workspace. 
 	//TODO will be replaced by api functions
 	var tempLink = document.getElementById('link'+jid);
-	var tempBtn = document.getElementById('button'+jid);
+	//var tempBtn = document.getElementById('button'+jid);
 	var tempIcon = document.getElementById('icon'+jid);
 	var found = false;
 	
@@ -51,7 +53,7 @@ function onWorkspace(jid){
 	$("input").each(function(index,value){
 		if($(this).attr('title') == jid) {
 			$(tempLink).attr('onclick','removeFromWorkspace(this)');//
-			$(tempBtn).attr('title','Remove from Workspace');
+			$(tempIcon).attr('title','Remove from Workspace');
 			tempIcon.className='icon-remove';
 			found = true;
 		}
@@ -60,7 +62,7 @@ function onWorkspace(jid){
 	if(found)return;
 	
 	$(tempLink).attr('onclick','addToWorkspace(this)');
-	$(tempBtn).attr('title','Add to Workspace');
+	$(tempIcon).attr('title','Add to Workspace');
 	tempIcon.className='icon-plus icon-white';
 }
 
@@ -133,11 +135,15 @@ function buttonTools(item){
 		viewIcon=document.createElement('i'),
 		visualizeIcon=document.createElement('i');
 		
-	$(wkSpaceIcon).addClass('icon-plus').attr('id','icon'+item.jid);
+	$(wkSpaceIcon).addClass('icon-plus')
+		.attr('id','icon'+item.jid)
+		.attr('rel','tooltip')
+		.attr('title','Add to Workspace')
+		.attr('data-placement','bottom');
 	$(viewIcon).addClass('icon-folder-open');
 	$(visualizeIcon).addClass('icon-eye-open');
 	
-	$(wkSpaceBtn).addClass('btn')
+	/*$(wkSpaceBtn).addClass('btn')
 		.attr('rel','tooltip')
 		.attr('title','Add to Workspace')
 		.attr('data-placement','bottom')
@@ -152,16 +158,28 @@ function buttonTools(item){
 		.attr('rel','tooltip')
 		.attr('title','VisualizeNetwork')
 		.attr('data-placement','bottom')
-		.append(visualizeIcon);
+		.append(visualizeIcon);*/
 	
 	$(wkSpaceLink).attr('onclick','')
 		.attr('id','link'+item.jid)
 		.attr('title',item.jid)
-		.append(wkSpaceBtn);
+		.addClass('btn')
+		//.attr('rel','tooltip')
+		//.attr('title','Add to Workspace')
+		//.attr('data-placement','bottom')
+		.append(wkSpaceIcon);
 	$(viewLink).attr('href','../viewNetwork/' + item.jid)
-		.append(viewBtn);
+		.addClass('btn')
+		.attr('rel','tooltip')
+		.attr('title','View Network')
+		.attr('data-placement','bottom')
+		.append(viewIcon);
 	$(visualizeLink).attr('href','../visualizeNetwork/' + item.jid)
-		.append(visualizeBtn);
+		.addClass('btn')
+		.attr('rel','tooltip')
+		.attr('title','VisualizeNetwork')
+		.attr('data-placement','bottom')
+		.append(visualizeIcon);
 		
 	$(buttonDiv).addClass('btn-group')
 		.append(wkSpaceLink)
