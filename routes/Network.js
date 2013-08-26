@@ -2,97 +2,19 @@ module.db = null;
 
 var common = require("./Common.js");
 
-function requestAccount(accountRID, callback, proceed) {
-	var cmd = "select from xAccount where @RID = '" + accountRID + "'";
-	module.db.command(cmd, function(err, results) {
-		if (common.checkErr(err, "checking account existence", callback)){
-			if (!results || results.length < 1){
-				console.log("found no accounts by id = '" + accountRID + "'");
-				callback({status : 404});
-			} else {
-				proceed(results[0]);
-			}
-		}
-	});
-}
-
 exports.init = function(orient, callback) {
     module.db = orient;   
 };
 
-exports.createInitialDocument = function(networkJDEx){
-		var o_nodes = [],
-		o_namespaces = [],
-		//s_nodeTypes = [],
-		//s_edges = {},
-		o_terms = [],
-		o_properties = {};
-		//s_supports = {},
-		//s_citations = {};
-
-		for(index in networkJDEx.namespaces){
-			var ns = networkJDEx.namespaces[index];
-			o_namespaces.push({"@type": "d", "@class": "xNameSpace",id: index, prefix: ns.prefix, uri: ns.uri});
+function xferProperties(from, to, propertyNames){
+	for (i in propertyNames){
+		var prop = propertyNames[i];
+		if (from[prop]){
+			to[prop] = from[prop];
 		}
-
-		// for each base term, create with id and name, link to namespace later
-		for(index in networkJDEx.terms){
-			var term = networkJDEx.terms[index];
-			if (term.name){
-				var o_term = {"@type": "d", "@class": "xBaseTerm", id: index, name: term.name};
-				o_terms.push(o_term);
-			}
-		}
-
-		// just copy the graph properties
-		for(index in networkJDEx.properties){
-			var value = networkJDEx.properties[index];
-			o_properties[index] = value;
-		}
-
-		// for each node, create with id and name, link to defining term later									
-		for(index in networkJDEx.nodes){
-			var node = networkJDEx.nodes[index],
-				o_node = {"@type": "d", "@class": "xNode", id: index};
-			if (node.name) o_node["name"] = node.name;
-			o_nodes.push(o_node);
-		}
-
-/*		
-		$.each(this.edges, function(index, edge){
-			s_edges[index] = edge.serializeJDEx();
-		});
-
-		$.each(this.supports, function(index, support){
-			s_supports[index] = support.serializeJDEx();
-		});
-		
-		$.each(this.citations, function(index, citation){
-			s_citations[index] = citation.serializeJDEx();
-		});		
-
-		$.each(this.nodeTypes, function(index, nodeType){
-			s_nodeTypes[index] = nodeType.serializeJDEx();
-		});	
-
-*/		
-
-		return {
-				"@class": "xNetwork",
-				"@type": "d",
-				format: networkJDEx.format, 
-				namespaces: o_namespaces,
-				terms: o_terms,
-				properties : o_properties,
-				nodes: o_nodes, 
-				edges: [], 
-				//nodeTypes: s_nodeTypes,
-				//citations : s_citations,
-				//supports : s_supports
-				};
-		
-
+	}
 }
+
 
 exports.createNetworkEdges = function(networkJDEx, network){
 	for(index in networkJDEx.edges){
@@ -194,11 +116,11 @@ exports.linkNodeToTerm = function(nodeRID, networkRID, termId){
 	});
 };
 
+
+
 // Create a new network in the specified account
-exports.createNetwork = function(networkJDEx, accountRID, callback){
-	
-	requestAccount(accountRID, callback, function(){
-	//temporay check so not indented, will return account if its own callback is given a var
+exports.createNetworkOld = function(networkJDEx, accountRID, callback){
+
 	var title = "untitled";
 
 	if (networkJDEx.properties && networkJDEx.properties.title){
@@ -209,9 +131,10 @@ exports.createNetwork = function(networkJDEx, accountRID, callback){
 	
 	// First create a document to load which will create all of the Vertices
 	// including their JDEx IDs, but not the cross-links between the objects.
-	// (in some cases, such as functional terms, the JDEx ID is the *only* property they have at this time)
+	// (in some cases, such as functional terms, the JDEx ID is the *only* 
+	// property they have at this time)
 	
-	var initialDocument = exports.createInitialDocument(networkJDEx);
+	var initialDocument = exports.createNetworkDocument(networkJDEx);
 	// console.log(JSON.stringify(initialDocument));
 	
 		
@@ -241,14 +164,268 @@ exports.createNetwork = function(networkJDEx, accountRID, callback){
 		
 			// TODO link nodes to terms via represents
 			exports.linkNodesToTerms(networkJDEx, document);
+			
+			// link 
 		
 			callback({jid: networkRID, ownedBy: accountRID, error : err, status : 200});
+			
 		} else {
 			console.log("initial document is null, even though no error signaled");
 		}
 	});
-	});//request account closure	
 };	
+
+
+// Create a new network in the specified account
+exports.createNetwork = function(networkJDEx, accountRID, callback){
+	
+	var title = "untitled";
+
+	if (networkJDEx.properties && networkJDEx.properties.title){
+		title = networkJDEx.properties.title;
+	}
+	
+	console.log("calling createNetwork for " + title + " owned by account: " + accountRID);
+	
+	// First create a document to load which will create all of the Vertices
+	// including their JDEx IDs, but not the cross-links between the objects.
+	// (in some cases, such as functional terms, the JDEx ID is the *only* 
+	// property they have at this time)
+	
+	var initialDocument = createNetworkDocument(networkJDEx);
+	// console.log(JSON.stringify(initialDocument));
+	
+		
+	// The initial network will be created by the db.cascadingSave facility
+	// db.save works for documents without links
+	// where as cascadingSave creates embedded documents and links them
+	module.db.cascadingSave(initialDocument, function (err, document){
+	
+		if(common.checkErr(err, "Saving initial network", callback)){		
+			if (document && document["@rid"]){
+		
+				var networkRID = document["@rid"],
+					// create lookup table indexing the created Vertices by their
+					// JDEx IDs so that we can efficiently create relationships and edges
+					// cross-linking the Vertices.
+					networkIndex = indexNetworkDocument(document);
+				
+				// assert ownership of network - can be asynch since both network and account exist
+				var ownsEdgeCMD = "create edge xOwnsNetwork from " + accountRID + " to " + networkRID;
+				module.db.command(ownsEdgeCMD, function(err){
+					if (err) throw("Failed to create xOwnsNetwork edge : " + err);
+				});
+			
+				// create xEdge edges between xNodes
+				for(index in networkJDEx.edges){
+					createNetworkEdgeAsync(networkRID, networkJDEx.edges[index], networkIndex);
+				}
+			
+				// link xFunctionTerms to the their Parameter xTerms
+				linkFunctionTerms(networkJDEx, networkIndex);
+		
+				// link xNodes to xTerms via represents
+				linkNodesToTerms(networkJDEx, networkIndex);			
+		
+				callback({jid: networkRID, ownedBy: accountRID, error : err, status : 200});
+			
+			} else {
+				callback({network : null, "initial network created is null, even though db did not error" : err, status : 500});
+			}
+		}
+	});
+};	
+
+
+function createNetworkDocument(networkJDEx){
+		var o_nodes = [],
+		o_namespaces = [],
+		o_terms = [],
+		o_properties = {},
+		o_supports = {},
+		o_citations = {};
+
+		for(index in networkJDEx.namespaces){
+			var ns = networkJDEx.namespaces[index];
+			o_namespaces.push({"@type": "d", "@class": "xNameSpace",id: index, prefix: ns.prefix, uri: ns.uri});
+		}
+
+		// for each term, create xTerm with appropriate type, id and name, 
+		// link to namespace later,
+		// link xFunctionTerm vertices to their parameters later
+		for(index in networkJDEx.terms){
+			var term = networkJDEx.terms[index];
+			if (term.name){
+				var o_term = {"@type": "d", "@class": "xBaseTerm", id: index, name: term.name};
+				o_terms.push(o_term);
+			}
+		}
+
+		// Copy the graph properties
+		for(index in networkJDEx.properties){
+			var value = networkJDEx.properties[index];
+			o_properties[index] = value;
+		}
+
+		// For each node, create an xNode with id and name
+		// link to represented term later									
+		for(index in networkJDEx.nodes){
+			var node = networkJDEx.nodes[index],
+				o_node = {"@type": "d", "@class": "xNode", id: index};
+			if (node.name) o_node["name"] = node.name;
+			o_nodes.push(o_node);
+		}
+		
+		// for each support, create with id and text, 
+		// link to edges and citation later									
+		for(index in networkJDEx.supports){
+			var support = networkJDEx.supports[index],
+				o_support = {"@type": "d", "@class": "xSupport", id: index};
+			xferProperties(support, o_support, ["text"]);
+			o_supports.push(o_node);
+		}
+
+		// for each citation, create xCitation with id and other properties, 
+		// link to xEdges and xSupports later									
+		for(index in networkJDEx.citations){
+			var citation = networkJDEx.citations[index],
+				o_citation = {"@type": "d", "@class": "xCitation", id: index};
+			xferProperties(citation, o_citation, ["identifier", "type", "title", "contributors"]);
+			o_citations.push(o_citation);
+		}			
+
+		return {
+				"@class": "xNetwork",
+				"@type": "d",
+				format: networkJDEx.format, 
+				namespaces: o_namespaces,
+				terms: o_terms,
+				properties : o_properties,
+				nodes: o_nodes, 
+				edges: [], 
+				//nodeTypes: o_nodeTypes,
+				citations : o_citations,
+				supports : o_supports
+				};
+		
+
+}
+
+function indexNetworkDocument(document){
+	var networkIndex = {};
+	for(index in document.namespaces){
+		var ns = document.namespaces[index];
+		networkIndex[ns.id] = ns["@rid"];
+	}
+	for(index in document.terms){
+		var term = document.terms[index];
+		networkIndex[term.id] = term["@rid"];
+	}						
+	for(index in document.nodes){
+		var node = document.nodes[index];
+		networkIndex[node.id] = node["@rid"];
+	}									
+	for(index in document.supports){
+		var support = document.supports[index];
+		networkIndex[support.id] = support["@rid"];
+	}									
+	for(index in document.citations){
+		var citation = document.citations[index];
+		networkIndex[citation.id] = citation["@rid"];
+	}			
+	return networkIndex;
+};
+
+function createNetworkEdgeAsync(networkRID, edge, networkIndex){
+	// Get the RIDs for the subject node, object node, and predicate term
+	var subjectRID = networkIndex[edge.s],
+		objectRID = networkIndex[edge.o],
+		predicateRID = networkIndex[edge.p];
+	
+	if (subjectRID && objectRID && predicateRID){
+		var	cmd = "create edge xEdge from " + subjectRID + " to " + objectRID + " set p = " + predicateRID + ", n = " + networkRID ;
+		
+		// TODO : 	if the edge has citations or supports, find their ids 
+		// 			and add them to the create command
+			 
+		module.db.command(cmd, function (err, results){
+			//console.log("ran " + cmd);
+			if (err) {
+				throw("Failed to create xEdge via [ " + cmd + " ] with error: "+ err);
+			} else {
+				// Add the new xEdge to the edges field of the xNetwork
+				var newEdge = results[0],
+					updateCmd = "update " + networkRID + " add edges = " + newEdge["@rid"];
+				module.db.command(updateCmd, function (err2, results2){
+					//console.log("ran " + updateCmd);
+					if (err2) throw("Failed to add xEdge to xNetwork " + err2);
+				});
+			}
+		});
+	} else {
+		throw ("Failed to find RIDs to make xEdge: Subject: " + edge.s + " = " + subjectRID + " Object: " + edge.o + " = " + objectRID + " Predicate: " + edge.p + " = " + predicateRID);
+	}
+}
+
+function linkNodesToTerms(networkJDEx, networkIndex){
+	for (nodeId in networkJDEx.nodes){
+		var node = networkJDEx.nodes[nodeId];
+		if (node.represents){
+			// the node is linked to the term, so we attempt to find corresponding RIDs
+			var xNodeRID = networkIndex[nodeId],
+				xTermRID = networkIndex[node.represents];
+			if (xNodeRID && xTermRID){
+				// insert the link asynchronously
+				var updateCmd = "update " + xNodeRID + " set represents = " + xTermRID;
+				console.log("Represents: " + updateCmd);
+				module.db.command(updateCmd, function(err2){
+					if (err2){
+						throw ("Failed to set represents for xNode to xTerm pair : " + err2);
+					}
+				});
+			} else {
+				throw ("Failed to find RIDs: Node " + nodeId + " = " + xNodeRID + " Term " + node.represents + " = " + xTermRID);
+			}
+		}
+	}
+}
+
+function linkFunctionTerms(networkJDEx, networkIndex){
+	for (termId in networkJDEx.terms){
+		var term = networkJDEx.terms[termId],
+			xTermRID = networkIndex[termId];
+		if (!xTermRID) throw "Failed to find RID for term id = " + termId;
+		
+		if (term.function && term.parameters){
+			// This is a function term
+			// First, get the RID of the function and link it
+			var functionRID = networkIndex[term.function];
+			if (!functionRID) throw("Failed to find RID for function term " + term.function);
+			
+			// create the parameter expression
+			var params = [];
+			// Find RIDs for parameters that are terms
+			for (parameterId in term.parameters){
+				var param = term.parameters[parameterId];
+				if (param.term){
+					var paramRID = networkIndex[param.term];
+					if (!paramRID) throw("Failed to find RID for functional term parameter id = " + param.term);
+					params.push(paramRID);
+				} else {
+					// if param doesn't have a term, its a literal
+					params.push(param);
+				}
+			}
+			var parameterExpression = params.join(", ");
+			var cmd = "update " + xTermRID + " set function = " + functionRID + " , parameters = [" + parameterExpression + "]";
+			
+			module.db.command(cmd, function(err){
+				if (err) throw ("Failed to set function for xTerm to xTerm pair : " + err);
+			});
+		}	
+	}
+}
+
 
 //
 // Temporary: searchExpression is only used to match substrings in title and description fields of network
