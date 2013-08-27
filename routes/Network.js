@@ -432,7 +432,7 @@ function linkFunctionTerms(networkJDEx, networkIndex){
 //
 exports.findNetworks = function (searchExpression, limit, offset, callback){
 	console.log("calling findNetworks with arguments: '" + searchExpression + "' " + limit + " " + offset);
-	
+	var start = (offset)*limit;
 	var where_clause = "";
 
 	if (searchExpression.length > 0){
@@ -442,7 +442,7 @@ exports.findNetworks = function (searchExpression, limit, offset, callback){
 	}
 		
 	var descriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount",
-		cmd = "select " + descriptors + " from xNetwork" + where_clause + " order by creation_date desc limit " + limit;
+		cmd = "select " + descriptors + " from xNetwork" + where_clause + " order by creation_date desc skip " +  start + " limit " + limit;
 		
 	console.log(cmd);
 	module.db.command(cmd, function(err, networks) {
