@@ -19,6 +19,7 @@ Teardown
 
     delete User: NetworkOwner
 */
+//TODO for should get 200 getting network by edges, parameters not test nor implemented in routes
 var request = require('request'),
 	assert = require('assert'),
 	should = require('should'),
@@ -69,7 +70,7 @@ describe('NDEx Networks: ', function (done) {
 				
 		});
 		it("should get 404 attempting to create Network1 with non-existant User Id ", function(done){
-			var data = fs.readFileSync('../test_db/test_networks/pc_sif/testNetwork.jdex', 'utf8'); 
+			var data = fs.readFileSync('../../test_db/test_networks/pc_sif/testNetwork.jdex', 'utf8'); 
 			data = JSON.parse(data);	
 			request({
 				method : 'POST',
@@ -86,7 +87,7 @@ describe('NDEx Networks: ', function (done) {
 			);
 		});
 		it("should get 200 creating Network1 owned by NetworkOwner", function(done){
-			var data = fs.readFileSync('../test_db/test_networks/pc_sif/testNetwork.jdex', 'utf8'); 
+			var data = fs.readFileSync('../../test_db/test_networks/pc_sif/testNetwork.jdex', 'utf8'); 
 			data = JSON.parse(data);	
 			request({
 				method : 'POST',
@@ -131,6 +132,38 @@ describe('NDEx Networks: ', function (done) {
   					else {
 	  					res.should.have.status(200);
 	  					network1.title.should.equal(res.body.user.ownedNetworks[0].title);
+	  					done();
+  					}
+  				}
+  			);	
+  		});
+  		it("should get 200 on getting network by edges", function (done){
+  			request({
+  					url: baseURL + '/networks/' + network1.jid + '/edge',
+  					qs : {typeFilter: '', propertyFilter: '', subjectNodeFilter: '', objectNodeFilter: '', limit: 10, offset : 0},
+  					json : true
+  				},
+  				function(err, res, body){
+  					if(err) { done(err) }  
+  					else {
+	  					res.should.have.status(200);
+	  					//console.log(res.body.network.edges);
+	  					done();
+  					}
+  				}
+  			);	
+  		});
+  		it("should get 200 on getting network by nodes", function (done){
+  			request({
+  					url: baseURL + '/networks/' + network1.jid + '/node',
+  					qs : {typeFilter: '', propertyFilter: '', limit: 10, offset : 0},
+  					json : true
+  				},
+  				function(err, res, body){
+  					if(err) { done(err) }  
+  					else {
+	  					res.should.have.status(200);
+	  					console.log(res.body.network.nodes);
 	  					done();
   					}
   				}

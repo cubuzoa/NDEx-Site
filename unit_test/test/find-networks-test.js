@@ -94,6 +94,7 @@ describe('NDEx Find Networks: ', function (done) {
 					else {
 						res.should.have.status(200);
 						testNetwork.title.should.equal(res.body.networks[0].title);
+						console.log(testNetwork.title); //TODO, check that this is working
 						done();
 					}
 				}

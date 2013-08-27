@@ -15,6 +15,8 @@
 
     <!-- Button to trigger modal -->
 
+<!-- Page used to sample html that does not have an implementaion or home -->
+<!-- send group invite or request -->
 <div class=''>
 	<h3>Send Invitation</h3>
 	<hr>
@@ -53,15 +55,19 @@
 	
 </div>
 
-
+<!--create a group -->
 <div class=''>
 	<h3>Create a Group</h3>
 	<hr>
-	<form  class="form-horizontal" action="" method="post" enctype="multiipart/form-data">
+	<form  class="form-horizontal" action="http://localhost:3333/groups" method="POST" enctype="multiipart/form-data">
 		<div class="control-group">
 				<label class="control-label" for="inputGroupName">Group Name</label>
 				<div class="controls">
 					<input  type="text" id="inputGroupName" name="groupName"></div></div>
+		<div class="control-group">
+				<label class="control-label" for="inputuserid">User Id (temporary)</label>
+				<div class="controls">
+					<input  type="text" id="inputuserid" name="userid"></div></div>
 		<div class="control-group">
 				<label class="control-label" for="inputWebsite">Associated Website</label>
 				<div class="controls">

@@ -43,12 +43,12 @@
 	</div>
 	<div class="modal-body">
 		<strong> Nodes </strong> <br>
-		Nodes per page: <input type = "text" class = "span1" pattern = "" min = "1"> <br>
+		Nodes per page: <input id = "nodeCount" type = "text" class = "span1" pattern = "" min = "1"> <br>
 		<strong> Edges </strong> <br>
-		Edges per page: <input type = "text" class = "span1" pattern = "" min = "1"> <br>
+		Edges per page: <input id = "edgeCount" type = "text" class = "span1" pattern = "" min = "1"> <br>
 	</div>
 	<div class = "modal-footer">
-		<button class = "btn" onclick = "" data-dismiss = "modal" aria-hidden = "true"> Save Changes </button>
+		<button class = "btn" onclick = "getNetwork()" data-dismiss = "modal" aria-hidden = "true"> Save Changes </button>
 		<button class = "btn" data-dismiss = "modal" aria-hidden = "true"> Cancel </button>
 	</div>
 </div>
@@ -186,37 +186,53 @@ function removeFromWorkspace(){
 	
 }
 
+
+function getNetwork(){
+	//TODO
+	//consider changing trigger to onkeyup or fix cancel
+	var edgeInput = document.getElementById('edgeCount');
+	var nodeInput = document.getElementById('nodeCount');
+	var edgeCount = $(edgeInput).val();
+	var nodeCount = $(nodeInput).val();
+	if(!edgeCount) { 
+		$(edgeInput).val(15);
+		edgeCount = 15;
+	}
+	if(!nodeCount) { 
+		$(nodeInput).val(15);
+		nodeCount = 15;
+	}
+	
+	$(ndexClient.getNetworkByEdges(networkRID, '', '', '', '', edgeCount, 0, function(data) {
+		$('#edges').html('');
+		$.each(data.network.edges, function(index, edge){
+  			$('#edges').append(formatEdge(edge, data.network));
+  		});
+		},
+		function(error){
+			$('#error').append(formatError(error));
+		})
+	);
+	$(ndexClient.getNetworkByNodes(networkRID, '', '', nodeCount, 0, function(data) {
+		$('#nodes').html('');
+		$('#viewNetTitle').html('');
+		$('#viewNetTitle').append(data.network.title);
+		
+		$.each(data.network.nodes, function(index, node){
+  			$('#nodes').append(formatNode(node, data.network));
+  		});
+		},
+		function(error){
+			$('#error').append(formatError(error));
+		})
+	);
+}
 //prevent settings dropdown from closing when an input form is clicked
 $('.dropdown-menu input, .dropdown-menu label').click(function(e) {
 	e.stopPropagation();
 });
 
-$(ndexClient.getNetwork(networkRID, function(data){
-		console.log("Got results from getNetwork");
-		console.log(data);
-	
-  		// Clears the nodes and edges divs
-		$('#nodes').html('');
-		$('#edges').html('');
-		$('#viewNetTitle').html('');
-		
-		$('#viewNetTitle').append(data.network.title);
-  		$.each(data.network.nodes, function(index, node){
-			$('#nodes').append(formatNode(node, data.network));
-		});  
-
-  		
-  		$.each(data.network.edges, function(index, edge){
-  			$('#edges').append(formatEdge(edge, data.network));
-  		});
-  		
-
-    },
-    // error handler
-    function(error){
-    	$('#error').append(formatError(error));
-    })
-);
+getNetwork();
 
 </script>
 

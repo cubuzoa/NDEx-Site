@@ -534,6 +534,130 @@ exports.getNetwork = function(networkRID, callback){
     }); // close find network query
 };
 
+// get a network via its edges
+exports.getNetworkByEdges = function(networkid, typeFilter, propertyFilter, subjectNodeFilter, objectNodeFilter, limit, offset, callback, errorHandler){
+	console.log("calling get network by edges with arguments: " + limit + ', ' + offset);
+	//TODO
+	//implement filters
+	//assuming offset acting as start indicator, lowest value can be 1 for page 1
+	//implement get terms and nodes via edge links, currently getting all terms and nodes
+	//namespaces not included
+	
+	var result = {title : '', blockAmount: '', namespaces : {}, terms: {}, nodes: {}, edges: {}};
+	
+	// get the terms
+	var term_cmd = "select id, name, ns.id as nsid, @rid as rid from (traverse terms from " + networkid + ") where $depth = 1";
+	module.db.command(term_cmd, function(err, terms) {
+		if (common.checkErr(err, "getting terms", callback)){
+						
+			// process the terms
+			for (i in terms){
+				var term = terms[i];
+				result.terms[term.id] = {name: term.name, jid: common.convertFromRID(term.rid), ns: term.nsid};
+			}
+							
+			// get the nodes
+			// TODO - get the defining terms...
+			var node_cmd = "select id, name, represents.id as represents, @rid as rid from (traverse nodes from " + networkid + ") where $depth = 1";
+			module.db.command(node_cmd, function(err, nodes) {
+				if (common.checkErr(err, "getting nodes", callback)){
+						
+					// process the nodes
+					for (i in nodes){
+						var node = nodes[i];
+							result.nodes[node.id] = {name: node.name, jid: common.convertFromRID(node.rid), represents: node.represents};
+					}
+					
+					//get desired amount of edges
+					//intialization
+					var edgeCount = 0,
+						start = 0;
+	
+					var cmd = "select properties.title as title, edges.size() as edges from " + networkid; // 
+
+					module.db.command(cmd, function(err, networks){
+						var network = networks[0];
+						
+						result.title = network.title;//fix
+						edgeCount = network.edges;
+						result.blockAmount = Math.ceil(edgeCount/limit);// needs to be returned for pagination module 
+						start = (offset)*limit;
+						
+						var getEdgeCmd = "select  in.id as s, p.id as p, out.id as o, @rid as rid from (traverse edges from " + networkid + ") where $depth = 1 skip " + start + " limit " + limit;
+	
+						module.db.command(getEdgeCmd, function(err, edges) {
+							if (common.checkErr(err, "getting edges", callback)){		
+								// process the edges
+								for (i in edges){
+									var edge = edges[i];
+									result.edges[i] = {s: edge.s, p: edge.p, o: edge.o, jid: common.convertFromRID(edge.rid)};
+								}
+										
+								callback({network : result, status : 200});
+							}
+						});
+					});//close network query
+				
+				}
+			});//close node query
+		}
+	});//close term query
+				
+	
+};
+//get a network via its nodes
+exports.getNetworkByNodes = function(networkid, typeFilter, propertyFilter, limit, offset, callback, errorHandler){
+	console.log("calling get network by nodes with arguments: " + limit + ', ' + offset);
+	//TODO
+	//implement filters
+	//assuming offset acting as start indicator, lowest value can be 1 for page 1
+	//implement get terms and nodes via edge links, currently getting all terms and nodes
+	//namespaces not included
+	
+	var result = {title : '', blockAmount: '', namespaces : {}, terms: {}, nodes: {}, edges: {}};
+	
+	// get the terms
+	var term_cmd = "select id, name, ns.id as nsid, @rid as rid from (traverse terms from " + networkid + ") where $depth = 1";
+	module.db.command(term_cmd, function(err, terms) {
+		if (common.checkErr(err, "getting terms", callback)){
+						
+			// process the terms
+			for (i in terms){
+				var term = terms[i];
+				result.terms[term.id] = {name: term.name, jid: common.convertFromRID(term.rid), ns: term.nsid};
+			}
+			
+			var nodeCount = 0,
+				start = 0;
+	
+			var cmd = "select properties.title as title, nodes.size() as nodes from " + networkid; // 
+
+			module.db.command(cmd, function(err, networks){
+				var network = networks[0];
+						
+				result.title = network.title;//fix
+				nodeCount = network.nodes;
+				result.blockAmount = Math.ceil(nodeCount/limit);// needs to be returned for pagination module 
+				start = (offset)*limit;
+				
+				var getNodeCmd = "select  id, name, represents.id as represents, @rid as rid from (traverse nodes from " + networkid + ") where $depth = 1 skip " + start + " limit " + limit;
+				
+				module.db.command(getNodeCmd, function(err, nodes) {
+					if (common.checkErr(err, "getting nodes", callback)){
+						
+						// process the nodes
+						for (i in nodes){
+							var node = nodes[i];
+							result.nodes[node.id] = {name: node.name, jid: common.convertFromRID(node.rid), represents: node.represents};
+						}
+						callback({network : result, status : 200});
+					}
+				});
+			});
+		}
+	});
+};
+
 // delete a network
 exports.deleteNetwork = function (networkRID, callback){
 	console.log("calling delete network with id = '" + networkRID + "'");
