@@ -261,6 +261,7 @@ background-color:white;
 .month{
 	width:7.5em;
 }
+/*---- --*/
 .notifications{
 	/*-add left and right margins, maybe grey background color*/ 
 	background-color: white;
@@ -289,4 +290,15 @@ background-color:white;
 .requestModalLabel{
 	font-weight:900;
 	text-align:right;
+}
+/*--- page menus --*/
+a.ndex-options{
+	padding: 19px 15px;
+	font-size: 23px;
+	margin-top: 4px;
+	color: #1F1D1D ;
+}
+a.ndex-options:hover{
+	color: #3366BB;
+	text-decoration:none;
 }

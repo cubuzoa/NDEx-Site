@@ -432,7 +432,7 @@ function linkFunctionTerms(networkJDEx, networkIndex){
 //
 exports.findNetworks = function (searchExpression, limit, offset, callback){
 	console.log("calling findNetworks with arguments: '" + searchExpression + "' " + limit + " " + offset);
-	
+	var start = (offset)*limit;
 	var where_clause = "";
 
 	if (searchExpression.length > 0){
@@ -442,7 +442,7 @@ exports.findNetworks = function (searchExpression, limit, offset, callback){
 	}
 		
 	var descriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount",
-		cmd = "select " + descriptors + " from xNetwork" + where_clause + " order by creation_date desc limit " + limit;
+		cmd = "select " + descriptors + " from xNetwork" + where_clause + " order by creation_date desc skip " +  start + " limit " + limit;
 		
 	console.log(cmd);
 	module.db.command(cmd, function(err, networks) {
@@ -450,7 +450,8 @@ exports.findNetworks = function (searchExpression, limit, offset, callback){
 			var network = networks[i];
 			network.jid = common.convertFromRID(network.jid);
 		}
-        callback({networks : networks, error : err});
+		
+        callback({networks : networks, blockAmount: networks.length, error : err});
     });
 };
 
@@ -640,7 +641,7 @@ exports.getNetworkByNodes = function(networkid, typeFilter, propertyFilter, limi
 				result.blockAmount = Math.ceil(nodeCount/limit);// needs to be returned for pagination module 
 				start = (offset)*limit;
 				
-				var getNodeCmd = "select  in.id as s, p.id as p, out.id as o, @rid as rid from (traverse nodes from " + networkid + ") where $depth = 1 skip " + start + " limit " + limit;
+				var getNodeCmd = "select  id, name, represents.id as represents, @rid as rid from (traverse nodes from " + networkid + ") where $depth = 1 skip " + start + " limit " + limit;
 				
 				module.db.command(getNodeCmd, function(err, nodes) {
 					if (common.checkErr(err, "getting nodes", callback)){
