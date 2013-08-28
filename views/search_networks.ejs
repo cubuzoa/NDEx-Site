@@ -128,9 +128,6 @@ function buttonTools(item){
 		wkSpaceLink=document.createElement('a'),
 		viewLink=document.createElement('a'),
 		visualizeLink=document.createElement('a'),
-		wkSpaceBtn=document.createElement('button'),
-		viewBtn=document.createElement('button'),
-		visualizeBtn=document.createElement('button'),
 		wkSpaceIcon=document.createElement('i'),
 		viewIcon=document.createElement('i'),
 		visualizeIcon=document.createElement('i');
@@ -143,30 +140,12 @@ function buttonTools(item){
 	$(viewIcon).addClass('icon-folder-open');
 	$(visualizeIcon).addClass('icon-eye-open');
 	
-	/*$(wkSpaceBtn).addClass('btn')
-		.attr('rel','tooltip')
-		.attr('title','Add to Workspace')
-		.attr('data-placement','bottom')
-		.attr('id','button'+item.jid)
-		.append(wkSpaceIcon);
-	$(viewBtn).addClass('btn')
-		.attr('rel','tooltip')
-		.attr('title','View Network')
-		.attr('data-placement','bottom')
-		.append(viewIcon);
-	$(visualizeBtn).addClass('btn')
-		.attr('rel','tooltip')
-		.attr('title','VisualizeNetwork')
-		.attr('data-placement','bottom')
-		.append(visualizeIcon);*/
+
 	
 	$(wkSpaceLink).attr('onclick','')
 		.attr('id','link'+item.jid)
 		.attr('title',item.jid)
 		.addClass('btn')
-		//.attr('rel','tooltip')
-		//.attr('title','Add to Workspace')
-		//.attr('data-placement','bottom')
 		.append(wkSpaceIcon);
 	$(viewLink).attr('href','../viewNetwork/' + item.jid)
 		.addClass('btn')
@@ -210,8 +189,8 @@ function tableHead(){
 function formatNetworkDescriptor(item){
 	var networkDIV = document.createElement('div'),
 		nTable = document.createElement('table'),
-        	tblBody = document.createElement('tbody'),
-        	row = document.createElement('tr'),
+        tblBody = document.createElement('tbody'),
+        row = document.createElement('tr'),
 		cell = document.createElement('td'),
 		nodeSpan = document.createElement('span'),
 		edgeSpan = document.createElement('span'),
@@ -243,29 +222,16 @@ function formatNetworkDescriptor(item){
 	$(titleSpan).addClass('span4 networkTitle').append(networkLink); 
 	$(iconSpan).addClass('span1').append(buttonLink);   
 	
-
-	/*$(cell).addClass('background-contrast').append(iconSpan)
-		.append(titleSpan)
-		.append(nodeSpan)
-		.append(edgeSpan);
-	
-	$(row).append(cell);
-	$(tblBody).append(row);
-	$(nTable).addClass('table table-bordered table-hover').append(tblBody);
-
-	$(networkDIV).addClass('networkDescriptor')
-                 .append(nTable).append(infoDiv);*/
         
-        var li = document.createElement('li');
-        var ul = document.createElement('ul');
-        var a = document.createElement('a');
+    var li = document.createElement('li');
+    var ul = document.createElement('ul');
+    var a = document.createElement('a');
         
-        $(networkDIV).addClass('row-fluid').append(iconSpan).append(titleSpan).append(nodeSpan).append(edgeSpan);
-        $(a).attr('style','color:black').append(networkDIV).append(infoDiv);
+    $(networkDIV).addClass('row-fluid').append(iconSpan).append(titleSpan).append(nodeSpan).append(edgeSpan);
+    $(a).attr('style','color:black').append(networkDIV).append(infoDiv);
         
-        $(li).append(a);//.append(iconSpan).append(titleSpan).append(nodeSpan).append(edgeSpan);
-        $(ul).addClass("nav nav-list").append(li);
-        //$(networkDIV).append(ul);
+    $(li).append(a);
+    $(ul).addClass("nav nav-list").append(li);
 
 	return ul;//networkDIV;
 

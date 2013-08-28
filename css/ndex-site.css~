@@ -230,6 +230,13 @@ background-color:white;
 	border-color:blue;
 }
 /*--for the sidebar-- */
+.workspace{
+	border:2px;
+	border-color:black;
+	-webkit-border-radius: 4px;
+ 	 -moz-border-radius: 4px;
+  	border-radius: 4px;
+}
 .thumbText{
 	font-size:10px;
 	font-weight:600;
@@ -280,6 +287,6 @@ background-color:white;
 	font-weight:200;
 }
 .requestModalLabel{
-	font-weight:500;
+	font-weight:900;
 	text-align:right;
 }
