@@ -1,6 +1,6 @@
 <% include head.ejs %>
 <% include nav.ejs %>
-<% include sidebar.ejs %>
+
 
 
 <div class="tabbable">
@@ -8,10 +8,13 @@
 		<div class="btn-group" > 
 			<h4 id = "viewNetTitle"> Network Title </h4>
 		</div>
-		<div class="btn-group pull-right">
-			<button class = "btn btn-large dropdown-toggle" onclick="onWorkspace()" data-toggle="dropdown"> 
+		<div class="dropdown pull-right">
+			<a class = "ndex-options" href="../visualizeNetwork/<%= networkId %>" > 
+				<i class="icon-eye-open icon-large"></i> 
+			</a>
+			<a class = "ndex-options dropdown-toggle" href="javascript:void(0)" onclick="onWorkspace()" data-toggle="dropdown"> 
 				<i class="icon-cog icon-large"></i> 
-			</button>
+			</a>
 			<ul class="dropdown-menu">
 				<li id="netStatus"></li>
 				<li> <a href = "#networkDisplay" data-toggle="modal"> Network Display </a></li>
@@ -198,8 +201,36 @@ function createPaginationModule(pageAmount, page, type) {
 
 	var pagDiv = document.createElement('div');
 	var pagUl = document.createElement('ul');
-
-	/*for(var ii = 0; ii < pageAmount; ii++){
+	
+	var prevLi = document.createElement('li');
+	var prev = document.createElement('a');
+	var nextLi = document.createElement('li');
+	var next = document.createElement('a');
+	var firstLi = document.createElement('li');
+	var first = document.createElement('a');
+	var lastLi = document.createElement('li');
+	var last = document.createElement('a');
+	
+	if(page == 0) $(prevLi).addClass('active');
+	if(page == 0) $(firstLi).addClass('active');
+	if(page == (pageAmount - 1)) $(nextLi).addClass('active');
+	if(page == (pageAmount - 1)) $(lastLi).addClass('active');
+	
+	$(prev).attr('onclick','get'+type+'(Number(this.id))').attr('id', page).html('<');
+	$(next).attr('onclick','get'+type+'(Number(this.id))').attr('id', page+2).html('>');
+	$(first).attr('onclick','get'+type+'(1)').attr('rel','tooltip').attr('title', 'page 1').html('<<');
+	$(last).attr('onclick','get'+type+'(Number(this.id))').attr('id', pageAmount).attr('rel','tooltip').attr('title', 'page ' + pageAmount).html('>>');
+	
+	$(firstLi).append(first);
+	$(pagUl).append(firstLi);
+	$(prevLi).addClass('prev').append(prev);
+	$(pagUl).append(prevLi);
+	$(nextLi).addClass('next').append(next);
+	$(lastLi).append(last);
+	
+	for(var ii = 0; ii < pageAmount; ii++){
+		if(ii < (page-2)) continue;
+		if(ii > (page+2)) continue;
 		var pagLi = document.createElement('li');
 		var pagA = document.createElement('a');
 		
@@ -208,21 +239,10 @@ function createPaginationModule(pageAmount, page, type) {
 		$(pagA).attr('onclick','get'+type+'(Number(this.innerHTML))').html( ii + 1);
 		$(pagLi).append(pagA);
 		$(pagUl).append(pagLi);
-	}*/
-	var prevLi = document.createElement('li');
-	var prev = document.createElement('a');
-	var nextLi = document.createElement('li');
-	var next = document.createElement('a');
+	}
 	
-	if(page == 0) $(prevLi).addClass('active');
-	if(page == (pageAmount - 1)) $(nextLi).addClass('active');
-	
-	$(prev).attr('onclick','get'+type+'(Number(this.id))').attr('id', page).html('prev');
-	$(next).attr('onclick','get'+type+'(Number(this.id))').attr('id', page+2).html('next');
-	$(prevLi).append(prev);
-	$(nextLi).append(next);
-	$(pagUl).append(prevLi).append(nextLi);
-	
+	$(pagUl).append(nextLi);
+	$(pagUl).append(lastLi);
 	
 	$(pagDiv).addClass('pagination pagination-centered').append(pagUl);
 	return pagDiv;
@@ -305,5 +325,5 @@ getNetwork();
 </script>
 
 
-
+<% include sidebar.ejs %>
 <% include foot.ejs %>

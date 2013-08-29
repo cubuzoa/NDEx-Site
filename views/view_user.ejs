@@ -233,18 +233,21 @@ function addElements(item, index){
 }
 
 
+
 function onWorkspace(jid){
+	//check if network is on the user workspace. 
+	//TODO will be replaced by api functions
 	var tempLink = document.getElementById('link'+jid);
-	var tempBtn = document.getElementById('button'+jid);
+	//var tempBtn = document.getElementById('button'+jid);
 	var tempIcon = document.getElementById('icon'+jid);
 	var found = false;
 	
 	
 	$("input").each(function(index,value){
 		if($(this).attr('title') == jid) {
-			$(tempLink).attr('onclick','removeFromWorkspace(this)');
-			$(tempBtn).attr('title','Remove from Workspace');
-			tempIcon.className='icon-remove icon-white';
+			$(tempLink).attr('onclick','removeFromWorkspace(this)');//
+			$(tempIcon).attr('title','Remove from Workspace');
+			tempIcon.className='icon-remove';
 			found = true;
 		}
 	});
@@ -252,7 +255,7 @@ function onWorkspace(jid){
 	if(found)return;
 	
 	$(tempLink).attr('onclick','addToWorkspace(this)');
-	$(tempBtn).attr('title','Add to Workspace');
+	$(tempIcon).attr('title','Add to Workspace');
 	tempIcon.className='icon-plus icon-white';
 }
 
@@ -312,47 +315,43 @@ function toggle(obj) {
 	onWorkspace($(obj).attr('title'));
 }
 
+//actions for network upon dropdown
 function buttonTools(item){
 	var buttonDiv = document.createElement('div'),
 		wkSpaceLink=document.createElement('a'),
 		viewLink=document.createElement('a'),
 		visualizeLink=document.createElement('a'),
-		wkSpaceBtn=document.createElement('button'),
-		viewBtn=document.createElement('button'),
-		visualizeBtn=document.createElement('button'),
 		wkSpaceIcon=document.createElement('i'),
 		viewIcon=document.createElement('i'),
 		visualizeIcon=document.createElement('i');
 		
-	$(wkSpaceIcon).addClass('icon-plus icon-white').attr('id','icon'+item.jid);
-	$(viewIcon).addClass('icon-folder-open icon-white');
-	$(visualizeIcon).addClass('icon-eye-open icon-white');
-	
-	$(wkSpaceBtn).addClass('btn btn-primary')
+	$(wkSpaceIcon).addClass('icon-plus')
+		.attr('id','icon'+item.jid)
 		.attr('rel','tooltip')
 		.attr('title','Add to Workspace')
-		.attr('data-placement','bottom')
-		.attr('id','button'+item.jid)
-		.append(wkSpaceIcon);
-	$(viewBtn).addClass('btn btn-primary')
-		.attr('rel','tooltip')
-		.attr('title','View Network')
-		.attr('data-placement','bottom')
-		.append(viewIcon);
-	$(visualizeBtn).addClass('btn btn-primary')
-		.attr('rel','tooltip')
-		.attr('title','VisualizeNetwork')
-		.attr('data-placement','bottom')
-		.append(visualizeIcon);
+		.attr('data-placement','bottom');
+	$(viewIcon).addClass('icon-folder-open');
+	$(visualizeIcon).addClass('icon-eye-open');
+	
+
 	
 	$(wkSpaceLink).attr('onclick','')
 		.attr('id','link'+item.jid)
 		.attr('title',item.jid)
-		.append(wkSpaceBtn);
+		.addClass('btn')
+		.append(wkSpaceIcon);
 	$(viewLink).attr('href','../viewNetwork/' + item.jid)
-		.append(viewBtn);
+		.addClass('btn')
+		.attr('rel','tooltip')
+		.attr('title','View Network')
+		.attr('data-placement','bottom')
+		.append(viewIcon);
 	$(visualizeLink).attr('href','../visualizeNetwork/' + item.jid)
-		.append(visualizeBtn);
+		.addClass('btn')
+		.attr('rel','tooltip')
+		.attr('title','VisualizeNetwork')
+		.attr('data-placement','bottom')
+		.append(visualizeIcon);
 		
 	$(buttonDiv).addClass('btn-group')
 		.append(wkSpaceLink)
@@ -369,7 +368,7 @@ function tableHead(){
         mainRow = document.createElement('tr'),
         mainCell = document.createElement('th');
 
-    $(mainCell).addClass('span9').html("My Networks");
+    $(mainCell).addClass('span9').html("Available Networks");
 
     $(mainRow).addClass('success').append(mainCell);
     $(mainTblBody).append(mainRow);
@@ -383,8 +382,8 @@ function tableHead(){
 function formatNetworkDescriptor(item){
 	var networkDIV = document.createElement('div'),
 		nTable = document.createElement('table'),
-        	tblBody = document.createElement('tbody'),
-        	row = document.createElement('tr'),
+        tblBody = document.createElement('tbody'),
+        row = document.createElement('tr'),
 		cell = document.createElement('td'),
 		nodeSpan = document.createElement('span'),
 		edgeSpan = document.createElement('span'),
@@ -416,23 +415,20 @@ function formatNetworkDescriptor(item){
 	$(titleSpan).addClass('span4 networkTitle').append(networkLink); 
 	$(iconSpan).addClass('span1').append(buttonLink);   
 	
+        
+    var li = document.createElement('li');
+    var ul = document.createElement('ul');
+    var a = document.createElement('a');
+        
+    $(networkDIV).addClass('row-fluid').append(iconSpan).append(titleSpan).append(nodeSpan).append(edgeSpan);
+    $(a).attr('style','color:black').append(networkDIV).append(infoDiv);
+        
+    $(li).append(a);
+    $(ul).addClass("nav nav-list").append(li);
 
-	$(cell).addClass('background-contrast').append(iconSpan)
-		.append(titleSpan)
-		.append(nodeSpan)
-		.append(edgeSpan);
-	
-	$(row).append(cell);
-	$(tblBody).append(row);
-	$(nTable).addClass('table table-bordered table-hover').append(tblBody);
-
-	$(networkDIV).addClass('networkDescriptor')
-                 .append(nTable).append(infoDiv);
-
-	return networkDIV;
+	return ul;//networkDIV;
 
 }
-
 $(ndexClient.getUser(userJID, function(data){
 		console.log("Got results from getUser");
 		console.log(data);

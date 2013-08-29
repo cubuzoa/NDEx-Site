@@ -9,9 +9,21 @@
 //copy code to view group and view user
 
 function doSearch(offset) {
-	var searchExpression = $('#searchExpression').val().toUpperCase(), 
-		limit = 100,
-		count = 1;
+	var limitInput = document.getElementById('searchCount');
+	var limit = $(limitInput).val();
+
+	if(!offset) { offset = $('#searchPage').val(); }
+
+	if(!limit) { 
+		$(limitInput).val(2);
+		limit = 2;
+	}
+	if(!offset) { offset = 1; }
+	
+	$('#searchPage').val(offset);
+	offset = offset - 1;
+
+	var searchExpression = $('#searchExpression').val().toUpperCase();
 
 	console.log("Calling findNetworks with '" + searchExpression + "' " + limit + " " + offset);
 	
@@ -30,7 +42,10 @@ function doSearch(offset) {
 			$('#searchResults').append(tableHead());
 			$.each(data.networks, function(index, item){
 				$('#searchResults').append(formatNetworkDescriptor(item));
-			});  
+			}); 
+ 			
+			$('#searchResults').append(createPaginationModule(data.blockAmount, offset));
+  			$('#searchPage').attr('placeholder', 'max value: ' + data.blockAmount);
 		}
     },
     // error handler
@@ -40,6 +55,58 @@ function doSearch(offset) {
     
     return false;
 }
+
+function createPaginationModule(pageAmount, page) {
+
+	var pagDiv = document.createElement('div');
+	var pagUl = document.createElement('ul');
+	
+	var prevLi = document.createElement('li');
+	var prev = document.createElement('a');
+	var nextLi = document.createElement('li');
+	var next = document.createElement('a');
+	var firstLi = document.createElement('li');
+	var first = document.createElement('a');
+	var lastLi = document.createElement('li');
+	var last = document.createElement('a');
+	
+	if(page == 0) $(prevLi).addClass('active');
+	if(page == 0) $(firstLi).addClass('active');
+	if(page == (pageAmount - 1)) $(nextLi).addClass('active');
+	if(page == (pageAmount - 1)) $(lastLi).addClass('active');
+	
+	$(prev).attr('onclick','doSearch(Number(this.id))').attr('id', page).html('<');
+	$(next).attr('onclick','doSearch(Number(this.id))').attr('id', page+2).html('>');
+	$(first).attr('onclick','doSearch(1)').attr('rel','tooltip').attr('title', 'page 1').html('<<');
+	$(last).attr('onclick','doSearch(Number(this.id))').attr('id', pageAmount).attr('rel','tooltip').attr('title', 'page ' + pageAmount).html('>>');
+	
+	$(firstLi).append(first);
+	$(pagUl).append(firstLi);
+	$(prevLi).addClass('prev').append(prev);
+	$(pagUl).append(prevLi);
+	$(nextLi).addClass('next').append(next);
+	$(lastLi).append(last);
+	
+	for(var ii = 0; ii < pageAmount; ii++){
+		if(ii < (page-2)) continue;
+		if(ii > (page+2)) continue;
+		var pagLi = document.createElement('li');
+		var pagA = document.createElement('a');
+		
+		if(ii == page) { $(pagLi).addClass('active') };
+		
+		$(pagA).attr('onclick','doSearch(Number(this.innerHTML))').html( ii + 1);
+		$(pagLi).append(pagA);
+		$(pagUl).append(pagLi);
+	}
+	
+	$(pagUl).append(nextLi);
+	$(pagUl).append(lastLi);
+	
+	$(pagDiv).addClass('pagination pagination-centered').append(pagUl);
+	return pagDiv;
+}
+
 
 function onWorkspace(jid){
 	//check if network is on the user workspace. 
@@ -128,9 +195,6 @@ function buttonTools(item){
 		wkSpaceLink=document.createElement('a'),
 		viewLink=document.createElement('a'),
 		visualizeLink=document.createElement('a'),
-		wkSpaceBtn=document.createElement('button'),
-		viewBtn=document.createElement('button'),
-		visualizeBtn=document.createElement('button'),
 		wkSpaceIcon=document.createElement('i'),
 		viewIcon=document.createElement('i'),
 		visualizeIcon=document.createElement('i');
@@ -143,30 +207,12 @@ function buttonTools(item){
 	$(viewIcon).addClass('icon-folder-open');
 	$(visualizeIcon).addClass('icon-eye-open');
 	
-	/*$(wkSpaceBtn).addClass('btn')
-		.attr('rel','tooltip')
-		.attr('title','Add to Workspace')
-		.attr('data-placement','bottom')
-		.attr('id','button'+item.jid)
-		.append(wkSpaceIcon);
-	$(viewBtn).addClass('btn')
-		.attr('rel','tooltip')
-		.attr('title','View Network')
-		.attr('data-placement','bottom')
-		.append(viewIcon);
-	$(visualizeBtn).addClass('btn')
-		.attr('rel','tooltip')
-		.attr('title','VisualizeNetwork')
-		.attr('data-placement','bottom')
-		.append(visualizeIcon);*/
+
 	
 	$(wkSpaceLink).attr('onclick','')
 		.attr('id','link'+item.jid)
 		.attr('title',item.jid)
 		.addClass('btn')
-		//.attr('rel','tooltip')
-		//.attr('title','Add to Workspace')
-		//.attr('data-placement','bottom')
 		.append(wkSpaceIcon);
 	$(viewLink).attr('href','../viewNetwork/' + item.jid)
 		.addClass('btn')
@@ -210,8 +256,8 @@ function tableHead(){
 function formatNetworkDescriptor(item){
 	var networkDIV = document.createElement('div'),
 		nTable = document.createElement('table'),
-        	tblBody = document.createElement('tbody'),
-        	row = document.createElement('tr'),
+        tblBody = document.createElement('tbody'),
+        row = document.createElement('tr'),
 		cell = document.createElement('td'),
 		nodeSpan = document.createElement('span'),
 		edgeSpan = document.createElement('span'),
@@ -243,29 +289,16 @@ function formatNetworkDescriptor(item){
 	$(titleSpan).addClass('span4 networkTitle').append(networkLink); 
 	$(iconSpan).addClass('span1').append(buttonLink);   
 	
-
-	/*$(cell).addClass('background-contrast').append(iconSpan)
-		.append(titleSpan)
-		.append(nodeSpan)
-		.append(edgeSpan);
-	
-	$(row).append(cell);
-	$(tblBody).append(row);
-	$(nTable).addClass('table table-bordered table-hover').append(tblBody);
-
-	$(networkDIV).addClass('networkDescriptor')
-                 .append(nTable).append(infoDiv);*/
         
-        var li = document.createElement('li');
-        var ul = document.createElement('ul');
-        var a = document.createElement('a');
+    var li = document.createElement('li');
+    var ul = document.createElement('ul');
+    var a = document.createElement('a');
         
-        $(networkDIV).addClass('row-fluid').append(iconSpan).append(titleSpan).append(nodeSpan).append(edgeSpan);
-        $(a).attr('style','color:black').append(networkDIV).append(infoDiv);
+    $(networkDIV).addClass('row-fluid').append(iconSpan).append(titleSpan).append(nodeSpan).append(edgeSpan);
+    $(a).attr('style','color:black').append(networkDIV).append(infoDiv);
         
-        $(li).append(a);//.append(iconSpan).append(titleSpan).append(nodeSpan).append(edgeSpan);
-        $(ul).addClass("nav nav-list").append(li);
-        //$(networkDIV).append(ul);
+    $(li).append(a);
+    $(ul).addClass("nav nav-list").append(li);
 
 	return ul;//networkDIV;
 
@@ -276,20 +309,45 @@ function formatError(error){
 }
 
 </script>
+<!-- btn-group from twitter allows for next div to be aligned and pulled right, easy fix-->
+<div class="btn-group">
+	<form onsubmit="return doSearch();" id="searchForm">
+		<div>
+		<label>Query:</label>
+		<input type="text" name="searchExpression" id="searchExpression"/><br/>
+		</div>
 
-<form onsubmit="return doSearch(0);" id="searchForm">
-	<div>
-	<label>Query:</label>
-	<input type="text" name="searchExpression" id="searchExpression"/><br/>
-	</div>
-
-	<div>
-	<input type="submit" value="Search"/>
-	</div>
-</form>
+		<div>
+		<input type="submit" value="Search"/>
+		</div>
+	</form>
+</div>
+<div class = "pull-right">
+	<a class = "ndex-options" href = "#searchOptions" data-toggle="modal"> 
+		<i class="icon-cog icon-large"></i> 
+	</a>
+</div>
 
 <div id="searchResults">
 
+</div>
+
+<div id = "searchOptions" class = " modal hide fade" tabindex = "-1" role = "dialog" aria-labelledby = "myModalLabel" aria-hidden = "true">
+	<div class = "modal-header">
+		<h4 id = "myModalLabel"> Network Search Options </h4>
+	</div>
+	<div class="modal-body">
+		
+		<label class = "span2">Search results per page: </label>
+		<input id = "searchCount" type = "text" class = "span2" pattern = "" min = "1"> <br>
+		<label class = "span2">Current page: </label>
+		<input id = "searchPage" type = "text" class = "span2" pattern = "" min = "1" placeholder = "0"> <br>
+		
+	</div>
+	<div class = "modal-footer">
+		<button class = "btn" onclick = "doSearch()" data-dismiss = "modal" aria-hidden = "true"> Save Changes </button>
+		<button class = "btn" data-dismiss = "modal" aria-hidden = "true"> Cancel </button>
+	</div>
 </div>
 
 <% include sidebar.ejs %>

@@ -431,6 +431,9 @@ function linkFunctionTerms(networkJDEx, networkIndex){
 // Temporary: searchExpression is only used to match substrings in title and description fields of network
 //
 exports.findNetworks = function (searchExpression, limit, offset, callback){
+	//TODO
+	//find method of knowing how much search results there are
+	//for return block amount
 	console.log("calling findNetworks with arguments: '" + searchExpression + "' " + limit + " " + offset);
 	var start = (offset)*limit;
 	var where_clause = "";
@@ -450,7 +453,8 @@ exports.findNetworks = function (searchExpression, limit, offset, callback){
 			var network = networks[i];
 			network.jid = common.convertFromRID(network.jid);
 		}
-        callback({networks : networks, error : err});
+		
+        callback({networks : networks, blockAmount: networks.length, error : err});
     });
 };
 

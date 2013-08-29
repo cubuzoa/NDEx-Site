@@ -39,6 +39,7 @@ describe('NDEx Find Networks: ', function (done) {
 			function(err, res, body){
 				if(err) { done(err) }
 				else {
+					//console.log(res.body.error);
 					res.should.have.status(200);
 					networkOwnerJID = res.body.jid;
 					console.log('...user created...creating network...');
@@ -92,7 +93,7 @@ describe('NDEx Find Networks: ', function (done) {
 					if(err) { done(err) }
 					else {
 						res.should.have.status(200);
-						//testNetwork.title.should.equal(res.body.networks[0].title);
+						testNetwork.title.should.equal(res.body.networks[0].title); //TODO, check that this is working
 						done();
 					}
 				}
