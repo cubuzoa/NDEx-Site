@@ -5,8 +5,9 @@
     "private": true,
     "dependencies": {
         "express": "3.x",
-        "passport": "0.1.x",
-        "passport-local": "0.1.x",
+        "passport": "*",
+        "passport-local": "*",
+        "passport-http" : "*",
         "util": "0.4.9",
         "connect-flash": "0.1.x",
         "ejs" : "0.8.3",

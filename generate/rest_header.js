@@ -1,9 +1,13 @@
 var flash = require('connect-flash')
   , express = require('express')
   , passport = require('passport')
-//  , util = require('util')
-  , LocalStrategy = require('passport-local').Strategy;
-  
+  , BasicStrategy = require('passport-http').BasicStrategy;
+
+//-----------------------------------------------------------
+//
+//				configure OrientDB
+//
+//-----------------------------------------------------------
 
 var orientdb = require('orientdb');
 
@@ -16,6 +20,13 @@ var serverConfig = {
 	host: 'localhost',
 	port: 2424
 };
+
+//-----------------------------------------------------------
+//
+//				create the App
+//              Specify the REST API port
+//
+//-----------------------------------------------------------
 
 var app = express();
 var port = 3333;
@@ -46,25 +57,28 @@ app.configure(function(){
 });
  
 app.configure(function() {
-
-  app.set('views', __dirname + '/views');
-  app.set('view engine', 'ejs');
   
   app.use(allowCrossDomain);
   
-  //app.use(express.logger());
+  app.use(express.logger());
   app.use(express.cookieParser());
   app.use(express.bodyParser());
   app.use(express.methodOverride());
-  app.use(express.session({ secret: 'keyboard cat' }));
-  
-  // Initialize Passport!  
-  // Also use passport.session() middleware, to support
-  // persistent login sessions (recommended).
-  //
-  app.use(flash());
-  app.use(passport.initialize());
-  app.use(passport.session());
+
+  // Initialize Passport!
+  // REST API not using sessions
+  // No need to use session middleware when each
+  // request carries authentication credentials, as is the case with HTTP Basic.
+    app.use(passport.initialize());
+
+    //
+    // app.use(express.session({ secret: 'keyboard cat' }));
+    // Not using flash messaging
+    // app.use(flash());
+
+    // Not using passport.session() middleware
+    // app.use(passport.session());
+
   
   app.use(app.router);
   
@@ -82,6 +96,43 @@ app.configure(function() {
 //
 //-----------------------------------------------------------
 
+// Use the BasicStrategy within Passport.
+//   Strategies in Passport require a `verify` function, which accept
+//   credentials (in this case, a username and password), and invoke a callback
+//   with a user object.
+passport.use(new BasicStrategy({
+    },
+    function(username, password, done) {
+        // asynchronous verification, for effect...
+        process.nextTick(function () {
+
+            // Find the user by username.  If there is no user with the given
+            // username, or the password is not correct, set the user to `false` to
+            // indicate failure.  Otherwise, return the authenticated `user`.
+            console.log("About to authenticate " + username + ":" + password);
+            if(username == "guest" && password == "guestpassword"){
+                console.log("authenticating guest user");
+                return done(null, {username: "guest", jid: 'guestjid'});
+            } else findByUsername(username, function (err, users) {
+                console.log("found users " + JSON.stringify(users));
+                if (err) {
+                    return done(err);
+                }
+                if (!users || users.length == 0) {
+                    return done(null, false);
+                }
+                var user = users[0];
+                if (user.password != password) {
+                    return done(null, false);
+                }
+                return done(null, user);
+            })
+        });
+    }
+));
+
+
+/*
 // Passport session setup.
 //
 //   To support persistent login sessions, Passport needs to be able to
@@ -113,7 +164,6 @@ passport.deserializeUser(function(id, done) {
 	}
   });
 });
-
 
 //   Use the LocalStrategy within Passport.
 //
@@ -149,11 +199,42 @@ passport.use(new LocalStrategy(
   }
 ));
 
+*/
+
 app.get('/', function(req, res){
-  res.render('home', { user: req.user, title: "Home"});
+  res.redirect('/authenticate');
 });
 
-// POST /authenticate
+// curl -v -I http://127.0.0.1:3000/
+// curl -v -I --user public:public_password http://127.0.0.1:3000/
+app.get('/authenticate',
+    // Authenticate using HTTP Basic credentials, with session support disabled.
+    passport.authenticate('basic', { session: false }),
+    function(req, res){
+        res.json({ username: req.user.username,
+                   jid: convertFromRID(req.user.rid)
+                   });
+    });
+
+/*
+// Simple route middleware checks passport flags to ensure user is authenticated.
+//
+//   (works with passport session)
+//
+//   Use this route middleware on API resources that need to be protected.
+//
+//   If the request is authenticated the request will proceed.
+//
+//   Otherwise, respond with a 401 indicating that authentication is required
+//
+function apiEnsureAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) { return next(); }
+    res.send(401, {error: "authentication required"});
+}
+*/
+
+/*
+// POST /authenticate  example used with sessions and LocalStrategy
 //
 //   Use passport.authenticate() as route middleware to authenticate the
 //   request.  
@@ -163,24 +244,11 @@ app.get('/', function(req, res){
 app.post('/authenticate', 
   passport.authenticate('local', { failureRedirect: '/login', failureFlash: true }),
   function(req, res) {
-  	// TODO - change to make a simple success response - and pass back token?
     res.redirect('/');
   });
+*/
   
-  
-// Simple route middleware to ensure user is authenticated.
 
-//   Use this route middleware on API resources that need to be protected.  
-//
-//   If the request is authenticated (typically via a persistent login session),
-//   the request will proceed.
-//
-//   Otherwise, respond with a 401 indicating that authentication is required
-//
-function apiEnsureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) { return next(); }
-  res.send(401, {error: "authentication required"});
-}
 
 //-----------------------------------------------------------
 //

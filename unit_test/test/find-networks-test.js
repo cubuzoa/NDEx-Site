@@ -17,37 +17,34 @@ Teardown
 var request = require('request'),
 	assert = require('assert'),
 	should = require('should'),
+    ndex = require('../ndex_modules/ndex-request.js');
 	fs = require('fs');
-	
-var baseURL = 'http://localhost:3333';
 
-console.log("starting find networks test");
- 
-describe('NDEx Find Networks: ', function (done) {
+describe('find-networks', function (done) {
+
 	this.timeout(10000);
-	var testNetwork = {title : '', jid : ''};
-	var networkOwnerJID = null;
+	var networkOwner, testNetwork;
 	before( function (done) {
-		console.log('\nsetup: find networks test');
+		console.log('setup: find-networks');
 		var data = fs.readFileSync('../test_db/test_networks/pc_sif/testNetwork.jdex', 'utf8'); 
 		data = JSON.parse(data);
-		request({
-			method : 'POST',
-			url : baseURL + '/users/',
-			json : {username : 'NetworkOwner', password : 'password'}
-			},
+        testNetwork = {title : '', jid : ''};
+        networkOwner = {username : 'NetworkOwner', password : 'password'};
+		ndex.post(
+			'/users/',
+			{username : networkOwner.username, password : networkOwner.password},
+            ndex.guest,
 			function(err, res, body){
 				if(err) { done(err) }
 				else {
-					//console.log(res.body.error);
+					console.log(res.body.error);
 					res.should.have.status(200);
-					networkOwnerJID = res.body.jid;
+					networkOwner.jid = res.body.jid;
 					console.log('...user created...creating network...');
-					request({
-							method : 'POST',
-							url: baseURL + '/networks',
-							json : {network : data, accountid : networkOwnerJID}
-						},
+					ndex.post(
+						'/networks',
+						{network : data, accountid : networkOwner.jid},
+                        networkOwner,
 						function(err, res, body){
 							if(err) { done(err) }
 							else {
@@ -57,21 +54,17 @@ describe('NDEx Find Networks: ', function (done) {
 								console.log('...complete');//ensures completion
 								done();
 							}
-						}
-					);
+						});
 				}
-			}
-		);
+			});
 	});
 	
-	describe("Should: ", function(){
+	describe("find-networks", function(){
 		it("should get 200 searching with a long random string but no results", function(done){
-			request({
-					method : 'GET',
-					url: baseURL + '/networks/',
-					qs: {searchExpression: 'DLKJFALDJFLADJFK', limit: 10, offset: 0},
-					json:true
-				},
+			ndex.get(
+				'/networks/',
+				{searchExpression: 'DLKJFALDJFLADJFK', limit: 10, offset: 0},
+                networkOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -82,13 +75,12 @@ describe('NDEx Find Networks: ', function (done) {
 				}
 			);	
 		});
+
 		it("should get 200 and network descriptors including expected network searching on known TestNetwork title", function(done){
-			request({
-					method : 'GET',
-					url: baseURL + '/networks/',
-					qs: {searchExpression: testNetwork.title.toUpperCase(), limit: 10, offset: 0},
-					json:true
-				},
+			ndex.get(
+				'/networks/',
+				{searchExpression: testNetwork.title.toUpperCase(), limit: 10, offset: 0},
+				networkOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -100,13 +92,12 @@ describe('NDEx Find Networks: ', function (done) {
 				}
 			);	
 		});
+
 		it("should get 200 and only 2 results searching on '' with limit = 2", function(done){
-			request({
-					method : 'GET',
-					url: baseURL + '/networks/',
-					qs: {searchExpression: '', limit: 2, offset: 0},
-					json:true
-				},
+			ndex.get(
+				'/networks/',
+				{searchExpression: '', limit: 2, offset: 0},
+				networkOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -117,13 +108,12 @@ describe('NDEx Find Networks: ', function (done) {
 				}
 			);	
 		});
+
 		it("should get 200 and 2 different results searching on '' with limit = 2, offset = 2", function(done){
-			request({
-					method : 'GET',
-					url: baseURL + '/networks/',
-					qs: {searchExpression: '', limit: 2, offset: 2},
-					json:true
-				},
+			ndex.get(
+				'/networks/',
+				{searchExpression: '', limit: 2, offset: 2},
+				networkOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -138,20 +128,18 @@ describe('NDEx Find Networks: ', function (done) {
 	});
 	
 	after( function (done) {
-		console.log('\nteardown: find networks test');
-		request({
-				method : 'DELETE',
-				url : baseURL + '/networks/' + testNetwork.jid
-			},
+		console.log('teardown: find-networks');
+		ndex.delete(
+			'/networks/' + testNetwork.jid,
+            networkOwner,
 			function(err, res, body){
 				if(err) { done(err) }
 				else {
 					res.should.have.status(200);
 					console.log('...network deleted...deleting user...');
-					request({
-						method : 'DELETE',
-						url : baseURL + '/users/' + networkOwnerJID	
-						},
+					ndex.delete(
+						'/users/' + networkOwner.jid,
+						networkOwner,
 				  		function(err, res, body){
 				  			if(err) { done(err) }
 				  			else { 

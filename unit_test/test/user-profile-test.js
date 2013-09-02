@@ -15,10 +15,12 @@ var request = require('request'),
 	
 var baseURL = 'http://localhost:3333';
 
-console.log("starting user profile test");
  
 describe('NDEx User Profile: ', function () {
-	//harryJID is to be used in multiple test cases
+
+    console.log("starting user profile test");
+
+    //harryJID is to be used in multiple test cases
 	var harryJID = null;
 	before( function (done) {
 		console.log('\nsetup: user profile test');

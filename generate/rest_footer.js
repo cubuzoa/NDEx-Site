@@ -6,14 +6,12 @@
 //
 //-----------------------------------------------------------
 
-function findByUsername(username, fn) {
-	var cmd = "select from xUser where username = '" + username + "'";
-	db.command(cmd, fn);
+function findByUsername(username, callback) {
+    db.command("select username, password, @rid as rid from xUser where username = '" + username + "'", callback);
 }
 
-function findById(id, fn) {
-  var cmd = "select from " + id + " where @class = xUser";
-  db.command(cmd, fn);
+function findById(userRID, callback) {
+  db.command("select from xUser where @rid = " + userRID + "", callback);
 }
 
 //-----------------------------------------------------------

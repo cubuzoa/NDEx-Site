@@ -30,42 +30,40 @@ Teardown
 var request = require('request'),
 	assert = require('assert'),
 	should = require('should'),
-	fs = require('fs');
-	
-var baseURL = 'http://localhost:3333';
-
-console.log("starting user workspace test");
+	fs = require('fs'),
+    ndex = require('../ndex_modules/ndex-request.js');
  
-describe('NDEx Workspaces: ', function (done) {
-	//to be used throughout test cases
-	var workspaceOwnerJID = null;
-	var newNetworkJID = null;
-	//unit test setup
+describe('user-workspace', function (done) {
+
+	var workspaceOwner, newNetwork, networkArray, cell_map;
+
 	before( function (done) {
 		console.log('\nsetup: user workspace test');
-		request({
-				method : 'POST',
-				url : baseURL + '/users/', 
-				json : {username : "WorkspaceOwner", password : "password"}
-			},
+        workspaceOwner = {username : "WorkspaceOwner", password : "password"};
+        newNetwork = {};
+        networkArray = [];
+        cell_map = null;
+		ndex.post(
+			'/users/',
+			{username : workspaceOwner.username, password : workspaceOwner.password},
+			ndex.guest,
 			function(err,res,body){
 				if(err) { console.log(err) }
 				else { 
 					res.should.have.status(200)
-					workspaceOwnerJID = res.body.jid
+					workspaceOwner.jid = res.body.jid
 					console.log('...user created...creating network...')//ensures completion
 					var data = fs.readFileSync('../test_db/test_networks/pc_sif/testNetwork.jdex', 'utf8'); 
 					data = JSON.parse(data);	
-					request({
-							method : 'POST',
-							url: baseURL + '/networks',
-							json : {network : data, accountid : workspaceOwnerJID}
-						},
+					ndex.post(
+						'/networks',
+						{network : data, accountid : workspaceOwner.jid},
+                        workspaceOwner,
 						function(err, res, body){
 							if(err) { done(err) }
 							else {
 								res.should.have.status(200)
-								newNetworkJID = res.body.jid
+								newNetwork.jid = res.body.jid
 								console.log('...complete')//ensures completion
 								done()
 							}
@@ -79,11 +77,10 @@ describe('NDEx Workspaces: ', function (done) {
 	describe('Should', function() {
 		this.timeout(10000);// occasionally, requests take longer
 		it("should get 404 getting workspace for non-existent User Id", function(done){
-			request({
-					method : 'GET',
-					url: baseURL + '/users/C21R4444/workspace',
-					json: true
-				},
+			ndex.get(
+				'/users/C21R4444/workspace',
+                {},
+                workspaceOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -94,12 +91,12 @@ describe('NDEx Workspaces: ', function (done) {
 			);
 				
 		});
+
 		it("should get 200 and empty workspace on getting workspace of new user WorkspaceOwner", function(done){
-			request({
-					method : 'GET',
-					url: baseURL + '/users/'+ workspaceOwnerJID +'/workspace',
-					json: true
-				},
+			ndex.get(
+				'/users/'+ workspaceOwner.jid +'/workspace',
+                {},
+				workspaceOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -109,17 +106,14 @@ describe('NDEx Workspaces: ', function (done) {
 						done();
 					}
 				}
-			);							
-				
+			);
 		});
-		var networkArray = []; 
+
 		it("should get 200 and network descriptors finding existing networks by name that will be added to workspace.", function(done){
-			request({
-					method : 'GET',
-					url: baseURL + '/networks/',
-					qs: {searchExpression: 'REACT', limit: 100, offset: 0},
-					json:true
-				},
+			ndex.get(
+				'/networks/',
+				{searchExpression: 'REACT', limit: 100, offset: 0},
+				workspaceOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -134,16 +128,17 @@ describe('NDEx Workspaces: ', function (done) {
 		});
 		
 		it("should get 200 adding a network to WorkspaceOwner's workspace; repeat to add all of the test networks.",function(done){
-			//code need inside test case due to asynchrounous nature of this unit test, otherwise, networkArray will be null
+			// code needed inside test case due to asynchronous nature
+			// of this unit test, otherwise, networkArray will be null
 			var isFin = function doNothing() {};
+
 			for(var ii = 0; ii < networkArray.length ; ii ++){
 				if(ii == (networkArray.length -1)) { isFin = done }
 				(function(tempNet, isFinished){
-					request({
-							method : 'POST',
-							url: baseURL + '/users/'+ workspaceOwnerJID +'/workspace',
-							json: {networkid: tempNet.jid}
-						},
+					ndex.post(
+						'/users/'+ workspaceOwner.jid +'/workspace',
+						{networkid: tempNet.jid},
+                        workspaceOwner,
 						function(err,res,body){
 							if(err) { done(err) }
 							else {
@@ -156,12 +151,12 @@ describe('NDEx Workspaces: ', function (done) {
 				})(networkArray[ii],isFin);//params passed at closure due to asynch function inside
 			}					
 		});
+
 		it("should get 200 and workspace on getting workspace of new user WorkspaceOwner", function(done){
-			request({
-					method : 'GET',
-					url: baseURL + '/users/'+ workspaceOwnerJID +'/workspace',
-					json: true
-				},
+			ndex.get(
+				'/users/'+ workspaceOwner.jid +'/workspace',
+                {},
+				workspaceOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -173,24 +168,21 @@ describe('NDEx Workspaces: ', function (done) {
 				}
 			);		
 		});
+
 		it("should get 404 attempting to remove network from workspace that is not in workspace", function(done){
-			var cell_map = null;
-			request({
-					method : 'GET',
-					url: baseURL + '/networks/',
-					qs: {searchExpression: 'CELL_MAP:TGFBR', limit: 100, offset: 0},
-					json:true
-				},
+			ndex.get(
+				'/networks/',
+				{searchExpression: 'CELL_MAP:TGFBR', limit: 100, offset: 0},
+				workspaceOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
 						res.should.have.status(200);
 						cell_map = res.body.networks;
 						cell_map = cell_map[0];
-						request({
-								method : 'DELETE',
-								url: baseURL + '/users/'+ workspaceOwnerJID +'/workspace/' + cell_map.jid
-							},
+						ndex.delete(
+							'/users/'+ workspaceOwner.jid +'/workspace/' + cell_map.jid,
+                            workspaceOwner,
 							function(err,res,body){
 								if(err) { done(err) }
 								else {
@@ -203,13 +195,13 @@ describe('NDEx Workspaces: ', function (done) {
 				}
 			);	
 		});
+
 		it("should get 400 attempting to add network already in workspace", function(done){
 			var tempNet = networkArray[0];
-			request({
-					method : 'POST',
-					url: baseURL + '/users/'+ workspaceOwnerJID +'/workspace',
-					json: {networkid: tempNet.jid}
-				},
+			ndex.post(
+				'/users/'+ workspaceOwner.jid +'/workspace',
+				{networkid: tempNet.jid},
+				workspaceOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -220,12 +212,12 @@ describe('NDEx Workspaces: ', function (done) {
 				}
 			);	
 		});
+
 		it("should get 404 attempting to add non-existent Network Id", function(done){
-			request({
-					method : 'POST',
-					url: baseURL + '/users/'+ workspaceOwnerJID +'/workspace',
-					json: {networkid: 'C11R4444444'}
-				},
+			ndex.post(
+				'/users/'+ workspaceOwner.jid +'/workspace',
+				{networkid: 'C11R4444444'},
+				workspaceOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -236,12 +228,12 @@ describe('NDEx Workspaces: ', function (done) {
 				}
 			);		
 		});
+
 		it("should get 404 attempting to add using non-existent User Id", function(done){
-			request({
-					method : 'POST',
-					url: baseURL + '/users/C21R4444444/workspace',
-					json: {networkid: 'C11R3'}
-				},
+			ndex.post(
+				'/users/C21R4444444/workspace',
+				{networkid: 'C11R3'},
+				workspaceOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -252,12 +244,12 @@ describe('NDEx Workspaces: ', function (done) {
 				}
 			);		
 		});
+
 		it("should get 200 adding new network to workspace", function(done){
-			request({
-					method : 'POST',
-					url: baseURL + '/users/' + workspaceOwnerJID + '/workspace',
-					json: {networkid: newNetworkJID}
-				},
+			ndex.post(
+				'/users/' + workspaceOwner.jid + '/workspace',
+				{networkid: newNetwork.jid},
+				workspaceOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -267,12 +259,12 @@ describe('NDEx Workspaces: ', function (done) {
 				}
 			);		
 		});
+
 		it("should get 200 and network descriptors including new network when getting workspace", function(done){
-			request({
-					method : 'GET',
-					url: baseURL + '/users/'+ workspaceOwnerJID +'/workspace',
-					json: true
-				},
+			ndex.get(
+				'/users/'+ workspaceOwner.jid +'/workspace',
+                {},
+				workspaceOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -286,11 +278,11 @@ describe('NDEx Workspaces: ', function (done) {
 				}
 			);		
 		});
+
 		it("should get 200 deleting new network", function(done){
-			request({
-					method : 'DELETE',
-					url : baseURL + '/networks/' + newNetworkJID
-				},
+			ndex.delete(
+				'/networks/' + newNetwork.jid,
+				workspaceOwner,
 				function(err, res, body){
 					if(err) { done(err) }
 					else {
@@ -301,12 +293,12 @@ describe('NDEx Workspaces: ', function (done) {
 				}
 			);		
 		});
+
 		it("should get 200 and network descriptors NOT including new network when getting workspace", function(done){
-			request({
-					method : 'GET',
-					url: baseURL + '/users/'+ workspaceOwnerJID +'/workspace',
-					json: true
-				},
+			ndex.get(
+				'/users/'+ workspaceOwner.jid +'/workspace',
+                {},
+				workspaceOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -324,20 +316,18 @@ describe('NDEx Workspaces: ', function (done) {
 	});
 	//unit test teardown
 	after( function (done) {
-		console.log('\nteardown: user workspace test');
-		request({
-				method : 'DELETE',
-				url : baseURL + '/networks/' + newNetworkJID
-			},
+		console.log('teardown: user workspace test');
+		ndex.delete(
+			'/networks/' + newNetwork.jid,
+            workspaceOwner,
 			function(err, res, body){
 				if(err) { done(err) }
 				else {
 					res.should.have.status(404);
 					console.log('...network deletion comfirmed...deleting user...');// ensures completion
-					request({
-						method : 'DELETE',
-						url : baseURL + '/users/' + workspaceOwnerJID	
-						},
+					ndex.delete(
+						'/users/' + workspaceOwner.jid,
+						workspaceOwner,
 				  		function(err, res, body){
 				  			if(err) { done(err) }
 				  			else { 

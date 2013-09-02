@@ -26,9 +26,8 @@ var request = require('request'),
 	
 var baseURL = 'http://localhost:3333';
 
-console.log("starting group profile test");
- 
 describe('NDEx Group Profile: ', function () {
+    console.log("starting group profile test");
 	var group1 = {jid : '', profile : {}};
 	var group1JID = null;
 	before( function (done) {

@@ -19,10 +19,9 @@ var request = require('request'),
 	should = require('should');
 	
 var baseURL = 'http://localhost:3333';
-
-console.log("starting group test");
  
 describe('NDEx Groups: ', function () {
+    console.log("starting group test");
 	//joshJID is to be used in multiple test cases
 	var joshJID = null;
 	before( function (done) {

@@ -112,10 +112,7 @@ for (n in specs.resourceTypes){
 			}
 			responseModifierLines.push("          }");
 			
-			var authenticator = "";
-			if (spec.requiresAuthentication){
-				authenticator = ", apiEnsureAuthentication ";
-			}
+			var authenticator = ", passport.authenticate('basic', { session: false }) ";
 			
 			lines = lines.concat(
 								

@@ -4,10 +4,11 @@ var request = require('request'),
 	
 var baseURL = 'http://localhost:3333';
 
-console.log("starting status test");
+
  
 describe('Server Status:', function () {
- 
+  console.log("starting status test");
+
   describe('GET /status', function () {
   
     it("should respond with status 200", function (done) {

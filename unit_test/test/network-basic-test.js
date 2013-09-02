@@ -1,50 +1,31 @@
-/*
-Setup:
 
-    create User: NetworkOwner
-
-Should:
-
-    get 404 getting non-existent Network Id
-    get 404 attempting to create Network1 with non-existant User Id
-    get 200 creating Network1 owned by NetworkOwner
-    get 200 getting Network1 and verifying title and description
-    get 200 getting NetworkOwner and verify that Network1 is on ownedNetworks
-    get 200 deleting Network1
-    get 404 deleting Network1 again
-    get 200 getting NetworkOwner and verify that Network1 is not on owned networks (this probably fails right now)
-    get 404 getting Network1
-
-Teardown
-
-    delete User: NetworkOwner
-*/
-//TODO for should get 200 getting network by edges, parameters not test nor implemented in routes
+//TODO for should get 200 getting network by edges, parameters not yet tested, preliminary implementation in Network.js
 var request = require('request'),
 	assert = require('assert'),
 	should = require('should'),
-	fs = require('fs');
-	
-var baseURL = 'http://localhost:3333';
-
-console.log("starting networks test");
+	fs = require('fs'),
+    ndex = require('../ndex_modules/ndex-request.js');
  
-describe('NDEx Networks: ', function (done) {
-	this.timeout(10000);
-	var networkOwnerJID = null;
-	var network1 = {title : '', jid : ''};
+describe('network-basic', function (done) {
+
+    this.timeout(10000);
+	var networkOwner, network1, data;
 	before( function(done){
-		console.log('\nsetup: network test');
-		request({
-				method : 'POST',
-				url : baseURL + '/users',
-				json : {username: 'NetworkOwner', password: 'password'}
-			},
+		console.log('setup: network test');
+        network1 = {title : '', jid : ''};
+        networkOwner = {username: 'NetworkOwner', password: 'password'};
+        data = fs.readFileSync('../test_db/test_networks/pc_sif/testNetwork.jdex', 'utf8');
+        data = JSON.parse(data);
+
+        ndex.post(
+			'/users',
+            {username: networkOwner.username, password: networkOwner.password},
+			ndex.guest,
 			function(err, res, body){
 				if(err) { done(err) }
 				else{
 					res.should.have.status(200);
-					networkOwnerJID = res.body.jid;
+					networkOwner.jid = res.body.jid;
 					console.log('...complete');
 					done();
 				}
@@ -52,13 +33,12 @@ describe('NDEx Networks: ', function (done) {
 		);	
 	});
 	
-	describe('Should: ', function(done) {
+	describe('network-basic', function(done) {
 		it("should get 404 getting non-existent Network Id", function(done){
-			request({
-					method : 'GET',
-					url: baseURL + '/networks/C11R44444',
-					json: true
-				},
+			ndex.get(
+				'/networks/C11R44444',
+                {},
+				networkOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -69,14 +49,12 @@ describe('NDEx Networks: ', function (done) {
 			);
 				
 		});
+
 		it("should get 404 attempting to create Network1 with non-existant User Id ", function(done){
-			var data = fs.readFileSync('../../test_db/test_networks/pc_sif/testNetwork.jdex', 'utf8'); 
-			data = JSON.parse(data);	
-			request({
-				method : 'POST',
-				url: baseURL + '/networks',
-				json : {network : data, accountid : 'C21R44444'}
-				},
+			ndex.post(
+				'/networks',
+				{network : data, accountid : 'C21R44444'},
+				networkOwner,
 				function(err, res, body){
 					if(err) { done(err) }
 					else {
@@ -86,14 +64,12 @@ describe('NDEx Networks: ', function (done) {
 				}
 			);
 		});
+
 		it("should get 200 creating Network1 owned by NetworkOwner", function(done){
-			var data = fs.readFileSync('../../test_db/test_networks/pc_sif/testNetwork.jdex', 'utf8'); 
-			data = JSON.parse(data);	
-			request({
-				method : 'POST',
-				url: baseURL + '/networks',
-				json : {network : data, accountid : networkOwnerJID}
-				},
+            ndex.post(
+                '/networks',
+				{network : data, accountid : networkOwner.jid},
+				networkOwner,
 				function(err, res, body){
 					if(err) { done(err) }
 					else {
@@ -105,12 +81,12 @@ describe('NDEx Networks: ', function (done) {
 				}
 			);
 		});
+
 		it("should get 200 getting Network1 and verifying title and description", function(done){
-			request({
-					method : 'GET',
-					url: baseURL + '/networks/' + network1.jid,
-					json: true
-				},
+			ndex.get(
+				'/networks/' + network1.jid,
+                {},
+				networkOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -122,11 +98,12 @@ describe('NDEx Networks: ', function (done) {
 			);
 				
 		});
+
 		it("should get 200 getting NetworkOwner and verify that Network1 is on ownedNetworks", function (done){
-  			request({
-  					url: baseURL + '/users/' + networkOwnerJID,
-  					json : true
-  				},
+  			ndex.get(
+  				'/users/' + networkOwner.jid,
+                {},
+  				networkOwner,
   				function(err, res, body){
   					if(err) { done(err) }  
   					else {
@@ -137,12 +114,12 @@ describe('NDEx Networks: ', function (done) {
   				}
   			);	
   		});
+
   		it("should get 200 on getting network by edges", function (done){
-  			request({
-  					url: baseURL + '/networks/' + network1.jid + '/edge',
-  					qs : {typeFilter: '', propertyFilter: '', subjectNodeFilter: '', objectNodeFilter: '', limit: 10, offset : 0},
-  					json : true
-  				},
+  			ndex.get(
+  				'/networks/' + network1.jid + '/edge',
+  				{typeFilter: '', propertyFilter: '', subjectNodeFilter: '', objectNodeFilter: '', limit: 10, offset : 0},
+  				networkOwner,
   				function(err, res, body){
   					if(err) { done(err) }  
   					else {
@@ -153,12 +130,12 @@ describe('NDEx Networks: ', function (done) {
   				}
   			);	
   		});
+
   		it("should get 200 on getting network by nodes", function (done){
-  			request({
-  					url: baseURL + '/networks/' + network1.jid + '/node',
-  					qs : {typeFilter: '', propertyFilter: '', limit: 10, offset : 0},
-  					json : true
-  				},
+  			ndex.get(
+  				'/networks/' + network1.jid + '/node',
+  				{typeFilter: '', propertyFilter: '', limit: 10, offset : 0},
+  				networkOwner,
   				function(err, res, body){
   					if(err) { done(err) }  
   					else {
@@ -169,11 +146,11 @@ describe('NDEx Networks: ', function (done) {
   				}
   			);	
   		});
+
 		it("should get 200 deleting network", function(done){
-			request({
-					method : 'DELETE',
-					url : baseURL + '/networks/' + network1.jid
-				},
+			ndex.delete(
+				'/networks/' + network1.jid,
+				networkOwner,
 				function(err, res, body){
 					if(err) { done(err) }
 					else {
@@ -183,11 +160,11 @@ describe('NDEx Networks: ', function (done) {
 				}
 			);		
 		});
-		it("should get 404 deleting network", function(done){
-			request({
-					method : 'DELETE',
-					url : baseURL + '/networks/' + network1.jid
-				},
+
+		it("should get 404 deleting already deleted network", function(done){
+			ndex.delete(
+				'/networks/' + network1.jid,
+				networkOwner,
 				function(err, res, body){
 					if(err) { done(err) }
 					else {
@@ -197,11 +174,12 @@ describe('NDEx Networks: ', function (done) {
 				}
 			);		
 		});
+
 		it("should get 200 getting NetworkOwner and verify that Network1 is not in ownedNetworks", function (done){
-  			request({
-  					url: baseURL + '/users/' + networkOwnerJID,
-  					json : true
-  				},
+  			ndex.get(
+  				'/users/' + networkOwner.jid,
+                {},
+  				networkOwner,
   				function(err, res, body){
   					if(err) { done(err) }  
   					else {
@@ -212,12 +190,12 @@ describe('NDEx Networks: ', function (done) {
   				}
   			);	
   		});
+
   		it("should get 404 getting Network1", function(done){
-			request({
-					method : 'GET',
-					url: baseURL + '/networks/' + network1.jid,
-					json: true
-				},
+			ndex.get(
+				'/networks/' + network1.jid,
+                {},
+				networkOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -231,11 +209,10 @@ describe('NDEx Networks: ', function (done) {
 	});
 	
 	after( function(done){
-		console.log('\nteardown: network test');
-		request({
-			method : 'DELETE',
-			url : baseURL + '/users/' + networkOwnerJID
-			},
+		console.log('teardown: network-basic-test');
+		ndex.delete(
+			'/users/' + networkOwner.jid,
+			networkOwner,
 			function(err, res, body){
 				if(err) { done(err) }
 				else{

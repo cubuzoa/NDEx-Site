@@ -13,53 +13,51 @@ delete User: GroupOwner*/
 
 var request = require('request'),
 	assert = require('assert'),
-	should = require('should');
-	
-var baseURL = 'http://localhost:3333';
-
-console.log("starting group members test");
+	should = require('should'),
+    ndex = require('../ndex_modules/ndex-request.js');
  
-describe('NDEx Group Members: ', function () {
-	//var jid = {groupOwner : '', groupMember : '', group1 : ''};
-	var groupOwnerJID = null;
-	var groupMemberJID = null;
-	var group1JID = null;
+describe('group-members', function () {
+
+    //var jid = {groupOwner : '', groupMember : '', group1 : ''};
+	var groupOwner, groupMember, group1, request1;
+
 	before( function (done) {
-		console.log('\nsetup: group members test');
-		request({
-				method : 'POST',
-				url : baseURL + '/users', 
-				json : {username : "GroupOwner", password : "password"}
-			},
+		console.log('setup: group-members');
+        groupOwner = {username : "GroupOwner", password : "password"};
+        groupMember = {username : "GroupMember", password : "password"};
+        group1 = {groupname : "Group1"};
+        request1 = {};
+		ndex.post(
+			'/users',
+			{username : groupOwner.username, password : groupOwner.password},
+            ndex.guest,
 			function(err,res,body){
 				if(err) { done(err) }
 				else { 
 					//console.log(JSON.stringify(body));
 					res.should.have.status(200);
-					groupOwnerJID = res.body.jid;
+					groupOwner.jid = res.body.jid;
 					console.log('...1 user created...creating second user...');
-					request({
-							method : 'POST',
-							url : baseURL + '/users', 
-							json : {username : "GroupMember", password : "password"}
-						},
+					ndex.post(
+						'/users',
+						{username : groupMember.username, password : groupMember.password},
+						ndex.guest,
 						function(err,res,body){
 							if(err) { done(err) }
 							else { 
 								//console.log(JSON.stringify(body));
 								res.should.have.status(200);
-								groupMemberJID = res.body.jid;
+								groupMember.jid = res.body.jid;
 								console.log('...2 users created...creating group...');
-								request({
-										method : 'POST',
-										url : baseURL + '/groups/',
-										json : {userid : groupOwnerJID , groupName : "Group1"}
-									},
+								ndex.post(
+									'/groups/',
+									{userid : groupOwner.jid , groupName : group1.groupname},
+									groupOwner,
 									function(err,res,body){
 										if(err) { done(err) }
 										else {
 											res.should.have.status(200);
-											group1JID = res.body.jid;
+											group1.jid = res.body.jid;
 											done();
 										}
 									}
@@ -71,31 +69,31 @@ describe('NDEx Group Members: ', function () {
 			}
 		);//close create group owner
 	});
-	describe("Should : ", function(){
-		var request1JID = null;
+
+	describe("group-members", function(){
+
 		it("should get 200 for creating request from group owner to group member", function(done){
-			request({
-					method : 'POST',
-					url : baseURL + '/requests',
-					json : {toid : groupMemberJID, fromid : groupOwnerJID, requestType: 'groupInvitation', message: 'this is a test', aboutid: group1JID}
-				},
+			ndex.post(
+				'/requests',
+				{toid : groupMember.jid, fromid : groupOwner.jid, requestType: 'groupInvitation', message: 'this is a test', aboutid: group1.jid},
+				groupOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
 						//console.log(body.error);
 						res.should.have.status(200);
-						request1JID = res.body.jid;
+						request1.jid = res.body.jid;
 						done();
 					}
 				}
 			);
 		});
+
 		it("should get 200 for deleting request1", function(done){
-			request({
-					method : 'POST',
-					url : baseURL + '/requests/' + request1JID,
-					json : {approval : "approve"}
-				},
+			ndex.post(
+				'/requests/' + request1.jid,
+				{approval : "approve"},
+                groupMember,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -108,29 +106,26 @@ describe('NDEx Group Members: ', function () {
 	});
 	
 	after( function (done) {
-		console.log('\nteardown: group members test')
-		request({
-				method : 'DELETE',
-				url : baseURL + '/groups/' + group1JID	
-			},
+		console.log('teardown: group-members');
+		ndex.delete(
+			'/groups/' + group1.jid,
+            groupOwner,
 	  		function(err, res, body){
 	  			if(err) { done(err) }
 	  			else { 
 	  				res.should.have.status(200);
 	  				console.log('...group deleted...deleting group member...');
-	  				request({
-							method : 'DELETE',
-							url : baseURL + '/users/' + groupMemberJID	
-						},
+	  				ndex.delete(
+						'/users/' + groupMember.jid,
+						groupMember,
 				  		function(err, res, body){
 				  			if(err) { done(err) }
 				  			else { 
 				  				res.should.have.status(200);
 				  				console.log('...group member deleted...deleting group owner...');
-				  				request({
-										method : 'DELETE',
-										url : baseURL + '/users/' + groupOwnerJID	
-									},
+				  				ndex.delete(
+									'/users/' + groupOwner.jid,
+									groupOwner,
 							  		function(err, res, body){
 							  			if(err) { done(err) }
 							  			else { 

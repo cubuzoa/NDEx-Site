@@ -5,10 +5,12 @@ var request = require('request'),
 	
 var baseURL = 'http://localhost:3333';
 
-console.log("starting tasks test");
  
 describe('NDEx Tasks: ', function () {
-	var userJID = null;
+
+    console.log("starting tasks test");
+
+    var userJID = null;
 	before( function (done) {
 		console.log('\nsetup: tasks test');
 		request({
