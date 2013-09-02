@@ -22,32 +22,34 @@ Teardown
 
 var request = require('request'),
 	assert = require('assert'),
-	should = require('should');
-	
-var baseURL = 'http://localhost:3333';
+	should = require('should'),
+    ndex = require('../ndex_modules/ndex-request.js');
 
 describe('NDEx Group Profile: ', function () {
-    console.log("starting group profile test");
-	var group1 = {jid : '', profile : {}};
-	var group1JID = null;
+	var group1, groupOwner;
 	before( function (done) {
-		console.log('\nsetup: user profile test');
-		request({
-				method : 'POST',
-				url : baseURL + '/users', 
-				json : {username : "groupOwner", password : "password"}
-			},
+		console.log('setup: user profile test');
+        group1 = {jid : '', profile : {}, groupName : "Group1"};
+        group1.profile.organizationName = 'Anonymous';
+        group1.profile.website = 'http://www.op99.org';
+        group1.profile.foregroundImg = 'none';
+        group1.profile.backgroundImg = 'none';
+        group1.profile.description = 'no one knows';
+        groupOwner = {username : "groupOwner", password : "password"};
+		ndex.post(
+			'/users',
+			{username : groupOwner.username, password : groupOwner.password},
+			ndex.guest,
 			function(err,res,body){
 				if(err) { done(err) }
 				else { 
 					res.should.have.status(200);
-					groupOwnerJID = res.body.jid;
+					groupOwner.jid = res.body.jid;
 					console.log('...user created...creating group');
-					request({
-						method : 'POST',
-						url : baseURL + '/groups/',
-						json : {userid : groupOwnerJID, groupName : "Group1"}
-						},
+					ndex.post(
+						'/groups/',
+						{userid : groupOwner.jid, groupName : group1.groupName},
+						groupOwner,
 						function(err, res, body){
 							if(err) { done(err) }
 							else{
@@ -63,12 +65,13 @@ describe('NDEx Group Profile: ', function () {
 		);
 	});
 	
-	describe("Should:", function(){
+	describe("group-profile", function(){
+
 		it("should get 404 getting profile for non-existent Group Id", function(done){
-			request({
-					method : 'GET',
-					url : baseURL + '/groups/C22R444444'
-				},
+			ndex.get(
+				'/groups/C22R444444',
+                {},
+				groupOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -78,12 +81,12 @@ describe('NDEx Group Profile: ', function () {
 				}
 			);
 		});
+
 		it("should get 200 and '' getting profile of Group1", function(done){
-			request({
-					method : 'GET',
-					url : baseURL + '/groups/' + group1.jid,
-					json : true
-				},
+			ndex.get(
+				'/groups/' + group1.jid,
+                {},
+				groupOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -94,18 +97,12 @@ describe('NDEx Group Profile: ', function () {
 				}
 			);
 		});
+
 		it("get 200 posting profile to Group1", function(done){
-			group1.profile.organizationName = 'Anonymous';
-			group1.profile.website = 'http://www.op99.org';
-			group1.profile.foregroundImg = 'none';
-			group1.profile.backgroundImg = 'none';
-			group1.profile.description = 'no one knows';
-			
-			request({
-					method : 'POST',
-					url : baseURL + '/groups/' + group1.jid + '/profile',
-					json : {groupid: group1.jid, profile: group1.profile}
-				},
+			ndex.post(
+				'/groups/' + group1.jid + '/profile',
+				{groupid: group1.jid, profile: group1.profile},
+				groupOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -115,12 +112,12 @@ describe('NDEx Group Profile: ', function () {
 				}
 			);
 		});
+
 		it("should get 200 getting profile of Group1", function(done){
-			request({
-					method : 'GET',
-					url : baseURL + '/groups/' + group1.jid,
-					json : true
-				},
+			ndex.get(
+				'/groups/' + group1.jid,
+                {},
+				groupOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -131,6 +128,7 @@ describe('NDEx Group Profile: ', function () {
 				}
 			);
 		});
+
 		it("get 200 posting different profile to Group1", function(done){
 			group1.profile.organizationName = 'OpenSource';
 			group1.profile.website = 'http://www.opensource.org';
@@ -138,11 +136,10 @@ describe('NDEx Group Profile: ', function () {
 			group1.profile.backgroundImg = 'none';
 			group1.profile.description = 'none';
 			
-			request({
-					method : 'POST',
-					url : baseURL + '/groups/' + group1.jid + '/profile',
-					json : {groupid: group1.jid, profile: group1.profile}
-				},
+			ndex.post(
+				'/groups/' + group1.jid + '/profile',
+				{groupid: group1.jid, profile: group1.profile},
+				groupOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -152,12 +149,12 @@ describe('NDEx Group Profile: ', function () {
 				}
 			);
 		});
+
 		it("should get 200 getting different profile of Group1", function(done){
-			request({
-					method : 'GET',
-					url : baseURL + '/groups/' + group1.jid,
-					json : true
-				},
+			ndex.get(
+				'/groups/' + group1.jid,
+                {},
+				groupOwner,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -171,20 +168,18 @@ describe('NDEx Group Profile: ', function () {
 	});
 	
 	after( function (done) {
-		console.log('\nteardown: group profile test')
-		request({
-				method : 'DELETE',
-				url : baseURL + '/groups/' + group1.jid	
-			},
+		console.log('teardown: group profile test')
+		ndex.delete(
+			'/groups/' + group1.jid,
+			groupOwner,
 	  		function(err, res, body){
 	  			if(err) { done(err) }
 	  			else { 
 	  				res.should.have.status(200);
 	  				console.log('...group deleted...deleting user...');
-	  				request({
-							method : 'DELETE',
-							url : baseURL + '/users/' + groupOwnerJID	
-						},
+	  				ndex.delete(
+						'/users/' + groupOwner.jid,
+						groupOwner,
 				  		function(err, res, body){
 				  			if(err) { done(err) }
 				  			else { 

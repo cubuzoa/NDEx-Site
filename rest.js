@@ -374,7 +374,7 @@ app.post('/users', passport.authenticate('basic', { session: false }) , function
 // Set new profile for user. Requester must be user or have admin permissions.
 app.post('/users/:userid/profile', passport.authenticate('basic', { session: false }) , function(req, res) {
   try {
-    var userid = req.body['userid'];
+    var userid = req.params['userid'];
     if(!common.checkJID(userid)) res.send(400, { error: 'bad JID : ' + userid});
     userid = convertToRID(userid);
     var profile = req.body['profile'];
@@ -407,7 +407,7 @@ app.post('/users/:userid/profile', passport.authenticate('basic', { session: fal
 // Set a new foreground image for user. Requester must be user or have admin permissions.
 app.post('/users/:userid/images', passport.authenticate('basic', { session: false }) , function(req, res) {
   try {
-    var userid = req.body['userid'];
+    var userid = req.params['userid'];
     if(!common.checkJID(userid)) res.send(400, { error: 'bad JID : ' + userid});
     userid = convertToRID(userid);
     var type = req.body['type'];

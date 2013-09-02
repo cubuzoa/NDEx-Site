@@ -70,12 +70,9 @@ exports.User = [
 		doc : "Set new profile for user. Requester must be user or have admin permissions.",
 		method : "POST",
 		route : "/users/:userid/profile",
-		postData: {
-				userid : {	doc : "user id", type : "JID", required : true, class : "xUser"},
-				profile : {	doc : "group profile", type : "JSON"}
-				},
-		response: {
-			},
+        routeParams: {userid : {doc : "user id", type : "JID", class : "xUser"}},
+		postData: {profile : {	doc : "group profile", type : "JSON"}},
+		response: {},
 		exceptions: ["404 unknown user id",
 					"401 Requester not authorized"]
 	},
@@ -85,9 +82,9 @@ exports.User = [
 		doc : "Set a new foreground image for user. Requester must be user or have admin permissions.",
 		method : "POST",
 		route : "/users/:userid/images",
+        routeParams: {userid : {doc : "user id", type : "JID", class : "xUser"}},
 		postData: {
-				userid : {	doc : "user id", type : "JID", required : true, class : "xUser"},
-				type : {	doc : "type of image", 
+				type : {	doc : "type of image",
 							type : "string", 
 							oneOf: ["foreground", "background"]}
 				},
@@ -153,9 +150,7 @@ exports.User = [
 		doc : "Get a user by userid. Content returned depends on requester permissions.",
 		method : "GET",
 		route : "/users/:userid",
-		routeParams: {	
-				userid : { doc : "user id", type : "JID", class : "xUser"}
-					},
+        routeParams: {userid : {doc : "user id", type : "JID", class : "xUser"}},
 		response: {user : "user descriptor"},
 		exceptions: ["404 unknown user id",
 					"401 Requester not authorized"]
@@ -166,9 +161,7 @@ exports.User = [
 		doc : "Delete a user by user id. Requester must be user or have admin permissions.",
 		method : "DELETE",
 		route : "/users/:userid",
-		routeParams: {	
-				userid : { doc : "user id", type : "JID", class : "xUser"}
-					},
+        routeParams: {userid : {doc : "user id", type : "JID", class : "xUser"}},
 		response: {},
 		exceptions: ["404 unknown user id",
 					"401 Requester not authorized"]
@@ -180,9 +173,7 @@ exports.User = [
 		doc : "Get the user's workspace. Requester must be user or have admin permissions.",
 		method : "GET",
 		route : "/users/:userid/workspace",
-		routeParams: {	
-				userid : { doc : "user id", type : "JID", class : "xUser"}
-					},
+        routeParams: {userid : {doc : "user id", type : "JID", class : "xUser"}},
 		response: {user : "user descriptor"},
 		exceptions: ["404 unknown user id",
 					"401 Requester not authorized"]
@@ -194,9 +185,7 @@ exports.User = [
 		doc : "Add a network to the user's workspace. Requester must be user or have admin permissions. User must have permission to access network",
 		method : "POST",
 		route : "/users/:userid/workspace",
-		routeParams: {	
-				userid : { doc : "user id", type : "JID", class : "xUser"}
-					},
+        routeParams: {userid : {doc : "user id", type : "JID", class : "xUser"}},
 		postData: {
 				networkid : {	doc : "user id", type : "JID", required : true, class : "xNetwork"},
 				},

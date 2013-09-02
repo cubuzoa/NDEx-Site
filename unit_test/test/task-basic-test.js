@@ -1,29 +1,27 @@
 
 var request = require('request'),
 	assert = require('assert'),
-	should = require('should');
-	
-var baseURL = 'http://localhost:3333';
+	should = require('should'),
+    ndex = require('../ndex_modules/ndex-request.js');
 
  
-describe('NDEx Tasks: ', function () {
+describe('task-basic', function () {
 
-    console.log("starting tasks test");
-
-    var userJID = null;
+    var user1, task1;
 	before( function (done) {
-		console.log('\nsetup: tasks test');
-		request({
-				method : 'POST',
-				url : baseURL + '/users', 
-				json : {username : "User", password : "password"}
-			},
+		console.log('setup: tasks test');
+        user1 = {username : "User1xe45e", password : "password"};
+        task1 = {description: "modify network"};
+		ndex.post(
+			'/users',
+			{username : user1.username, password : user1.password},
+			ndex.guest,
 			function(err,res,body){
 				if(err) { done(err) }
 				else { 
 					//console.log(JSON.stringify(body));
 					res.should.have.status(200);
-					userJID = res.body.jid;
+					user1.jid = res.body.jid;
 					console.log('...complete');
 					done();
 				}
@@ -31,31 +29,29 @@ describe('NDEx Tasks: ', function () {
 		);
 	});
 	
-	describe("Should : ", function(){
-		var task1JID = null;
+	describe(" -> task-basic", function(){
 		it("should get 200 for creating task for user", function(done){
-			request({
-					method : 'POST',
-					url : baseURL + '/tasks',
-					json : {task: "modify network", userid: userJID}
-				},
+			ndex.post(
+				'/tasks',
+				{task: task1.description, userid: user1.jid},
+				user1,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
 						//console.log(body);
 						res.should.have.status(200);
-						task1JID = res.body.jid;
+						task1.jid = res.body.jid;
 						done();
 					}
 				}
 			);
 		});
+
 		it("should get 200 for getting task1", function(done){
-			request({
-					method : 'GET',
-					url : baseURL + '/tasks/' + task1JID,
-					json : true
-				},
+			ndex.get(
+				'/tasks/' + task1.jid,
+                {},
+				user1,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -66,12 +62,12 @@ describe('NDEx Tasks: ', function () {
 				}
 			);
 		});
+
 		it("should get 200 for updating task1", function(done){
-			request({
-					method : 'POST',
-					url : baseURL + '/tasks/' + task1JID,
-					json : {status : "inactive"}
-				},
+			ndex.post(
+				'/tasks/' + task1.jid,
+				{status : "inactive"},
+				user1,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -82,12 +78,12 @@ describe('NDEx Tasks: ', function () {
 				}
 			);
 		});
+
 		it("should get 200 for getting updated task1", function(done){
-			request({
-					method : 'GET',
-					url : baseURL + '/tasks/' + task1JID, 
-					json : true
-				},
+			ndex.get(
+				'/tasks/' + task1.jid,
+                {},
+				user1,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -98,11 +94,11 @@ describe('NDEx Tasks: ', function () {
 				}
 			);
 		});
+
 		it("should get 200 for deleting task1", function(done){
-			request({
-					method : 'DELETE',
-					url : baseURL + '/tasks/' + task1JID
-				},
+			ndex.delete(
+				'/tasks/' + task1.jid,
+				user1,
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
@@ -115,11 +111,10 @@ describe('NDEx Tasks: ', function () {
 	});
 	
 	after( function (done) {
-		console.log('\nteardown: tasks test')
-		request({
-				method : 'DELETE',
-				url : baseURL + '/users/' + userJID	
-			},
+		console.log('teardown: tasks test')
+		ndex.delete(
+			'/users/' + user1.jid,
+			user1,
 	  		function(err, res, body){
 	  			if(err) { done(err) }
 	  			else { 
