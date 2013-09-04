@@ -170,7 +170,7 @@ exports.getUser = function (userRID, callback) {
 
                     // get owned networks
                     var networkDescriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount";
-                    var traverseExpression = "traverse V.out, E.in from " + userRID + " while $depth <= 2"
+                    var traverseExpression = "select flatten(out(xOwnsNetwork)) from " + userRID;
 
                     var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
                     module.db.command(networks_cmd, function (err, networks) {
@@ -186,7 +186,7 @@ exports.getUser = function (userRID, callback) {
 
                             // get owned groups
                             var groupDescriptors = "organizationName as organizationName, @rid as jid";
-                            var traverseExpression = "traverse V.out, E.in from " + userRID + " while $depth <= 2"
+                            var traverseExpression = "select flatten(out(xOwnsGroup)) from" + userRID;
                             var groups_cmd = "select " + groupDescriptors + " from (" + traverseExpression + ") where @class = 'xGroup'";
                             module.db.command(groups_cmd, function (err, groups) {
                                 if (common.checkErr(err, "getting owned groups", callback)) {
