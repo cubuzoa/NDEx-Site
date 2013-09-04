@@ -15,168 +15,7 @@ function xferProperties(from, to, propertyNames){
 	}
 }
 
-
-exports.createNetworkEdges = function(networkJDEx, network){
-	for(index in networkJDEx.edges){
-		exports.createNetworkEdge(network["@rid"], networkJDEx.edges[index]);
-	}
-}
-
-exports.createNetworkEdge = function(networkRID, edge){
-	// Get the predicate term
-	var termCmd = "select from (traverse terms from " + networkRID + " while $depth < 2) where $depth = 1 and id = " + edge.p;
-	//console.log("index " + index + " edge " + edge.s + " " + edge.o);
-	
-	module.db.command(termCmd, function(err1, results1){
-	
-			if (err1){
-				console.log("error in finding term for edge: " + err1);
-			} else {
-
-			//
-			// Finding nodes and predicate term referenced by the edge, use traverse to search terms in this network:
-			//
-			// select from (traverse terms from #18:7 while $depth < 2) where $depth = 1 and id = 2
-			//		
-			var	term = results1[0],
-				fromExp = "select from (traverse nodes from " + networkRID + " while $depth < 2) where $depth = 1 and id = " + edge.s,
-				toExp = "select from (traverse nodes from " + networkRID + " while $depth < 2) where $depth = 1 and id = " + edge.o,
-				 cmd = "create edge xEdge from (" + fromExp + ") to (" + toExp + ") set p = " + term["@rid"] + ", n = " + networkRID ;
-			 
-			module.db.command(cmd, function (err2, results2){
-				//console.log("ran " + cmd);
-				if (err2) {
-					console.log("error in creating edge: " + err2);
-				} else {
-				//console.log("got " + Object.keys(results2[0]).join(", "));
-		
-					// TODO:
-					// After each edge is created, link it to its supports (if any)
-		
-					// now link the edge to the network, not just the nodes
-					var newEdge = results2[0],
-						updateCmd = "update " + networkRID + " add edges = " + newEdge["@rid"];
-						module.db.command(updateCmd, function (err3, results3){
-							//console.log("ran " + updateCmd);
-							if (err3) console.log("error: " + err3);
-						});
-				}
-			
-			});
-		}
-	});
-}
-
-exports.linkNodesToTerms = function(networkJDEx, network){
-	console.log("------------- link nodes to terms ------------------");
-	var networkRID = network["@rid"];
-	var nodeCmd = "select from (traverse nodes from " + networkRID + " while $depth < 2) where $depth = 1";
-	console.log(nodeCmd);
-	module.db.command(nodeCmd, function(err, nodes){		
-			
-		if (err){
-			console.log("error in finding nodes of network: " + err);
-		} else {
-			for (i in nodes){
-				var node = nodes[i];
-				// look up the term id that the node represents
-				if (node.id){
-					var jnode = networkJDEx.nodes[node.id];
-					if (jnode && jnode.represents){
-						// IF we found the node in the jdex 
-						// AND it has a 'represents' property
-						// THEN link it to the xTerm in orient
-						exports.linkNodeToTerm(node['@rid'], networkRID, jnode.represents);
-						
-
-					}
-				}
-			}
-			
-		}
-	});
-
-};
-
-exports.linkNodeToTerm = function(nodeRID, networkRID, termId){
-	var termCmd= "select from (traverse terms from " + networkRID + " while $depth < 2) where $depth = 1 and id = " + termId;
-	module.db.command(termCmd, function(err, terms){
-		if (err){
-			console.log("error in finding represented term : " + err);
-		} else {
-			var term = terms[0];
-			updateCmd = "update " + nodeRID + " set represents = " + term['@rid'];
-			console.log("Represents: " + updateCmd);
-			module.db.command(updateCmd, function(err2){
-				if (err2){
-					console.log("error in setting represented term : " + err2);
-				}
-			});
-		}
-	});
-};
-
-
-
-// Create a new network in the specified account
-exports.createNetworkOld = function(networkJDEx, accountRID, callback){
-
-	var title = "untitled";
-
-	if (networkJDEx.properties && networkJDEx.properties.title){
-		title = networkJDEx.properties.title;
-	}
-	
-	console.log("calling createNetwork for " + title + " owned by account: " + accountRID);
-	
-	// First create a document to load which will create all of the Vertices
-	// including their JDEx IDs, but not the cross-links between the objects.
-	// (in some cases, such as functional terms, the JDEx ID is the *only* 
-	// property they have at this time)
-	
-	var initialDocument = exports.createNetworkDocument(networkJDEx);
-	// console.log(JSON.stringify(initialDocument));
-	
-		
-	// The initial network will be created by the db.cascadingSave facility
-	// db.save works for documents without links
-	// where as cascadingSave creates embedded documents and links them
-	module.db.cascadingSave(initialDocument, function (err, document){
-	
-		if (err){
-			console.log("error saving initial network: " + err);
-		}
-		
-		if (document && document["@rid"]){
-		
-			var networkRID = document["@rid"];
-	
-			//console.log("Saved initial document: " + JSON.stringify(document));
-		
-			// assert ownership of network - can be asynch since both network and account exist
-			var ownsEdgeCMD = "create edge xOwnsNetwork from " + accountRID + " to " + networkRID;
-			module.db.command(ownsEdgeCMD, function(err){
-			});
-		
-			// create all the Edges with their JDEx IDs.
-			// This can be asynchronous because the nodes already exist.	
-			exports.createNetworkEdges(networkJDEx, document);
-		
-			// TODO link nodes to terms via represents
-			exports.linkNodesToTerms(networkJDEx, document);
-			
-			// link 
-		
-			callback({jid: networkRID, ownedBy: accountRID, error : err, status : 200});
-			
-		} else {
-			console.log("initial document is null, even though no error signaled");
-		}
-	});
-};	
-
-
-// Create a new network in the specified account
+// Create a new network from JDEx, owned by the specified account
 exports.createNetwork = function(networkJDEx, accountRID, callback){
 	
 	var title = "untitled";
@@ -336,6 +175,9 @@ function indexNetworkDocument(document){
 	return networkIndex;
 };
 
+//
+// TODO : errors thrown in callbacks are useless.
+// They are NOT caught by the API catch so they will crash the server instead of aborting the network creation
 function createNetworkEdgeAsync(networkRID, edge, networkIndex){
 	// Get the RIDs for the subject node, object node, and predicate term
 	var subjectRID = networkIndex[edge.s],
@@ -367,6 +209,9 @@ function createNetworkEdgeAsync(networkRID, edge, networkIndex){
 	}
 }
 
+// The semantics of a node are defined by the term to which the node is linked
+// There are use cases for *both* finding nodes based on terms *and* finding terms based on nodes
+//
 function linkNodesToTerms(networkJDEx, networkIndex){
 	for (nodeId in networkJDEx.nodes){
 		var node = networkJDEx.nodes[nodeId];
@@ -390,6 +235,12 @@ function linkNodesToTerms(networkJDEx, networkIndex){
 	}
 }
 
+//
+// Function Terms are defined by reference to:
+// 1. a function term  (so far, always a Basic Term)
+// 2. parameters that are terms (either Basic Terms *or* FunctionTerms
+// 3. parameters that are literal values
+//
 function linkFunctionTerms(networkJDEx, networkIndex){
 	for (termId in networkJDEx.terms){
 		var term = networkJDEx.terms[termId],
@@ -429,8 +280,9 @@ function linkFunctionTerms(networkJDEx, networkIndex){
 
 //
 // Temporary: searchExpression is only used to match substrings in title and description fields of network
-//
+// TODO : Redesign API to allow for more complex search expressions, including search based on network content
 exports.findNetworks = function (searchExpression, limit, offset, callback){
+	//TODO : determine size of search results in order to compute block size
 	console.log("calling findNetworks with arguments: '" + searchExpression + "' " + limit + " " + offset);
 	var start = (offset)*limit;
 	var where_clause = "";
@@ -451,11 +303,12 @@ exports.findNetworks = function (searchExpression, limit, offset, callback){
 			network.jid = common.convertFromRID(network.jid);
 		}
 		
-        callback({networks : networks, blockAmount: networks.length, error : err});
+        callback({networks : networks, blockAmount: '5', error : err});
     });
 };
 
 // get an entire network
+// TODO: handle all components of network, such as citations, supports, etc.
 exports.getNetwork = function(networkRID, callback){
 	console.log("calling getNetwork with networkRID = '" + networkRID + "'");
 	var cmd = "select from " + networkRID + "";
@@ -538,11 +391,10 @@ exports.getNetwork = function(networkRID, callback){
 // get a network via its edges
 exports.getNetworkByEdges = function(networkid, typeFilter, propertyFilter, subjectNodeFilter, objectNodeFilter, limit, offset, callback, errorHandler){
 	console.log("calling get network by edges with arguments: " + limit + ', ' + offset);
-	//TODO
-	//implement filters
+	//TODO: implement filters
 	//assuming offset acting as start indicator, lowest value can be 1 for page 1
 	//implement get terms and nodes via edge links, currently getting all terms and nodes
-	//namespaces not included
+	//TODO: include other network components referenced by the edges - i.e. return a coherent subnetwork
 	
 	var result = {title : '', blockAmount: '', namespaces : {}, terms: {}, nodes: {}, edges: {}};
 	
@@ -609,13 +461,12 @@ exports.getNetworkByEdges = function(networkid, typeFilter, propertyFilter, subj
 //get a network via its nodes
 exports.getNetworkByNodes = function(networkid, typeFilter, propertyFilter, limit, offset, callback, errorHandler){
 	console.log("calling get network by nodes with arguments: " + limit + ', ' + offset);
-	//TODO
-	//implement filters
+	//TODO: implement filters
 	//assuming offset acting as start indicator, lowest value can be 1 for page 1
 	//implement get terms and nodes via edge links, currently getting all terms and nodes
-	//namespaces not included
-	
-	var result = {title : '', blockAmount: '', namespaces : {}, terms: {}, nodes: {}, edges: {}};
+	//TODO: include other network components referenced by the nodes - i.e. return a coherent subnetwork
+
+    var result = {title : '', blockAmount: '', namespaces : {}, terms: {}, nodes: {}, edges: {}};
 	
 	// get the terms
 	var term_cmd = "select id, name, ns.id as nsid, @rid as rid from (traverse terms from " + networkid + ") where $depth = 1";
@@ -662,7 +513,8 @@ exports.getNetworkByNodes = function(networkid, typeFilter, propertyFilter, limi
 // delete a network
 exports.deleteNetwork = function (networkRID, callback){
 	console.log("calling delete network with id = '" + networkRID + "'");
-	// Check that network exists
+	// TODO: existence of network now handled by ridCheck function in Common.js, can remove check from this method
+    // TODO: determine whether this simple delete will delete dependent objects or if we need a more sophisticated delete method
 	module.db.command("select @rid as rid from " + networkRID + " where @class = 'xNetwork'", function(err, network_ids){
 		if(common.checkErr(err, "checking network before adding to workspace ", callback)){
 			if (!network_ids || network_ids.length < 1){

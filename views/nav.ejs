@@ -8,11 +8,10 @@
 	  		<span class="icon-bar"></span>
 	  	</a>
 			<a class="brand" href="/" ><b>NDEx</b></a>
-			<% if (user) {%> <%= user.username %><%}%>
-		
-			<div class="nav-collapse">			
-				<ul class="nav pull-left main-nav">   
-				  
+			<!--<% if (user) {%> <%= user.username %><%}%>-->
+	
+			<div class="nav-collapse">
+				<ul class="nav pull-left main-nav"> 
 				  <li><a href="/searchNetworks">Networks</a></li>
 				  <li><a href="/searchGroups">Groups</a></li>
 				  <li><a href="/searchUsers">Users</a></li>
@@ -27,6 +26,10 @@
 				  <%} else {%>
 				  <li><a href="/logout" >Sign out</a></li>
 				  <%}%>
+
+				</ul>
+				<ul class ="nav pull-right main-nav">
+					<li> <a> <% if (user) {%> <%= user.username %><%}%> </a> </li>
 				</ul>
 			
 			</div><!-- /.nav-collapse -->

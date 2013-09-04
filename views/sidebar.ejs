@@ -1,11 +1,10 @@
+<% if (user) { %>
 <div id= "sidebar" >
 	<div id="stay" class="well" data-spy="affix">
-		<a onClick="toggle2(this)"><i id="sidebarButton" class="icon-chevron-left"></i></a>
+		<a onClick="toggle2(this)" href="#"><i id="sidebarButton" class="icon-chevron-left"></i></a>
 		<h4 style="text-align:center" >Work Surface</h4>
-		<div id="wrapper" style="dipslay: none">
-			<div id="workSurface">
-		
-			</div>
+		<div id="workSurface" style="dipslay: none">
+			
 		</div>
 		<div id="tools" class="btn-group">
 			<a id="viewNet" onclick="viewNtwk()" class = "btn" rel = "tooltip" title = "View Network" data-placement = "top" >
@@ -23,15 +22,16 @@
 		</div>
 	</div>
 </div>
-<div id= "sideError"></div>
 
 <script>
 //TODO
 //update remove/add workspace buttons for searchnetworks/view user/view group
 //add icon representaions for thumbnails?
-//fix button tools as done in search networks
+
+var user = {username : '<%= user.username %>', jid: 'C21R1'};
+
 function toggle2(obj) {
-	var ele = document.getElementById('wrapper');
+	var ele = document.getElementById('workSurface');
 	var prnt = document.getElementById('sidebar');
 	var but = document.getElementById('sidebarButton');
 	if(ele.style.display == "block") {
@@ -46,7 +46,7 @@ function toggle2(obj) {
 	}
 }
 
-function addNetworkIcon(ntwkObj,count){
+function addNetworkIcon(ntwkObj){
 	var unlst = document.createElement('ul'),
 		lst = document.createElement('li'),
 		cnt = document.createElement('div'),
@@ -147,84 +147,37 @@ function compareNtwks(){
 
 function removeNtwk(){
 	var parent = document.getElementById('workSurface');
-
+	
 	$("input").each(function(index,value){
 		if($(this).is(':checked')){
+			ndexClient.deleteNetworkFromUserWorkspace(user.jid, $(this).attr('title'), function(data) {});
+
 			var child = document.getElementById('thumbnail' + $(this).attr('title'));
 			parent.removeChild(child);
 		}
 	});
 	
+	
 }
 
 function formatError(error){
 }
-
-</script>
-
-
-
-
-<script>
-var searchExpression = '', 
-		limit = 100,
-		count = 1,
-		offset = 0;
-
-	console.log("Calling findNetworks");
-	
-	
-	ndexClient.findNetworks(searchExpression, limit, offset, function(data){
-		console.log("Got results from findNetworks");
-		console.log(data);
-		for (i in data.networks){
-			var network = data.networks[i];
-			console.log(network.title);
-		}
+//------------------------------------
+//
+//			Initialization Code
+//
+//------------------------------------
 		
-		// Clears the searchResults div
-		$('#workSurface').html('');
-		
-		if (data.networks){
-			$.each(data.networks, function(index, item){
-				$('#workSurface').append(addNetworkIcon(item,count));
-				count = count + 1;
-			});  
-		}
-    },
-    // error handler
-    function(error){
-    	$('#sideError').append(formatError(error));
-    });
-    
-    /*ndexClient.addNetworkToUserWorkspace('C21R0', 'C11R2', 
-    	function(data){
-    		for (i in data){	
-    			$('#workSurface').append(i);
-    		}
-    	},
-  	function(error){
-  		for (i in error){	
-    			$('#workSurface').append(i);
-    		}
-  	}
-    );*/
-    
-    ndexClient.getUserWorkspace('C21R0', function(data){
-			
-			if(data.networks){
-				for (i in data.networks){	
-    					$('#workSurface').append(data.networks);
-    				}
-				$.each(data.networks, function(index, item){
-					$('#workSurface').append('item');	
-				});
-			}
-		},
-		function(error){
-		}
-	);
-    
+
+ndexClient.getUserWorkspace(user.jid, function(data){	
+	if(data.networks){
+		$.each(data.networks, function(index, item){
+			$('#workSurface').append(addNetworkIcon(item));	
+		});
+	}
+}
+);
+  
     
 </script>    
-   
+   <%}%>

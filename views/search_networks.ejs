@@ -1,12 +1,56 @@
 <% include head.ejs %>
 <% include nav.ejs %>
 
+<!-- btn-group from twitter allows for next div to be aligned and pulled right, easy fix-->
+<div class="btn-group">
+	<form onsubmit="return doSearch();" id="searchForm">
+		<div>
+		<label>Query:</label>
+		<input type="text" name="searchExpression" id="searchExpression"/><br/>
+		</div>
+
+		<div>
+		<input type="submit" value="Search"/>
+		</div>
+	</form>
+</div>
+<div class = "pull-right">
+	<a class = "ndex-options" href = "#searchOptions" data-toggle="modal"> 
+		<i class="icon-cog icon-large"></i> 
+	</a>
+</div>
+
+<div id="searchResults">
+
+</div>
+
+<div id = "searchOptions" class = " modal hide fade" tabindex = "-1" role = "dialog" aria-labelledby = "myModalLabel" aria-hidden = "true">
+	<div class = "modal-header">
+		<h4 id = "myModalLabel"> Network Search Options </h4>
+	</div>
+	<div class="modal-body">
+		
+		<label class = "span2">Search results per page: </label>
+		<input id = "searchCount" type = "text" class = "span2" pattern = "" min = "1"> <br>
+		<label class = "span2">Current page: </label>
+		<input id = "searchPage" type = "text" class = "span2" pattern = "" min = "1" placeholder = "0"> <br>
+		
+	</div>
+	<div class = "modal-footer">
+		<button class = "btn" onclick = "doSearch()" data-dismiss = "modal" aria-hidden = "true"> Save Changes </button>
+		<button class = "btn" data-dismiss = "modal" aria-hidden = "true"> Cancel </button>
+	</div>
+</div>
+
 <script>
 // On form submit, send the search expression to findNetworks
 // with a limit of 100.
 //TODO 
 //DOM Elements depend on object JID for identification, consider using names instead.
 //copy code to view group and view user
+<% if (user) { %>
+var user = {username : '<%= user.username %>', jid: 'C21R1'};
+<% } %>
 
 function doSearch(offset) {
 	var limitInput = document.getElementById('searchCount');
@@ -107,14 +151,16 @@ function createPaginationModule(pageAmount, page) {
 	return pagDiv;
 }
 
+//---------------------------------
+//	Workspace Functions
+//---------------------------------
+<% if (user) { %>
 
 function onWorkspace(jid){
-	//check if network is on the user workspace. 
-	//TODO will be replaced by api functions
-	var tempLink = document.getElementById('link'+jid);
-	//var tempBtn = document.getElementById('button'+jid);
-	var tempIcon = document.getElementById('icon'+jid);
-	var found = false;
+	//check if network is on the user workspace.  
+	var tempLink = document.getElementById('link'+jid),
+		tempIcon = document.getElementById('icon'+jid),
+		found = false;
 	
 	
 	$("input").each(function(index,value){
@@ -134,19 +180,26 @@ function onWorkspace(jid){
 }
 
 function removeFromWorkspace(obj){
+	//$(obj).attr('title') holds the corresponding network jid
+	var network = $(obj).data('networkProperties');
 	var parent = document.getElementById('workSurface');
 
 	$("input").each(function(index,value){
-		if($(this).attr('title') == $(obj).attr('title')){
-			var child = document.getElementById('thumbnail' + $(this).attr('title'));
+		if($(this).attr('title') == network.jid){
+			ndexClient.deleteNetworkFromUserWorkspace(user.jid, network.jid, function(data) {});
+			var child = document.getElementById('thumbnail' + network.jid);
 			parent.removeChild(child);
-			onWorkspace($(obj).attr('title'));
+			onWorkspace(network.jid);
 		}
 	});
 	
 }
 
 function addToWorkspace(obj){
+	//$(obj).attr('title') holds the corresponding network jid
+	var network= $(obj).data('networkProperties');
+
+	ndexClient.addNetworkToUserWorkspace(user.jid, network.jid, function(data) {});
 	var unlst = document.createElement('ul'),
 		lst = document.createElement('li'),
 		cnt = document.createElement('div'),
@@ -156,23 +209,26 @@ function addToWorkspace(obj){
 	var parent = document.getElementById('workSurface');
 		
 	$(titleSpan).addClass('thumbText')
-		.append($(obj).attr('title'));//
-	$(chckbox).attr('id','checkbox' + $(obj).attr('title'))
-		.attr('title',$(obj).attr('title'))
+		.append(network.title);//
+	$(chckbox).attr('id','checkbox' + network.jid)
+		.attr('title',network.jid)
 		.attr('type','checkbox');
 	$(formBox).append(chckbox);
 	$(cnt).addClass('thumbnail thumbIcon')
 		.append(formBox)
 		.append(titleSpan);
 	$(lst).append(cnt);
-	$(unlst).attr('id','thumbnail' + $(obj).attr('title'))
+	$(unlst).attr('id','thumbnail' + network.jid)
 		.addClass('thumbnails')
 		.append(lst);
 	
 	$(parent).append(unlst);
-	onWorkspace($(obj).attr('title'));
+	onWorkspace(network.jid);
 }
-
+<% } %>
+//------------------------------------
+//	Network List Interface
+//--------------------------------------
 function toggle(obj) {
 	var divDisplay = obj.id +1;
 	var ele = document.getElementById(divDisplay);
@@ -210,6 +266,7 @@ function buttonTools(item){
 
 	
 	$(wkSpaceLink).attr('onclick','')
+		.data('networkProperties',{title : item.title, jid : item.jid})
 		.attr('id','link'+item.jid)
 		.attr('title',item.jid)
 		.addClass('btn')
@@ -227,11 +284,14 @@ function buttonTools(item){
 		.attr('data-placement','bottom')
 		.append(visualizeIcon);
 		
+	<% if (user) { %>
+	$(buttonDiv).append(wkSpaceLink);
+	<% } %>
+		
 	$(buttonDiv).addClass('btn-group')
-		.append(wkSpaceLink)
 		.append(viewLink)
 		.append(visualizeLink);
-		
+
 	return buttonDiv
 }
 
@@ -309,46 +369,7 @@ function formatError(error){
 }
 
 </script>
-<!-- btn-group from twitter allows for next div to be aligned and pulled right, easy fix-->
-<div class="btn-group">
-	<form onsubmit="return doSearch();" id="searchForm">
-		<div>
-		<label>Query:</label>
-		<input type="text" name="searchExpression" id="searchExpression"/><br/>
-		</div>
 
-		<div>
-		<input type="submit" value="Search"/>
-		</div>
-	</form>
-</div>
-<div class = "pull-right">
-	<a class = "ndex-options" href = "#searchOptions" data-toggle="modal"> 
-		<i class="icon-cog icon-large"></i> 
-	</a>
-</div>
-
-<div id="searchResults">
-
-</div>
-
-<div id = "searchOptions" class = " modal hide fade" tabindex = "-1" role = "dialog" aria-labelledby = "myModalLabel" aria-hidden = "true">
-	<div class = "modal-header">
-		<h4 id = "myModalLabel"> Network Search Options </h4>
-	</div>
-	<div class="modal-body">
-		
-		<label class = "span2">Search results per page: </label>
-		<input id = "searchCount" type = "text" class = "span2" pattern = "" min = "1"> <br>
-		<label class = "span2">Current page: </label>
-		<input id = "searchPage" type = "text" class = "span2" pattern = "" min = "1" placeholder = "0"> <br>
-		
-	</div>
-	<div class = "modal-footer">
-		<button class = "btn" onclick = "doSearch()" data-dismiss = "modal" aria-hidden = "true"> Save Changes </button>
-		<button class = "btn" data-dismiss = "modal" aria-hidden = "true"> Cancel </button>
-	</div>
-</div>
 
 <% include sidebar.ejs %>
 <% include foot.ejs %>

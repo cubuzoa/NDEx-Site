@@ -170,7 +170,7 @@ background-color:white;
 	padding-bottom:1em;
 }
 
-#wrapper{
+#workSurface{
 /*This fixed position along with overflow attribute create constant size for div and add scrollbar*/
 	position:absolute;
 	top:75px;
@@ -300,4 +300,5 @@ a.ndex-options{
 }
 a.ndex-options:hover{
 	color: #3366BB;
+	text-decoration:none;
 }

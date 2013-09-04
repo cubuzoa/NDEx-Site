@@ -64,6 +64,9 @@
 	</div>
 </div>
 <script>
+<% if (user) { %>
+	var user = {username : '<%= user.username %>', jid: 'C21R1'};
+<% } %>
 
 // the network id passed from the ejs template
 var networkRID = '<%= networkId %>';
@@ -136,6 +139,12 @@ function formatNode(node, network){
 
 }
 
+//--------------------------------------------	
+//		Workspace Functions
+//--------------------------------------------
+<% if (user) { %>
+
+
 function onWorkspace(){
 	var tempEle = document.getElementById('netStatus');
 	var tempLnk = document.createElement('a');
@@ -158,6 +167,7 @@ function onWorkspace(){
 }
 
 function addToWorkspace(){
+	ndexClient.addNetworkToUserWorkspace(user.jid, networkRID, function(data) {});// TODO handle errors? along with similar functions
 	var unlst = document.createElement('ul'),
 		lst = document.createElement('li'),
 		cnt = document.createElement('div'),
@@ -167,7 +177,7 @@ function addToWorkspace(){
 	var parent = document.getElementById('workSurface');
 		
 	$(titleSpan).addClass('thumbText')
-		.append(networkRID);//
+		.append($('#viewNetTitle').html());//
 	$(chckbox).attr('id','checkbox' + networkRID)
 		.attr('title',networkRID)
 		.attr('type','checkbox');
@@ -189,6 +199,8 @@ function removeFromWorkspace(){
 
 	$("input").each(function(index,value){
 		if($(this).attr('title') == networkRID){
+			ndexClient.deleteNetworkFromUserWorkspace(user.jid, $(this).attr('title'), function(data) {});
+			
 			var child = document.getElementById('thumbnail' + $(this).attr('title'));
 			parent.removeChild(child);
 			onWorkspace();
@@ -197,6 +209,10 @@ function removeFromWorkspace(){
 	
 }
 
+<% } %>
+//-----------------------------------------------------
+//		Pagination functions
+//-----------------------------------------------------
 function createPaginationModule(pageAmount, page, type) {
 
 	var pagDiv = document.createElement('div');

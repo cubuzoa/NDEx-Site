@@ -303,7 +303,7 @@ exports.findNetworks = function (searchExpression, limit, offset, callback){
 			network.jid = common.convertFromRID(network.jid);
 		}
 		
-        callback({networks : networks, blockAmount: networks.length, error : err});
+        callback({networks : networks, blockAmount: 5, error : err});
     });
 };
 

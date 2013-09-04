@@ -5,7 +5,7 @@
 <p><%= message %></p>
 <%}%>
 
-<form action="/login" method="post" id="loginForm">
+<form name="login" action="/login" method="post" id="loginForm" onsubmit="saveCredentials()">
 	<div>
 	<label>Username:</label>
 	<input type="text" name="username"/><br/>
@@ -20,3 +20,12 @@
 </form>
 <p><small>Hint - me5:pass</small></p>
 <p><small>Not an NDEx member? click <a href="/join">here</a> to join</small></p> 
+
+<script>
+function saveCredentials() {
+	if(typeof(Storage)!=="undefined") {
+  		localStorage.ndexUsername = document.forms["login"]["username"].value;
+  		localStorage.ndexPassword = document.forms["login"]["password"].value;
+	}
+}
+</script>

@@ -13,7 +13,7 @@
 //work on modal css
 //update href relative urls for networks
 
-// the network id passed from the ejs template
+// the user id passed from the ejs template
 var userJID = '<%= userId %>';
 
 function formatError(error){
@@ -232,15 +232,15 @@ function addElements(item, index){
 	}
 }
 
-
+//---------------------------------
+//	Workspace Functions
+//---------------------------------
 
 function onWorkspace(jid){
-	//check if network is on the user workspace. 
-	//TODO will be replaced by api functions
-	var tempLink = document.getElementById('link'+jid);
-	//var tempBtn = document.getElementById('button'+jid);
-	var tempIcon = document.getElementById('icon'+jid);
-	var found = false;
+	//check if network is on the user workspace.  
+	var tempLink = document.getElementById('link'+jid),
+		tempIcon = document.getElementById('icon'+jid),
+		found = false;
 	
 	
 	$("input").each(function(index,value){
@@ -260,19 +260,26 @@ function onWorkspace(jid){
 }
 
 function removeFromWorkspace(obj){
+	//$(obj).attr('title') holds the corresponding network jid
+	var network = $(obj).data('networkProperties');
 	var parent = document.getElementById('workSurface');
 
 	$("input").each(function(index,value){
-		if($(this).attr('title') == $(obj).attr('title')){
-			var child = document.getElementById('thumbnail' + $(this).attr('title'));
+		if($(this).attr('title') == network.jid){
+			ndexClient.deleteNetworkFromUserWorkspace(user.jid, network.jid, function(data) {});
+			var child = document.getElementById('thumbnail' + network.jid);
 			parent.removeChild(child);
-			onWorkspace($(obj).attr('title'));
+			onWorkspace(network.jid);
 		}
 	});
 	
 }
 
 function addToWorkspace(obj){
+	//$(obj).attr('title') holds the corresponding network jid
+	var network= $(obj).data('networkProperties');
+
+	ndexClient.addNetworkToUserWorkspace(user.jid, network.jid, function(data) {});
 	var unlst = document.createElement('ul'),
 		lst = document.createElement('li'),
 		cnt = document.createElement('div'),
@@ -282,23 +289,26 @@ function addToWorkspace(obj){
 	var parent = document.getElementById('workSurface');
 		
 	$(titleSpan).addClass('thumbText')
-		.append($(obj).attr('title'));//
-	$(chckbox).attr('id','checkbox' + $(obj).attr('title'))
-		.attr('title',$(obj).attr('title'))
+		.append(network.title);//
+	$(chckbox).attr('id','checkbox' + network.jid)
+		.attr('title',network.jid)
 		.attr('type','checkbox');
 	$(formBox).append(chckbox);
 	$(cnt).addClass('thumbnail thumbIcon')
 		.append(formBox)
 		.append(titleSpan);
 	$(lst).append(cnt);
-	$(unlst).attr('id','thumbnail' + $(obj).attr('title'))
+	$(unlst).attr('id','thumbnail' + network.jid)
 		.addClass('thumbnails')
 		.append(lst);
 	
 	$(parent).append(unlst);
-	onWorkspace($(obj).attr('title'));
+	onWorkspace(network.jid);
 }
 
+//------------------------------------
+//	Network List Interface
+//--------------------------------------
 function toggle(obj) {
 	var divDisplay = obj.id +1;
 	var ele = document.getElementById(divDisplay);
@@ -336,6 +346,7 @@ function buttonTools(item){
 
 	
 	$(wkSpaceLink).attr('onclick','')
+		.data('networkProperties',{title : item.title, jid : item.jid})
 		.attr('id','link'+item.jid)
 		.attr('title',item.jid)
 		.addClass('btn')
@@ -353,8 +364,11 @@ function buttonTools(item){
 		.attr('data-placement','bottom')
 		.append(visualizeIcon);
 		
+	<% if (user) { %>
+	$(buttonDiv).append(wkSpaceLink);
+	<% } %>
+		
 	$(buttonDiv).addClass('btn-group')
-		.append(wkSpaceLink)
 		.append(viewLink)
 		.append(visualizeLink);
 		
@@ -409,7 +423,7 @@ function formatNetworkDescriptor(item){
 			.append(divButton);
 
 	  
-	$(networkLink).attr('href','viewNetwork/' + item.jid).append(item.title);
+	$(networkLink).attr('href','/viewNetwork/' + item.jid).append(item.title);
 	$(nodeSpan).addClass('span2 elementCount').append(item.nodeCount + " nodes"); 
 	$(edgeSpan).addClass('span2 elementCount').append(item.edgeCount + " edges"); 
 	$(titleSpan).addClass('span4 networkTitle').append(networkLink); 
@@ -429,6 +443,7 @@ function formatNetworkDescriptor(item){
 	return ul;//networkDIV;
 
 }
+
 $(ndexClient.getUser(userJID, function(data){
 		console.log("Got results from getUser");
 		console.log(data);
@@ -438,7 +453,7 @@ $(ndexClient.getUser(userJID, function(data){
 		$('#networks').html('');
 		
 		$('#profile').append(formatProfile())
-			.append(formatNotifications());
+			.append(formatNotifications()); //TODO make it dependent on user
 		$('#networks').append(formatImages()).append(tableHead());
 
   		$.each(data.user.profile, function(index, item){
