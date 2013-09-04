@@ -212,6 +212,7 @@ app.get('/authenticate',
     passport.authenticate('basic', { session: false }),
     function(req, res){
         res.json({ username: req.user.username,
+                    password: req.user.password,
                    jid: convertFromRID(req.user.rid)
                    });
     });
@@ -336,6 +337,39 @@ app.get('/status', passport.authenticate('basic', { session: false }) , function
   catch (e){
           console.log('error in handler for status : ' + e); 
           res.send(500, {error : 'error in handler for status : ' + e}); 
+  }
+}); // close handler
+
+// Authenticate a username and password
+app.get('/authenticate', passport.authenticate('basic', { session: false }) , function(req, res) {
+  try {
+    var username = req.query['username'];
+    if(username === undefined){res.send(400, { error: 'value for username is required' })};
+    var password = req.query['password'];
+    if(password === undefined){res.send(400, { error: 'value for password is required' })};
+    common.ridCheck(
+      [
+      ], 
+      res,
+      function(){
+        User.authenticate(username, password, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+            data.jid = convertFromRID(data.jid);
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          console.log('error in handler for authenticate : ' + e); 
+          res.send(500, {error : 'error in handler for authenticate : ' + e}); 
   }
 }); // close handler
 

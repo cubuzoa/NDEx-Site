@@ -105,3 +105,12 @@
         });
     }
 
+    // GET authenticate
+    exports.authenticate = function(username, password, callback, errorHandler){
+        var mergedRoute = '/authenticate';
+        exports.ndexGet(mergedRoute, {username: username, password: password}, callback, errorHandler);
+    }
+
+
+
+

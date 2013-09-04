@@ -212,6 +212,7 @@ app.get('/authenticate',
     passport.authenticate('basic', { session: false }),
     function(req, res){
         res.json({ username: req.user.username,
+                    password: req.user.password,
                    jid: convertFromRID(req.user.rid)
                    });
     });

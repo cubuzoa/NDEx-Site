@@ -105,6 +105,15 @@
         });
     }
 
+    // GET authenticate
+    exports.authenticate = function(username, password, callback, errorHandler){
+        var mergedRoute = '/authenticate';
+        exports.ndexGet(mergedRoute, {username: username, password: password}, callback, errorHandler);
+    }
+
+
+
+
 
 
 // GET server description
@@ -118,6 +127,13 @@
     exports.status = function(callback, errorHandler){
         var mergedRoute = '/status';
         exports.ndexGet(mergedRoute, {},callback, errorHandler);
+    }
+
+
+// Authenticate a username and password
+    exports.authenticate = function(username, password, callback, errorHandler){
+        var mergedRoute = '/authenticate';
+        exports.ndexGet(mergedRoute, {username: username, password: password}, callback, errorHandler);
     }
 
 
