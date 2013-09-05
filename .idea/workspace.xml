@@ -3,11 +3,14 @@
   <component name="ChangeListManager">
     <list default="true" id="6be177e8-3901-4a98-98e5-f5a9d3951979" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/Group.js" afterPath="$PROJECT_DIR$/routes/Group.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/User.js" afterPath="$PROJECT_DIR$/routes/User.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/generate/api_spec.js" afterPath="$PROJECT_DIR$/generate/api_spec.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/rest.js" afterPath="$PROJECT_DIR$/rest.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="NDEx-Site.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1378424159394" ignored="false" />
+    <file path="/Dummy.txt" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1378424365150" ignored="false" />
     <file path="/a.js" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1377806936052" ignored="false" />
     <file path="/rest_footer.js" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1377898564151" ignored="false" />
     <file path="/package.json" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1377978754631" ignored="false" />
@@ -54,7 +57,7 @@
       <file leaf-file-name="User.js" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/routes/User.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="110" column="82" selection-start="4772" selection-end="4772" vertical-scroll-proportion="0.5679348">
+            <state line="110" column="62" selection-start="4752" selection-end="4752" vertical-scroll-proportion="0.4646739">
               <folding />
             </state>
           </provider>
@@ -63,7 +66,7 @@
       <file leaf-file-name="Network.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/routes/Network.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="287" column="84" selection-start="10003" selection-end="10003" vertical-scroll-proportion="-2.6923077">
+            <state line="290" column="47" selection-start="10081" selection-end="10096" vertical-scroll-proportion="-7.8076925">
               <folding />
             </state>
           </provider>
@@ -72,7 +75,7 @@
       <file leaf-file-name="api_spec.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/generate/api_spec.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="42" column="1" selection-start="762" selection-end="762" vertical-scroll-proportion="0.0">
+            <state line="130" column="39" selection-start="3296" selection-end="3296" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -81,7 +84,7 @@
       <file leaf-file-name="rest.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/rest.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="486" column="58" selection-start="14555" selection-end="14555" vertical-scroll-proportion="-4.8846154">
+            <state line="453" column="58" selection-start="13497" selection-end="13497" vertical-scroll-proportion="-4.8846154">
               <folding />
             </state>
           </provider>
@@ -110,7 +113,7 @@
       <file leaf-file-name="Group.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/routes/Group.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="89" column="37" selection-start="3108" selection-end="3108" vertical-scroll-proportion="0.0">
+            <state line="91" column="49" selection-start="3227" selection-end="3242" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -174,14 +177,14 @@
         <option value="$PROJECT_DIR$/unit_test/test/status-test.js" />
         <option value="$PROJECT_DIR$/unit_test/test/task-test.js" />
         <option value="$PROJECT_DIR$/generate/rest_header.js" />
-        <option value="$PROJECT_DIR$/generate/api_spec.js" />
         <option value="$PROJECT_DIR$/js/ndexClient.js" />
         <option value="$PROJECT_DIR$/generate/client_api_header.js" />
         <option value="$PROJECT_DIR$/unit_test/test/authentication-test.js" />
         <option value="$PROJECT_DIR$/js/jdex.js" />
         <option value="$PROJECT_DIR$/test_db/download_pc_sif.js" />
-        <option value="$PROJECT_DIR$/routes/User.js" />
         <option value="$PROJECT_DIR$/routes/Group.js" />
+        <option value="$PROJECT_DIR$/generate/api_spec.js" />
+        <option value="$PROJECT_DIR$/routes/User.js" />
       </list>
     </option>
   </component>
@@ -468,7 +471,11 @@
       <created>1378424161773</created>
       <updated>1378424161773</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="fixed typo">
+      <created>1378424369353</created>
+      <updated>1378424369354</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TodoView" selected-index="0">
@@ -556,7 +563,7 @@
     <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="changed searchexpression handling" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed typo" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -573,6 +580,7 @@
     <MESSAGE value="Changes resulting from trying WebStorm as IDE" />
     <MESSAGE value="renames + fixes to support findGroups and findUsers" />
     <MESSAGE value="changed searchexpression handling" />
+    <MESSAGE value="fixed typo" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -665,37 +673,37 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/generate/api_spec.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="42" column="1" selection-start="762" selection-end="762" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/rest.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="486" column="58" selection-start="14555" selection-end="14555" vertical-scroll-proportion="-4.8846154">
+        <state line="453" column="58" selection-start="13497" selection-end="13497" vertical-scroll-proportion="-4.8846154">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/routes/Network.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="287" column="84" selection-start="10003" selection-end="10003" vertical-scroll-proportion="-2.6923077">
+        <state line="290" column="47" selection-start="10081" selection-end="10096" vertical-scroll-proportion="-7.8076925">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/generate/api_spec.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="130" column="39" selection-start="3296" selection-end="3296" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/routes/Group.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="89" column="37" selection-start="3108" selection-end="3108" vertical-scroll-proportion="0.0">
+        <state line="91" column="49" selection-start="3227" selection-end="3242" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/routes/User.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="110" column="82" selection-start="4772" selection-end="4772" vertical-scroll-proportion="0.5679348">
+        <state line="110" column="62" selection-start="4752" selection-end="4752" vertical-scroll-proportion="0.4646739">
           <folding />
         </state>
       </provider>

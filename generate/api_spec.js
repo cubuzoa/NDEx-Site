@@ -128,7 +128,7 @@ exports.User = [
 		queryParams: {	
 				searchExpression : { doc : "string to match vs user",
 							type : "string",
-							default : "*"}, 
+							default : ""},
 				limit : { 	doc : "maximum number of users to return", 
 							type : "integer",
 							default : 100,
@@ -419,7 +419,7 @@ exports.Group = [
 		queryParams: {	
 				searchExpression : { doc : "string to specify search",
 							type : "string",
-							default : "*"}, 
+							default : ""},
 				limit : { 	doc : "maximum number of groups to return", 
 							type : "integer",
 							default : 100,
