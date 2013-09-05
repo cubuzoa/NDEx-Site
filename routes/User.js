@@ -105,9 +105,10 @@ exports.updateUserProfile = function (userRID, profile, callback) {
     });
 };
 
-exports.findUsersByUserName = function (nameExpression, limit, offset, callback) {
-    console.log("calling findUsersByUserName with arguments: " + nameExpression + " " + limit + " " + offset);
-    var cmd = "select from xUser where username like " + nameExpression + " order by creation_date desc limit " + limit;
+exports.findUsers = function (searchExpression, limit, offset, callback) {
+    console.log("calling findUsers with arguments: " + searchExpression + " " + limit + " " + offset);
+    var start = (offset)*limit;
+    var cmd = "select from xUser where username like " + searchExpression + " order by creation_date desc skip " +  start + " limit " + limit;
     console.log(cmd);
     module.db.command(cmd, function (err, users) {
         callback({users: users, error: err});

@@ -87,9 +87,10 @@ exports.updateGroupProfile = function(groupRID, profile, callback){
 
 };
 
-exports.findGroupsByGroupName = function (nameExpression, limit, offset, callback){
-	console.log("calling findGroupsByGroupName with arguments: " + nameExpression + " " + limit + " " + offset);
-	var cmd = "select from xGroup where groupname like " + nameExpression + " order by creation_date desc limit " + limit;
+exports.findGroups = function (nameExpression, limit, offset, callback){
+    var start = (offset)*limit;
+    var cmd = "select from xGroup where groupname like " + searchExpression + " order by creation_date desc skip " +  start + " limit " + limit;
+    console.log("calling findGroups with arguments: " + searchExpression + " " + limit + " " + offset);
 	console.log(cmd);
 	module.db.command(cmd, function(err, groups) {
         callback({groups : groups, error : err});
