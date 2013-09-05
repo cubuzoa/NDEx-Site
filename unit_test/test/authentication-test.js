@@ -34,7 +34,7 @@ describe('authentication-test', function () {
         });
     });
 
-
+ /*
     describe('testAuthenticateExistingUser ndex client', function(){
         it("should get 200 when attempting to authenticate dexterpratt", function (done){
             ndexClient.authenticate(
@@ -51,7 +51,7 @@ describe('authentication-test', function () {
                 });
         });
     });
-
+  */
 });
 
 
