@@ -87,7 +87,7 @@ exports.updateGroupProfile = function(groupRID, profile, callback){
 
 };
 
-exports.findGroups = function (nameExpression, limit, offset, callback){
+exports.findGroups = function (searchExpression, limit, offset, callback){
     var start = (offset)*limit;
     var cmd = "select from xGroup where groupname like '%" + searchExpression + "%'  order by creation_date desc skip " +  start + " limit " + limit;
     console.log("calling findGroups with arguments: " + searchExpression + " " + limit + " " + offset);
