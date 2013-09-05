@@ -10,18 +10,15 @@
       <change type="DELETED" beforePath="$PROJECT_DIR$/unit_test/status-test.js" afterPath="" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/unit_test/user-test.js" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/unit_test/README.md" afterPath="$PROJECT_DIR$/unit_test/README.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/routes/User.js" afterPath="$PROJECT_DIR$/routes/User.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/generate/api_spec.js" afterPath="$PROJECT_DIR$/generate/api_spec.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/generate/client_api_header.js" afterPath="$PROJECT_DIR$/generate/client_api_header.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/js/ndexClient.js" afterPath="$PROJECT_DIR$/js/ndexClient.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/unit_test/package.json" afterPath="$PROJECT_DIR$/unit_test/package.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/rest.js" afterPath="$PROJECT_DIR$/rest.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/generate/rest_header.js" afterPath="$PROJECT_DIR$/generate/rest_header.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="NDEx-Site.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1377883775421" ignored="false" />
+    <file path="/Dummy.txt" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1378308932363" ignored="false" />
     <file path="/a.js" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1377806936052" ignored="false" />
     <file path="/rest_footer.js" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1377898564151" ignored="false" />
     <file path="/package.json" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1377978754631" ignored="false" />
@@ -29,7 +26,7 @@
     <file path="/rest_header.js" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1378255489581" ignored="false" />
     <file path="/generate_rest.js" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1377992207486" ignored="false" />
     <file path="/.gitignore" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1377992588784" ignored="false" />
-    <file path="/authentication-test.js" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1378066106521" ignored="false" />
+    <file path="/authentication-test.js" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1378408721362" ignored="false" />
     <file path="/ndex-request.js" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1378093609101" ignored="false" />
     <file path="/user-basic-test.js" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1378066246719" ignored="false" />
     <file path="/find-networks-test.js" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1378094784712" ignored="false" />
@@ -41,9 +38,10 @@
     <file path="/status-test.js" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1378165267456" ignored="false" />
     <file path="/group-test.js" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1378164799824" ignored="false" />
     <file path="/task-test.js" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1378165840477" ignored="false" />
-    <file path="/client_api_header.js" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1378255703561" ignored="false" />
+    <file path="/client_api_header.js" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1378408565869" ignored="false" />
     <file path="/api_spec.js" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1378254938092" ignored="false" />
     <file path="/User.js" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1378255292191" ignored="false" />
+    <file path="/ndexClient.js" changelist="6be177e8-3901-4a98-98e5-f5a9d3951979" time="1378409846655" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,44 +74,6 @@
         <entry file="file://$PROJECT_DIR$/generate/generate_client.js">
           <provider selected="true" editor-type-id="text-editor">
             <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="n#!!doc" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="contact.ejs" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/views/contact.ejs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="create_group.ejs" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/views/create_group.ejs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="group_invite.ejs" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/views/group_invite.ejs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="triptych_compare_networks.ejs" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/views/triptych_compare_networks.ejs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -122,7 +82,7 @@
       <file leaf-file-name="api_spec.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/generate/api_spec.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="61" column="27" selection-start="1353" selection-end="1353" vertical-scroll-proportion="0.0">
+            <state line="42" column="1" selection-start="762" selection-end="762" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -137,10 +97,37 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="client_api_header.js" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="rest.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/rest.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="386" column="46" selection-start="11429" selection-end="11429" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="authentication-test.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/unit_test/test/authentication-test.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="16" column="65" selection-start="444" selection-end="444" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="client_api_header.js" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/generate/client_api_header.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="113" column="0" selection-start="3385" selection-end="3385" vertical-scroll-proportion="0.0">
+            <state line="105" column="86" selection-start="3149" selection-end="3149" vertical-scroll-proportion="3.422833">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ndexClient.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/js/ndexClient.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="34" column="0" selection-start="862" selection-end="1047" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="n#!!doc" expanded="true" />
               </folding>
@@ -148,13 +135,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ndexClient.js" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/js/ndexClient.js">
+      <file leaf-file-name="login.ejs" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/views/login.ejs">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="33" column="87" selection-start="861" selection-end="861" vertical-scroll-proportion="0.3900966">
-              <folding>
-                <element signature="n#!!doc" expanded="true" />
-              </folding>
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -178,7 +163,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/unit_test/test/find-networks-test.js" />
         <option value="$PROJECT_DIR$/unit_test/test/group-members-test.js" />
         <option value="$PROJECT_DIR$/unit_test/test/user-workspace-test.js" />
         <option value="$PROJECT_DIR$/routes/Network.js" />
@@ -189,19 +173,20 @@
         <option value="$PROJECT_DIR$/unit_test/test/group-basic-test.js" />
         <option value="$PROJECT_DIR$/unit_test/test/status-test.js" />
         <option value="$PROJECT_DIR$/unit_test/test/task-test.js" />
-        <option value="$PROJECT_DIR$/generate/api_spec.js" />
         <option value="$PROJECT_DIR$/routes/User.js" />
         <option value="$PROJECT_DIR$/generate/rest_header.js" />
-        <option value="$PROJECT_DIR$/generate/client_api_header.js" />
+        <option value="$PROJECT_DIR$/unit_test/test/authentication-test.js" />
+        <option value="$PROJECT_DIR$/generate/api_spec.js" />
         <option value="$PROJECT_DIR$/js/ndexClient.js" />
+        <option value="$PROJECT_DIR$/generate/client_api_header.js" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="330" />
-    <option name="y" value="50" />
-    <option name="width" value="1852" />
-    <option name="height" value="1252" />
+    <option name="x" value="735" />
+    <option name="y" value="88" />
+    <option name="width" value="1409" />
+    <option name="height" value="1076" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -361,13 +346,13 @@
   <component name="PropertiesComponent">
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="options.lastSelected" value="project.propVCSSupport.Mappings" />
     <property name="recentsLimit" value="5" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/rest.js" />
+    <property name="options.lastSelected" value="project.propVCSSupport.Mappings" />
     <property name="restartRequiresConfirmation" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/rest.js" />
     <property name="FullScreen" value="false" />
-    <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
   </component>
   <component name="PublishConfig" serverName="NDEx REST" serverId="318dea50-944d-48a5-849d-55a8178bfb76">
     <servers>
@@ -478,17 +463,17 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="330" y="50" width="1852" height="1252" extended-state="0" />
+    <frame x="735" y="88" width="1409" height="1076" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3275463" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32900432" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.13723347" sideWeight="0.76766783" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18109669" sideWeight="0.52296454" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.63322884" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3275862" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23233216" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.4770355" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2627315" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -574,95 +559,58 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/unit_test/test/task-basic-test.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="128" column="92" selection-start="2614" selection-end="2614" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/views/join.ejs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/unit_test/ndex_modules/ndex-request.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="0" selection-start="207" selection-end="269" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="10" column="0" selection-start="207" selection-end="269" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/generate/generate_client.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/contact.ejs">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/routes/Group.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/create_group.ejs">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/rest.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="386" column="46" selection-start="11415" selection-end="11415" vertical-scroll-proportion="-10.615385">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/group_invite.ejs">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/triptych_compare_networks.ejs">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/routes/Network.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="77" selection-start="804" selection-end="804" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/generate/api_spec.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="61" column="27" selection-start="1353" selection-end="1353" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="29" column="77" selection-start="804" selection-end="804" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/routes/User.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="5" column="0" selection-start="81" selection-end="81" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/login.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
@@ -674,21 +622,40 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/generate/client_api_header.js">
+    <entry file="file://$PROJECT_DIR$/rest.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="113" column="0" selection-start="3385" selection-end="3385" vertical-scroll-proportion="0.0">
+        <state line="386" column="46" selection-start="11429" selection-end="11429" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/generate/api_spec.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="42" column="1" selection-start="762" selection-end="762" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/unit_test/test/authentication-test.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="65" selection-start="444" selection-end="444" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/js/ndexClient.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="34" column="0" selection-start="862" selection-end="1047" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="n#!!doc" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/js/ndexClient.js">
+    <entry file="file://$PROJECT_DIR$/generate/client_api_header.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="87" selection-start="861" selection-end="861" vertical-scroll-proportion="0.3900966">
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-          </folding>
+        <state line="105" column="86" selection-start="3149" selection-end="3149" vertical-scroll-proportion="3.422833">
+          <folding />
         </state>
       </provider>
     </entry>

@@ -40,26 +40,6 @@ exports.System = [
 
 exports.User = [
 
-    {	fn : "authenticate",
-        status : "active",
-        doc : "Authenticate a username and password",
-        method : "GET",
-        route : "/authenticate",
-        queryParams: {
-            username : {	doc : "username",
-                type : "string"
-            },
-            password : {	doc : "password",
-                type : "string"
-            }
-        },
-        response: {
-            jid : {doc : "the id of the authenticated user", type : "JID", class : "xUser"}
-        },
-        exceptions: [
-            "404 unknown username and password"
-            ]
-    },
 
 	{	fn : "createUser",
 		status : "active",

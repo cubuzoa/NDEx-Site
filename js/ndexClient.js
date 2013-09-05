@@ -32,8 +32,8 @@
 
     }
 
-    function encodedCredentials(){
-        var credentials = currentCredentials();
+    function encodedCredentials(credentials){
+        if (!credentials) credentials = currentCredentials();
         return btoa(credentials.username + ":" + credentials.password);
     }
 
@@ -105,10 +105,22 @@
         });
     }
 
-    // GET authenticate
     exports.authenticate = function(username, password, callback, errorHandler){
-        var mergedRoute = '/authenticate';
-        exports.ndexGet(mergedRoute, {username: username, password: password}, callback, errorHandler);
+        var route = '/authenticate';
+
+        $.ajax({
+            type: "GET",
+
+            beforeSend: function(xhr){
+                xhr.setRequestHeader(
+                    "Authorization",
+                    "Basic " + encodedCredentials({username: username, password: password}));
+            },
+            url: exports.host + route,
+            dataType: "JSON",
+            success: callback,
+            error: errorHandler || exports.defaultNDExErrorHandler
+        });
     }
 
 
@@ -127,13 +139,6 @@
     exports.status = function(callback, errorHandler){
         var mergedRoute = '/status';
         exports.ndexGet(mergedRoute, {},callback, errorHandler);
-    }
-
-
-// Authenticate a username and password
-    exports.authenticate = function(username, password, callback, errorHandler){
-        var mergedRoute = '/authenticate';
-        exports.ndexGet(mergedRoute, {username: username, password: password}, callback, errorHandler);
     }
 
 
