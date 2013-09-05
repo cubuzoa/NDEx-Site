@@ -1,0 +1,77 @@
+{
+    "format": "PC SIF",
+    "nodes": {
+        "0": {
+            "name": "<error>\r",
+            "represents": 0
+        },
+        "1": {
+            "represents": 0
+        },
+        "2": {
+            "name": "  <error_code>453</error_code>\r",
+            "represents": 0
+        },
+        "3": {
+            "represents": 0
+        },
+        "4": {
+            "name": "  <error_msg>Bad Request (invalid arguments)</error_msg>\r",
+            "represents": 0
+        },
+        "5": {
+            "represents": 0
+        },
+        "6": {
+            "name": "  <error_details>q must contain integer values only.</error_details>\r",
+            "represents": 0
+        },
+        "7": {
+            "represents": 0
+        },
+        "8": {
+            "name": "</error>\r",
+            "represents": 0
+        },
+        "9": {
+            "represents": 0
+        }
+    },
+    "edges": {
+        "0": {
+            "s": 0,
+            "p": 0,
+            "o": 1
+        },
+        "1": {
+            "s": 2,
+            "p": 0,
+            "o": 3
+        },
+        "2": {
+            "s": 4,
+            "p": 0,
+            "o": 5
+        },
+        "3": {
+            "s": 6,
+            "p": 0,
+            "o": 7
+        },
+        "4": {
+            "s": 8,
+            "p": 0,
+            "o": 9
+        }
+    },
+    "namespaces": {},
+    "terms": {
+        "0": {}
+    },
+    "nodeTypes": {},
+    "properties": {
+        "title": "undefined:undefined"
+    },
+    "citations": {},
+    "supports": {}
+}

@@ -104,34 +104,24 @@ var DOMParser = require('xmldom').DOMParser;
 */
 
 exports.Graph = function(){
+	// We have one counter for internal IDs of objects
+	// (i.e. avoid confusion where two objects of different types have the same id)
+	this.maxInternalId = 0;
 	this.namespaces = {};
-	this.maxNamespaceId = 0;
+	
 	this.namespacePrefixMap = {};
 	
-	this.terms = {};
-	this.maxTermId = 0;
-	
-	this.nodeTypes = {};
-	this.maxNodeTypeId = 0;
-	
-	this.nodes = {};
-	this.maxNodeId = 0;
-	
+	this.terms = {};	
+	this.nodeTypes = {};	
+	this.nodes = {};	
 	this.edges = {};
-	this.maxEdgeId = 0;
-	
 	this.nodeIdentifierMap = {};
 	
 	this.paths = {};
-	
 	this.subnetworks = {};
 
 	this.citations = {};
-	this.maxCitationId = 0;
-	
 	this.supports = {};
-	this.maxSupportId = 0;
-	
 	this.properties = {};
 };
 
@@ -182,7 +172,7 @@ exports.Graph.prototype = {
 	},
 	
 	addNode : function (node){
-		node.id = this.maxNodeId++;
+		node.id = this.maxInternalId++;
 		this.nodes[node.id] = node;
 		if (node.represents) {
 			this.nodeIdentifierMap[node.represents.identifier()] = node;
@@ -267,7 +257,7 @@ exports.Graph.prototype = {
 //---------------Edge Methods -------------------------------------------
 	
 	addEdge : function (edge){
-		edge.id = this.maxEdgeId++;
+		edge.id = this.maxInternalId++;
 		this.edges[edge.id] = edge;
 		edge.graph = this;
 		return edge;
@@ -337,18 +327,32 @@ exports.Graph.prototype = {
 	},
 
 	functionTermByFunctionAndParameters : function (fn, parameters){
-		$.each(this.terms, function(index, term){
-			if (term.termFunction && fn == term.termFunction){
+		for (i in this.terms){
+		 	var term = this.terms[i];
+			if (term.termFunction && fn.id == term.termFunction.id){
 				if (term.parameters && term.parameters.length == parameters.length){
 					var match = true;
-					$.each(parameters, function(index, param){
-						if (param != term.parameters[index]) match = false;
-					});
-					if (match) return term;	
+					for (j in parameters){
+						var param = parameters[j],
+							termParam = term.parameters[j];
+							
+						if (param.id && termParam.id){
+							// if they have ids, check by ids
+							if (param.id != termParam.id) match = false;
+						} else {
+							// otherwise, they are literal values, check directly
+							if (param != termParam) match = false;
+						}
+					}
+					if (match) {
+						if (fn.id == "47") {
+							console.log("found match for function term id 47");
+						}
+						return term;
+					}	
 				}		
 			}
-		});
-		
+		}	
 		//console.log("function term not found for function " + fn.identifier() + " and parameters TBD");		
 		return false;
 	},
@@ -361,7 +365,7 @@ exports.Graph.prototype = {
 	},
 	
 	addTerm : function (term){
-		term.id = this.maxTermId++;
+		term.id = this.maxInternalId++;
 		this.terms[term.id] = term;
 		return term;
 	},
@@ -385,13 +389,18 @@ exports.Graph.prototype = {
 		if (!uri) uri = prefix;
 		var ns = this.namespaceByURI(uri);
 		if (ns) return ns;
-		console.log("creating namespace for " + prefix + " : " + uri + "  " + description);
+		
+		if (description){
+			console.log("creating namespace for " + prefix + " : " + uri + "  " + description);
+		} else {
+			console.log("creating namespace for " + prefix + " : " + uri );
+		}
 		ns = new exports.Namespace(uri, prefix, description);
 		return this.addNamespace(ns)
 	},
 
 	addNamespace : function (ns){
-		ns.id = this.maxNamespaceId++;
+		ns.id = this.maxInternalId++;
 		this.namespaces[ns.id] = ns;
 		if (ns.prefix){
 			this.namespacePrefixMap[ns.prefix] = ns;
@@ -404,7 +413,7 @@ exports.Graph.prototype = {
 //---------------Citation Methods ----------------------------------------
 
 	addCitation : function (citation){
-		citation.id = this.maxCitationId++;
+		citation.id = this.maxInternalId++;
 		this.citations[citation.id] = citation;
 		citation.graph = this;
 		return citation;
@@ -414,7 +423,7 @@ exports.Graph.prototype = {
 //---------------Suport Methods -----------------------------------------
 
 	addSupport : function (support){
-		support.id = this.maxSupportId++;
+		support.id = this.maxInternalId++;
 		this.supports[support.id] = support;
 		support.graph = this;
 		return support;
@@ -636,6 +645,8 @@ exports.Edge = function(subject, predicate, object){
 	this.o = object;
 	this.p = predicate;
 	this.properties = {};
+	this.citations = [];
+	this.supports = [];
 	this.id = null;
 
 };
@@ -646,8 +657,20 @@ exports.Edge.prototype = {
 
 	serializeJDEx : function(){
 		var s_edge = {s: this.s.id, p: this.p.id, o: this.o.id};
-		if (this.citation) s_edge.citation = this.citation.id;
-		if (this.support) s_edge.support = this.support.id;	
+		if (this.citations && this.citations.length > 0){
+			var cites = [];
+			$.each(this.citations, function(i, citationId){
+				cites.push(citationId);
+			});
+			s_edge.citations = cites;
+		}
+		if (this.supports && this.supports.length > 0){
+			var supps = [];
+			$.each(this.supports, function(i, supportId){
+				supps.push(supportId);
+			});
+			s_edge.supports = supps;
+		}
 		if (this.properties && this.properties.length > 0){
 			var props = {};
 			$.each(this.properties, function(property, value){
@@ -979,10 +1002,10 @@ Header Example:
 
 exports.processXBELHeader = function (graph, header){
 	// Add DublinCore namespace
-	var dc_namespace_uri = graph.findOrCreateNamespace("http://purl.org/dc/terms/", "DC");
+	var dc_namespace_uri = graph.findOrCreateNamespace("http://purl.org/dc/terms/", "DC", "DublinCore");
 	
 	// Add TextLocation namespace
-	var dc_namespace_uri = graph.findOrCreateNamespace("http://purl.org/dc/terms/", "TextLocation");
+	var dc_namespace_uri = graph.findOrCreateNamespace("http://purl.org/dc/terms/", "TextLocation", "BEL TextLocation Namespace");
 
 	// Unary properties mapped from BEL to DC
 	var Unary_Properties_XBEL_to_DC = {
@@ -1038,8 +1061,6 @@ exports.processXBELAnnotationDefinitionGroup = function(graph, AnnotationDefinit
 */
 
 	$.each(AnnotationDefinitionGroup.getElementsByTagName('bel:internalAnnotationDefinition'), function(index, intDefElement){
-	
-		
 		
 		var description = "", 
 			prefix = intDefElement.getAttribute('bel:id'),
@@ -1048,8 +1069,6 @@ exports.processXBELAnnotationDefinitionGroup = function(graph, AnnotationDefinit
 		// process the description element, if present
 		var descriptionElements = intDefElement.getElementsByTagName('bel:description');
 		if (descriptionElements) description = descriptionElements[0].textContent;
-		
-
 		
 		var ns = graph.findOrCreateNamespace("internal", prefix, description);
 		graph.findOrCreateTerm(prefix, graph.belNS);
@@ -1182,37 +1201,46 @@ exports.processXBELStatement = function(graph, statement, context){
 		var sname = s ? s.name : "unknown",
 			pname = p ? p.name : "unknown",
 			oname = o ? o.name : "unknown";
-		console.log("skipping edge creation for " 
-					+ sname + ", "
-					+ pname + ", "
-					+ oname);
+		//console.log("skipping edge creation for " + sname + ", " + pname + ", " + oname);
 	}
 }
 
 exports.processXBELNodeElement = function(graph, nodeElement){
 
-	var termElement = nodeElement.childNodes[1];
-	
+	var term = exports.processXBELTermElement(graph, nodeElement.childNodes[1]);
+	return graph.findOrCreateNodeByTerm(term, term.identifier());
+
+}
+
+exports.processXBELTermElement = function(graph, termElement){
 	// find or create the term function
 	var functionName = termElement.getAttribute('bel:function'),
 		fn = graph.findOrCreateTerm(functionName, graph.belNS),
 		parameters = [];
 	
-
-	$.each(termElement.childNodes, function (index, parameter){
-		if (parameter.tagName == 'bel:parameter'){
-			var nsPrefix = parameter.getAttribute('bel:ns')
-				name = parameter.textContent,
+	
+	$.each(termElement.childNodes, function (index, child){
+		if (child.tagName == 'bel:parameter'){
+			// child is a basic term or a literal value
+			var nsPrefix = child.getAttribute('bel:ns');
+			if (nsPrefix){
+				// child is a basic term
+				name = child.textContent,
 				ns = graph.namespaceByPrefix(nsPrefix),
 				term = graph.findOrCreateTerm(name, ns);
-			parameters.push(term);	
+				parameters.push(term);	
+			} else{
+				// child is a literal value
+				parameters.push(child.textContent);
+			}	
+		} else if (child.tagName == 'bel:term'){
+			// child is a function term
+			var childTerm = exports.processXBELTermElement(graph, child);
+			parameters.push(childTerm);
 		}
 	});
 	
-	var term = graph.findOrCreateFunctionTerm(fn, parameters),
-		node = graph.findOrCreateNodeByTerm(term, term.identifier());
-		
-	return node;
+	return graph.findOrCreateFunctionTerm(fn, parameters)
 }
 
 exports.processXBELCitation = function(graph, citationElement){
