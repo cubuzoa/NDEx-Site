@@ -108,7 +108,7 @@ exports.updateUserProfile = function (userRID, profile, callback) {
 exports.findUsers = function (searchExpression, limit, offset, callback) {
     console.log("calling findUsers with arguments: " + searchExpression + " " + limit + " " + offset);
     var start = (offset)*limit;
-    var cmd = "select from xUser where username like " + searchExpression + " order by creation_date desc skip " +  start + " limit " + limit;
+    var cmd = "select from xUser where username like  '%" + searchExpression + "%' order by creation_date desc skip " +  start + " limit " + limit;
     console.log(cmd);
     module.db.command(cmd, function (err, users) {
         callback({users: users, error: err});
