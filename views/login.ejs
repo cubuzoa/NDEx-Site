@@ -24,7 +24,7 @@
 <script>
 
 $('#loginForm').submit(function() {
-	if(localStorage.ndexUsername == $('#username').val()){
+	if(localStorage['ndexUsername'] == $('#username').val()){
 		return true;
 	}
 	return false;
@@ -34,22 +34,26 @@ function checkCredentials() {
 	
 	ndexClient.authenticate($('#username').val(), $('#password').val(), function(data) {
 			if(data && (typeof(Storage)!=="undefined")) {
-		  		localStorage.ndexUsername = data.username;
-		  		localStorage.ndexPassword = data.password;
-				localStorage.ndexJid = data.jid;
+		  		localStorage['ndexUsername'] = data.username;
+		  		localStorage['ndexPassword'] = data.password;
+				localStorage['ndexJid'] = data.jid;
 				$('#loginForm').submit();
 			}
+			//console.log(JSON.stringify(data));
 			
 		},
 		function(error) {
-			if(error.status == 401) { $('#message').html('Invalid username and password'); }
-			if(typeof(Storage)!=="undefined") {
-		  		localStorage.ndexUsername = '';
-		  		localStorage.ndexPassword = '';
-				localStorage.ndexJid = '';
+			if(error.status == 401) { 
+				$('#message').html('Invalid username and password'); 
+				if(typeof(Storage)!=="undefined") {
+			  		localStorage.ndexUsername = '';
+			  		localStorage.ndexPassword = '';
+					localStorage.ndexJid = '';
+					//$('#loginForm').submit();
+				}
 				$('#loginForm').submit();
 			}
-			$('#loginForm').submit();
+			//console.log(JSON.stringify(error));
 		}	
 	);
 	

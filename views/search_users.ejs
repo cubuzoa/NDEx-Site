@@ -16,44 +16,6 @@
     <!-- Button to trigger modal -->
 
 <!-- Page used to sample html that does not have an implementaion or home -->
-<!-- send group invite or request -->
-<div class=''>
-	<h3>Send Group Invitation (same form for Send Group Request)</h3>
-	<hr>
-	<p>Send an invitation to a fellow colleague! Once recipients accept invitaions, they will become members of the group.</p>
-	<p>Group Admin will have the right to assign the group ownership rights to any network they create.</p> 
-	<br>
-	<form  class="form-horizontal" action="" method="post" enctype="multiipart/form-data">
-		<div class="control-group">
-				<label class="control-label" for="inputGroup">Select Group</label>
-				<div class="controls">
-					<select name="group" id="inputGroup">
-						<option value="">Select group</option>
-						<option value="group1">Group 1</option>
-						<option value="group2">Group 2</option>
-						<option value="group3">Group 3</option>
-					</select></div></div>
-		<div class="control-group">
-				<label class="control-label" for="inputPermissions">Group Permissions</label>
-				<div class="controls">
-					<select name="permissions" id="inputPermissions">
-						<option value="">Select Permissions</option>
-						<option value="groupAdmin">Group Admin</option>
-						<option value="groupMember">Group Member</option>
-					</select></div></div>
-		<div class="control-group">
-				<label class="control-label" for="inputSubject">Subject</label>
-				<div class="controls">
-					<input  class="span4" type="text" id="inputSubject" name="subject"></div></div>
-		<div class="control-group">
-				<label class="control-label" for="inputMessage">Message</label>
-				<div class="controls">
-					<textarea class="span4" rows="3" id="inputMessage" name="message" placeholder="Add a welcome message!"></textarea></div></div>
-		<hr>
-		<input type="submit" value="Send Invite">
-	</form>
-	
-</div>
 
 <!--create a group -->
 <div class=''>
@@ -90,46 +52,13 @@
 	
 </div>
 
-<div class='well'>
-	<h3>Send Share Network Invitation (same form for Send Share Network Request)</h3>
-	
-	<form  class="form-horizontal" action="" method="post" enctype="multiipart/form-data">
-		<div class="control-group">
-				<label class="control-label" for="inputGroup">Select Network</label>
-				<div class="controls">
-					<select name="group" id="inputGroup">
-						<option value="">Select network</option>
-						<option value="group1">Network 1</option>
-						<option value="group2">Network 2</option>
-						<option value="group3">Network 3</option>
-					</select></div></div>
-		<div class="control-group">
-				<label class="control-label" for="inputPermissions">Network Permissions</label>
-				<div class="controls">
-					<select name="permissions" id="inputPermissions">
-						<option value="">Select Permissions</option>
-						<option value="groupAdmin">Network Editor</option>
-						<option value="groupMember">Network Viewer</option>
-					</select></div></div>
-		<div class="control-group">
-				<label class="control-label" for="inputSubject">Subject</label>
-				<div class="controls">
-					<input  class="span4" type="text" id="inputSubject" name="subject"></div></div>
-		<div class="control-group">
-				<label class="control-label" for="inputMessage">Message</label>
-				<div class="controls">
-					<textarea class="span4" rows="3" id="inputMessage" name="message" placeholder="Add a welcome message!"></textarea></div></div>
-		<hr>
-		<input type="submit" value="Send Invite">
-	</form>
-	
-</div>
 
 <!----------------------------------------------------------------------------------------------------->
 <!------------------------------------- All in One Request -------------------------------------------->
 
 <!--form-->
-<div class="" id="allRequest">
+<% if(user) { %>
+<div class="well" id="allRequest">
 	<h3>Make a Request</h3>
 	<hr>
 	<form  class="form-horizontal" action="" method="post" enctype="multiipart/form-data" id="requestForm">
@@ -235,12 +164,12 @@
 		<button class = "btn" onclick = "clearResults()" data-dismiss = "modal" aria-hidden = "true"> Cancel </button>
 	</div>
 </div>
-
+<% } %>
 <script>
 
 
 //should get JID from server/ logged in user
-var userId = localStorage.ndexJid;
+var userId =  localStorage['ndexJid'] ;
 
 function populateFrom(userObject){
 	//show username, owned networks, and owned groups
@@ -483,15 +412,15 @@ $(ndexClient.getUser(userId, function(data){
 		var user = data.user;
 		user.jid = userId;
 		populateFrom(user);
-		$('#allRequest').append('test3');
+		//$('#allRequest').append('test3');
 	},
-	function formatError(error){$('#allRequest').append('test2');}
+	function formatError(error){$('#allRequest').append('An error has occured');}
 	)
 );
 
-$('#allRequest').append(userId);
-
-
+//$('#allRequest').html(localStorage['ndexJid']);
+//console.log(JSON.stringify(localStorage));
+console.log(localStorage['ndexJid']);
 </script>
 
 
