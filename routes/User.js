@@ -108,16 +108,21 @@ exports.updateUserProfile = function (userRID, profile, callback) {
 exports.findUsers = function (searchExpression, limit, offset, callback) {
     console.log("calling findUsers with arguments: " + searchExpression + " " + limit + " " + offset);
     var start = (offset)*limit;
-    var cmd = "select from xUser where username.toUpperCase()  like  '%" + searchExpression + "%' order by creation_date desc skip " +  start + " limit " + limit;
+	var descriptors = " username as username, @rid as jid ";
+    var cmd = "select" + descriptors + "from xUser where username.toUpperCase()  like  '%" + searchExpression + "%' order by creation_date desc skip " +  start + " limit " + limit;
     console.log(cmd);
     module.db.command(cmd, function (err, users) {
+		for (i in users){
+			var user = users[i];
+			user.jid = common.convertFromRID(user.jid);
+		}
         callback({users: users, error: err});
     });
 };
 
 exports.getUserByName = function (username, callback) {
     console.log("calling getUserByName with username = '" + username + "'");
-    var cmd = "select from xUser where username = '" + username + "'";
+    var cmd = "select @rid as jid from xUser where username = '" + username + "'";
     console.log(cmd);
     module.db.command(cmd, function (err, users) {
         // TODO - case where more than one user returned...

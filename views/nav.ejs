@@ -1,4 +1,6 @@
 
+
+
 <div class="navbar navbar-fixed-top">
 	<div class="navbar-inner">
 	  <div class="container-fluid">
@@ -8,28 +10,51 @@
 	  		<span class="icon-bar"></span>
 	  	</a>
 			<a class="brand" href="/" ><b>NDEx</b></a>
-			<!--<% if (user) {%> <%= user.username %><%}%>-->
+			
 	
 			<div class="nav-collapse">
 				<ul class="nav pull-left main-nav"> 
-				  <li><a href="/searchNetworks">Networks</a></li>
-				  <li><a href="/searchGroups">Groups</a></li>
-				  <li><a href="/searchUsers">Users</a></li>
-				  <% if (!user) { 
-				  } else { %> 
-				  <li><a href="/myAccount">My Account</a></li>
-				  <li><a href="/ManageTasks">Tasks</a></li>
-				  <li><a href="/UploadNetwork">Upload</a></li>
-				  <%}%>
-				  <% if (!user) {%> 
-				  <li><a href="/login" >Sign in</a></li>
-				  <%} else {%>
-				  <li><a href="/logout" >Sign out</a></li>
-				  <%}%>
+				  <li class ="dropdown" >
+					<a href="#" class ="dropdown-toggle" data-toggle="dropdown" >Networks</a>
+					<ul class = "dropdown-menu" role = "menu">
+						<li><a href = "/searchNetworks">Find Networks</a></li>
+					</ul>
+				  </li>
+				  <li class ="dropdown">
+					<a  href="#" class ="dropdown-toggle" data-toggle="dropdown" >Groups</a>
+					<ul class = "dropdown-menu" role = "menu">
+						<li id = "navMyGroups" style="display:none" ><a href = "#">My Groups</a></li>
+						<li><a href = "/searchGroups">Find Groups</a></li>
+					</ul>
+				  </li>
+				  <li class ="dropdown">
+					<a  href="#" class ="dropdown-toggle" data-toggle="dropdown" >Users</a>
+					<ul class = "dropdown-menu" role = "menu">
+						<li><a href = "/searchUsers">Find Users</a></li>
+					</ul>
+				  </li>
+				  
+				  <li id ="myAccount"  class ="dropdown" style="display:none">
+					<a href="#" class ="dropdown-toggle" data-toggle="dropdown" >My Account</a>
+				  	<ul class = "dropdown-menu" role = "menu">
+						<li><a href = "/myAccount">My Account</a></li>
+						<li><a href = "#">Edit Profile</a></li>
+						<li><a href = "#">Upload Network</a></li>
+					</ul>
+				  </li>
+				  <li id = "manageTasks" class ="dropdown" style="display:none">
+					<a href="#" class ="dropdown-toggle" data-toggle="dropdown" >Tasks</a>
+				  	<ul class = "dropdown-menu" role = "menu">
+						<li><a href = "/ManageTasks">Show Tasks</a></li>
+						<li><a href = "#">New Task</a></li>
+					</ul>
+				  </li>
+				  <li id = "signIn" style="display:none"><a href="/login" >Sign in</a></li> 
+				  <li id = "signOut" style="display:none"><a onclick = 'signout()' " >Sign out</a></li>
 
 				</ul>
 				<ul class ="nav pull-right main-nav">
-					<li> <a> <% if (user) {%> <%= user.username %><%}%> </a> </li>
+					<li ><a href='#' id = "navname"> </a></li>
 				</ul>
 			
 			</div><!-- /.nav-collapse -->
@@ -37,4 +62,45 @@
     </div>
 </div>
 
+<script>
+
+function isSignedIn() {
+	if(localStorage['ndexUsername'] == '') {
+		console.log('not signed in');
+		return false;
+	} else {
+		console.log('signed in');
+		return true;
+	}
+}
+
+function signout() {
+	
+	localStorage['ndexUsername'] = '';
+	localStorage['ndexPassword'] = '';
+	localStorage['ndexJid'] = '';
+
+	window.location.href = "/";
+	//console.log(JSON.stringify(localStorage));
+}
+
+if(isSignedIn()){
+	$('#myAccount').attr('style','display:block');
+	$('#manageTasks').attr('style','display:block');
+	$('#signOut').attr('style','display:block');
+	$('#navMyGroups').attr('style','display:block');
+	$('#signIn').attr('style','display:none');
+	
+	$('#navname').html(localStorage['ndexUsername']);
+} else {
+	$('#myAccount').attr('style','display:none');
+	$('#manageTasks').attr('style','display:none');
+	$('#signOut').attr('style','display:none');
+	$('#navMyGroups').attr('style','display:none');
+	$('#signIn').attr('style','display:block');
+
+	$('#navname').html('');
+}
+
+</script>
 
