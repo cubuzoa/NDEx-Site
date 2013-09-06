@@ -7,6 +7,8 @@ account_img/groups/foreground/*
 account_img/groups/background/*
 unit_test/node_modules/*
 .idea/*
+.idea
+.idea/*/*
 views/*~
 routes/*~
 js/*~
