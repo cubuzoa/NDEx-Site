@@ -27,7 +27,6 @@ function ensureSchemaIsSetup(callback) {
 	ensureClass("xCitation", "V");
 	ensureClass("xSupport", "V");
 	ensureClass("xPermission", "V");
-	ensureClass("xRequest", "V");
 	ensureClass("xOwnsGroup", "E");
 	ensureClass("xOwnsAgent", "E");
 	callback();
@@ -36,10 +35,12 @@ function ensureSchemaIsSetup(callback) {
 function ensureClass(className, parentName, callback){
     if (module.db.getClassByName(className) === null) {
     	console.log("creating " + className);
-    	var cmd = "create class " + className + " extends " + parentName;
-        module.db.command(cmd, function(err){
-        	if (callback) callback();
-        	});
+        module.db.createClass(className, parentName, function(err) {
+            if (err)
+                throw new Error("Unexpected error " + err);
+            else if (callback)
+                callback()
+        });
     } else {
     	console.log(className + " exists");
     	if (callback) callback();	

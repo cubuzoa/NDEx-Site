@@ -149,21 +149,21 @@ exports.getUserByName = function (username, callback) {
 
 exports.getUser = function (userRID, callback) {
     console.log("calling getUser with userRID = '" + userRID + "'");
-    var cmd = "select from xUser where @rid = " + userRID + "";
-    console.log(cmd);
-    module.db.command(cmd, function (err, users) {
+    module.db.loadRecord(userRID, function (err, user) {
 
         if (common.checkErr(err, "finding user", callback)) {
             try {
-                if (!users || users.length < 1) {
+                if (!user) {
                     console.log("found no users by id = '" + userRID + "'");
                     callback({status: 404});
                 } else {
 
-                    var user = users[0],
-                        profile = {};
+                    var profile = {};
 
-                    console.log("found " + users.length + " users, first one is " + user["@rid"]);
+                    if (user["@class"] !== "xUser")
+                        throw new Error("Document " + userRID + " is not a user. (actual class is '" + user["@class"] + "')");
+
+                    console.log("found user " + user["@rid"]);
 
                     if (user.firstName) profile.firstName = user.firstName;
                     if (user.lastName) profile.lastName = user.lastName;
@@ -176,7 +176,7 @@ exports.getUser = function (userRID, callback) {
 
                     // get owned networks
                     var networkDescriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount";
-                    var traverseExpression = "traverse V.out, E.in from " + userRID + " while $depth <= 2"
+                    var traverseExpression = "select flatten(out(xOwnsNetwork)) from " + userRID;
 
                     var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
                     module.db.command(networks_cmd, function (err, networks) {
@@ -192,7 +192,7 @@ exports.getUser = function (userRID, callback) {
 
                             // get owned groups
                             var groupDescriptors = "organizationName as organizationName, @rid as jid";
-                            var traverseExpression = "traverse V.out, E.in from " + userRID + " while $depth <= 2"
+                            var traverseExpression = "select flatten(out(xOwnsGroup)) from" + userRID;
                             var groups_cmd = "select " + groupDescriptors + " from (" + traverseExpression + ") where @class = 'xGroup'";
                             module.db.command(groups_cmd, function (err, groups) {
                                 if (common.checkErr(err, "getting owned groups", callback)) {
