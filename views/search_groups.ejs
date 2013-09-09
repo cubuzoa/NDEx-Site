@@ -2,6 +2,10 @@
 <% include nav.ejs %>
 <!-- <p>TODO: Groups</p> -->
 
+<!-------------------------------------------------------------------->
+<!------------------Upload Network Code------------------------------->
+<!-------------------------------------------------------------------->
+
 <div class="" id="holder">
 	<h3>Upload Network</h3>
 	<hr>
@@ -191,16 +195,289 @@
 		
 	}
 
-//form validation
-/*$('').form({
-	url:'', //url for server side code?
-	onSubmit:function(){
-		return $(this).form('validate');
-	},
-	success:function(data)[
-		$.messenger.alert('Info',data, 'info');
-	}
-});*/
+
 
 </script>
+
+
+<!-------------------------------------------------------------------->
+<!------------------Actual Search Groups Code------------------------->
+<!-------------------------------------------------------------------->
+
+<hr>
+<hr>
+
+<div class="btn-group">
+	<form onsubmit="return doSearch();" id="searchForm">
+		<div>
+		<label>Query:</label>
+		<input type="text" name="searchExpression" id="searchExpression"/><br/>
+		</div>
+
+		<div>
+		<input type="submit" value="Search"/>
+		</div>
+	</form>
+</div>
+<div class = "pull-right">
+	<a class = "ndex-options" href = "#searchOptions" data-toggle="modal"> 
+		<i class="icon-cog icon-large"></i> 
+	</a>
+</div>
+
+<div id="searchResults">
+
+</div>
+
+<div id = "searchOptions" class = " modal hide fade" tabindex = "-1" role = "dialog" aria-labelledby = "myModalLabel" aria-hidden = "true">
+	<div class = "modal-header">
+		<h4 id = "myModalLabel"> Group Search Options </h4>
+	</div>
+	<div class="modal-body">
+		
+		<label class = "span2">Search results per page: </label>
+		<input id = "searchCount" type = "text" class = "span2" pattern = "" min = "1"> <br>
+		<label class = "span2">Current page: </label>
+		<input id = "searchPage" type = "text" class = "span2" pattern = "" min = "1" placeholder = "0"> <br>
+		
+	</div>
+	<div class = "modal-footer">
+		<button class = "btn" onclick = "doSearch()" data-dismiss = "modal" aria-hidden = "true"> Save Changes </button>
+		<button class = "btn" data-dismiss = "modal" aria-hidden = "true"> Cancel </button>
+	</div>
+</div>
+
+<script>
+
+function isOwnedGroup(jid){
+	var owned = false;
+	$.each(user.ownedGroups, function(index, group){
+		if (group.jid == jid) {
+			owned = true;
+			return false;
+		}
+	});
+	return owned;
+}
+
+function doSearch(offset) {
+	var limitInput = document.getElementById('searchCount');
+	var limit = $(limitInput).val();
+
+	if(!offset) { offset = $('#searchPage').val(); }
+
+	if(!limit) { 
+		$(limitInput).val(2);
+		limit = 2;
+	}
+	if(!offset) { offset = 1; }
+	
+	$('#searchPage').val(offset);
+	offset = offset - 1;
+
+	var searchExpression = $('#searchExpression').val().toUpperCase();
+	
+	ndexClient.findGroups(searchExpression, limit, offset, function(data){
+		$('#searchResults').html('');
+		
+		if (data.groups){
+			$('#searchResults').append(tableHead());
+			$.each(data.groups, function(index, item){
+				$('#searchResults').append(formatGroupDescriptor(item));
+			}); 
+ 			
+			$('#searchResults').append(createPaginationModule('2', offset));
+  			//$('#searchPage').attr('placeholder', 'max value: ' + data.blockAmount);
+		}
+    },
+    // error handler
+    function(error){
+    	$('#searchResults').append();
+    });
+    
+    return false;
+}
+
+function createPaginationModule(pageAmount, page) {
+
+	var pagDiv = document.createElement('div');
+	var pagUl = document.createElement('ul');
+	
+	var prevLi = document.createElement('li');
+	var prev = document.createElement('a');
+	var nextLi = document.createElement('li');
+	var next = document.createElement('a');
+	var firstLi = document.createElement('li');
+	var first = document.createElement('a');
+	var lastLi = document.createElement('li');
+	var last = document.createElement('a');
+	
+	if(page == 0) $(prevLi).addClass('active');
+	if(page == 0) $(firstLi).addClass('active');
+	if(page == (pageAmount - 1)) $(nextLi).addClass('active');
+	if(page == (pageAmount - 1)) $(lastLi).addClass('active');
+	
+	$(prev).attr('onclick','doSearch(Number(this.id))').attr('id', page).html('<');
+	$(next).attr('onclick','doSearch(Number(this.id))').attr('id', page+2).html('>');
+	$(first).attr('onclick','doSearch(1)').attr('rel','tooltip').attr('title', 'page 1').html('<<');
+	$(last).attr('onclick','doSearch(Number(this.id))').attr('id', pageAmount).attr('rel','tooltip').attr('title', 'page ' + pageAmount).html('>>');
+	
+	$(firstLi).append(first);
+	$(pagUl).append(firstLi);
+	$(prevLi).addClass('prev').append(prev);
+	$(pagUl).append(prevLi);
+	$(nextLi).addClass('next').append(next);
+	$(lastLi).append(last);
+	
+	for(var ii = 0; ii < pageAmount; ii++){
+		if(ii < (page-2)) continue;
+		if(ii > (page+2)) continue;
+		var pagLi = document.createElement('li');
+		var pagA = document.createElement('a');
+		
+		if(ii == page) { $(pagLi).addClass('active') };
+		
+		$(pagA).attr('onclick','doSearch(Number(this.innerHTML))').html( ii + 1);
+		$(pagLi).append(pagA);
+		$(pagUl).append(pagLi);
+	}
+	
+	$(pagUl).append(nextLi);
+	$(pagUl).append(lastLi);
+	
+	$(pagDiv).addClass('pagination pagination-centered').append(pagUl);
+	return pagDiv;
+}
+
+function toggle(obj) {
+	var jid = $(obj).data('toggle').jid;
+	var ele = document.getElementById('info' + jid);
+	var but = document.getElementById('icon' + jid);
+	if(ele.style.display == "block") {
+		ele.style.display = "none";
+		but.className = 'icon-chevron-right';
+	}
+	else {
+		ele.style.display = "block";
+		but.className = 'icon-chevron-down';
+	}
+	
+}
+
+function buttonTools(item){
+	var buttonDiv = document.createElement('div'),
+		viewLink=document.createElement('a'),
+		viewIcon=document.createElement('i'),
+		shareLink = document.createElement('a'),
+		shareIcon = document.createElement('i'),
+		accessLink = document.createElement('a'),
+		accessIcon = document.createElement('i');
+		
+	
+	$(viewIcon).addClass('icon-folder-open');
+	$(shareIcon).addClass('icon-share');
+	$(accessIcon).addClass('icon-exchange');
+	
+
+	
+	$(viewLink).attr('href','../viewGroup/' + item.jid)
+		.addClass('btn')
+		.attr('rel','tooltip')
+		.attr('title','View Group')
+		.attr('data-placement','bottom')
+		.append(viewIcon);
+	
+	$(shareLink).attr('href','#')
+		.addClass('btn')
+		.attr('rel', 'tooltip')
+		.attr('title', 'Invite User to this Group')
+		.attr('data-placement', 'bottom')
+		.append(shareIcon);
+	$(accessLink).attr('href', '#')
+		.addClass('btn')
+		.attr('rel', 'tooltip')
+		.attr('title', 'Request Group Membership')
+		.attr('data-placement', 'bottom')
+		.append(accessIcon);
+		
+	if (isSignedIn()) {
+		if (isOwnedGroup(item.jid)) {	
+			$(buttonDiv).append(shareLink);
+		}
+		if (!isOwnedGroup(item.jid)){
+			//may need to be isGroupPartOf
+			$(buttonDiv).append(accessLink);
+		}
+	}
+		
+	$(buttonDiv).addClass('btn-group')
+		.append(viewLink);
+	return buttonDiv
+}
+
+
+function tableHead(){
+    var mainDiv = document.createElement('div'),
+        mainTable = document.createElement('table'),
+        mainTblBody = document.createElement('tbody'),
+        mainRow = document.createElement('tr'),
+        mainCell = document.createElement('th');
+
+    $(mainCell).addClass('span9').html("Available Groups");
+
+    $(mainRow).addClass('success').append(mainCell);
+    $(mainTblBody).append(mainRow);
+    $(mainTable).addClass('table').append(mainTblBody);
+    $(mainDiv).append(mainTable);
+
+    return mainDiv;
+
+}
+
+function formatGroupDescriptor(item){
+	var groupDIV = document.createElement('div'),
+		titleSpan = document.createElement('span'),
+		iconSpan = document.createElement('span'),
+		divButton = document.createElement('i'),
+		groupLink = document.createElement('a'),
+		buttonLink = document.createElement('a'),
+		infoDiv = document.createElement('div');
+
+	$(divButton).attr('rel','tooltip')
+		.attr('title','More Info')
+		.attr('id', 'icon' + item.jid)
+		.addClass('icon-chevron-right');
+
+	$(infoDiv).attr('id', 'info' + item.jid)
+		.attr('style','display: none')
+		.append(buttonTools(item));	
+
+	$(buttonLink).data('toggle', {jid : item.jid} )
+		.attr('onClick', 'toggle(this)')
+		.append(divButton);
+
+	  
+	$(groupLink).attr('href','viewGroup/' + item.jid).append(item.organizationName);
+	$(titleSpan).addClass('span4 networkTitle').append(groupLink); 
+	$(iconSpan).addClass('span1').append(buttonLink);   
+	
+        
+    var li = document.createElement('li');
+    var ul = document.createElement('ul');
+    var a = document.createElement('a');
+        
+    $(groupDIV).addClass('row-fluid').append(iconSpan).append(titleSpan);
+    $(a).attr('style','color:black').append(groupDIV).append(infoDiv);
+        
+    $(li).append(a);
+    $(ul).addClass("nav nav-list").append(li);
+
+	return ul;
+
+}
+
+
+</script>
+
+
 <% include foot.ejs %>

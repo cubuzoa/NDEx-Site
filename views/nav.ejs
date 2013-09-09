@@ -64,13 +64,23 @@
 
 <script>
 
+//global user obj
+var user = {};
+
 function isSignedIn() {
 	if(localStorage['ndexUsername'] == '') {
 		console.log('not signed in');
 		return false;
 	} else {
 		console.log('signed in');
+		user.username = localStorage['ndexUsername'];
+		user.jid = localStorage['ndexJid'];
+		ndexClient.getUser(user.jid, function(data){
+			user.ownedNetworks = data.user.ownedNetworks;
+			user.ownedGroups = data.user.ownedGroups;
+		});
 		return true;
+		
 	}
 }
 
@@ -92,6 +102,8 @@ if(isSignedIn()){
 	$('#signIn').attr('style','display:none');
 	
 	$('#navname').html(localStorage['ndexUsername']);
+
+
 } else {
 	$('#myAccount').attr('style','display:none');
 	$('#manageTasks').attr('style','display:none');

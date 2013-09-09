@@ -48,9 +48,16 @@
 //TODO 
 //DOM Elements depend on object JID for identification, consider using names instead.
 //copy code to view group and view user
-<% if (user) { %>
-var user = {username : '<%= user.username %>', jid: 'C21R1'};
-<% } %>
+/*function isSignedIn() {
+	if(localStorage['ndexUsername'] == '') {
+		console.log('not signed in');
+		return false;
+	} else {
+		console.log('signed in');
+		return true;
+	}
+}*/
+
 
 function doSearch(offset) {
 	var limitInput = document.getElementById('searchCount');
@@ -151,10 +158,28 @@ function createPaginationModule(pageAmount, page) {
 	return pagDiv;
 }
 
+function isOwnedNetwork(jid){
+	var owned = false;
+	$.each(user.ownedNetworks, function(index, network){
+		if (network.jid == jid) {
+			owned = true;
+			return false;
+		}
+	});
+	return owned;
+}
+
+function isSharedNetwork(jid){
+	var shared = false
+
+	//TODO shared network implementation?
+
+	return shared;
+}
 //---------------------------------
 //	Workspace Functions
 //---------------------------------
-<% if (user) { %>
+
 
 function onWorkspace(jid){
 	//check if network is on the user workspace.  
@@ -225,7 +250,7 @@ function addToWorkspace(obj){
 	$(parent).append(unlst);
 	onWorkspace(network.jid);
 }
-<% } %>
+
 //------------------------------------
 //	Network List Interface
 //--------------------------------------
@@ -253,7 +278,11 @@ function buttonTools(item){
 		visualizeLink=document.createElement('a'),
 		wkSpaceIcon=document.createElement('i'),
 		viewIcon=document.createElement('i'),
-		visualizeIcon=document.createElement('i');
+		visualizeIcon=document.createElement('i'),
+		shareLink = document.createElement('a'),
+		shareIcon = document.createElement('i'),
+		accessLink = document.createElement('a'),
+		accessIcon = document.createElement('i');
 		
 	$(wkSpaceIcon).addClass('icon-plus')
 		.attr('id','icon'+item.jid)
@@ -262,13 +291,14 @@ function buttonTools(item){
 		.attr('data-placement','bottom');
 	$(viewIcon).addClass('icon-folder-open');
 	$(visualizeIcon).addClass('icon-eye-open');
+	$(shareIcon).addClass('icon-share');
+	$(accessIcon).addClass('icon-exchange');
 	
 
 	
 	$(wkSpaceLink).attr('onclick','')
 		.data('networkProperties',{title : item.title, jid : item.jid})
 		.attr('id','link'+item.jid)
-		.attr('title',item.jid)
 		.addClass('btn')
 		.append(wkSpaceIcon);
 	$(viewLink).attr('href','../viewNetwork/' + item.jid)
@@ -283,10 +313,28 @@ function buttonTools(item){
 		.attr('title','VisualizeNetwork')
 		.attr('data-placement','bottom')
 		.append(visualizeIcon);
+	$(shareLink).attr('href','#')
+		.addClass('btn')
+		.attr('rel', 'tooltip')
+		.attr('title', 'Share Network')
+		.attr('data-placement', 'bottom')
+		.append(shareIcon);
+	$(accessLink).attr('href', '#')
+		.addClass('btn')
+		.attr('rel', 'tooltip')
+		.attr('title', 'Request Network Access')
+		.attr('data-placement', 'bottom')
+		.append(accessIcon);
 		
-	<% if (user) { %>
-	$(buttonDiv).append(wkSpaceLink);
-	<% } %>
+	if (isSignedIn()) {
+		$(buttonDiv).append(wkSpaceLink);
+		if (isOwnedNetwork(item.jid)) {	
+			$(buttonDiv).append(shareLink);
+		}
+		if (!isOwnedNetwork(item.jid) && !isSharedNetwork(item.jid)){
+			$(buttonDiv).append(accessLink);
+		}
+	}
 		
 	$(buttonDiv).addClass('btn-group')
 		.append(viewLink)
@@ -315,10 +363,6 @@ function tableHead(){
 
 function formatNetworkDescriptor(item){
 	var networkDIV = document.createElement('div'),
-		nTable = document.createElement('table'),
-        tblBody = document.createElement('tbody'),
-        row = document.createElement('tr'),
-		cell = document.createElement('td'),
 		nodeSpan = document.createElement('span'),
 		edgeSpan = document.createElement('span'),
 		titleSpan = document.createElement('span'),
