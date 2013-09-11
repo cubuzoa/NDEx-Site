@@ -1,0 +1,13 @@
+{
+    "name": "build_test_db",
+    "description": "Test Database Initialization",
+    "version": "0.0.1",
+    "private": true,
+    "dependencies": {
+        "jquery": "1.8.x",
+        "mocha": "1.9.x",
+        "should" : "1.2.x",
+        "request" : "2.20.x" 
+
+    }
+}
