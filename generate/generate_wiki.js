@@ -22,6 +22,8 @@ var lines = [];
 for (n in specs.resourceTypes){
 	resourceType = specs.resourceTypes[n];
 	lines.push("");
+    lines.push("***");
+    lines.push("");
 	lines.push("###" + resourceType);
 	resourceSpecs = specs[resourceType];
 	for (i in resourceSpecs){
@@ -38,6 +40,7 @@ for (n in specs.resourceTypes){
 			lines.push("");
 			
 			if (spec.routeParams){
+                lines.push("");
 				lines.push("Route Parameters:");
 				for (n in spec.routeParams){
 					var param = spec.routeParams[n];
@@ -46,6 +49,7 @@ for (n in specs.resourceTypes){
 			}
 			
 			if (spec.queryParams){
+                lines.push("");
 				lines.push("Query Parameters:");
 				for (n in spec.queryParams){
 					var param = spec.queryParams[n];
@@ -55,6 +59,7 @@ for (n in specs.resourceTypes){
 			}
 			
 			if (spec.postData){
+                lines.push("");
 				lines.push("Post Data Parameters:");
 				for (n in spec.postData){
 					var param = spec.postData[n];
@@ -63,6 +68,14 @@ for (n in specs.resourceTypes){
 				}
 			}
 
+            if (spec.exceptions){
+                lines.push("");
+                lines.push("Exceptions:");
+                for (n in spec.exceptions){
+                    var exception = spec.exceptions[n];
+                    lines.push("* " + exception);
+                }
+            }
 
 		}
 	}

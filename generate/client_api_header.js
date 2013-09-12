@@ -12,8 +12,8 @@
 (function (exports) {
 
     if (typeof($) === 'undefined') {
-        console.log("requiring jQuery");
-        $ = require('jQuery');
+        console.log("requiring jquery");
+        $ = require('jquery');
     }
 
     exports.host = "http://localhost:3333";

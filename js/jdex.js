@@ -115,7 +115,9 @@ exports.Graph = function(){
 	this.nodeTypes = {};	
 	this.nodes = {};	
 	this.edges = {};
+
 	this.nodeIdentifierMap = {};
+    this.termMap = {};
 	
 	this.paths = {};
 	this.subnetworks = {};
@@ -164,8 +166,12 @@ exports.Graph.prototype = {
 	},
 		
 	findOrCreateNodeByTerm : function(term, name){
+        //console.log("find or create node by " + term.identifier() + " with name : " + name) ;
 		var node = this.nodeByIdentifier(term.identifier());
-		if (node) return node;
+		if (node) {
+            //console.log("found: " + node.name);
+            return node;
+        }
 		node = new exports.Node(name, term);
 		this.addNode(node)
 		return node;
@@ -294,8 +300,14 @@ exports.Graph.prototype = {
 	},
 
 //---------------Term Methods -------------------------------------------
-	
+    /*
 	termByNameAndNamespace : function (name, ns){
+        var key = name + ":" + namespace,
+            term = this.termMap(key);
+
+        if(term) return term;
+
+
 		if (ns){
 			for (index in this.terms){
 				var term = this.terms[index];
@@ -315,49 +327,30 @@ exports.Graph.prototype = {
 			}
 			//console.log("term not found for " + name);
 		}
-				
+
 		return false;
 	},
+         */
+
+    termByNameAndNamespace : function (name, ns){
+        return this.termMap[termIdentifier(name, ns)];
+    },
 	
 	findOrCreateTerm : function (name, ns){
+		if (!name) throw new Error("attempt to create term in namespace " + ns.uri + " with no name");
 		var term = this.termByNameAndNamespace(name, ns);
 		if (term) return term;
 		term = new exports.Term(name, ns);
 		return this.addTerm(term);
 	},
 
-	functionTermByFunctionAndParameters : function (fn, parameters){
-		for (i in this.terms){
-		 	var term = this.terms[i];
-			if (term.termFunction && fn.id == term.termFunction.id){
-				if (term.parameters && term.parameters.length == parameters.length){
-					var match = true;
-					for (j in parameters){
-						var param = parameters[j],
-							termParam = term.parameters[j];
-							
-						if (param.id && termParam.id){
-							// if they have ids, check by ids
-							if (param.id != termParam.id) match = false;
-						} else {
-							// otherwise, they are literal values, check directly
-							if (param != termParam) match = false;
-						}
-					}
-					if (match) {
-						if (fn.id == "47") {
-							console.log("found match for function term id 47");
-						}
-						return term;
-					}	
-				}		
-			}
-		}	
-		//console.log("function term not found for function " + fn.identifier() + " and parameters TBD");		
-		return false;
-	},
+    functionTermByFunctionAndParameters : function (fn, parameters){
+        return this.termMap[functionTermIdentifier(fn, parameters)];
+    },
 
 	findOrCreateFunctionTerm : function (fn, parameters){
+		if (!fn) throw new Error("attempt to create functionTerm with no function");
+		if (!parameters || parameters.length == 0) throw new Error("attempt to create functionTerm with no parameters");
 		var term = this.functionTermByFunctionAndParameters(fn, parameters);
 		if (term) return term;
 		term = new exports.FunctionTerm(fn, parameters);
@@ -367,6 +360,7 @@ exports.Graph.prototype = {
 	addTerm : function (term){
 		term.id = this.maxInternalId++;
 		this.terms[term.id] = term;
+        this.termMap[term.identifier()] = term;
 		return term;
 	},
 	
@@ -746,6 +740,18 @@ exports.Term = function(name, ns){
 	
 };
 
+function termIdentifier (name, ns){
+    if (ns){
+        if (ns.prefix){
+            return ns.prefix + ":" + name;
+        } else {
+            return ns.uri + name;
+        }
+    } else {
+        return name;
+    }
+}
+
 exports.Term.prototype = {
 
 	constructor : exports.Term,
@@ -760,16 +766,8 @@ exports.Term.prototype = {
 	},
 	
 	identifier : function(){
-		if (this.ns){
-			if (this.ns.prefix){
-				return this.ns.prefix + ":" + this.name;
-			} else {
-				return this.ns.uri + this.name;
-			}
-		} else {
-			return this.name;
-		}
-	}
+        return termIdentifier(this.name, this.ns);
+    }
 
 };
 
@@ -780,6 +778,18 @@ exports.FunctionTerm = function(fn, parameters){
 	this.termFunction = fn;
 	this.parameters = parameters;	
 };
+
+function functionTermIdentifier(termFunction, parameters){
+    var params =[];
+    $.each(parameters, function(index, parameter){
+        if (parameter.termFunction || parameter.name){
+            params.push(parameter.identifier());
+        } else {
+            params.push(parameter);
+        }
+    });
+    return termFunction.identifier() + "(" + params.join(', ') + ")";
+}
 
 exports.FunctionTerm.prototype = {
 
@@ -798,15 +808,7 @@ exports.FunctionTerm.prototype = {
 	},
 	
 	identifier : function(){
-		var params =[];
-		$.each(this.parameters, function(index, parameter){
-			if (parameter.fn || parameter.name){
-				params.push(parameter.identifier());
-			} else { 
-				params.push(parameter);
-			}
-		});
-		return this.termFunction.identifier() + "(" + params.join(', ') + ")";
+        return functionTermIdentifier(this.termFunction, this.parameters);
 	}
 
 };
@@ -945,6 +947,8 @@ exports.createGraphFromXBEL = function (xml_text){
 	var graph = new exports.Graph();
 	var doc = new DOMParser().parseFromString(xml_text,'text/xml');
 	
+	console.log("parsed XML text");
+	
 	// Process the header
 	var header = doc.documentElement.getElementsByTagName('bel:header').item(0);
 	exports.processXBELHeader(graph, header);
@@ -964,9 +968,12 @@ exports.createGraphFromXBEL = function (xml_text){
 		
 	// Process the statementGroups
 	
+	var nStatementGroups = doc.documentElement.childNodes.length;
+	
 	$.each(doc.documentElement.childNodes, function(index, statementGroup){
 		if (statementGroup.tagName == 'bel:statementGroup'){
 			var context = {annotations: []};
+				console.log(index + " / " + nStatementGroups + " maxID: " + graph.maxInternalId );
 			exports.processXBELStatementGroup(graph, statementGroup, context);
 		}
 	}); 
@@ -1078,7 +1085,7 @@ exports.processXBELAnnotationDefinitionGroup = function(graph, AnnotationDefinit
 		
 		$.each(termElements.childNodes, function (j, termElement){
 			var termName = termElement.textContent;
-			console.log("creating internal annotation term: " + termName + " in " + ns.prefix);
+			//console.log("creating internal annotation term: " + termName + " in " + ns.prefix);
 			graph.findOrCreateTerm(termName, ns);
 		});
 		
@@ -1087,7 +1094,7 @@ exports.processXBELAnnotationDefinitionGroup = function(graph, AnnotationDefinit
 }
 
 exports.processXBELStatementGroup = function(graph, statementGroup, context){
-	console.log('\n----------------------\n');
+
 
 	// process the annotation group		
 	$.each(statementGroup.childNodes, function(index, element){
@@ -1126,7 +1133,7 @@ exports.processXBELAnnotationGroup = function(graph, annotationGroup, context){
 					value = element.textContent,
 					ns = graph.namespaceByPrefix(propertyName);
 				
-				console.log("processing annotation " + propertyName + " : " + value);	
+				//console.log("processing annotation " + propertyName + " : " + value);	
 				if (ns) {
 					var valueTerm = graph.findOrCreateTerm(value, ns),
 						propertyTerm = graph.termByNameAndNamespace(propertyName, graph.belNS);
@@ -1159,43 +1166,52 @@ exports.processXBELAnnotationGroup = function(graph, annotationGroup, context){
 exports.processXBELStatement = function(graph, statement, context){
 	//console.log("processing statement with context = " + context);
 
-	// find or create the predicate	
-	var relationshipName = statement.getAttribute('bel:relationship'),
-		p = graph.findOrCreateTerm(relationshipName, graph.belNS),
-		s, o;
+	var s, o;
 	
+
 	$.each(statement.childNodes, function(index, nodeElement){
 		if (nodeElement.tagName == 'bel:subject'){
 			// find or create the subject node
 			s = exports.processXBELNodeElement(graph, nodeElement);
 		} else if (nodeElement.tagName == 'bel:object') {
 			// find or create the object node
+			// for now, a relationship as an object will return false
+			// and we will only create the subject node, and skip the edge
 			o = exports.processXBELNodeElement(graph, nodeElement);
 		}
 	});
-	// create the edge (because this is a BEL document, not a model, each statement creates a unique edge)
+	
+	
+	// find or create the predicate	
+	var relationshipName = statement.getAttribute('bel:relationship');
+	if (relationshipName){
+		p = graph.findOrCreateTerm(relationshipName, graph.belNS);
+	}
+
+	// create the edge if we have a subject, predicate, and object 
+	// (because this is a BEL document, not a model, each statement creates a unique edge)
 	if (s && p && o){
 		var edge = new exports.Edge(s, p, o);
-	
+
 		// if there is a citation, add the edge and vice versa
 		if (context.citation){
 			context.citation.addEdge(edge);
 			edge.citation = context.citation;
 		}
-	
+
 		// if there is a support, add the edge
 		if (context.support){
 			context.support.addEdge(edge);
 			edge.support = context.support;
 		}
-		
+	
 		// for each annotation, add it to the edge
 		$.each(context.annotations, function(index, pair){
 			//console.log("adding annotation to edge : " + pair.property.identifier() + " = " + pair.value.identifier());
 			edge.properties[pair.property.identifier()] = pair.value;
 		});
-		
 	
+
 		graph.addEdge(edge);
 	} else {
 		var sname = s ? s.name : "unknown",
@@ -1206,19 +1222,20 @@ exports.processXBELStatement = function(graph, statement, context){
 }
 
 exports.processXBELNodeElement = function(graph, nodeElement){
-
-	var term = exports.processXBELTermElement(graph, nodeElement.childNodes[1]);
+	var termElement = nodeElement.childNodes[1];
+	if (termElement.tagName == 'bel:statement') return false;
+	var term = exports.processXBELTermElement(graph, termElement);
 	return graph.findOrCreateNodeByTerm(term, term.identifier());
-
 }
 
 exports.processXBELTermElement = function(graph, termElement){
 	// find or create the term function
-	var functionName = termElement.getAttribute('bel:function'),
-		fn = graph.findOrCreateTerm(functionName, graph.belNS),
+	var functionName = termElement.getAttribute('bel:function');
+	if (!functionName) throw new Error("no function name found for " + termElement);
+		
+	var fn = graph.findOrCreateTerm(functionName, graph.belNS),
 		parameters = [];
-	
-	
+
 	$.each(termElement.childNodes, function (index, child){
 		if (child.tagName == 'bel:parameter'){
 			// child is a basic term or a literal value
@@ -1266,7 +1283,7 @@ exports.processXBELCitation = function(graph, citationElement){
 	
 	// process the authors, if listed
 	var authorGroups = citationElement.getElementsByTagName('bel:authorGroup');
-	if (authorGroups){
+	if (authorGroups && authorGroups.length > 0){
 		$.each(authorGroups[0].getElementsByTagName('bel:author'), function(index, authorElement){
 			citation.addContributor(authorElement.textContent);
 		});

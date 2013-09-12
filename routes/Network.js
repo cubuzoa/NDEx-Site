@@ -81,8 +81,8 @@ function createNetworkDocument(networkJDEx){
 		o_namespaces = [],
 		o_terms = [],
 		o_properties = {},
-		o_supports = {},
-		o_citations = {};
+		o_supports = [],
+		o_citations = [];
 
 		for(index in networkJDEx.namespaces){
 			var ns = networkJDEx.namespaces[index];
@@ -97,7 +97,10 @@ function createNetworkDocument(networkJDEx){
 			if (term.name){
 				var o_term = {"@type": "d", "@class": "xBaseTerm", id: index, name: term.name};
 				o_terms.push(o_term);
-			}
+			} else if (term.termFunction) {
+                var o_term = {"@type": "d", "@class": "xFunctionTerm", id: index};
+                o_terms.push(o_term);
+            }
 		}
 
 		// Copy the graph properties
@@ -247,10 +250,10 @@ function linkFunctionTerms(networkJDEx, networkIndex){
 			xTermRID = networkIndex[termId];
 		if (!xTermRID) throw "Failed to find RID for term id = " + termId;
 		
-		if (term.function && term.parameters){
+		if (term.termFunction && term.parameters){
 			// This is a function term
 			// First, get the RID of the function and link it
-			var functionRID = networkIndex[term.function];
+			var functionRID = networkIndex[term.termFunction];
 			if (!functionRID) throw("Failed to find RID for function term " + term.function);
 			
 			// create the parameter expression
@@ -332,7 +335,7 @@ exports.getNetwork = function(networkRID, callback){
 							// process the namespaces
 							for (i in namespaces){
 								var ns = namespaces[i];
-								result.namespaces[ns.id] = {prefix: ns.prefix, rid: module.common.convertFromRID(ns.rid), uri: ns.uri};
+								result.namespaces[ns.id] = {prefix: ns.prefix, rid: common.convertFromRID(ns.rid), uri: ns.uri};
 							}
 							
 							// get the terms
