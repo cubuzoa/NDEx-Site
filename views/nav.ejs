@@ -77,36 +77,20 @@
 //global user obj
 var user = {};
 
-function isSignedIn() {
-	if(localStorage['ndexUsername'] == '') {
-		console.log('not signed in');
-		return false;
-	} else {
-		console.log('signed in');
-		user.username = localStorage['ndexUsername'];
-		user.jid = localStorage['ndexJid'];
-		ndexClient.getUser(user.jid, function(data){
-			//console.log(JSON.stringify(data));
-			user.ownedNetworks = data.user.ownedNetworks;
-			user.ownedGroups = data.user.ownedGroups;
-			console.log('----' + JSON.stringify(user));
-		});
-		return true;
-		
-	}
-}
 
-function signout() {
-	
-	localStorage['ndexUsername'] = '';
-	localStorage['ndexPassword'] = '';
-	localStorage['ndexJid'] = '';
-
-	window.location.href = "/";
-	//console.log(JSON.stringify(localStorage));
-}
 
 if(isSignedIn()){
+	//Initializing the globally used user object
+	user.username = localStorage['ndexUsername'];
+	user.jid = localStorage['ndexJid'];
+	ndexClient.getUser(user.jid, function(data){
+		//console.log(JSON.stringify(data));
+		user.ownedNetworks = data.user.ownedNetworks;
+		user.ownedGroups = data.user.ownedGroups;
+		console.log('----' + JSON.stringify(user));
+	});
+
+	//assigning a class, ex: signInOnly, can eliminate a lot of lines of code
 	$('#myAccount').attr('style','display:block');
 	$('#manageTasks').attr('style','display:block');
 	$('#signOut').attr('style','display:block');
@@ -119,7 +103,6 @@ if(isSignedIn()){
 	$('#toNetworks').attr('href', '/viewUser/' + user.jid + '/#tab_ownedNetworks');
 	
 	$('#navname').html(localStorage['ndexUsername']);
-
 
 } else {
 	$('#myAccount').attr('style','display:none');

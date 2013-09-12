@@ -90,12 +90,12 @@ function doSearch(offset) {
 		$('#searchResults').html('');
 		
 		if (data.networks){
-			$('#searchResults').append(tableHead());
+			$('#searchResults').append('Available Networks');
 			$.each(data.networks, function(index, item){
 				$('#searchResults').append(formatNetworkDescriptor(item));
 			}); 
  			
-			$('#searchResults').append(createPaginationModule(data.blockAmount, offset));
+			$('#searchResults').append(createPaginationModule(data.blockAmount, offset, 'doSearch'));
   			$('#searchPage').attr('placeholder', 'max value: ' + data.blockAmount);
 		}
     },
@@ -107,306 +107,29 @@ function doSearch(offset) {
     return false;
 }
 
-function createPaginationModule(pageAmount, page) {
-
-	var pagDiv = document.createElement('div');
-	var pagUl = document.createElement('ul');
-	
-	var prevLi = document.createElement('li');
-	var prev = document.createElement('a');
-	var nextLi = document.createElement('li');
-	var next = document.createElement('a');
-	var firstLi = document.createElement('li');
-	var first = document.createElement('a');
-	var lastLi = document.createElement('li');
-	var last = document.createElement('a');
-	
-	if(page == 0) $(prevLi).addClass('active');
-	if(page == 0) $(firstLi).addClass('active');
-	if(page == (pageAmount - 1)) $(nextLi).addClass('active');
-	if(page == (pageAmount - 1)) $(lastLi).addClass('active');
-	
-	$(prev).attr('onclick','doSearch(Number(this.id))').attr('id', page).html('<');
-	$(next).attr('onclick','doSearch(Number(this.id))').attr('id', page+2).html('>');
-	$(first).attr('onclick','doSearch(1)').attr('rel','tooltip').attr('title', 'page 1').html('<<');
-	$(last).attr('onclick','doSearch(Number(this.id))').attr('id', pageAmount).attr('rel','tooltip').attr('title', 'page ' + pageAmount).html('>>');
-	
-	$(firstLi).append(first);
-	$(pagUl).append(firstLi);
-	$(prevLi).addClass('prev').append(prev);
-	$(pagUl).append(prevLi);
-	$(nextLi).addClass('next').append(next);
-	$(lastLi).append(last);
-	
-	for(var ii = 0; ii < pageAmount; ii++){
-		if(ii < (page-2)) continue;
-		if(ii > (page+2)) continue;
-		var pagLi = document.createElement('li');
-		var pagA = document.createElement('a');
-		
-		if(ii == page) { $(pagLi).addClass('active') };
-		
-		$(pagA).attr('onclick','doSearch(Number(this.innerHTML))').html( ii + 1);
-		$(pagLi).append(pagA);
-		$(pagUl).append(pagLi);
-	}
-	
-	$(pagUl).append(nextLi);
-	$(pagUl).append(lastLi);
-	
-	$(pagDiv).addClass('pagination pagination-centered').append(pagUl);
-	return pagDiv;
-}
-
-function isOwnedNetwork(jid){
-	var owned = false;
-	$.each(user.ownedNetworks, function(index, network){
-		if (network.jid == jid) {
-			owned = true;
-			return false;
-		}
-	});
-	return owned;
-}
-
-function isSharedNetwork(jid){
-	var shared = false
-
-	//TODO shared network implementation?
-
-	return shared;
-}
-//---------------------------------
-//	Workspace Functions
-//---------------------------------
 
 
-function onWorkspace(jid){
-	//check if network is on the user workspace.  
+function updateWorkspaceTools(jid){
+//this is not in ndexUI.js because viewNetwork has a different version
 	var tempLink = document.getElementById('link'+jid),
-		tempIcon = document.getElementById('icon'+jid),
-		found = false;
-	
-	
-	$("input").each(function(index,value){
-		if($(this).attr('title') == jid) {
+		tempIcon = document.getElementById('icon'+jid);
+
+	isOnWorkspace(jid, function(found) {
+		if (found) {
 			$(tempLink).attr('onclick','removeFromWorkspace(this)');//
 			$(tempIcon).attr('title','Remove from Workspace');
 			tempIcon.className='icon-remove';
-			found = true;
+		}
+		else{
+			$(tempLink).attr('onclick','addToWorkspace(this)');
+			$(tempIcon).attr('title','Add to Workspace');
+			tempIcon.className='icon-plus icon-white';
 		}
 	});
-	
-	if(found)return;
-	
-	$(tempLink).attr('onclick','addToWorkspace(this)');
-	$(tempIcon).attr('title','Add to Workspace');
-	tempIcon.className='icon-plus icon-white';
 }
 
-function removeFromWorkspace(obj){
-	//$(obj).attr('title') holds the corresponding network jid
-	var network = $(obj).data('networkProperties');
-	var parent = document.getElementById('workSurface');
 
-	$("input").each(function(index,value){
-		if($(this).attr('title') == network.jid){
-			ndexClient.deleteNetworkFromUserWorkspace(user.jid, network.jid, function(data) {});
-			var child = document.getElementById('thumbnail' + network.jid);
-			parent.removeChild(child);
-			onWorkspace(network.jid);
-		}
-	});
-	
-}
 
-function addToWorkspace(obj){
-	//$(obj).attr('title') holds the corresponding network jid
-	var network= $(obj).data('networkProperties');
-
-	ndexClient.addNetworkToUserWorkspace(user.jid, network.jid, function(data) {});
-	var unlst = document.createElement('ul'),
-		lst = document.createElement('li'),
-		cnt = document.createElement('div'),
-		formBox = document.createElement('form'),
-		chckbox = document.createElement('input'),
-		titleSpan = document.createElement('p');
-	var parent = document.getElementById('workSurface');
-		
-	$(titleSpan).addClass('thumbText')
-		.append(network.title);//
-	$(chckbox).attr('id','checkbox' + network.jid)
-		.attr('title',network.jid)
-		.attr('type','checkbox');
-	$(formBox).append(chckbox);
-	$(cnt).addClass('thumbnail thumbIcon')
-		.append(formBox)
-		.append(titleSpan);
-	$(lst).append(cnt);
-	$(unlst).attr('id','thumbnail' + network.jid)
-		.addClass('thumbnails')
-		.append(lst);
-	
-	$(parent).append(unlst);
-	onWorkspace(network.jid);
-}
-
-//------------------------------------
-//	Network List Interface
-//--------------------------------------
-function toggle(obj) {
-	var divDisplay = obj.id +1;
-	var ele = document.getElementById(divDisplay);
-	var but = document.getElementById(obj.id +2);
-	if(ele.style.display == "block") {
-		ele.style.display = "none";
-		but.className = 'icon-chevron-right';
-	}
-	else {
-		ele.style.display = "block";
-		but.className = 'icon-chevron-down';
-	}
-	
-	onWorkspace($(obj).attr('title'));
-}
-
-//actions for network upon dropdown
-function buttonTools(item){
-	var buttonDiv = document.createElement('div'),
-		wkSpaceLink=document.createElement('a'),
-		viewLink=document.createElement('a'),
-		visualizeLink=document.createElement('a'),
-		wkSpaceIcon=document.createElement('i'),
-		viewIcon=document.createElement('i'),
-		visualizeIcon=document.createElement('i'),
-		shareLink = document.createElement('a'),
-		shareIcon = document.createElement('i'),
-		accessLink = document.createElement('a'),
-		accessIcon = document.createElement('i');
-		
-	$(wkSpaceIcon).addClass('icon-plus')
-		.attr('id','icon'+item.jid)
-		.attr('rel','tooltip')
-		.attr('title','Add to Workspace')
-		.attr('data-placement','bottom');
-	$(viewIcon).addClass('icon-folder-open');
-	$(visualizeIcon).addClass('icon-eye-open');
-	$(shareIcon).addClass('icon-share');
-	$(accessIcon).addClass('icon-exchange');
-	
-
-	
-	$(wkSpaceLink).attr('onclick','')
-		.data('networkProperties',{title : item.title, jid : item.jid})
-		.attr('id','link'+item.jid)
-		.addClass('btn')
-		.append(wkSpaceIcon);
-	$(viewLink).attr('href','../viewNetwork/' + item.jid)
-		.addClass('btn')
-		.attr('rel','tooltip')
-		.attr('title','View Network')
-		.attr('data-placement','bottom')
-		.append(viewIcon);
-	$(visualizeLink).attr('href','../visualizeNetwork/' + item.jid)
-		.addClass('btn')
-		.attr('rel','tooltip')
-		.attr('title','VisualizeNetwork')
-		.attr('data-placement','bottom')
-		.append(visualizeIcon);
-	$(shareLink).attr('href','#')
-		.addClass('btn')
-		.attr('rel', 'tooltip')
-		.attr('title', 'Share Network')
-		.attr('data-placement', 'bottom')
-		.append(shareIcon);
-	$(accessLink).attr('href', '#')
-		.addClass('btn')
-		.attr('rel', 'tooltip')
-		.attr('title', 'Request Network Access')
-		.attr('data-placement', 'bottom')
-		.append(accessIcon);
-		
-	if (isSignedIn()) {
-		$(buttonDiv).append(wkSpaceLink);
-		if (isOwnedNetwork(item.jid)) {	
-			$(buttonDiv).append(shareLink);
-		}
-		if (!isOwnedNetwork(item.jid) && !isSharedNetwork(item.jid)){
-			$(buttonDiv).append(accessLink);
-		}
-	}
-		
-	$(buttonDiv).addClass('btn-group')
-		.append(viewLink)
-		.append(visualizeLink);
-
-	return buttonDiv
-}
-
-function tableHead(){
-    var mainDiv = document.createElement('div'),
-        mainTable = document.createElement('table'),
-        mainTblBody = document.createElement('tbody'),
-        mainRow = document.createElement('tr'),
-        mainCell = document.createElement('th');
-
-    $(mainCell).addClass('span9').html("Available Networks");
-
-    $(mainRow).addClass('success').append(mainCell);
-    $(mainTblBody).append(mainRow);
-    $(mainTable).addClass('table').append(mainTblBody);
-    $(mainDiv).append(mainTable);
-
-    return mainDiv;
-
-}
-
-function formatNetworkDescriptor(item){
-	var networkDIV = document.createElement('div'),
-		nodeSpan = document.createElement('span'),
-		edgeSpan = document.createElement('span'),
-		titleSpan = document.createElement('span'),
-		iconSpan = document.createElement('span'),
-		divButton = document.createElement('i'),
-		networkLink = document.createElement('a'),
-		buttonLink = document.createElement('a'),
-		infoDiv = document.createElement('div');
-
-	$(divButton).attr('rel','tooltip')
-			.attr('title','More Info')
-			.attr('id',item.title + 2)
-			.addClass('icon-chevron-right');
-
-	$(infoDiv).addClass('searchInfo').attr('id',item.title + 1)
-					.attr('style','display: none')
-					.append(buttonTools(item));	
-
-	$(buttonLink).attr('id',item.title)
-			.attr('title',item.jid)
-			.attr('onClick', 'toggle(this)')
-			.append(divButton);
-
-	  
-	$(networkLink).attr('href','viewNetwork/' + item.jid).append(item.title);
-	$(nodeSpan).addClass('span2 elementCount').append(item.nodeCount + " nodes"); 
-	$(edgeSpan).addClass('span2 elementCount').append(item.edgeCount + " edges"); 
-	$(titleSpan).addClass('span4 networkTitle').append(networkLink); 
-	$(iconSpan).addClass('span1').append(buttonLink);   
-	
-        
-    var li = document.createElement('li');
-    var ul = document.createElement('ul');
-    var a = document.createElement('a');
-        
-    $(networkDIV).addClass('row-fluid').append(iconSpan).append(titleSpan).append(nodeSpan).append(edgeSpan);
-    $(a).attr('style','color:black').append(networkDIV).append(infoDiv);
-        
-    $(li).append(a);
-    $(ul).addClass("nav nav-list").append(li);
-
-	return ul;//networkDIV;
-
-}
 
 function formatError(error){
 
