@@ -1,50 +1,217 @@
 <% include head.ejs %>
 <% include nav.ejs %>
 
+
 <div class="row-fluid">
-<div id="networks" class="span7"></div>
-<div id="profile" class="span3"></div>
-<div id="error"></div>
+	<div id="" class="span7">
+		<div id = "image"> </div>
+		<div id = "" class = "tabbable" > 
+			<ul class="nav nav-tabs tab-title">
+				<li class="active">
+					<a href="#ownedNetworks" data-toggle="tab" class=""> Owned Networks </a>
+				</li>
+				<li>
+					<a href="#groupMembers" data-toggle="tab" class=""> Members </a>
+				</li>
+				<li id ="showOwnedAgentAccounts" style="display:none">
+					<a href="#ownedAgentAccounts" data-toggle="tab" class=""> Owned Agent Accounts </a>
+				</li>
+			</ul>
+			<div class="tab-content">
+				<div class="tab-pane active" id="ownedNetworks"></div>
+				<div class="tab-pane" id="groupMembers"></div>
+				<div class = "tab-pane" id = "ownedAgentAccounts"> </div>
+			</div>
+		</div>
+	</div>
+	<div id="profile" class="span3">
+		<h3 id = "name"> </h3>
+		<p><a  id = "link" target = "_blank"> </a></p>
+		<p id = "descrip"> </p>
+		<div id = "notifications" class = "notifications" style="display:none">
+			<div class = "notificationsHeader">
+			Notifications
+			</div>
+			<div id = "notifContent" style = "background-color:white" >
+			Requests
+			</div>
+		</div>
+	</div>
+	<div class = "span2 dropdown">
+			<a class = "ndex-options dropdown-toggle" data-toggle="dropdown"> 
+				<i class="icon-cog icon-large"></i> 
+			</a>
+			<ul class="dropdown-menu">
+				<li id=""></li>
+				<li> <a href = "#displayOptions" data-toggle = "modal" > Display Options </a></li>
+				<li> <a href = "#" class = "accountMiniMenu" style="display:none"> Edit Group Profile </a></li>
+				<li> <a href = "#" class = "accountMiniMenu" style="display:none"> New Group Profile Image </a></li>
+				<li> <a href = "#" class = "accountMiniMenu" style="display:none"> New Background Image </a></li>
+				<li> <a href = "#" class = "accountMiniMenu" style="display:none"> Create a Request </a></li>
+				<li> <a href = "#" class = "accountMiniMenu" style="display:none"> Edit/Create Agent </a></li>
+			</ul>
+	</div>
+	<div id="error"></div>
 </div>
+
+<!--- Modal for Display Options ---->
+<div id = "displayOptions" class = " modal hide fade" tabindex = "-1" role = "dialog" aria-labelledby = "myModalLabel" aria-hidden = "true">
+	<div class = "modal-header">
+		<h4 id = "myModalLabel"> Network Search Options </h4>
+	</div>
+	<div class="modal-body">
+		
+		In progress
+		
+	</div>
+	<div class = "modal-footer">
+		<button class = "btn" onclick = "" data-dismiss = "modal" aria-hidden = "true"> Save Changes </button>
+		<button class = "btn" data-dismiss = "modal" aria-hidden = "true"> Cancel </button>
+	</div>
+</div>
+
 <script>
 
 // the group id passed from the ejs template
 var groupJID = '<%= groupId %>';
 
+// Javascript to enable link to tab
+var hash = document.location.hash;
+var prefix = "tab_";
+if (hash) {
+    $('.nav-tabs a[href='+hash.replace(prefix,"")+']').tab('show');
+} 
+
+// Change hash for page-reload
+$('.nav-tabs a').on('shown', function (e) {
+    window.location.hash = e.target.hash.replace("#", "#" + prefix);
+});
+
+
 function formatError(error){
-
+	
 }
 
-
-function formatProfile(){
-	var header = document.createElement('h3'),
-		para1 = document.createElement('p'),
-		para2 = document.createElement('p'),
-		website = document.createElement('a'),
-		proDiv = document.createElement('div');
-
-	$(header).attr('id','name');
-	$(para2).attr('id','descrip');
-	$(website).attr('id','link').attr('target','_blank');
-
-	$(para1).append(website);
+function addInvite(name,id){
+	var modalTrigger = document.createElement('a');		
+	var list = document.createElement('li');
+	var unlist = document.createElement('ul');
 	
-	$(proDiv).addClass('profile')
-		.append(header)
-		.append(para1)
-		.append(para2);
-
-	return proDiv;
+	$(modalTrigger)
+		.addClass('unread')
+		.attr('href','#modal'+id)
+		.attr('data-toggle','modal')
+		.attr('id','trigger'+id)
+		.append(name);
+	
+	$(list).append(modalTrigger);
+	$(unlist).attr('id','triggerParent'+id).addClass("nav nav-list").append(list);
+	
+	return unlist;
 }
 
-function formatImages(){
-	var imageDiv = document.createElement('div');
+function respondInvite(obj){
+	var pageLink = document.getElementById('trigger' + obj.title);
+	var linkParent = document.getElementById('triggerParent' + obj.title);
+	var modal = document.getElementById('modal' + obj.title);
+	var notifContent = document.getElementById('notifContent');
 	
-	$(imageDiv).attr('id','image');
-	
-	return imageDiv;
-
+	if (obj.id == 'postpone'){
+		pageLink.className ='read';
+		//modal.removeChild(obj);
+	}
+	if (obj.id == 'accept'){
+		notifContent.removeChild(linkParent);
+	}
+	if (obj.id == 'deny'){
+		notifContent.removeChild(linkParent);
+	}	
 }
+
+function createModal(name,id){
+	var inviteModal = document.createElement('div'),
+		modalHeader = document.createElement('div'),
+		modalBody = document.createElement('div'),
+		modalFooter = document.createElement('div'),
+		title = document.createElement('h4'),
+		accept = document.createElement('button'),
+		postpone = document.createElement('button'),
+		deny = document.createElement('button');
+		
+	//Modal body
+	var topDiv = document.createElement('div'),
+		infoDiv = document.createElement('div'),
+		infoDiv2 = document.createElement('div'),
+		picDiv = document.createElement('div'),
+		messageDiv = document.createElement('div'),
+		headerSpan = document.createElement('span'),
+		contSpan = document.createElement('span'),
+		subjectSpan = document.createElement('span');
+	
+	//once server-side script is completed, variable declaration and initialization will be done inside of .each(data.request) etc. 
+	$(headerSpan).addClass('span3 requestModalLabel').html('From:');//plan to include from, date, groupname, memberType
+	$(contSpan).addClass('span7').html('Dexter');
+	$(infoDiv2).addClass('row-fluid').append(headerSpan).append(contSpan);
+	
+	
+	$(infoDiv).addClass('span7').append(infoDiv2);
+	$(picDiv).addClass('span5').append('picture here');
+	$(topDiv).addClass('row-fluid').append(infoDiv).append(picDiv);
+	
+	$(subjectSpan).addClass('').append('subject');
+	$(messageDiv).addClass('notifications').append('message');
+	
+	//-----------
+	$(title).attr('id','modal'+id+'Label')
+		.append('Join my Group on NDEx');
+	
+	$(accept).addClass('btn')
+		.attr('title',id)
+		.attr('id','accept')
+		.attr('data-dismiss','modal')
+		.attr('aria-hidden','true')
+		.attr('onclick','respondInvite(this)')
+		.append('Accept');
+	$(postpone).addClass('btn')
+		.attr('title',id)
+		.attr('id','postpone')
+		.attr('onclick','respondInvite(this)')
+		.attr('data-dismiss','modal')
+		.attr('aria-hidden','true')
+		.append('Postpone');
+	$(deny).addClass('btn')
+		.attr('title',id)
+		.attr('id','deny')
+		.attr('data-dismiss','modal')
+		.attr('aria-hidden','true')
+		.attr('onclick','respondInvite(this)')
+		.append('Deny');	
+		
+	$(modalHeader).addClass('modal-header')
+		.append(title);
+	$(modalBody).addClass('modal-body')
+		.append('test'+id)
+		.append(topDiv)
+		.append(subjectSpan)
+		.append(messageDiv);
+		
+	$(modalFooter).addClass('modal-footer')
+		.append(accept)
+		.append(postpone)
+		.append(deny);
+	
+	$(inviteModal).addClass('modal hide fade')
+		.attr('id','modal'+id)
+		.attr('tabindex','-1')
+		.attr('role','dialog')
+		.attr('aria-labelledby','modal' + id + 'label')
+		.attr('aria-hidden','true')
+		.append(modalHeader).append(modalBody).append(modalFooter);
+	
+	return inviteModal;
+	
+}	
+
 
 function addElements(item, index){
 	var header = document.getElementById('name'),
@@ -60,13 +227,12 @@ function addElements(item, index){
 	if (index == "website") {
 		$(link).attr('href','http://www.triptychjs.com')
 			.attr('target','_blank')
-			.append('Check out our website');
+			.append('Check out my website');
 	}
 
 	if (index == "description") {
 		$(descrip).append(item);
 	}
-	
 	
 	if (index =="backgroundImg") {
 		var fImg = document.getElementById("foreground");
@@ -83,11 +249,29 @@ function addElements(item, index){
 	}
 }
 
+function isOwnedNetwork(jid){
+	var owned = false;
+	$.each(user.ownedNetworks, function(index, network){
+		if (network.jid == jid) {
+			owned = true;
+			return false;
+		}
+	});
+	return owned;
+}
 
+function isSharedNetwork(jid){
+	var shared = false
 
+	//TODO shared network implementation?
+
+	return shared;
+}
 //---------------------------------
 //	Workspace Functions
 //---------------------------------
+
+
 function onWorkspace(jid){
 	//check if network is on the user workspace.  
 	var tempLink = document.getElementById('link'+jid),
@@ -157,6 +341,7 @@ function addToWorkspace(obj){
 	$(parent).append(unlst);
 	onWorkspace(network.jid);
 }
+
 //------------------------------------
 //	Network List Interface
 //--------------------------------------
@@ -184,7 +369,11 @@ function buttonTools(item){
 		visualizeLink=document.createElement('a'),
 		wkSpaceIcon=document.createElement('i'),
 		viewIcon=document.createElement('i'),
-		visualizeIcon=document.createElement('i');
+		visualizeIcon=document.createElement('i'),
+		shareLink = document.createElement('a'),
+		shareIcon = document.createElement('i'),
+		accessLink = document.createElement('a'),
+		accessIcon = document.createElement('i');
 		
 	$(wkSpaceIcon).addClass('icon-plus')
 		.attr('id','icon'+item.jid)
@@ -193,36 +382,55 @@ function buttonTools(item){
 		.attr('data-placement','bottom');
 	$(viewIcon).addClass('icon-folder-open');
 	$(visualizeIcon).addClass('icon-eye-open');
+	$(shareIcon).addClass('icon-share');
+	$(accessIcon).addClass('icon-exchange');
 	
 
 	
 	$(wkSpaceLink).attr('onclick','')
 		.data('networkProperties',{title : item.title, jid : item.jid})
 		.attr('id','link'+item.jid)
-		.attr('title',item.jid)
 		.addClass('btn')
 		.append(wkSpaceIcon);
-	$(viewLink).attr('href','../viewNetwork/' + item.jid)
+	$(viewLink).attr('href','../../viewNetwork/' + item.jid)
 		.addClass('btn')
 		.attr('rel','tooltip')
 		.attr('title','View Network')
 		.attr('data-placement','bottom')
 		.append(viewIcon);
-	$(visualizeLink).attr('href','../visualizeNetwork/' + item.jid)
+	$(visualizeLink).attr('href','../../visualizeNetwork/' + item.jid)
 		.addClass('btn')
 		.attr('rel','tooltip')
 		.attr('title','VisualizeNetwork')
 		.attr('data-placement','bottom')
 		.append(visualizeIcon);
+	$(shareLink).attr('href','#')
+		.addClass('btn')
+		.attr('rel', 'tooltip')
+		.attr('title', 'Share Network')
+		.attr('data-placement', 'bottom')
+		.append(shareIcon);
+	$(accessLink).attr('href', '#')
+		.addClass('btn')
+		.attr('rel', 'tooltip')
+		.attr('title', 'Request Network Access')
+		.attr('data-placement', 'bottom')
+		.append(accessIcon);
 		
-	<% if (user) { %>
-	$(buttonDiv).append(wkSpaceLink);
-	<% } %>
+	if (isSignedIn()) {
+		$(buttonDiv).append(wkSpaceLink);
+		if (isOwnedNetwork(item.jid)) {	
+			$(buttonDiv).append(shareLink);
+		}
+		if (!isOwnedNetwork(item.jid) && !isSharedNetwork(item.jid)){
+			$(buttonDiv).append(accessLink);
+		}
+	}
 		
 	$(buttonDiv).addClass('btn-group')
 		.append(viewLink)
 		.append(visualizeLink);
-		
+
 	return buttonDiv
 }
 
@@ -246,10 +454,6 @@ function tableHead(){
 
 function formatNetworkDescriptor(item){
 	var networkDIV = document.createElement('div'),
-		nTable = document.createElement('table'),
-        tblBody = document.createElement('tbody'),
-        row = document.createElement('tr'),
-		cell = document.createElement('td'),
 		nodeSpan = document.createElement('span'),
 		edgeSpan = document.createElement('span'),
 		titleSpan = document.createElement('span'),
@@ -274,7 +478,7 @@ function formatNetworkDescriptor(item){
 			.append(divButton);
 
 	  
-	$(networkLink).attr('href','viewNetwork/' + item.jid).append(item.title);
+	$(networkLink).attr('href','../../viewNetwork/' + item.jid).append(item.title);
 	$(nodeSpan).addClass('span2 elementCount').append(item.nodeCount + " nodes"); 
 	$(edgeSpan).addClass('span2 elementCount').append(item.edgeCount + " edges"); 
 	$(titleSpan).addClass('span4 networkTitle').append(networkLink); 
@@ -295,19 +499,36 @@ function formatNetworkDescriptor(item){
 
 }
 
+function isOwnedGroup(jid){
+	var owned = false;
+	$.each(user.ownedGroups, function(index, group){
+		if (group.jid == jid) {
+			owned = true;
+			return false;
+		}
+	});
+	return owned;
+}
+
+//----------------------------/
+if(isSignedIn()){// && isOwnedGroup(groupJID)){  <---waiting for fix on xownsgroup edge
+	//$('#showGroups').attr('style', 'display:block');
+	//$('#showOwnedAgentAccounts').attr('style', 'display:block');
+	$('#notifications').attr('style', 'display:block');
+	$('.accountMiniMenu').attr('style', 'display:block');
+	$('#showOwnedAgentAccounts').attr('style', 'display:block');
+
+}
+
+
+//----------------------------//
 
 
 $(ndexClient.getGroup(groupJID, function(data){
 		console.log("Got results from getGroup");
 		console.log(data);
 	
-  		// Clears the nodes and edges divs
-		$('#profile').html('');
-		$('#networks').html('');
-		
-		$('#profile').append(formatProfile());
-		$('#networks').append(formatImages()).append(tableHead());
-		
+  		
   		$.each(data.group.profile, function(index, item){
 			addElements(item, index);
 			//$('#profile').append(index + ' ' );
@@ -315,7 +536,7 @@ $(ndexClient.getGroup(groupJID, function(data){
 
   		
   		$.each(data.group.ownedNetworks, function(index, network){
-  			$('#networks').append(formatNetworkDescriptor(network));
+  			$('#ownedNetworks').append(formatNetworkDescriptor(network));
   		});
 
     },
@@ -324,6 +545,13 @@ $(ndexClient.getGroup(groupJID, function(data){
     	$('#error').append(formatError(error));
     })
 );
+
+
+$('#notifContent').append(addInvite('group1','G1'))
+			.append(createModal('group1','G1'))
+			.append(addInvite('group2','G2'))
+			.append(createModal('group2','G2'));
+			
 </script>
 
 <% include sidebar.ejs %>

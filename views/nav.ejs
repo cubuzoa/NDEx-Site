@@ -9,8 +9,15 @@
 	  		<span class="icon-bar"></span>
 	  		<span class="icon-bar"></span>
 	  	</a>
-			<a class="brand" href="/" ><b>NDEx</b></a>
+			<!---<a class="brand" href="/" ><b>NDEx</b></a>-->
 			
+				<a href="/" class ="brand dropwdown dropdown-toggle" data-toggle="dropdown" >NDEx</a>
+				<ul class = "dropdown-menu" role = "menu">
+					<li><a href = "/">Home</a></li>
+					<li><a href = "#">Contact</a></li>
+					<li><a href = "#">Policies</a></li>
+				</ul>
+		    
 	
 			<div class="nav-collapse">
 				<ul class="nav pull-left main-nav"> 
@@ -18,13 +25,14 @@
 					<a href="#" class ="dropdown-toggle" data-toggle="dropdown" >Networks</a>
 					<ul class = "dropdown-menu" role = "menu">
 						<li><a href = "/searchNetworks">Find Networks</a></li>
+						<li><a id = "navUploadNetwork" href = "#" style="display:none">Upload Networks</a></li> <!--hide-->
 					</ul>
 				  </li>
 				  <li class ="dropdown">
 					<a  href="#" class ="dropdown-toggle" data-toggle="dropdown" >Groups</a>
 					<ul class = "dropdown-menu" role = "menu">
-						<li id = "navMyGroups" style="display:none" ><a href = "#">My Groups</a></li>
 						<li><a href = "/searchGroups">Find Groups</a></li>
+						<li><a id = "navNewGroup" href = "#">New Group</a></li>
 					</ul>
 				  </li>
 				  <li class ="dropdown">
@@ -37,9 +45,9 @@
 				  <li id ="myAccount"  class ="dropdown" style="display:none">
 					<a href="#" class ="dropdown-toggle" data-toggle="dropdown" >My Account</a>
 				  	<ul class = "dropdown-menu" role = "menu">
-						<li><a href = "/myAccount">My Account</a></li>
-						<li><a href = "#">Edit Profile</a></li>
-						<li><a href = "#">Upload Network</a></li>
+						<li><a id = "toAccount" href = "/viewUser">My Account</a></li>
+						<li><a id = "toGroups" href = "#" >My Groups</a></li>
+						<li><a id = "toNetworks" href = "#" >My Networks</a></li>
 					</ul>
 				  </li>
 				  <li id = "manageTasks" class ="dropdown" style="display:none">
@@ -64,6 +72,8 @@
 
 <script>
 
+
+
 //global user obj
 var user = {};
 
@@ -76,8 +86,10 @@ function isSignedIn() {
 		user.username = localStorage['ndexUsername'];
 		user.jid = localStorage['ndexJid'];
 		ndexClient.getUser(user.jid, function(data){
+			//console.log(JSON.stringify(data));
 			user.ownedNetworks = data.user.ownedNetworks;
 			user.ownedGroups = data.user.ownedGroups;
+			console.log('----' + JSON.stringify(user));
 		});
 		return true;
 		
@@ -98,8 +110,13 @@ if(isSignedIn()){
 	$('#myAccount').attr('style','display:block');
 	$('#manageTasks').attr('style','display:block');
 	$('#signOut').attr('style','display:block');
-	$('#navMyGroups').attr('style','display:block');
+	$('#navUploadNetwork').attr('style','display:block');
+	$('#navNewGroup').attr('style','display:block');
 	$('#signIn').attr('style','display:none');
+	
+	$('#toAccount').attr('href','/viewUser/' + user.jid);
+	$('#toGroups').attr('href', '/viewUser/' + user.jid + '/#tab_ownedGroups');
+	$('#toNetworks').attr('href', '/viewUser/' + user.jid + '/#tab_ownedNetworks');
 	
 	$('#navname').html(localStorage['ndexUsername']);
 
@@ -108,7 +125,8 @@ if(isSignedIn()){
 	$('#myAccount').attr('style','display:none');
 	$('#manageTasks').attr('style','display:none');
 	$('#signOut').attr('style','display:none');
-	$('#navMyGroups').attr('style','display:none');
+	$('#navUploadNetwork').attr('style','display:none');
+	$('#navNewGroup').attr('style','display:none');
 	$('#signIn').attr('style','display:block');
 
 	$('#navname').html('');

@@ -18,6 +18,9 @@
 			<ul class="dropdown-menu">
 				<li id="netStatus"></li>
 				<li> <a href = "#networkDisplay" data-toggle="modal"> Network Display </a></li>
+				<li> <a href ="#" class = "networkMiniMenu" style = "display:none"> Edit Network MetaData </a> </li>
+				<li> <a href ="#" class = "networkMiniMenu" style = "display:none"> Edit Network Permissions </a> </li>
+				<li> <a href ="#" class = "networkMiniMenu" style = "display:none"> Publish Network </a> </li>
 			</ul>
 		</div>
 			
@@ -64,9 +67,7 @@
 	</div>
 </div>
 <script>
-<% if (user) { %>
-	var user = {username : '<%= user.username %>', jid: 'C21R1'};
-<% } %>
+
 
 // the network id passed from the ejs template
 var networkRID = '<%= networkId %>';
@@ -142,7 +143,7 @@ function formatNode(node, network){
 //--------------------------------------------	
 //		Workspace Functions
 //--------------------------------------------
-<% if (user) { %>
+ if (isSignedIn()) { 
 
 
 function onWorkspace(){
@@ -209,7 +210,7 @@ function removeFromWorkspace(){
 	
 }
 
-<% } %>
+ } 
 //-----------------------------------------------------
 //		Pagination functions
 //-----------------------------------------------------
@@ -331,13 +332,36 @@ function getEdges(edgePage){
 		})
 	);
 }
+
+function isOwnedNetwork(jid){
+	var owned = false;
+	console.log(JSON.stringify(user));
+	$.each(user.ownedNetworks, function(index, network){
+		if (network.jid == jid) {
+			owned = true;
+			return false;
+		}
+	});
+	return owned;
+}
+
+
+
+
+
 //prevent settings dropdown from closing when an input form is clicked
 $('.dropdown-menu input, .dropdown-menu label').click(function(e) {
 	e.stopPropagation();
 });
 
 getNetwork();
-
+setTimeout( function(){
+		if(isSignedIn() && isOwnedNetwork(networkRID)){
+			$('.networkMiniMenu').attr('style', 'display:block');
+		}
+	},
+	1000
+);
 </script>
 
 
