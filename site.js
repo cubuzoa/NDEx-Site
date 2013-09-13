@@ -265,7 +265,7 @@ app.get('/uploadNetwork', ensureAuthenticated, function(req, res) {
 // These destinations do not require an authenticated user
 
 app.get('/policies', function(req, res) {
-  res.render('policies', {title: "Policies",
+  res.render('policy', {title: "Policies",
   							user: req.user });
 });
 
@@ -331,6 +331,55 @@ app.get('/visNet/:networkId', function(req, res) {
   res.render('search_networks', {title: "Networks", 
   								 networkId: req.params['networkId'],
   								 user: req.user });
+});
+
+app.get('/newGroup', function(req, res) {
+  res.render('create_group', 
+  			{	title: "New Group", 
+  				user: req.user 
+  			});
+});
+
+app.get('/sendRequest', function(req, res) {
+  res.render('request', 
+  			{	title: "Send Request", 
+  				user: req.user 
+  			});
+});
+
+app.get('/newTask', function(req, res) {
+  res.render('new_task', 
+  			{	title: "New Task", 
+  				user: req.user 
+  			});
+});
+
+app.get('/editProfile', function(req, res) {
+  res.render('edit_profile', 
+  			{	title: "Edit Profile", 
+  				user: req.user 
+  			});
+});
+
+app.get('/editGroupProfile', function(req, res) {
+  res.render('edit_group_profile', 
+  			{	title: "Edit Group Profile", 
+  				user: req.user 
+  			});
+});
+
+app.get('/editAgent', function(req, res) {
+  res.render('edit_agent', 
+  			{	title: "Edit Agent", 
+  				user: req.user 
+  			});
+});
+
+app.get('/editNetworkMetadata', function(req, res) {
+  res.render('edit_network_metadata', 
+  			{	title: "Edit Network Metadata", 
+  				user: req.user 
+  			});
 });
 
 //-----------------------------------------------------------

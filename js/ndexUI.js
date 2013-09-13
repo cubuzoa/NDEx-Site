@@ -185,13 +185,13 @@ function networkButtonTools(item){
 		.attr('title','VisualizeNetwork')
 		.attr('data-placement','bottom')
 		.append(visualizeIcon);
-	$(shareLink).attr('href','#')
+	$(shareLink).attr('href','/sendRequest')
 		.addClass('btn')
 		.attr('rel', 'tooltip')
 		.attr('title', 'Share Network')
 		.attr('data-placement', 'bottom')
 		.append(shareIcon);
-	$(accessLink).attr('href', '#')
+	$(accessLink).attr('href', '/sendRequest')
 		.addClass('btn')
 		.attr('rel', 'tooltip')
 		.attr('title', 'Request Network Access')
@@ -384,13 +384,13 @@ function groupButtonTools(item){
 		.attr('data-placement','bottom')
 		.append(viewIcon);
 	
-	$(shareLink).attr('href','#')
+	$(shareLink).attr('href','/sendRequest')
 		.addClass('btn')
 		.attr('rel', 'tooltip')
 		.attr('title', 'Invite User to this Group')
 		.attr('data-placement', 'bottom')
 		.append(shareIcon);
-	$(accessLink).attr('href', '#')
+	$(accessLink).attr('href', '/sendRequest')
 		.addClass('btn')
 		.attr('rel', 'tooltip')
 		.attr('title', 'Request Group Membership')
@@ -483,13 +483,13 @@ function userButtonTools(item){
 		.attr('data-placement','bottom')
 		.append(viewIcon);
 	
-	$(shareNetworkLink).attr('href','#')
+	$(shareNetworkLink).attr('href','/sendRequest')
 		.addClass('btn')
 		.attr('rel', 'tooltip')
 		.attr('title', 'Share a Network with this User')
 		.attr('data-placement', 'bottom')
 		.append(shareNetworkIcon);
-	$(inviteGroupLink).attr('href', '#')
+	$(inviteGroupLink).attr('href', '/sendRequest')
 		.addClass('btn')
 		.attr('rel', 'tooltip')
 		.attr('title', 'Invite User to a Group')
@@ -625,7 +625,7 @@ function createModal(name,id){
 	 |||------------|-----------||-|--------------------------||
 	 |||--header----|---cont----||-|--------------------------||
 	 |||--span------|---span----||-|--------------------------||
-	 |||------------|-----------||-|--------------------------||
+	 |||----from----|--dexter---||-|--------------------------||
 	 |||------------------------||-|--------------------------||
 	 ||--------------------------|-|--------------------------||
 	 |---------------------------------------------------------|

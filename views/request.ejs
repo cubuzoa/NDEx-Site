@@ -1,0 +1,391 @@
+<% include head.ejs %>
+<% include nav.ejs %>
+
+<!----------------------------------------------------------------------------------------------------->
+<!------------------------------------- All in One Request -------------------------------------------->
+
+<!--form-->
+
+<div class="well" id="allRequest" style="display:none" >
+	<h3>Make a Request</h3>
+	<hr>
+	<form  class="form-horizontal" action="" method="post" enctype="multiipart/form-data" id="requestForm">
+		<div class="control-group">
+			<label class="control-label" for="inputFrom">From</label>
+			<div class="controls">
+				<select name="from" id="from">
+					<option value=""></option>
+						</select></div></div>
+		<div class="control-group" style="display:none" id = "toDiv" >
+			<label class="control-label" for="toType">To</label>
+			<div class="controls">
+				<select name="toType" id="toType">
+					<option value=""></option>
+						</select></div></div>
+		<div class="control-group" style="display:none" id = "toWhom" >
+			<label class="control-label" for="spanWhom" id = "labelWhom">Selected </label>
+			<div class="controls">
+				<label id="spanWhom" class = "requestFormat"> </label>
+				<input  type="hidden" id="inputWhom" name="target" value=""></div></div>
+		<div class="control-group" style="display:none" id = "typeDiv" >
+			<label class="control-label" for="spanType" id = "labelType"> Type </label>
+			<div class="controls">
+				<label id="spanType" class = "requestFormat"></label>
+				<input  type="hidden" id="inputType" name="type" value=""></div></div>
+		<div class="control-group" style="display:none" id = "permissionsDiv" >
+			<label class="control-label" for="permissions"> Permissions </label>
+			<div class="controls">
+				<select name="permissions" id = "permissions">
+					<option value="">test2</option>
+						</select></div></div>
+		<hr>
+		<input type="submit" value="Submit">
+	</form>
+</div>
+
+<!--modals-->
+<div id = "searchNetworks" class = " modal hide fade" tabindex = "-1" role = "dialog" aria-labelledby = "myModalLabel" aria-hidden = "true">
+	<div class = "modal-header">
+		<h4 id = "myModalLabel"> Search Networks </h4>
+	</div>
+	<div class="modal-body">
+		<form onsubmit="return doNetworkSearch();" id="networkSearchForm">
+			<div>
+				<label>Query:</label>
+				<input type="text" name="networkSearchExpression" id="networkSearchExpression"/><br/>
+			</div>
+			<div>
+				<input type="submit" value="Search"/>
+			</div>
+		</form>
+		<div id="networkSearchResults">
+		</div>
+	</div>
+	<div class = "modal-footer">
+		<button class = "btn" onclick = "populateRemaining('networkSearchResults')" data-dismiss = "modal" aria-hidden = "true"> Select Network </button>
+		<button class = "btn" onclick = "clearResults()" data-dismiss = "modal" aria-hidden = "true"> Cancel </button>
+	</div>
+</div>
+
+<div id = "searchGroups" class = " modal hide fade" tabindex = "-1" role = "dialog" aria-labelledby = "myModalLabel" aria-hidden = "true">
+	<div class = "modal-header">
+		<h4 id = "myModalLabel"> Search Groups </h4>
+	</div>
+	<div class="modal-body">
+		<form onsubmit="return doGroupSearch();" id="groupSearchForm">
+			<div>
+				<label>Query:</label>
+				<input type="text" name="groupSearchExpression" id="groupSearchExpression"/><br/>
+			</div>
+			<div>
+				<input type="submit" value="Search"/>
+			</div>
+		</form>
+		<div id="groupSearchResults">
+		</div>
+	</div>
+	<div class = "modal-footer">
+		<button class = "btn" onclick = "populateRemaining('groupSearchResults')" data-dismiss = "modal" aria-hidden = "true"> Select Group </button>
+		<button class = "btn" onclick = "clearResults()" data-dismiss = "modal" aria-hidden = "true"> Cancel </button>
+	</div>
+</div>
+
+<div id = "searchUsers" class = " modal hide fade" tabindex = "-1" role = "dialog" aria-labelledby = "myModalLabel" aria-hidden = "true">
+	<div class = "modal-header">
+		<h4 id = "myModalLabel"> Search Users </h4>
+	</div>
+	<div class="modal-body">
+		<form onsubmit="return doUserSearch();" id="userSearchForm">
+			<div>
+				<label>Query:</label>
+				<input type="text" name="userSearchExpression" id="userSearchExpression"/><br/>
+			</div>
+			<div>
+				<input type="submit" value="Search"/>
+			</div>
+		</form>
+		<div id="userSearchResults">
+		</div>
+	</div>
+	<div class = "modal-footer">
+		<button class = "btn" onclick = "populateRemaining('userSearchResults')" data-dismiss = "modal" aria-hidden = "true"> Select User </button>
+		<button class = "btn" onclick = "clearResults()" data-dismiss = "modal" aria-hidden = "true"> Cancel </button>
+	</div>
+</div>
+
+<script>
+
+
+//should get JID from server/ logged in user
+var userId =  localStorage['ndexJid'] ;
+
+function populateFrom(userObject){
+	//show username, owned networks, and owned groups
+	var selectFrom = document.getElementById('from');
+	var userOption = document.createElement('option');
+	
+	$(userOption).data('type',{type : 'user'})
+		.attr('value', userObject.jid)
+		.attr('onclick','populateTo(this)')
+		.html(userObject.username); // values sent in request will be JIDs
+	$(selectFrom).append(userOption);
+	
+	$.each(userObject.ownedNetworks, function(index, network) {
+		var networkOption = document.createElement('option');
+		
+		$(networkOption).data('type',{type : 'network'})
+			.attr('value', network.jid)
+			.attr('onclick','populateTo(this)')
+			.html(network.title);
+		$(selectFrom).append(networkOption);
+	});
+	
+	$.each(userObject.ownedGroups, function(index, group) {
+		var groupOption = document.createElement('option');
+		
+		$(groupOption).data('type',{type : 'group'})
+			.attr('value', group.jid)
+			.attr('onclick','populateTo(this)')
+			.html(group.organizationName);
+		$(selectFrom).append(groupOption);
+	});
+}
+
+function populateTo(parent){
+	//show possible request reciever types, group, network, or user
+
+	//reset for a new To selection list and populate
+	$('#toDiv').attr('style','display:block');
+	$('#toWhom').attr('style','display:none');
+	$('#typeDiv').attr('style','display:none');
+	$('#permissionsDiv').attr('style','display:none');
+	$('#toType').empty();
+	//clear search results
+	clearResults();
+	
+	var type = $(parent).data('type').type;
+	var option = document.createElement('option');
+
+	$('#toType').append(option);
+	if ( type == 'user') {
+		var networkOption = document.createElement('option'),
+			groupOption = document.createElement('option');
+		$(networkOption).attr('data-target','#searchNetworks')
+			.attr('data-toggle', 'modal')
+			.attr('value','usernetwork')
+			.html('Network');
+		$(groupOption).attr('data-target','#searchGroups')
+			.attr('data-toggle', 'modal')
+			.attr('value','usergroup')
+			.html('Group');
+		$('#toType').append(networkOption).append(groupOption);
+	}
+	if ( type == 'network') {
+		var userOption = document.createElement('option'),
+			groupOption = document.createElement('option');
+		$(userOption).attr('data-target','#searchUsers')
+			.attr('data-toggle', 'modal')
+			.attr('value','networkuser')
+			.html('User');
+		$(groupOption).attr('data-target','#searchGroups')
+			.attr('data-toggle', 'modal')
+			.attr('value','networkgroup')
+			.html('Group');
+		$('#toType').append(userOption).append(groupOption);
+	}
+	if ( type == 'group') {
+		var networkOption = document.createElement('option'),
+			userOption = document.createElement('option');
+		$(networkOption).attr('data-target','#searchNetworks')
+			.attr('data-toggle', 'modal')
+			.attr('value','groupnetwork')
+			.html('Network');
+		$(userOption).attr('data-target','#searchUsers')
+			.attr('data-toggle', 'modal')
+			.attr('value','groupuser')
+			.html('User');
+		$('#toType').append(networkOption).append(userOption);
+	}
+}
+
+function populateRemaining(results){
+	$('#spanWhom').html(''); 
+
+	var selectedItem = document.getElementById(results),
+		toObject = {},
+		//used for something similar to implicit iteration
+		requestTypes = {networkgroup : 'Invitation to Access', 
+				networkuser: 'Invitation to Access', 
+				groupnetwork: 'Request Access', 
+				groupuser : 'Invite to Group', 
+				usergroup : 'Request Membership', 
+				usernetwork : 'Request Access'};
+
+	//find the selected item in the results list
+	$(selectedItem).find('input').each(function(index, item) {
+		if($(this).is(':checked')){
+			toObject = $(this).data('item');
+			return false;
+		}
+	});
+	//display to who the request is targeted to and set value of hidden input form for submission
+	$('#toWhom').attr('style','display:block'); 
+	$('#spanWhom').html(toObject.name); 
+	$('#inputWhom').attr('value', toObject.jid);
+	
+	//display request type and set value of hidden input form for submission
+	var request= requestTypes[$('#toType').val()];
+	$('#typeDiv').attr('style','display:block');
+	$('#spanType').html(request);
+	$('#inputType').attr('value',request); //may have to make request types objects within objects to tailor to inputType, server type might be different
+	
+	//display permissions
+	$('#permissionsDiv').attr('style','display:block');
+	$('#permissions').empty();
+	var option = document.createElement('option');
+		reqType = $('#toType').val();
+	
+	$('#permissions').append(option);
+	if((reqType == 'networkgroup') || (reqType == 'networkuser') || (reqType == 'usernetwork') || (reqType == 'groupnetwork')){
+		var viewOption = document.createElement('option'),
+			viewModifyOption = document.createElement('option'),
+			ownModifyOption = document.createElement('option');
+
+		$(viewOption).attr('value', 'view').html('View');
+		$(viewModifyOption).attr('value', 'viewModify').html('View and Modify');
+		$(ownModifyOption).attr('value', 'ownModify').html('Own and Modify');
+
+		$('#permissions').append(viewOption).append(viewModifyOption).append(ownModifyOption);
+	}	
+	if((reqType == 'groupuser') || (reqType == 'usergroup')){
+		var viewModifyOption = document.createElement('option'),
+			ownModifyOption = document.createElement('option');
+
+		$(viewModifyOption).attr('value', 'viewModify').html('View and Modify');
+		$(ownModifyOption).attr('value', 'ownModify').html('Own and Modify');
+
+		$('#permissions').append(viewModifyOption).append(ownModifyOption);
+	}
+	
+}
+
+function formatItem(item){
+	//expects {name : '', jid : '', extraInfo : ''}
+	var itemDiv = document.createElement('div'),
+		checkboxSpan = document.createElement('span'),
+		nameSpan = document.createElement('span'),
+		extraSpan = document.createElement('span'),
+		checkbox = document.createElement('input');
+
+	$(checkbox).data('item',{jid : item.jid, name: item.name}).attr('type','radio').attr('name', 'rad');
+	$(checkboxSpan).addClass('span1').append(checkbox);
+	$(nameSpan).addClass('span6').append(item.name);
+	$(extraSpan).addClass('span3').append(item.extraInfo);
+
+	$(itemDiv).addClass('row-fluid').append(checkboxSpan).append(nameSpan).append(extraSpan);
+	return itemDiv;
+}
+
+function clearResults() {
+	$('#userSearchResults').html('');
+	$('#networkSearchResults').html('');
+	$('#groupSearchResults').html('');
+}
+
+function doNetworkSearch(){;
+	//may want to include pagination
+	var searchExpression = $('#networkSearchExpression').val().toUpperCase(),
+		limit = 10,
+		offset = 0;
+	ndexClient.findNetworks(searchExpression, limit, offset, function(data){
+		$('#networkSearchResults').html('');
+		
+		if (data.networks){
+			$.each(data.networks, function(index, network){
+				//process
+				var item = {name : network.title, jid : network.jid, extraInfo : ''};
+				$('#networkSearchResults').append(formatItem(item));
+			}); 
+		}
+	},
+	function(error){}
+	);
+	return false;
+}
+
+function doUserSearch(){
+	var searchExpression = $('#userSearchExpression').val().toUpperCase(),
+		limit = 10,
+		offset = 0;
+	ndexClient.findUsers(searchExpression, limit, offset, function(data){
+		$('#userSearchResults').html('');
+		
+		if (data.users){
+			$.each(data.users, function(index, user){
+				//process
+				var item = {name : user.username, jid : user.jid, extraInfo : ''};
+				$('#userSearchResults').append(formatItem(item));
+			}); 
+		}
+		// $('#userSearchResults').append(JSON.stringify(data));
+	},
+	function(error){ $('#userSearchResults').append(JSON.stringify(error));}
+	);
+	
+	return false;
+}
+
+function doGroupSearch(){
+	var searchExpression = $('#groupSearchExpression').val().toUpperCase(),
+		limit = 10,
+		offset = 0;
+	ndexClient.findGroups(searchExpression, limit, offset, function(data){
+		$('#groupSearchResults').html('');
+		
+		if (data.groups){
+			$.each(data.groups, function(index, group){
+				//process
+				var item = {name : group.organizationName, jid : group.jid, extraInfo : ''};
+				$('#groupSearchResults').append(formatItem(item));
+			}); 
+		}
+		//$('#groupSearchResults').append(JSON.stringify(data));
+	},
+	function(error){ $('#groupSearchResults').append(JSON.stringify(error)); }
+	);
+	return false;
+}
+
+function isSignedIn() {
+	if(localStorage['ndexUsername'] == '') {
+		console.log('not signed in');
+		return false;
+	} else {
+		console.log('signed in');
+		return true;
+	}
+}
+
+
+if(isSignedIn()){
+	$('#allRequest').attr('style','display:block');
+}
+
+$(ndexClient.getUser(userId, function(data){
+		var user = data.user;
+		user.jid = userId;
+		populateFrom(user);
+		//$('#allRequest').append('test3');
+	},
+	function formatError(error){$('#allRequest').append('An error has occured');}
+	)
+);
+
+
+</script>
+
+
+<!------------------------------------------------------------------------------------------------------>
+
+<% include foot.ejs %>
+
