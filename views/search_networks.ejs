@@ -1,6 +1,7 @@
 <% include head.ejs %>
 <% include nav.ejs %>
 
+<h1>Find Networks</h1>
 <!-- btn-group from twitter allows for next div to be aligned and pulled right, easy fix-->
 <div class="btn-group">
 	<form onsubmit="return doSearch();" id="searchForm">
@@ -47,17 +48,6 @@
 // with a limit of 100.
 //TODO 
 //DOM Elements depend on object JID for identification, consider using names instead.
-//copy code to view group and view user
-/*function isSignedIn() {
-	if(localStorage['ndexUsername'] == '') {
-		console.log('not signed in');
-		return false;
-	} else {
-		console.log('signed in');
-		return true;
-	}
-}*/
-
 
 function doSearch(offset) {
 	var limitInput = document.getElementById('searchCount');
@@ -87,10 +77,9 @@ function doSearch(offset) {
 		}
 		
 		// Clears the searchResults div
-		$('#searchResults').html('');
+		$('#searchResults').html('<h3>Networks Found:</h3>');
 		
 		if (data.networks){
-			$('#searchResults').append('Available Networks');
 			$.each(data.networks, function(index, item){
 				$('#searchResults').append(formatNetworkDescriptor(item));
 			}); 
@@ -106,8 +95,6 @@ function doSearch(offset) {
     
     return false;
 }
-
-
 
 function updateWorkspaceTools(jid){
 //this is not in ndexUI.js because viewNetwork has a different version
@@ -126,13 +113,6 @@ function updateWorkspaceTools(jid){
 			tempIcon.className='icon-plus icon-white';
 		}
 	});
-}
-
-
-
-
-function formatError(error){
-
 }
 
 </script>
