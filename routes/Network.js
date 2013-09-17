@@ -47,16 +47,37 @@ exports.createNetwork = function(networkJDEx, accountRID, callback){
 					// create lookup table indexing the created Vertices by their
 					// JDEx IDs so that we can efficiently create relationships and edges
 					// cross-linking the Vertices.
-					networkIndex = indexNetworkDocument(document);
-				
-				// assert ownership of network - can be asynch since both network and account exist
+					networkIndex = indexNetworkDocument(document),
+                    documentTermCount = 0,
+                    documentNodeCount = 0;
+
+                for(index in document.terms){
+                    documentTermCount++;
+                }
+                for(index in document.nodes){
+                    documentNodeCount++;
+                }
+                // assert ownership of network - can be asynch since both network and account exist
 				var ownsEdgeCMD = "create edge xOwnsNetwork from " + accountRID + " to " + networkRID;
 				module.db.command(ownsEdgeCMD, function(err){
-					if (err) throw("Failed to create xOwnsNetwork edge : " + err);
+					if (err) {
+                        throw("Failed to create xOwnsNetwork edge : " + err);
+                    } else {
+                        console.log("Created Network Document with RID = " + networkRID + " owned by " + accountRID);
+                    }
 				});
 			
 				// create xEdge edges between xNodes
-				for(index in networkJDEx.edges){
+                var nodeCount = 0, termCount = 0;
+                for (index in networkJDEx.nodes){
+                    nodeCount++;
+                }
+                for (index in networkJDEx.terms){
+                    termCount++;
+                }
+                if(nodeCount != documentNodeCount) console.log("mismatch in node count for " + networkRID + ": " + nodeCount + " vs. " + documentNodeCount);
+                console.log("About to start async edge creation for network " + networkRID + " with " + nodeCount + " nodes and " + termCount + " terms");
+                for(index in networkJDEx.edges){
 					createNetworkEdgeAsync(networkRID, networkJDEx.edges[index], networkIndex);
 				}
 			
@@ -134,7 +155,9 @@ function createNetworkDocument(networkJDEx){
 				o_citation = {"@type": "d", "@class": "xCitation", id: index};
 			xferProperties(citation, o_citation, ["identifier", "type", "title", "contributors"]);
 			o_citations.push(o_citation);
-		}			
+		}
+
+        console.log("Created network document structure to save for network with " + o_nodes.length + " nodes and " + o_terms.length + " terms");
 
 		return {
 				"@class": "xNetwork",
@@ -157,18 +180,23 @@ function indexNetworkDocument(document){
 	var networkIndex = {};
 	for(index in document.namespaces){
 		var ns = document.namespaces[index];
+        if (!ns["@rid"]) throw new Error ("no RID for namespace " + ns.id);
 		networkIndex[ns.id] = ns["@rid"];
 	}
 	for(index in document.terms){
 		var term = document.terms[index];
+        if (!term["@rid"]) throw new Error ("no RID for term " + term.id);
 		networkIndex[term.id] = term["@rid"];
+
 	}						
 	for(index in document.nodes){
 		var node = document.nodes[index];
+        if (!node["@rid"]) throw new Error ("no RID for node " + node.id);
 		networkIndex[node.id] = node["@rid"];
 	}									
 	for(index in document.supports){
 		var support = document.supports[index];
+        if (!support["@rid"]) throw new Error ("no RID for support " + support.id);
 		networkIndex[support.id] = support["@rid"];
 	}									
 	for(index in document.citations){
@@ -196,7 +224,7 @@ function createNetworkEdgeAsync(networkRID, edge, networkIndex){
 		module.db.command(cmd, function (err, results){
 			//console.log("ran " + cmd);
 			if (err) {
-				throw("Failed to create xEdge via [ " + cmd + " ] with error: "+ err);
+				console.log("Failed to create xEdge via [ " + cmd + " ] with error: "+ err);
 			} else {
 				// Add the new xEdge to the edges field of the xNetwork
 				var newEdge = results[0],
@@ -208,7 +236,7 @@ function createNetworkEdgeAsync(networkRID, edge, networkIndex){
 			}
 		});
 	} else {
-		throw ("Failed to find RIDs to make xEdge: Subject: " + edge.s + " = " + subjectRID + " Object: " + edge.o + " = " + objectRID + " Predicate: " + edge.p + " = " + predicateRID);
+		console.log ("For network " + networkRID + ", Failed to find RIDs to make xEdge: Subject: " + edge.s + " = " + subjectRID + " Object: " + edge.o + " = " + objectRID + " Predicate: " + edge.p + " = " + predicateRID);
 	}
 }
 

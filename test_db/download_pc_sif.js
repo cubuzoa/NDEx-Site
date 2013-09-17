@@ -57,17 +57,35 @@ function getSIF(line){
 		url = makeSIFurl(pathwayCpathId);
 	// for each record returned, we get the CPATH_ID and retrieve the result as SIF
 	request(url, function (err, res, sif){
-		var lines = sif.split("\n"),
-			cpathIds = getUniqueCPathIds(lines);
 
-		getSIFWithNames(cpathIds, pathwayCpathId, lines, pathwayName, pathwaySource, function(graph){
-		
-			console.log(graph.toJDEx());
-			var filename = pathwaySource + "." + pathwayName + "." + pathwayCpathId + ".jdex";
-			filename = filename.replace("/", " ");
-			console.log("writing file : " + filename);
-			fs.writeFileSync("./test_networks/pc_sif/" + filename, graph.serializeJDEx());
-		});		
+
+        if(err){
+            console.log("Error in getSIF: " + JSON.stringify(err));
+            return false;
+        }
+
+        var lines = sif.split("\n");
+
+        if(lines[1] == "<error>\r"){
+            console.log("Error in getSIF: " + url + " => " + sif);
+            return false;
+        }
+
+        if (lines.length > 400){
+           console.log("Network " + pathwayName + " has too many lines: " + lines.length);
+        }  else {
+            console.log("Processing network " + pathwayName + " with lines: " + lines.length);
+            cpathIds = getUniqueCPathIds(lines);
+
+            getSIFWithNames(cpathIds, pathwayCpathId, lines, pathwayName, pathwaySource, function(graph){
+
+                console.log(graph.toJDEx());
+                var filename = pathwaySource + "." + pathwayName + "." + pathwayCpathId + ".jdex";
+                filename = filename.replace("/", " ");
+                console.log("writing file : " + filename);
+                fs.writeFileSync("./test_networks/pc_sif/" + filename, graph.serializeJDEx());
+            });
+        }
 	});
 }
 
@@ -156,7 +174,7 @@ function parseBioPAXElements(xml_text){
 // Database Pathway_Name Pathway_Database_Name CPATH_ID
 //
 
-console.log(makeGetPathwaysURL("RBL2"));
+console.log("Request to Pathway Commons: " + makeGetPathwaysURL("RBL2"));
 
 request( makeGetPathwaysURL("RBL2"), function (err, res, body) {
     if (err){
@@ -165,6 +183,7 @@ request( makeGetPathwaysURL("RBL2"), function (err, res, body) {
     	if (res.statusCode == 200){
     
 			var lines = body.split("\n");
+
 		
 			for (i = 1; i < lines.length; i++){
 			//for (i = 1; i < 2; i++){

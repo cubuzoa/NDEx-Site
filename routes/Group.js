@@ -30,7 +30,7 @@ exports.createGroup = function(userRID, groupname, callback){
 			else {
 
 				var password = "password";
-				console.log("calling createGroup with arguments: '" + groupname + "' '" + userRID + "'");
+				console.log("calling createGroup with arguments: '" + userRID + "' '" + groupname + "'");
 				var selectGroupByGroupNameCmd = "select from xGroup where groupname = '" + groupname + "'";
 				var insertGroupCmd = "insert into xGroup (groupname) values('" + groupname + "')";
 				//console.log("first checking that groupname is not taken");
@@ -75,8 +75,6 @@ exports.updateGroupProfile = function(groupRID, profile, callback){
 	var profileStrings = [
 			"organizationName = '" + profile.organizationName + "'",
 			"website = '" + profile.website + "'",
-			"foregroundImg = '" + profile.foregroundImg + "'",
-			"backgroundImg = '" + profile.backgroundImg + "'",
 			"description = '" + profile.description + "'"],
 		setString = profileStrings.join(", "),
 		updateCmd = "update " + groupRID + " set " + setString;

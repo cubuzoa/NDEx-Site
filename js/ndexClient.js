@@ -12,8 +12,13 @@
 (function (exports) {
 
     if (typeof($) === 'undefined') {
-        console.log("requiring jQuery");
-        $ = require('jQuery');
+        console.log("requiring jquery");
+        $ = require('jquery');
+    }
+
+    if (typeof(btoa) === 'undefined') {
+        console.log("requiring btoa");
+        btoa = require('btoa');
     }
 
     exports.host = "http://localhost:3333";
@@ -39,7 +44,7 @@
 
 
     exports.defaultNDExErrorHandler = function (data) {
-        console.log("Error : " + JSON.stringify(data));
+        console.log("Error in ndexClient caught by default handler : " + JSON.stringify(data));
         //alert("Error : " + JSON.stringify(data));
     }
 
@@ -79,8 +84,9 @@
                 xhr.setRequestHeader("Authorization", "Basic " + encodedCredentials());
             },
             url: exports.host + route,
-            data: postData,
+            data: JSON.stringify(postData),
             dataType: "JSON",
+            contentType: 'application/json',
             success: callback,
             error: errorHandler || exports.defaultNDExErrorHandler
         });

@@ -337,7 +337,12 @@ exports.Graph.prototype = {
     },
 	
 	findOrCreateTerm : function (name, ns){
-		if (!name) throw new Error("attempt to create term in namespace " + ns.uri + " with no name");
+        if (!name && !ns) {
+            throw new Error("attempt to create term without name or namespace");
+        }
+		if (!name) {
+            throw new Error("attempt to create term in namespace " + ns.uri + " with no name");
+        }
 		var term = this.termByNameAndNamespace(name, ns);
 		if (term) return term;
 		term = new exports.Term(name, ns);
@@ -349,8 +354,12 @@ exports.Graph.prototype = {
     },
 
 	findOrCreateFunctionTerm : function (fn, parameters){
-		if (!fn) throw new Error("attempt to create functionTerm with no function");
-		if (!parameters || parameters.length == 0) throw new Error("attempt to create functionTerm with no parameters");
+		if (!fn) {
+            throw new Error("attempt to create functionTerm with no function");
+        }
+		if (!parameters || parameters.length == 0) {
+            throw new Error("attempt to create functionTerm with no parameters");
+        }
 		var term = this.functionTermByFunctionAndParameters(fn, parameters);
 		if (term) return term;
 		term = new exports.FunctionTerm(fn, parameters);

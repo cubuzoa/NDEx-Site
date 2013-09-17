@@ -630,7 +630,7 @@ exports.Network = [
 				accountid : {		doc : "Account Id - User, Group, Agent",
 									type : "JID",
 									required : true,
-									class : "xUser"
+									class : "xAccount"
 							}
 					},
 		response: { 

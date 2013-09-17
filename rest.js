@@ -9,6 +9,8 @@ var flash = require('connect-flash')
 //
 //-----------------------------------------------------------
 
+var ndexDatabaseName = process.argv[2] || 'ndex';
+
 var orientdb = require('orientdb');
 
 var dbConfig = {
@@ -1131,7 +1133,7 @@ app.post('/networks', passport.authenticate('basic', { session: false }) , funct
     accountid = convertToRID(accountid);
     common.ridCheck(
       [
-            { rid: accountid , objectClass: 'xUser'},
+            { rid: accountid , objectClass: 'xAccount'},
       ], 
       res,
       function(){
@@ -1468,17 +1470,12 @@ app.delete('/tasks/:taskid', passport.authenticate('basic', { session: false }) 
           res.send(500, {error : 'error in handler for deleteTask : ' + e}); 
   }
 }); // close handler
-
-
 var server = new orientdb.Server(serverConfig);
-var db = new orientdb.GraphDb('ndex', server, dbConfig);
-
-db.open(function(err) {
-    if (err) {
-        throw err;
-    }
-	console.log('Successfully connected to OrientDB');
-	routes.init(db, function(err) {if (err) {throw err;}});
+var db = new orientdb.GraphDb(ndexDatabaseName, server, dbConfig); 
+db.open(function(err) {  
+    if (err)  throw err; 
+console.log('Successfully connected to OrientDB');
+routes.init(db, function(err) {if (err) {throw err;}});
 common.init(db, function(err) {if (err) {throw err;}});
 	System.init(db, function(err) {if (err) {throw err;}});
 	User.init(db, function(err) {if (err) {throw err;}});

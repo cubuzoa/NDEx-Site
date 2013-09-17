@@ -162,7 +162,15 @@ for (n in specs.resourceTypes){
 	}
 }
 
-var connect_to_db_lines = fs.readFileSync('./generate_connect_to_db.js').toString().split("\n");
+
+var connect_to_db_lines = [
+    "var server = new orientdb.Server(serverConfig);",
+    "var db = new orientdb.GraphDb(ndexDatabaseName, server, dbConfig); ",
+    "db.open(function(err) {  ",
+    "    if (err)  throw err; ",
+    "console.log('Successfully connected to OrientDB');",
+    "routes.init(db, function(err) {if (err) {throw err;}});"
+    ];
 
 lines = lines.concat(connect_to_db_lines);
 

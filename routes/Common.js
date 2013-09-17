@@ -80,7 +80,7 @@ exports.ridCheck = function (checklist, res, callback){
 					console.log("Error(s) in ID verification: "  + errors.join(", "));
 					res.send(404, {error : "Error(s) in ID verification: "  + errors.join(", ")});
 				} else {
-					console.log("passed ridCheck, going to callback");
+					//console.log("passed ridCheck, going to callback");
 					callback();
 					return true;
 				}

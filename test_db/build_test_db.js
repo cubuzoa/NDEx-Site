@@ -30,7 +30,7 @@ function readJSONFile(filename, directory){
 	var data = fs.readFileSync(directory + filename, 'utf8'); 
 	//
  	data = JSON.parse(data);
- 	console.log("JSON data: " + data);
+ 	console.log("JSON data: " + JSON.stringify(data));
 	return data;
 }
 
@@ -41,58 +41,84 @@ function processUserFile(filename){
 	var userJSON = readJSONFile(filename, "./test_accounts/"),
 		username = userJSON.username,
 		password = userJSON.password,
+        email = userJSON.recoveryEmail,
 		profile	= userJSON.profile;
-	
-	// TODO add error handler to call	
-	ndex.createUser(username, password, function(userData){
+	console.log("Creating User: " + username + " pwd: " + password + " email: " + email);
+	ndex.createUser(username, password, email,
+        function(userData){  // success handler for create user
+            console.log("user created: " + username + " with id = " + userData.jid);
+            doUpdateProfile(userData, profile);
+            doCreateNetworks(userData,userJSON);
+            doCreateGroups(userData, userJSON);
+	    },
+        function(error){      // error handler for create user
+            console.log("Error in create user: " + JSON.stringify(error));
+        });
 
-		// update the user's profile information
-		ndex.updateUserProfile(userData.jid, profile, function(profileResult){
-		
-		});	
-		
-		console.log("getting networks: " + userJSON.networkFilenames);
-				
-		// create networks owned by user
-		for (i in userJSON.networkFilenames){
-			var networkJDEx = readJSONFile(userJSON.networkFilenames[i], "./test_networks/pc_sif/");
-			if (networkJDEx){
-				ndex.createNetwork(networkJDEx, userData.jid, function (networkData){
-					console.log("Created network " + networkData.jid + " for user " + userData.jid);
-				});
-			} else {
-				console.log("No network for " + userJSON.networkFilenames[i]);
-			}
-		}
-		
-		// create groups owned by user
-		for (i in userJSON.ownedGroups){
-			var groupJSON = userJSON.ownedGroups[i],
-				groupname = groupJSON.groupname;
-			console.log("Processing Group: " + groupname);
-			ndex.createGroup(groupname, userData.jid, function (groupData){
-
-				// update the group's profile information
-				ndex.updateGroupProfile(groupData.jid, groupJSON.profile, function(groupProfileResult, groupProfileError){
-		
-				});	
-							
-				// create networks owned by group
-				for (i in groupJSON.networkFilenames){
-					var networkJDEx = readJSONFile(groupJSON.networkFilenames[i], "./test_networks/pc_sif/");
-					ndex.createNetwork(networkJDEx, groupData.jid, function (networkData){
-						console.log("Created network " + networkData.jid + " for group " + groupData.jid);
-					});
-				}
-			});
-		}		
-		
-	});
-	
 	return true;
-	
 }
 
+function doUpdateProfile(userData, profile){
+    console.log("started async update of profile for User: " + userData.jid);
+    ndex.updateUserProfile(userData.jid, profile,
+        function(result){
+            console.log("updated profile for User: " + userData.jid);
+        },
+        function(error){
+            console.log("Error while updating user profile: " + JSON.stringify(error));
+        });
+}
+
+function doUpdateGroupProfile(groupData, profile){
+    console.log("starting async update of profile for Group: " + groupData.jid);
+    ndex.updateGroupProfile(groupData.jid, profile,
+        function(result){      // success handler
+            console.log("updated profile for Group: " + groupData.jid);
+        },
+        function(error){             // error handler
+            console.log("Error while updating group profile: " + JSON.stringify(error));
+        });
+}
+
+function doCreateNetworks(accountData, accountJSON){
+    console.log("getting networks: " + JSON.stringify(accountJSON.networkFilenames));
+
+    // create networks owned by account
+    for (i in accountJSON.networkFilenames){
+        var networkJDEx = readJSONFile(accountJSON.networkFilenames[i], "./test_networks/");
+
+        if (networkJDEx){
+            console.log("started async creation of network from file: " + accountJSON.networkFilenames[i]);
+            ndex.createNetwork(networkJDEx, accountData.jid,
+                function (networkData){     // success handler
+                    console.log("Created network " + networkData.jid + " for Account: " + accountData.jid);
+                },
+                function (error){
+                    console.log("Error creating network: " + JSON.stringify(error));
+                });
+        } else {
+            console.log("No network found for " + accountJSON.networkFilenames[i]);
+        }
+    }
+}
+
+function doCreateGroups(userData, userJSON){
+    // create groups owned by user
+    for (i in userJSON.ownedGroups){
+        var groupJSON = userJSON.ownedGroups[i],
+            groupname = groupJSON.groupname;
+        console.log("started async creation of group: " + groupname);
+        ndex.createGroup(userData.jid, groupname,
+            function (groupData){
+                console.log("created group with id: " + groupData.jid);
+                doUpdateGroupProfile(groupData, groupJSON.profile);
+                doCreateNetworks(groupData, groupJSON);
+            },
+            function (error){
+                console.log("Error creating group: " + error);
+            });
+    }
+}
 var userFilenames = getUserFilenames();
 
 for (i in userFilenames){

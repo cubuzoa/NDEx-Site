@@ -1,5 +1,4 @@
-var flash = require('connect-flash')
-  , express = require('express')
+var express = require('express')
   , passport = require('passport')
 //  , util = require('util')
   , LocalStrategy = require('passport-local').Strategy;
@@ -41,6 +40,8 @@ app.configure(function() {
   app.use(express.cookieParser());
   app.use(express.bodyParser());
   app.use(express.methodOverride());
+
+/*
   app.use(express.session({ secret: 'keyboard cat' }));
   
   // Initialize Passport!  
@@ -51,7 +52,8 @@ app.configure(function() {
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(app.router);
-  
+*/
+
   // Setup static directories
   //
   app.use('/css', express.static(__dirname + '/css'));
@@ -61,126 +63,21 @@ app.configure(function() {
   app.use(express.static(__dirname + '/public'));
 });
 
-//-----------------------------------------------------------
-//
-//				Passport Authentication
-//
-//-----------------------------------------------------------
-
-// Passport session setup.
-//
-//   To support persistent login sessions, Passport needs to be able to
-//   serialize users into and deserialize users out of the session.  
-//
-//   Typically, this will be as simple as storing the user ID when serializing, 
-//   and finding the user by ID when deserializing.
-//
-passport.serializeUser(function(user, done) {
-  done(null, user.id);
-});
-
-passport.deserializeUser(function(id, done) {
-  findById(id, function (err, users) {
-  	if (err) {
-  		console.log("error while querying for user" + err);
-  		done(err, null);
-  	} else {
-		if (!users || users.length < 1){
-			console.log("no user found for id = " + id);
-			done("no user found for id = " + id);
-		} else {
-			var user = users[0],
-			u = {id: user['@rid'], username: user.username, password: user.password};
-			console.log("found user : " + JSON.stringify(user));
-			console.log("deserializing as: " + JSON.stringify(u));
-			done(err, u);
-		}
-	}
-  });
-});
-
-
-//   Use the LocalStrategy within Passport.
-//
-//   Strategies in passport require a `verify` function, which accept
-//   credentials (in this case, a username and password), and invoke a callback
-//   with a user object.
-//
-passport.use(new LocalStrategy(
-  function(username, password, done) {
-  
-    // asynchronous verification, for effect...
-    process.nextTick(function () {
-      
-      // Find the user by username.  If there is no user with the given
-      // username, or the password is not correct, set the user to `false` to
-      // indicate failure and set a flash message.  Otherwise, return the
-      // authenticated `user`.
-      findByUsername(username, function(err, users) {
-      	console.log("authenticating " + username + " found " + users.length + " users");
-        if (err) { return done(err); }
-        if (!users || users.length < 1) { return done(null, false, { message: 'Sorry, unknown user ' + username }); }
-        if (users.length > 1){
-        	return done(null, 
-        				false,
-        				{ message: "Unexpected Error: " + users.length + " users with username = " + username });
-        }
-        var u = users[0],
-        	user =  { id: u["@rid"], username: u.username, password: u.password };
-        if (user.password != password) { return done(null, false, { message: 'Sorry, invalid password' }); }
-        return done(null, user);
-      })
-    });
-  }
-));
-
 app.get('/', function(req, res){
   res.render('home', { user: req.user, title: "Home"});
 });
 
+/*
 // example page to use for testing login
-app.get('/test_login', ensureAuthenticated, function(req, res){
+app.get('/test_login',  function(req, res){
   res.render('test_login', { user: req.user,
   							 title: "Authentication Test Page" });
 });
+*/
 
 app.get('/login', function(req, res){
-  res.render('login', { user: req.user, message: req.flash('error'), title: "Login" });
+  res.render('login', { user: req.user, title: "Login" });
 });
-
-// POST /login
-//
-//   Use passport.authenticate() as route middleware to authenticate the
-//   request.  If authentication fails, the user will be redirected back to the
-//   login page.  Otherwise, the primary route function function will be called,
-//   which, in this example, will redirect the user to the home page.
-//
-//   curl -v -d "username=bob&password=secret" http://127.0.0.1:3330/login
-//
-app.post('/login', 
-  passport.authenticate('local', { failureRedirect: '/login', failureFlash: true }),
-  function(req, res) {
-    res.redirect('/');
-  });
-  
-// POST /login
-//   This is an alternative implementation that uses a custom callback to
-//   acheive the same functionality.
-/*
-app.post('/login', function(req, res, next) {
-  passport.authenticate('local', function(err, user, info) {
-    if (err) { return next(err) }
-    if (!user) {
-      req.flash('error', info.message);
-      return res.redirect('/login')
-    }
-    req.logIn(user, function(err) {
-      if (err) { return next(err); }
-      return res.redirect('/users/' + user.username);
-    });
-  })(req, res, next);
-});
-*/
 
 
 app.get('/logout', function(req, res){
@@ -190,33 +87,9 @@ app.get('/logout', function(req, res){
 
 
 app.get('/join', function(req, res){
-  res.render('join', { title: "Join", user: req.user, message: req.flash('error')});
+  res.render('join', { title: "Join", user: req.user});
 });
 
-// Simple route middleware to ensure user is authenticated.
-
-//   Use this route middleware on any site resource that needs to be protected.
-//   If the request is authenticated (typically via a persistent login session),
-//   the request will proceed.  
-//
-//   Otherwise, the user will be redirected to the login page.
-//
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) { return next(); }
-  res.redirect('/login')
-}
-
-//   Use this route middleware on API resources that need to be protected.  
-//
-//   If the request is authenticated (typically via a persistent login session),
-//   the request will proceed.
-//
-//   Otherwise, respond with a 401 indicating that authentication is required
-//
-function apiEnsureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) { return next(); }
-  res.send(401, {error: "authentication required"});
-}
 
 //-----------------------------------------------------------
 //
@@ -224,7 +97,7 @@ function apiEnsureAuthenticated(req, res, next) {
 //
 //-----------------------------------------------------------
 
-app.get('/myAccount', ensureAuthenticated, function(req, res) {
+app.get('/myAccount',  function(req, res) {
   res.render('my_account', {title: "My Account", 
   							user: req.user });
 });
@@ -244,12 +117,12 @@ app.get('/searchGroups', function(req, res) {
   							   user: req.user });
 });
 
-app.get('/manageTasks', ensureAuthenticated, function(req, res) {
-  res.render('manage_tasks', {title: "Tasks",
+app.get('/showTasks',  function(req, res) {
+  res.render('show_tasks', {title: "Tasks",
   							  user: req.user });
 });
 
-app.get('/uploadNetwork', ensureAuthenticated, function(req, res) {
+app.get('/uploadNetwork',  function(req, res) {
   res.render('upload_network', {title: "Upload Network",
   								user: req.user });
 });
@@ -327,12 +200,6 @@ app.get('/compareNetworks/:network1Id/:network2Id', function(req, res) {
   			});
 });
 
-app.get('/visNet/:networkId', function(req, res) {
-  res.render('search_networks', {title: "Networks", 
-  								 networkId: req.params['networkId'],
-  								 user: req.user });
-});
-
 app.get('/newGroup', function(req, res) {
   res.render('create_group', 
   			{	title: "New Group", 
@@ -382,16 +249,7 @@ app.get('/editNetworkMetadata', function(req, res) {
   			});
 });
 
-//-----------------------------------------------------------
-//
-//				The REST API
-//
-//				Generated REST API functions
-//				Would be better to serve separately, 
-//				but don't know how authentication would work
-//
-//-----------------------------------------------------------
-
+/*
 function convertToRID(JID){
 	return JID.replace("C","#").replace("R", ":");
 }
@@ -399,38 +257,10 @@ function convertToRID(JID){
 function convertFromRID(RID){
 	return RID.replace("#","C").replace(":", "R");
 }
-
-var routes = require('./routes');
-
+*/
 
 var server = new orientdb.Server(serverConfig);
-var db = new orientdb.GraphDb('ndex', server, dbConfig);
 
-db.open(function(err) {
-    if (err) {
-        throw err;
-    }
-	console.log('Successfully connected to OrientDB');
-	routes.init(db, function(err) {if (err) {throw err;}});
-});
-
-
-//-----------------------------------------------------------
-//
-//				Authentication Functions
-//
-//-----------------------------------------------------------
-
-function findByUsername(username, fn) {
-	var cmd = "select from xUser where username = '" + username + "'";
-	db.command(cmd, fn);
-}
-
-// TODO - check that result is an instance of xUser
-function findById(id, fn) {
-  var cmd = "select from " + id;
-  db.command(cmd, fn);
-}
 
 //-----------------------------------------------------------
 //

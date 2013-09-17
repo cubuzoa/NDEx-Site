@@ -9,6 +9,8 @@ var flash = require('connect-flash')
 //
 //-----------------------------------------------------------
 
+var ndexDatabaseName = process.argv[2] || 'ndex';
+
 var orientdb = require('orientdb');
 
 var dbConfig = {

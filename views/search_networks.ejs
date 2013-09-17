@@ -68,30 +68,31 @@ function doSearch(offset) {
 
 	console.log("Calling findNetworks with '" + searchExpression + "' " + limit + " " + offset);
 	
-	ndexClient.findNetworks(searchExpression, limit, offset, function(data){
-		console.log("Got results from findNetworks");
-		console.log(data);
-		for (i in data.networks){
-			var network = data.networks[i];
-			console.log(network.title);
-		}
-		
-		// Clears the searchResults div
-		$('#searchResults').html('<h3>Networks Found:</h3>');
-		
-		if (data.networks){
-			$.each(data.networks, function(index, item){
-				$('#searchResults').append(formatNetworkDescriptor(item));
-			}); 
- 			
-			$('#searchResults').append(createPaginationModule(data.blockAmount, offset, 'doSearch'));
-  			$('#searchPage').attr('placeholder', 'max value: ' + data.blockAmount);
-		}
-    },
-    // error handler
-    function(error){
-    	$('#searchResults').append(formatError(error));
-    });
+	ndexClient.findNetworks(searchExpression, limit, offset,
+        function(data){   // success handler
+            console.log("Got results from findNetworks");
+            console.log(data);
+            for (i in data.networks){
+                var network = data.networks[i];
+                console.log(network.title);
+            }
+
+            // Clears the searchResults div
+            $('#searchResults').html('<h3>Networks Found:</h3>');
+
+            if (data.networks){
+                $.each(data.networks, function(index, item){
+                    $('#searchResults').append(formatNetworkDescriptor(item));
+                });
+
+                $('#searchResults').append(createPaginationModule(data.blockAmount, offset, 'doSearch'));
+                $('#searchPage').attr('placeholder', 'max value: ' + data.blockAmount);
+            }
+        },
+
+        function(error){     // error handler
+            $('#searchResults').append(formatError(error));
+        });
     
     return false;
 }
