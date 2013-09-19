@@ -690,15 +690,30 @@ function createModal(name, id) {
 }
 
 //---------------------------------------------------------
-//				Profile Funcitons
+//				Profile Functions
 //---------------------------------------------------------
+
+function addProfileImages(accountname){
+
+    var foregroundImage = document.createElement('img'),
+        backgroundImage = document.createElement('img'),
+        imgDiv = document.getElementById('image'),
+        fImg = document.getElementById("foreground"),
+        bImg = document.getElementById("background");
+
+    $(backgroundImage).attr('src', "../img/background/" + accountname + ".jpg");
+    $(backgroundImage).addClass('bckImg');
+    $(imgDiv).append(backgroundImage).append(bImg);
+
+    $(foregroundImage).attr('src', "../img/foreground/" + accountname + ".jpg");
+    $(foregroundImage).addClass('foreImg');
+    $(imgDiv).append(foregroundImage).append(fImg);
+}
 
 function addElements(item, index) {
     var header = document.getElementById('name'),
         link = document.getElementById('link'),
-        descrip = document.getElementById('descrip'),
-        imgDiv = document.getElementById('image'),
-        image = document.createElement('img');
+        descrip = document.getElementById('descrip');
 
     if ((index == "firstName") || (index == "lastName")) {
         $(header).append(item + ' ');
@@ -711,24 +726,12 @@ function addElements(item, index) {
     if (index == "website") {
         $(link).attr('href', 'http://www.triptychjs.com')
             .attr('target', '_blank')
-            .append('Check out my website');
+            .append('website');
     }
 
     if (index == "description") {
         $(descrip).append(item);
     }
 
-    if (index == "backgroundImg") {
-        var fImg = document.getElementById("foreground");
-        $(image).attr('src', "../img/background/" + item);
-        $(image).addClass('bckImg');
-        $(imgDiv).append(image).append(fImg);
-    }
 
-    if (index == "foregroundImg") {
-        $(image).attr('id', 'foreground')
-            .attr('src', "../img/foreground/" + item);
-        $(image).addClass('foreImg');
-        $(imgDiv).append(image);
-    }
 }

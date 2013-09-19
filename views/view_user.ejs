@@ -1,10 +1,12 @@
 <% include head.ejs %>
 <% include nav.ejs %>
 
-
 <div class="row-fluid">
-	<div id="" class="span7">
-		<div id = "image"> </div>
+	  <div id="" class="span7">
+	    <div id = "image">
+          		    <div id = "foreground"></div>
+          		    <div id = "background"></div>
+        </div>
 		<div id = "" class = "tabbable" > 
 			<ul class="nav nav-tabs tab-title">
 				<li class="active">
@@ -139,6 +141,8 @@ if(isSignedIn() && (user.jid === userJID)){
 $(ndexClient.getUser(userJID, function(data){
 		console.log("Got results from getUser");
 		console.log(data);
+
+		addProfileImages(data.user.username);
 	
   		$.each(data.user.profile, function(index, item){
 			addElements(item, index);
