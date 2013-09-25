@@ -141,32 +141,6 @@ function formatNode(node, network){
 
 }
 
-//--------------------------------------------	
-//		Workspace Functions
-//--------------------------------------------
- if (isSignedIn()) { 
-
-	function updateWorkspaceTools(jid){
-		var tempEle = document.getElementById('netStatus');
-		var tempLnk = document.createElement('a');
-		$(tempEle).html('');
-		$(tempLnk).data('networkProperties', thisNetwork);
-
-		isOnWorkspace(jid, function(found) {
-			if (found) {
-				$(tempLnk).attr('onclick','removeFromWorkspace(this)').html('Remove from Workspace');
-				$(tempEle).append(tempLnk);
-			}
-			else{
-				$(tempLnk).attr('onclick','addToWorkspace(this)').html('Add to Workspace');
-				$(tempEle).append(tempLnk);
-			}
-		});
-	
-	}
-
-} //close if is signed in conditional
-
 
 function getNetwork(){
 	getNodes();
@@ -239,10 +213,6 @@ function getEdges(edgePage){
 
 //ownedNetwork
 
-
-
-
-
 //prevent settings dropdown from closing when an input form is clicked
 $('.dropdown-menu input, .dropdown-menu label').click(function(e) {
 	e.stopPropagation();
@@ -250,7 +220,7 @@ $('.dropdown-menu input, .dropdown-menu label').click(function(e) {
 
 getNetwork();
 setTimeout( function(){
-		if(isSignedIn() && isOwnedNetwork(networkRID)){
+		if(ndexUI.user.id && ndexUI.isOwnedNetwork(networkRID)){
 			$('.networkMiniMenu').attr('style', 'display:block');
 		}
 	},

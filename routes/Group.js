@@ -154,7 +154,7 @@ exports.getGroup = function(groupRID, callback){
 					
 					// get owned networks
 					var networkDescriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount";
-					var traverseExpression = "traverse V.out, E.in from " + groupRID + " while $depth <= 2"
+					var traverseExpression = "select flatten(out(xOwnsNetwork)) from " + groupRID
 			 
 					var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
 					module.db.command(networks_cmd, function(err, networks) {

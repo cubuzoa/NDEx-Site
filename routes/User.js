@@ -192,8 +192,9 @@ exports.getUser = function (userRID, callback) {
 
                             // get owned groups
                             var groupDescriptors = "organizationName as organizationName, @rid as jid";
-                            var traverseExpression = "select flatten(out(xOwnsGroup)) from" + userRID;
+                            var traverseExpression = "select flatten(out(xOwnsGroup)) from " + userRID;
                             var groups_cmd = "select " + groupDescriptors + " from (" + traverseExpression + ") where @class = 'xGroup'";
+                            console.log("groups_cmd = " + groups_cmd);
                             module.db.command(groups_cmd, function (err, groups) {
                                 if (common.checkErr(err, "getting owned groups", callback)) {
 
@@ -222,8 +223,102 @@ exports.getUser = function (userRID, callback) {
     });
 };
 
-exports.getUserWorkspace = function (userRID, callback) {
-    console.log("calling getUserWorkspace with userRID = '" + userRID + "'");
+
+
+function getWorkSurfaceInternal(userRID, callback){
+    var networkDescriptors = "properties.title as title, @rid as rid, nodes.size() as nodeCount, edges.size() as edgeCount";
+    var traverseExpression = "select flatten(workspace) from " + userRID;
+    var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
+
+    console.log(networks_cmd);
+    module.db.command(networks_cmd, function (err, worksurface_networks) {
+        callback(err, worksurface_networks);
+    });
+}
+
+exports.getUserWorkSurface = function (userRID, callback) {
+    console.log("calling getUserWorkSurface with userRID = '" + userRID + "'");
+    getWorkSurfaceInternal(userRID, function(err, worksurface_networks){
+        if (common.checkErr(err, "getting user worksurface networks", callback)) {
+        // process the worksurface_networks
+            for (i in worksurface_networks) {
+                var network = worksurface_networks[i];
+                network.jid = common.convertFromRID(network.rid);
+            }
+            callback({networks: worksurface_networks, error: err});
+        }
+    });
+}
+
+exports.addNetworkToUserWorkSurface = function (userRID, networkRID, callback) {
+    console.log("calling addNetworkToUserWorkSurface with userRID = '" + userRID + "' and networkRID = '" + networkRID + "'");
+    getWorkSurfaceInternal(userRID, function(err, worksurface_networks){
+        if (common.checkErr(err, "getting user worksurface networks", callback)) {
+            // return error if networkRID already on workSurface
+            for (i in worksurface_networks) {
+                var network = worksurface_networks[i];
+                if (network.rid == networkRID){
+                    callback({status: 400, error: "network " + networkRID + " already in user worksurface"});
+                }
+            }
+
+            // Otherwise, update the workSurface
+            var updateCmd = "update " + userRID + " add workspace = " + networkRID;
+            console.log(updateCmd);
+            module.db.command(updateCmd, function (err, worksurface) {
+                if (common.checkErr(err, "adding network " + networkRID + " to worksurface of user " + userRID, callback)) {
+                    getWorkSurfaceInternal(userRID, function(err, worksurface_networks){
+                        // return the worksurface if successful
+                        for (i in worksurface_networks) {
+                            var network = worksurface_networks[i];
+                            network.jid = common.convertFromRID(network.rid);
+                        }
+                        callback({networks: worksurface_networks, error: err});
+
+                    });
+                }
+            });
+        }
+    });
+}
+
+exports.deleteNetworkFromUserWorkSurface = function (userRID, networkRID, callback) {
+    console.log("calling deleteNetworkFromUserWorkSurface with userRID = '" + userRID + "' and networkRID = '" + networkRID + "'");
+    getWorkSurfaceInternal(userRID, function(err, worksurface_networks){
+        if (common.checkErr(err, "getting user worksurface networks", callback)) {
+            // return error if networkRID already on workSurface
+            var missing = true;
+            for (i in worksurface_networks) {
+                var network = worksurface_networks[i];
+                if (network.rid == networkRID){
+                    missing = false;
+                }
+            }
+            if (missing) callback({status: 400, error: "network " + networkRID + " not in user worksurface"});
+
+            // Otherwise, update the workSurface
+            var updateCmd = "update " + userRID + " remove workspace = " + networkRID;
+            console.log(updateCmd);
+            module.db.command(updateCmd, function (err, worksurface) {
+                if (common.checkErr(err, "removing network " + networkRID + " from worksurface of user " + userRID, callback)){
+                    getWorkSurfaceInternal(userRID, function(err, worksurface_networks){
+                        // return the worksurface if successful
+                        for (i in worksurface_networks) {
+                            var network = worksurface_networks[i];
+                            network.jid = common.convertFromRID(network.rid);
+                        }
+                        callback({networks: worksurface_networks, error: err});
+
+                    });
+                }
+            });
+        }
+    });
+}
+
+/*
+exports.getUserWorkSurface = function (userRID, callback) {
+    console.log("calling getUserWorkSurface with userRID = '" + userRID + "'");
 
     // TODO : check that requester has permission
 
@@ -237,61 +332,62 @@ exports.getUserWorkspace = function (userRID, callback) {
                 callback({status: 404});
             } else {
                 //user exists
-                // when getting the workspace networks,
+                // when getting the worksurface networks,
                 // we return network descriptors back for each
                 // network ID found so the interface can display without further queries
 
                 var networkDescriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount";
-                var traverseExpression = "traverse workspace from " + userRID + " while $depth <= 2"
+                var traverseExpression = "select flatten(out(xOwnsNetwork)) from " + userRID;
                 var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
 
                 console.log(networks_cmd);
-                module.db.command(networks_cmd, function (err, workspace_networks) {
-                    if (common.checkErr(err, "getting user workspace networks", callback)) {
-                        // process the workspace_networks
-                        for (i in workspace_networks) {
-                            var network = workspace_networks[i];
+                module.db.command(networks_cmd, function (err, worksurface_networks) {
+                    if (common.checkErr(err, "getting user worksurface networks", callback)) {
+                        // process the worksurface_networks
+                        for (i in worksurface_networks) {
+                            var network = worksurface_networks[i];
                             network.jid = common.convertFromRID(network.jid);
                         }
                     }
-                    callback({networks: workspace_networks, error: err});
+                    callback({networks: worksurface_networks, error: err});
                 });
             }
         }
     });
 }
 
-exports.addNetworkToUserWorkspace = function (userRID, networkRID, callback) {
-    console.log("calling addNetworkToUserWorkspace with userRID = '" + userRID + "' and networkRID = '" + networkRID + "'");
+
+exports.addNetworkToUserWorkSurface = function (userRID, networkRID, callback) {
+    console.log("calling addNetworkToUserWorkSurface with userRID = '" + userRID + "' and networkRID = '" + networkRID + "'");
 
     // TODO : check that requester has permission
 
-    module.db.command("select username, workspace from " + userRID + " where @class = 'xUser'", function (err, results) {
+    module.db.command("select username, worksurface from " + userRID + " where @class = 'xUser'", function (err, results) {
 
-        if (common.checkErr(err, "checking user before adding to workspace ", callback)) {
+        if (common.checkErr(err, "checking user before adding to worksurface ", callback)) {
             if (!results || results.length < 1) {
                 console.log("found no users by id = '" + userRID + "'");
                 callback({status: 404, error: "Found no user by id = '" + userRID + "'"});
             } else {
                 var user_data = results[0];
 
-                if (user_data.workspace && common.contains(user_data.workspace, networkRID)) {
+                if (user_data.worksurface && common.contains(user_data.worksurface, networkRID)) {
                     // aborting, already contains this network
-                    callback({status: 400, error: "network " + networkRID + " already in user workspace"});
+                    callback({status: 400, error: "network " + networkRID + " already in user worksurface"});
 
                 } else {
                     // Check that network exists
                     module.db.command("select @rid as rid from " + networkRID + " where @class = 'xNetwork'", function (err, network_ids) {
-                        if (common.checkErr(err, "checking network before adding to workspace ", callback)) {
+                        if (common.checkErr(err, "checking network before adding to worksurface ", callback)) {
                             if (!network_ids || network_ids.length < 1) {
                                 callback({status: 404, error: "Found no network by id = '" + networkRID + "'"});
                             } else {
                                 //
                                 // User and Network exist, do the update:
-                                var updateCmd = "update " + userRID + " add workspace = " + networkRID;
+                                var updateCmd = "update " + userRID + " add worksurface = " + networkRID;
                                 console.log(updateCmd);
-                                module.db.command(updateCmd, function (err, workspace) {
-                                    if (common.checkErr(err, "adding network " + networkRID + " to workspace of user " + userRID, callback)) {
+                                module.db.command(updateCmd, function (err, worksurface) {
+                                    if (common.checkErr(err, "adding network " + networkRID + " to worksurface of user " + userRID, callback)) {
                                         callback({status: 200});
                                     }
                                 });
@@ -309,29 +405,29 @@ exports.addNetworkToUserWorkspace = function (userRID, networkRID, callback) {
 }
 
 
-exports.deleteNetworkFromUserWorkspace = function (userRID, networkRID, callback) {
-    console.log("calling deleteNetworkFromUserWorkspace with userRID = '" + userRID + "' and networkRID = '" + networkRID + "'");
+exports.deleteNetworkFromUserWorkSurface = function (userRID, networkRID, callback) {
+    console.log("calling deleteNetworkFromUserWorkSurface with userRID = '" + userRID + "' and networkRID = '" + networkRID + "'");
 
     // TODO : check that user exists, that requester has permission
 
-    module.db.command("select username, workspace from " + userRID + " where @class = 'xUser'", function (err, results) {
-        if (common.checkErr(err, "checking user before adding to workspace ", callback)) {
+    module.db.command("select username, worksurface from " + userRID + " where @class = 'xUser'", function (err, results) {
+        if (common.checkErr(err, "checking user before adding to worksurface ", callback)) {
             if (!results || results.length < 1) {
                 console.log("found no users by id = '" + userRID + "'");
                 callback({status: 404, error: "Found no user by id = '" + userRID + "'"});
             } else {
                 var user_data = results[0];
 
-                if (!user_data.workspace || !common.contains(user_data.workspace, networkRID)) {
+                if (!user_data.worksurface || !common.contains(user_data.worksurface, networkRID)) {
                     // aborting, does not contain this network
-                    callback({status: 404, error: "network " + networkRID + " not in user workspace"});
+                    callback({status: 404, error: "network " + networkRID + " not in user worksurface"});
 
                 } else {
-                    // User exists and networkRID is in the workspace, do the update:
-                    var updateCmd = "update " + userRID + " remove workspace = " + networkRID;
+                    // User exists and networkRID is in the worksurface, do the update:
+                    var updateCmd = "update " + userRID + " remove worksurface = " + networkRID;
                     console.log(updateCmd);
-                    module.db.command(updateCmd, function (err, workspace) {
-                        if (common.checkErr(err, "removing network " + networkRID + " from workspace of user " + userRID, callback)) {
+                    module.db.command(updateCmd, function (err, worksurface) {
+                        if (common.checkErr(err, "removing network " + networkRID + " from worksurface of user " + userRID, callback)) {
                             callback({status: 200});
                         }
                     });
@@ -343,7 +439,7 @@ exports.deleteNetworkFromUserWorkspace = function (userRID, networkRID, callback
     });
 
 }
-
+ */
 //
 // TODO: clean up links from user.
 // This is a hard problem since the user may be the owner of groups and networks

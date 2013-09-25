@@ -10,16 +10,16 @@
 		<div id = "" class = "tabbable" > 
 			<ul class="nav nav-tabs tab-title">
 				<li class="active">
-					<a href="#ownedNetworks" data-toggle="tab" class=""> Owned Networks </a>
+					<a href="#ownedNetworks" data-toggle="tab" class=""> My Networks </a>
 				</li>
 				<li>
-					<a href="#ownedGroups" data-toggle="tab" class=""> Owned Groups </a>
+					<a href="#ownedGroups" data-toggle="tab" class=""> My Groups </a>
 				</li>
 				<li id = "showGroups" style="display:none">
-					<a href="#groups" data-toggle="tab" class=""> Groups </a>
+					<a href="#groups" data-toggle="tab" class=""> My Memberships </a>
 				</li>
 				<li id ="showOwnedAgentAccounts" style="display:none">
-					<a href="#ownedAgentAccounts" data-toggle="tab" class=""> Owned Agent Accounts </a>
+					<a href="#ownedAgentAccounts" data-toggle="tab" class=""> My Agents </a>
 				</li>
 			</ul>
 			<div class="tab-content">
@@ -79,55 +79,44 @@
 
 
 <script>
-//TODO
-//update notifications div to use bootstrap collapse css
-//work on modal css
-//update href relative urls for networks
 
-// the user id passed from the ejs template
+// TODO
+//   update notifications div to use bootstrap collapse css
+//   work on modal css
+//   update href relative urls for networks
+
+// the user id to display is passed from the ejs template
 var userJID = '<%= userId %>';
 
-
-// Javascript to enable link to tab
+// Display tab based on location hash
+//
 var hash = document.location.hash;
 var prefix = "tab_";
+//
+// If the document.location.hash is set,
+// then take the value and replace the prefix with blank to compute which tab we want to display
+// look up the nav tab with that href and invoke the method to show the tab
+//
 if (hash) {
     $('.nav-tabs a[href='+hash.replace(prefix,"")+']').tab('show');
 } 
 
-// Change hash for page-reload
+// Set location hash to persist tab over page-reload
+//
+// For all of the nav tabs, add an on 'shown' method
+// to update the window.location.hash
+//
+// That way, the desired tab will be displayed on page reload
+//
 $('.nav-tabs a').on('shown', function (e) {
     window.location.hash = e.target.hash.replace("#", "#" + prefix);
 });
 
-
-function formatError(error){
-	
-}
-
-function updateWorkspaceTools(jid){
-//this is not in ndexUI.js because viewNetwork has a different version
-	var tempLink = document.getElementById('link'+jid),
-		tempIcon = document.getElementById('icon'+jid);
-
-	isOnWorkspace(jid, function(found) {
-		if (found) {
-			$(tempLink).attr('onclick','removeFromWorkspace(this)');//
-			$(tempIcon).attr('title','Remove from Workspace');
-			tempIcon.className='icon-remove';
-		}
-		else{
-			$(tempLink).attr('onclick','addToWorkspace(this)');
-			$(tempIcon).attr('title','Add to Workspace');
-			tempIcon.className='icon-plus icon-white';
-		}
-	});
-}
-
-
-
 //----------------------------/
-if(isSignedIn() && (user.jid === userJID)){
+
+// Show additional elements if the viewed user is the same as the signedin user
+//
+if(ndexUI.user.id && (ndexUI.user.id === userJID)){
 	$('#showGroups').attr('style', 'display:block');
 	$('#showOwnedAgentAccounts').attr('style', 'display:block');
 	$('#notifications').attr('style', 'display:block');
@@ -135,37 +124,41 @@ if(isSignedIn() && (user.jid === userJID)){
 
 }
 
-
 //----------------------------//
 
 $(ndexClient.getUser(userJID, function(data){
 		console.log("Got results from getUser");
 		console.log(data);
 
-		addProfileImages(data.user.username);
+		ndexUI.addProfileImages(data.user.username);
 	
   		$.each(data.user.profile, function(index, item){
-			addElements(item, index);
+			ndexUI.addElements(item, index);
 			//$('#profile').append(index + image);
 		});  
-		
-  		
+
   		$.each(data.user.ownedNetworks, function(index, network){
-  			$('#ownedNetworks').append(formatNetworkDescriptor(network));
+  			$('#ownedNetworks').append(ndexUI.formatNetworkDescriptor(network));
   		});
+
+  		$.each(data.user.ownedGroups, function(index, group){
+            $('#ownedGroups').append(ndexUI.formatGroupDescriptor(group));
+        });
 
     },
     // error handler
     function(error){
-    	$('#error').append(formatError(error));
+    	$('#error').append(ndexUI.formatError(error));
     })
 );
 
-$('#notifContent').append(addInvite('group1','G1'))
-			.append(createModal('group1','G1'))
-			.append(addInvite('group2','G2'))
-			.append(createModal('group2','G2'));
-			
+/*
+$('#notifContent').append(ndexUI.addInvite('group1','G1'))
+			.append(ndexUI.createModal('group1','G1'))
+			.append(ndexUI.addInvite('group2','G2'))
+			.append(ndexUI.createModal('group2','G2'));
+*/
+
 </script>
 
 <% include sidebar.ejs %>

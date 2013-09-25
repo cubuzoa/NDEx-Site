@@ -11,13 +11,13 @@
 		<div id = "" class = "tabbable" > 
 			<ul class="nav nav-tabs tab-title">
 				<li class="active">
-					<a href="#ownedNetworks" data-toggle="tab" class=""> Owned Networks </a>
+					<a href="#ownedNetworks" data-toggle="tab" class=""> Networks </a>
 				</li>
 				<li>
 					<a href="#groupMembers" data-toggle="tab" class=""> Members </a>
 				</li>
 				<li id ="showOwnedAgentAccounts" style="display:none">
-					<a href="#ownedAgentAccounts" data-toggle="tab" class=""> Owned Agent Accounts </a>
+					<a href="#ownedAgentAccounts" data-toggle="tab" class=""> Agents </a>
 				</li>
 			</ul>
 			<div class="tab-content">
@@ -95,29 +95,8 @@ function formatError(error){
 	
 }
 
-function updateWorkspaceTools(jid){
-//this is not in ndexUI.js because viewNetwork has a different version
-	var tempLink = document.getElementById('link'+jid),
-		tempIcon = document.getElementById('icon'+jid);
-
-	isOnWorkspace(jid, function(found) {
-		if (found) {
-			$(tempLink).attr('onclick','removeFromWorkspace(this)');//
-			$(tempIcon).attr('title','Remove from Workspace');
-			tempIcon.className='icon-remove';
-		}
-		else{
-			$(tempLink).attr('onclick','addToWorkspace(this)');
-			$(tempIcon).attr('title','Add to Workspace');
-			tempIcon.className='icon-plus icon-white';
-		}
-	});
-}
-
-
-
 //----------------------------/
-if(isSignedIn()){// && isOwnedGroup(groupJID)){  <---waiting for fix on xownsgroup edge
+if(ndexUI.user.id){// && ndexUI.isOwnedGroup(groupJID)){  <---waiting for fix on xownsgroup edge
 	//$('#showGroups').attr('style', 'display:block');
 	//$('#showOwnedAgentAccounts').attr('style', 'display:block');
 	$('#notifications').attr('style', 'display:block');
@@ -134,15 +113,15 @@ $(ndexClient.getGroup(groupJID, function(data){
 		console.log("Got results from getGroup");
 		console.log(data);
 	
-  		addProfileImages(data.group.groupname);
+  		ndexUI.addProfileImages(data.group.groupname);
+
   		$.each(data.group.profile, function(index, item){
-			addElements(item, index);
+			ndexUI.addElements(item, index);
 			//$('#profile').append(index + ' ' );
 		});  
 
-  		
   		$.each(data.group.ownedNetworks, function(index, network){
-  			$('#ownedNetworks').append(formatNetworkDescriptor(network));
+  			$('#ownedNetworks').append(ndexUI.formatNetworkDescriptor(network));
   		});
 
     },
@@ -153,10 +132,10 @@ $(ndexClient.getGroup(groupJID, function(data){
 );
 
 
-$('#notifContent').append(addInvite('group1','G1'))
-			.append(createModal('group1','G1'))
-			.append(addInvite('group2','G2'))
-			.append(createModal('group2','G2'));
+$('#notifContent').append(ndexUI.addInvite('group1','G1'))
+			.append(ndexUI.createModal('group1','G1'))
+			.append(ndexUI.addInvite('group2','G2'))
+			.append(ndexUI.createModal('group2','G2'));
 			
 </script>
 

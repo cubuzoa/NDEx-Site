@@ -1,6 +1,4 @@
 
-
-
 <div class="navbar navbar-fixed-top">
 	<div class="navbar-inner">
 	  <div class="container-fluid">
@@ -59,7 +57,7 @@
 					</ul>
 				  </li>
 				  <li id = "signIn" style="display:none"><a href="/login" >Sign in</a></li> 
-				  <li id = "signOut" style="display:none"><a onclick = 'signout()' " >Sign out</a></li>
+				  <li id = "signOut" style="display:none"><a onclick = 'ndexUI.signOut()' " >Sign out</a></li>
 
 				</ul>
 				<ul class ="nav pull-right main-nav">
@@ -73,22 +71,12 @@
 
 <script>
 
-
-
-//global user obj
-var user = {};
-
-
-
-if(isSignedIn()){
-	//Initializing the globally used user object
-	user.username = localStorage['ndexUsername'];
-	user.jid = localStorage['ndexJid'];
-	ndexClient.getUser(user.jid, function(data){
-		//console.log(JSON.stringify(data));
-		user.ownedNetworks = data.user.ownedNetworks;
-		user.ownedGroups = data.user.ownedGroups;
-		console.log('----' + JSON.stringify(user));
+if(ndexUI.checkSignIn()){
+	ndexClient.getUser(ndexUI.user.id, function(data){
+		console.log(JSON.stringify(data));
+		ndexUI.user.ownedNetworks = data.user.ownedNetworks;
+		ndexUI.user.ownedGroups = data.user.ownedGroups;
+		//console.log('----' + JSON.stringify(ndexUI.user));
 	});
 
 	//assigning a class, ex: signInOnly, can eliminate a lot of lines of code
@@ -99,9 +87,9 @@ if(isSignedIn()){
 	$('#navNewGroup').attr('style','display:block');
 	$('#signIn').attr('style','display:none');
 	
-	$('#toAccount').attr('href','/viewUser/' + user.jid);
-	$('#toGroups').attr('href', '/viewUser/' + user.jid + '/#tab_ownedGroups');
-	$('#toNetworks').attr('href', '/viewUser/' + user.jid + '/#tab_ownedNetworks');
+	$('#toAccount').attr('href','/viewUser/' + ndexUI.user.id);
+	$('#toGroups').attr('href', '/viewUser/' + ndexUI.user.id + '/#tab_ownedGroups');
+	$('#toNetworks').attr('href', '/viewUser/' + ndexUI.user.id + '/#tab_ownedNetworks');
 	
 	$('#navname').html(localStorage['ndexUsername']);
 

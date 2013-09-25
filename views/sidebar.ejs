@@ -3,20 +3,20 @@
 	<div id="stay" class="well" data-spy="affix">
 		<a onClick="toggle2(this)" href="#"><i id="sidebarButton" class="icon-chevron-left"></i></a>
 		<h4 style="text-align:center" >Work Surface</h4>
-		<div id="workSurface" style="dipslay: none">
+		<div id="workSurface" style="display: none">
 			
 		</div>
 		<div id="tools" class="btn-group">
-			<a id="viewNet" onclick="viewNtwk()" class = "btn" rel = "tooltip" title = "View Network" data-placement = "top" >
+			<a id="viewNet" onclick="viewNetwork()" class = "btn" rel = "tooltip" title = "View Network" data-placement = "top" >
 				<i class="icon-folder-open icon-white"> </i> 
 			</a>
-			<a id="visualizeNet" onclick="visualizeNtwk()" class="btn" rel="tooltip" title="Visualize Network" data-placement="top">
+			<a id="visualizeNet" onclick="visualizeNetwork()" class="btn" rel="tooltip" title="Visualize Network" data-placement="top">
 				<i class="icon-eye-open icon-white"> </i> 
 			</a>	
-			<a id="compareNets" onclick="compareNtwks()" class="btn" rel="tooltip" title="Compare Networks" data-placement="top">
+			<a id="compareNets" onclick="compareNetworks()" class="btn" rel="tooltip" title="Compare Networks" data-placement="top">
 				<i class="icon-retweet icon-white"> </i> 
 			</a>
-			<a onclick="removeNtwk()" class="btn" rel="tooltip" title="Remove Network"  data-placement="left top">
+			<a onclick="removeNetwork()" class="btn" rel="tooltip" title="Remove Network"  data-placement="left top">
 				<i class="icon-remove icon-white"> </i> 
 			</a>
 		</div>
@@ -25,10 +25,10 @@
 
 <script>
 //TODO
-//using title attribute for passing JID is deprecated, convert to using jquery data. note: element attributes are interlinked with network displays in other pages
-//add icon representaions for thumbnails?
-
-
+// using title attribute for passing JID is deprecated,
+// convert to using jquery data. note: element attributes
+// are interlinked with network displays in other pages
+// add icon representations for thumbnails?
 
 function toggle2(obj) {
 	var ele = document.getElementById('workSurface');
@@ -71,7 +71,7 @@ function addNetworkIcon(ntwkObj){
 	return unlst;
 }
 
-function viewNtwk(){
+function viewNetwork(){
 	
 	var Lnk = document.getElementById('viewNet');
 	var found = false;
@@ -90,7 +90,7 @@ function viewNtwk(){
 
 }
 
-function visualizeNtwk(){
+function visualizeNetwork(){
 	
 	var Lnk = document.getElementById('visualizeNet');
 	var found = false;
@@ -109,7 +109,7 @@ function visualizeNtwk(){
 
 }
 
-function compareNtwks(){
+function compareNetworks(){
 	
 	var Lnk = document.getElementById('compareNets');
 	var firstNet = 1;
@@ -139,34 +139,15 @@ function compareNtwks(){
 
 }
 
-function removeNtwk(){
+function removeNetwork(){
 	var parent = document.getElementById('workSurface');
 	
 	$("input").each(function(index,value){
 		if($(this).is(':checked')){
-			ndexClient.deleteNetworkFromUserWorkspace(user.jid, $(this).attr('title'), function(data) {});
-
-			var child = document.getElementById('thumbnail' + $(this).attr('title'));
-			parent.removeChild(child);
+			ndexUI.removeFromWorkSurface($(this).attr('title'))
 		}
 	});
-	
-	
-}
 
-function formatError(error){
-}
-
-function isLoggedIn() {
-//same as is isSignedIn, uses different name to avoid conflicts
-//may not need declaration, isSignedIn from parent file may be used
-	if(localStorage['ndexUsername'] == '') {
-		console.log('not signed in');
-		return false;
-	} else {
-		console.log('signed in');
-		return true;
-	}
 }
 
 //------------------------------------
@@ -175,20 +156,11 @@ function isLoggedIn() {
 //
 //------------------------------------
 		
-if (isLoggedIn()) {
-	ndexClient.getUserWorkspace(user.jid, function(data){	
-			if(data.networks){
-				$.each(data.networks, function(index, item){
-					$('#workSurface').append(addNetworkIcon(item));	
-				});
-			}
-		}
-	);
+if (ndexUI.user.id) {
+    ndexUI.initUserWorkSurface();
 } else {
 	$('#sidebar').attr('style','display:none');
 }
 
-  
-    
 </script>    
  

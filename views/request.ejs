@@ -356,18 +356,7 @@ function doGroupSearch(){
 	return false;
 }
 
-function isSignedIn() {
-	if(localStorage['ndexUsername'] == '') {
-		console.log('not signed in');
-		return false;
-	} else {
-		console.log('signed in');
-		return true;
-	}
-}
-
-
-if(isSignedIn()){
+if(ndexUI.user.id){
 	$('#allRequest').attr('style','display:block');
 }
 

@@ -540,8 +540,8 @@ app.delete('/users/:userid', passport.authenticate('basic', { session: false }) 
   }
 }); // close handler
 
-// Get the user's workspace. Requester must be user or have admin permissions.
-app.get('/users/:userid/workspace', passport.authenticate('basic', { session: false }) , function(req, res) {
+// Get the user's WorkSurface. Requester must be user or have admin permissions.
+app.get('/users/:userid/worksurface', passport.authenticate('basic', { session: false }) , function(req, res) {
   try {
     var userid = req.params['userid'];
     if(!common.checkJID(userid)) res.send(400, { error: 'bad JID : ' + userid});
@@ -552,7 +552,7 @@ app.get('/users/:userid/workspace', passport.authenticate('basic', { session: fa
       ], 
       res,
       function(){
-        User.getUserWorkspace(userid, function(data){
+        User.getUserWorkSurface(userid, function(data){
             var status = data.status || 200;
           if(status && status == 200){
           }
@@ -567,13 +567,13 @@ app.get('/users/:userid/workspace', passport.authenticate('basic', { session: fa
   // now catch random errors
   }
   catch (e){
-          console.log('error in handler for getUserWorkspace : ' + e); 
-          res.send(500, {error : 'error in handler for getUserWorkspace : ' + e}); 
+          console.log('error in handler for getUserWorkSurface : ' + e); 
+          res.send(500, {error : 'error in handler for getUserWorkSurface : ' + e}); 
   }
 }); // close handler
 
-// Add a network to the user's workspace. Requester must be user or have admin permissions. User must have permission to access network
-app.post('/users/:userid/workspace', passport.authenticate('basic', { session: false }) , function(req, res) {
+// Add a network to the user's WorkSurface. Requester must be user or have admin permissions. User must have permission to access network
+app.post('/users/:userid/worksurface', passport.authenticate('basic', { session: false }) , function(req, res) {
   try {
     var userid = req.params['userid'];
     if(!common.checkJID(userid)) res.send(400, { error: 'bad JID : ' + userid});
@@ -588,7 +588,7 @@ app.post('/users/:userid/workspace', passport.authenticate('basic', { session: f
       ], 
       res,
       function(){
-        User.addNetworkToUserWorkspace(userid, networkid, function(data){
+        User.addNetworkToUserWorkSurface(userid, networkid, function(data){
             var status = data.status || 200;
           if(status && status == 200){
           }
@@ -603,13 +603,13 @@ app.post('/users/:userid/workspace', passport.authenticate('basic', { session: f
   // now catch random errors
   }
   catch (e){
-          console.log('error in handler for addNetworkToUserWorkspace : ' + e); 
-          res.send(500, {error : 'error in handler for addNetworkToUserWorkspace : ' + e}); 
+          console.log('error in handler for addNetworkToUserWorkSurface : ' + e); 
+          res.send(500, {error : 'error in handler for addNetworkToUserWorkSurface : ' + e}); 
   }
 }); // close handler
 
-// Delete a network from the user's workspace. Requester must be user or have admin permissions
-app.delete('/users/:userid/workspace/:networkid', passport.authenticate('basic', { session: false }) , function(req, res) {
+// Delete a network from the user's WorkSurface. Requester must be user or have admin permissions
+app.delete('/users/:userid/worksurface/:networkid', passport.authenticate('basic', { session: false }) , function(req, res) {
   try {
     var userid = req.params['userid'];
     if(!common.checkJID(userid)) res.send(400, { error: 'bad JID : ' + userid});
@@ -624,7 +624,7 @@ app.delete('/users/:userid/workspace/:networkid', passport.authenticate('basic',
       ], 
       res,
       function(){
-        User.deleteNetworkFromUserWorkspace(userid, networkid, function(data){
+        User.deleteNetworkFromUserWorkSurface(userid, networkid, function(data){
             var status = data.status || 200;
           if(status && status == 200){
           }
@@ -639,8 +639,8 @@ app.delete('/users/:userid/workspace/:networkid', passport.authenticate('basic',
   // now catch random errors
   }
   catch (e){
-          console.log('error in handler for deleteNetworkFromUserWorkspace : ' + e); 
-          res.send(500, {error : 'error in handler for deleteNetworkFromUserWorkspace : ' + e}); 
+          console.log('error in handler for deleteNetworkFromUserWorkSurface : ' + e); 
+          res.send(500, {error : 'error in handler for deleteNetworkFromUserWorkSurface : ' + e}); 
   }
 }); // close handler
 

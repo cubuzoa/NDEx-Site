@@ -168,24 +168,24 @@ exports.User = [
 					"401 Requester not authorized"]
 	},
 
-	{	fn : "getUserWorkspace",
+	{	fn : "getUserWorkSurface",
 		status : "active",
 		//requiresAuthentication : true,
-		doc : "Get the user's workspace. Requester must be user or have admin permissions.",
+		doc : "Get the user's WorkSurface. Requester must be user or have admin permissions.",
 		method : "GET",
-		route : "/users/:userid/workspace",
+		route : "/users/:userid/worksurface",
         routeParams: {userid : {doc : "user id", type : "JID", class : "xUser"}},
 		response: {user : "user descriptor"},
 		exceptions: ["404 unknown user id",
 					"401 Requester not authorized"]
 	},
 
-	{	fn : "addNetworkToUserWorkspace",
+	{	fn : "addNetworkToUserWorkSurface",
 		status : "active",
 		//requiresAuthentication : true,
-		doc : "Add a network to the user's workspace. Requester must be user or have admin permissions. User must have permission to access network",
+		doc : "Add a network to the user's WorkSurface. Requester must be user or have admin permissions. User must have permission to access network",
 		method : "POST",
-		route : "/users/:userid/workspace",
+		route : "/users/:userid/worksurface",
         routeParams: {userid : {doc : "user id", type : "JID", class : "xUser"}},
 		postData: {
 				networkid : {	doc : "user id", type : "JID", required : true, class : "xNetwork"},
@@ -195,12 +195,12 @@ exports.User = [
 					"401 Requester not authorized"]
 	},
 
-	{	fn : "deleteNetworkFromUserWorkspace",
+	{	fn : "deleteNetworkFromUserWorkSurface",
 		status : "active",
 		//requiresAuthentication : true,
-		doc : "Delete a network from the user's workspace. Requester must be user or have admin permissions",
+		doc : "Delete a network from the user's WorkSurface. Requester must be user or have admin permissions",
 		method : "DELETE",
-		route : "/users/:userid/workspace/:networkid",
+		route : "/users/:userid/worksurface/:networkid",
 		routeParams: {	
 				userid : { doc : "user id", type : "JID", class : "xUser"},
 				networkid : { doc : "network id", type : "JID", class : "xNetwork"}

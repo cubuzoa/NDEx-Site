@@ -190,23 +190,23 @@
     }
 
 
-// Get the user's workspace. Requester must be user or have admin permissions.
-    exports.getUserWorkspace = function(userid, callback, errorHandler){
-        var mergedRoute = '/users/' + encodeURIComponent(userid) + '/workspace';
+// Get the user's WorkSurface. Requester must be user or have admin permissions.
+    exports.getUserWorkSurface = function(userid, callback, errorHandler){
+        var mergedRoute = '/users/' + encodeURIComponent(userid) + '/worksurface';
         exports.ndexGet(mergedRoute, {},callback, errorHandler);
     }
 
 
-// Add a network to the user's workspace. Requester must be user or have admin permissions. User must have permission to access network
-    exports.addNetworkToUserWorkspace = function(userid, networkid, callback, errorHandler){
-        var mergedRoute = '/users/' + encodeURIComponent(userid) + '/workspace';
+// Add a network to the user's WorkSurface. Requester must be user or have admin permissions. User must have permission to access network
+    exports.addNetworkToUserWorkSurface = function(userid, networkid, callback, errorHandler){
+        var mergedRoute = '/users/' + encodeURIComponent(userid) + '/worksurface';
         exports.ndexPost(mergedRoute, {networkid: networkid}, callback, errorHandler);
     }
 
 
-// Delete a network from the user's workspace. Requester must be user or have admin permissions
-    exports.deleteNetworkFromUserWorkspace = function(userid, networkid, callback, errorHandler){
-        var mergedRoute = '/users/' + encodeURIComponent(userid) + '/workspace/' + encodeURIComponent(networkid) + '';
+// Delete a network from the user's WorkSurface. Requester must be user or have admin permissions
+    exports.deleteNetworkFromUserWorkSurface = function(userid, networkid, callback, errorHandler){
+        var mergedRoute = '/users/' + encodeURIComponent(userid) + '/worksurface/' + encodeURIComponent(networkid) + '';
         exports.ndexDelete(mergedRoute, callback, errorHandler);
     }
 
