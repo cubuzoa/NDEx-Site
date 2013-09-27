@@ -228,10 +228,11 @@ app.get('/editProfile', function(req, res) {
   			});
 });
 
-app.get('/editGroupProfile', function(req, res) {
+app.get('/editGroupProfile/:groupId', function(req, res) {
   res.render('edit_group_profile', 
   			{	title: "Edit Group Profile", 
-  				user: req.user 
+  				user: req.user,
+                groupId: req.params['groupId']
   			});
 });
 

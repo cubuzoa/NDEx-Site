@@ -352,7 +352,7 @@
                     // if successful
                     if (data.networks) {
                         updateWorkSurface(data.networks);
-                        exports.updateWorkSurfaceButton(networkId);
+                        exports.updateNetworkWorkSurfaceButton(networkId);
                     }
 
                 },
@@ -393,7 +393,7 @@
                 if (data.networks) {
                     updateWorkSurface(data.networks);
                     // also update the network display item
-                    exports.updateWorkSurfaceButton(networkId);
+                    exports.updateNetworkWorkSurfaceButton(networkId);
                 }
             },
             function (error){
@@ -406,11 +406,13 @@
 
     var updateWorkSurface = function(workSurfaceNetworks){
 
-        // Clear the networkElements
-        $.each($('#workSurface').children, function(index, element){
-            $('#workSurface').removeChild(element);
+        // Clear the networkElements  (need specific class assignment...)
+        $('.thumbnails').remove();
+        /*
+        $('#workSurface').children().each(function(index, element){
+            $('#workSurface').remove('.thumbnail');
         });
-
+        */
         // create a new networkElement for each workSurfaceNetwork
         $.each(workSurfaceNetworks, function(index, network){
             $('#workSurface').append(createWorkSurfaceNetworkElement(network));

@@ -2,6 +2,78 @@
 <% include nav.ejs %>
 
 <h1>Edit Group Profile</h1>
-<p>in progress </p>
+<% include head.ejs %>
+<% include nav.ejs %>
 
-<% include foot.ejs %>
+<div class=''>
+	<hr>
+	<form name="Edit Group Profile" id="editGroupProfileForm">
+		<div class="control-group">
+				<label class="control-label" for="inputWebsite">Associated Website</label>
+				<div class="controls">
+					<input  type="text" id="inputWebsite" name="website"></div></div>
+		<div class="control-group">
+				<label class="control-label" for="inputDescription">Description</label>
+				<div class="controls">
+					<textarea rows="3" id="inputDescription" name="description" placeholder="A brief description of your group (i.e., mission statement, purpose, etc.)"></textarea></div></div>
+		<input type="submit" value="Submit">
+	</form>
+
+</div>
+
+<!--
+
+		<div class="control-group">
+				<label class="control-label" for="inputForegroundImg">Profile Picture</label>
+				<div class="controls">
+					<input  type="file" id="inputForegroundImg" name="foregroundImg"></div></div>
+		<div class="control-group">
+				<label class="control-label" for="inputBackgroundImg">Cover Photo</label>
+				<div class="controls">
+					<input  type="file" id="inputBackgroundImg" name="backgroundImg"></div></div>
+		<hr>
+-->
+
+<script>
+// the group id passed from the ejs template
+var groupId = '<%= groupId %>';
+
+/* attach a submit handler to the form */
+$('#updateGroupProfileForm').submit(function(event) {
+
+    event.preventDefault();  // stop form from submitting normally
+    // $('#inputGroupName').val()
+
+	ndexClient.updateGroupProfile = function(groupId, profile,
+		    function(data) {
+    	        //
+    	        // Success: redirect to view the group
+    	        //
+    			window.location = "/viewGroup/" + groupId;
+    		},
+    		function(error) {
+    		    //
+    		    // Failure: display message
+    		    //
+    			if(error.status == 401) {
+    				$('#message').html('Invalid username and password');
+    				if(typeof(Storage)!=="undefined") {
+    			  		localStorage.ndexUsername = '';
+    			  		localStorage.ndexPassword = '';
+    					localStorage.ndexJid = '';
+    				}
+    				$('#loginForm').submit();
+    			}
+    			//console.log(JSON.stringify(error));
+    		});
+});
+
+// Get the group profile information and populate the profile edit fields
+
+// exports.updateGroupProfile = function(groupid, profile, callback, errorHandler){
+
+
+</script>
+
+<% include foot.ejs%>
+

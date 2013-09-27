@@ -1,30 +1,17 @@
 <% include head.ejs %>
 <% include nav.ejs %>
 
+<h1>New Group</h1>
+
 <div class=''>
-	<h3>Create a Group</h3>
-	<hr>
-	<form  class="form-horizontal" action="" method="post" enctype="multiipart/form-data">
+	<form name="Create Group" id="createGroupForm">
 		<div class="control-group">
 				<label class="control-label" for="inputGroupName">Group Name</label>
 				<div class="controls">
-					<input  type="text" id="inputGroupName" name="groupName"></div></div>
-		<div class="control-group">
-				<label class="control-label" for="inputWebsite">Associated Website</label>
-				<div class="controls">
-					<input  type="text" id="inputWebsite" name="website"></div></div>
-		<div class="control-group">
-				<label class="control-label" for="inputDescription">Description</label>
-				<div class="controls">
-					<textarea rows="3" id="inputDescription" name="description" placeholder="A brief description of your group (i.e., mission statement, purpose, etc.)"></textarea></div></div>
-		<div class="control-group">
-				<label class="control-label" for="inputForegroundImg">Profile Picture</label>
-				<div class="controls">
-					<input  type="file" id="inputForegroundImg" name="foregroundImg"></div></div>
-		<div class="control-group">
-				<label class="control-label" for="inputBackgroundImg">Cover Photo</label>
-				<div class="controls">
-					<input  type="file" id="inputBackgroundImg" name="backgroundImg"></div></div>
+					<input  type="text" id="inputGroupName" name="groupName">
+				</div>
+		</div>
+
 		<hr>
 		<input type="submit" value="Submit">
 	</form>
@@ -33,9 +20,37 @@
 
 
 <script>
-//TODO
-//create a function to use the client API call, 
-//maybe use node module to validate group input fields
+/* attach a submit handler to the form */
+$('#createGroupForm').submit(function(event) {
+
+    event.preventDefault();  // stop form from submitting normally
+
+	ndexClient.createGroup = function(ndexUI.user.id, $('#inputGroupName').val(),
+		    function(data) {
+    	        //
+    	        // Success: redirect to edit the profile of the new group
+    	        //
+    			window.location = "/editGroupProfile/" + data.jid
+    			} else {
+                    alert("Local storage not available, can't store login information");
+    			}
+    		},
+    		function(error) {
+    		    //
+    		    // Failure: display message
+    		    //
+    			if(error.status == 401) {
+    				$('#message').html('Invalid username and password');
+    				if(typeof(Storage)!=="undefined") {
+    			  		localStorage.ndexUsername = '';
+    			  		localStorage.ndexPassword = '';
+    					localStorage.ndexJid = '';
+    				}
+    				$('#loginForm').submit();
+    			}
+    			//console.log(JSON.stringify(error));
+    		});
+});
 
 
 </script>
