@@ -163,7 +163,7 @@
 
 
 // Set a new foreground image for user. Requester must be user or have admin permissions.
-    exports.uploadUserImage = function(userid, type, callback, errorHandler){
+    exports.uploadAccountImage = function(userid, type, callback, errorHandler){
         var mergedRoute = '/users/' + encodeURIComponent(userid) + '/images';
         exports.ndexPost(mergedRoute, {type: type}, callback, errorHandler);
     }
@@ -232,6 +232,13 @@
     }
 
 
+// Delete an Agent by Agent id. Requester must be agent owner, owner of group owning agent, or have admin permissions.
+    exports.deleteAgent = function(agentid, callback, errorHandler){
+        var mergedRoute = '/agents/' + encodeURIComponent(agentid) + '';
+        exports.ndexDelete(mergedRoute, callback, errorHandler);
+    }
+
+
 // Add a group account
     exports.createGroup = function(userid, groupName, callback, errorHandler){
         var mergedRoute = '/groups';
@@ -281,7 +288,7 @@
     }
 
 
-// toAccount creates a request to fromAccount.
+// toAccount creates a request to fromAccount. Requests mediate communication between accounts.  The current use cases are request/invitation to add a user to a group and request/grant of authorization for access to a network.  Actions happen when the recipient of the request processes the request.
     exports.createRequest = function(toid, fromid, requestType, message, aboutid, callback, errorHandler){
         var mergedRoute = '/requests';
         exports.ndexPost(mergedRoute, {toid: toid, fromid: fromid, requestType: requestType, message: message, aboutid: aboutid}, callback, errorHandler);
@@ -302,7 +309,7 @@
     }
 
 
-// find requests that were made by the user or can be processed by the user
+// Find requests that were made by the user or can be processed by the user
     exports.findRequests = function(userid, callback, errorHandler){
         var mergedRoute = '/users/' + encodeURIComponent(userid) + '/requests';
         exports.ndexGet(mergedRoute, {},callback, errorHandler);

@@ -2,7 +2,7 @@
 <% include nav.ejs %>
 
 <h1>New Group</h1>
-
+<p id ="message"></p>
 <div class=''>
 	<form name="Create Group" id="createGroupForm">
 		<div class="control-group">
@@ -25,30 +25,20 @@ $('#createGroupForm').submit(function(event) {
 
     event.preventDefault();  // stop form from submitting normally
 
-	ndexClient.createGroup = function(ndexUI.user.id, $('#inputGroupName').val(),
+    var groupName =  $('#inputGroupName').val();
+
+	ndexClient.createGroup(ndexUI.user.id, groupName,
 		    function(data) {
     	        //
     	        // Success: redirect to edit the profile of the new group
     	        //
-    			window.location = "/editGroupProfile/" + data.jid
-    			} else {
-                    alert("Local storage not available, can't store login information");
-    			}
+    			window.location = "/editGroupProfile/" + data.jid;
     		},
     		function(error) {
     		    //
     		    // Failure: display message
     		    //
-    			if(error.status == 401) {
-    				$('#message').html('Invalid username and password');
-    				if(typeof(Storage)!=="undefined") {
-    			  		localStorage.ndexUsername = '';
-    			  		localStorage.ndexPassword = '';
-    					localStorage.ndexJid = '';
-    				}
-    				$('#loginForm').submit();
-    			}
-    			//console.log(JSON.stringify(error));
+    			$('#message').html(JSON.stringify(error));
     		});
 });
 

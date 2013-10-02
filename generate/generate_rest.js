@@ -89,12 +89,12 @@ for (n in specs.resourceTypes){
 			}
 
 			for (n in spec.files){
-				arguments.push(n + "_path");
-				argumentLines.push("    var file_" + n + " = req.files['" + n + "'];");
+                var fileArg = "file_" + n;
+				arguments.push(fileArg);
+				argumentLines.push("    var " + fileArg + " = req.files['" + n + "'];");
 				if(spec.maxsize){
-					argumentLines.push("     if (file_" + n + ".size > " + spec.maxsize + "){res.send(400, { error: 'file size too large, max allowed = " + spec.maxsize + "' });");
-				}		
-				argumentLines.push("    var " + n + "_path = file_" + n + ".path;");
+					argumentLines.push("     if (" + fileArg + ".size > " + spec.maxsize + "){res.send(400, { error: 'file size too large, max allowed = " + spec.maxsize + "' });");
+				}
 			}
 						
 			var argumentString = "";

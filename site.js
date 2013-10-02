@@ -16,6 +16,8 @@ var serverConfig = {
 	port: 2424
 };
 
+var ndex_api_spec = require('./js/ndex_api_spec.js');
+
 var app = express();
 var port = 9999;
 
@@ -152,6 +154,19 @@ app.get('/about', function(req, res) {
   						user: req.user });
 });
 
+//-----------------------------------------------------------
+//
+//				View the API Specification for the REST Server
+//
+//-----------------------------------------------------------
+
+app.get('/api', function(req, res) {
+    res.render('api_spec', {
+            title: "NDEx API Specification",
+            user: req.user,
+            spec: ndex_api_spec
+    });
+});
 
 //-----------------------------------------------------------
 //

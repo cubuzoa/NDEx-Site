@@ -1,6 +1,6 @@
 <% include head.ejs %>
 <% include nav.ejs %>
-
+<h1>Find Users</h1>
 
 <div class="btn-group">
 	<form onsubmit="return doSearch();" id="searchForm">
@@ -67,10 +67,10 @@ function doSearch(offset) {
 		if (data.users){
 			$('#searchResults').append('Available Users');
 			$.each(data.users, function(index, item){
-				$('#searchResults').append(formatUserDescriptor(item));
+				$('#searchResults').append(ndexUI.formatUserDescriptor(item));
 			}); 
  			
-			$('#searchResults').append(createPaginationModule('2', offset, 'doSearch'));
+			$('#searchResults').append(ndexUI.createPaginationModule('2', offset, 'doSearch'));
   			//$('#searchPage').attr('placeholder', 'max value: ' + data.blockAmount);
 		}
     },

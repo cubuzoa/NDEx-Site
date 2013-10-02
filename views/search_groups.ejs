@@ -67,10 +67,10 @@ function doSearch(offset) {
 		if (data.groups){
 			$('#searchResults').append('Available Groups');
 			$.each(data.groups, function(index, item){
-				$('#searchResults').append(formatGroupDescriptor(item));
+				$('#searchResults').append(ndexUI.formatGroupDescriptor(item));
 			}); 
  			
-			$('#searchResults').append(createPaginationModule('2', offset, 'doSearch'));
+			$('#searchResults').append(ndexUI.createPaginationModule('2', offset, 'doSearch'));
   			//$('#searchPage').attr('placeholder', 'max value: ' + data.blockAmount);
 		}
     },

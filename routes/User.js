@@ -3,41 +3,6 @@ module.db = null;
 var common = require("./Common.js");
 var fs = require('fs');
 
-
-function uploadImg(path, destination, name, callback) {
-    //TODO read comments on here and where used
-    //add name check for filename to avoid overwrite, maybe include jid?
-    //fs.readFile and fs.writeFile may be replaced by fs.rename
-    var tempPath = path; //hardwired for now
-    var targetPath = destination + name + '.jpg';
-    var results = { name: name + '.jpg', filesize: ''};
-    fs.readFile('img/foreground/treyideker.jpg', function (err, data) {
-        // ...
-        if (err) {
-            callback(err);
-        } else {
-            fs.writeFile(targetPath, data, function (err) {
-                if (err) {
-                    callback(err);
-                } else {
-                    // delete the temporary file, so that the explicitly set temporary upload dir does not get filled with unwanted files
-                    fs.unlink(tempPath, function () {
-                        if (err) {
-                            callback(err);
-                        } else {
-                            fs.stat(targetPath, function (err, stats) {
-                                results.filesize = stats.size;
-                                console.log('File uploaded to: ' + targetPath + ' - ' + stats.size + ' bytes');
-                                callback(err, results);
-                            });
-                        }
-                    });
-                }
-            });
-        }
-    });
-}
-
 exports.init = function (orient, callback) {
     module.db = orient;
 };
@@ -316,130 +281,6 @@ exports.deleteNetworkFromUserWorkSurface = function (userRID, networkRID, callba
     });
 }
 
-/*
-exports.getUserWorkSurface = function (userRID, callback) {
-    console.log("calling getUserWorkSurface with userRID = '" + userRID + "'");
-
-    // TODO : check that requester has permission
-
-    var cmd = "select from xUser where @rid = " + userRID + "";
-    console.log(cmd);
-    //checking that user exists
-    module.db.command(cmd, function (err, users) {
-        if (common.checkErr(err, "finding user", callback)) {
-            if (!users || users.length < 1) {
-                console.log("found no users by id = '" + userRID + "'");
-                callback({status: 404});
-            } else {
-                //user exists
-                // when getting the worksurface networks,
-                // we return network descriptors back for each
-                // network ID found so the interface can display without further queries
-
-                var networkDescriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount";
-                var traverseExpression = "select flatten(out(xOwnsNetwork)) from " + userRID;
-                var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
-
-                console.log(networks_cmd);
-                module.db.command(networks_cmd, function (err, worksurface_networks) {
-                    if (common.checkErr(err, "getting user worksurface networks", callback)) {
-                        // process the worksurface_networks
-                        for (i in worksurface_networks) {
-                            var network = worksurface_networks[i];
-                            network.jid = common.convertFromRID(network.jid);
-                        }
-                    }
-                    callback({networks: worksurface_networks, error: err});
-                });
-            }
-        }
-    });
-}
-
-
-exports.addNetworkToUserWorkSurface = function (userRID, networkRID, callback) {
-    console.log("calling addNetworkToUserWorkSurface with userRID = '" + userRID + "' and networkRID = '" + networkRID + "'");
-
-    // TODO : check that requester has permission
-
-    module.db.command("select username, worksurface from " + userRID + " where @class = 'xUser'", function (err, results) {
-
-        if (common.checkErr(err, "checking user before adding to worksurface ", callback)) {
-            if (!results || results.length < 1) {
-                console.log("found no users by id = '" + userRID + "'");
-                callback({status: 404, error: "Found no user by id = '" + userRID + "'"});
-            } else {
-                var user_data = results[0];
-
-                if (user_data.worksurface && common.contains(user_data.worksurface, networkRID)) {
-                    // aborting, already contains this network
-                    callback({status: 400, error: "network " + networkRID + " already in user worksurface"});
-
-                } else {
-                    // Check that network exists
-                    module.db.command("select @rid as rid from " + networkRID + " where @class = 'xNetwork'", function (err, network_ids) {
-                        if (common.checkErr(err, "checking network before adding to worksurface ", callback)) {
-                            if (!network_ids || network_ids.length < 1) {
-                                callback({status: 404, error: "Found no network by id = '" + networkRID + "'"});
-                            } else {
-                                //
-                                // User and Network exist, do the update:
-                                var updateCmd = "update " + userRID + " add worksurface = " + networkRID;
-                                console.log(updateCmd);
-                                module.db.command(updateCmd, function (err, worksurface) {
-                                    if (common.checkErr(err, "adding network " + networkRID + " to worksurface of user " + userRID, callback)) {
-                                        callback({status: 200});
-                                    }
-                                });
-                            }
-
-                        }
-                    });
-
-                }
-            }
-
-        }
-    });
-
-}
-
-
-exports.deleteNetworkFromUserWorkSurface = function (userRID, networkRID, callback) {
-    console.log("calling deleteNetworkFromUserWorkSurface with userRID = '" + userRID + "' and networkRID = '" + networkRID + "'");
-
-    // TODO : check that user exists, that requester has permission
-
-    module.db.command("select username, worksurface from " + userRID + " where @class = 'xUser'", function (err, results) {
-        if (common.checkErr(err, "checking user before adding to worksurface ", callback)) {
-            if (!results || results.length < 1) {
-                console.log("found no users by id = '" + userRID + "'");
-                callback({status: 404, error: "Found no user by id = '" + userRID + "'"});
-            } else {
-                var user_data = results[0];
-
-                if (!user_data.worksurface || !common.contains(user_data.worksurface, networkRID)) {
-                    // aborting, does not contain this network
-                    callback({status: 404, error: "network " + networkRID + " not in user worksurface"});
-
-                } else {
-                    // User exists and networkRID is in the worksurface, do the update:
-                    var updateCmd = "update " + userRID + " remove worksurface = " + networkRID;
-                    console.log(updateCmd);
-                    module.db.command(updateCmd, function (err, worksurface) {
-                        if (common.checkErr(err, "removing network " + networkRID + " from worksurface of user " + userRID, callback)) {
-                            callback({status: 200});
-                        }
-                    });
-                }
-
-            }
-
-        }
-    });
-
-}
- */
 //
 // TODO: clean up links from user.
 // This is a hard problem since the user may be the owner of groups and networks
@@ -470,3 +311,46 @@ exports.deleteUser = function (userRID, callback) {
         }
     });
 };
+
+exports.uploadAccountImage = function(accountId, type, imageFile, callback) {
+    console.log('File uploaded to: ' + imageFile.path + ' - ' + imageFile.size + ' bytes');
+
+    // First, find accountName for accountId
+    var accountName;
+    module.db.loadRecord(accountId, function (err, account) {
+
+        if (common.checkErr(err, "finding account", callback)) {
+            try {
+                if (!account) {
+                    console.log("found no account by id = '" + accountId + "'");
+                    callback({status: 404});
+                } else {
+
+                    var profile = {};
+
+                    if (user["@class"] == "xUser") accountName = account.username;
+                    if (user["@class"] == "xGroup") accountName = account.groupname;
+                    if (!accountName)  callback({error: "account is neither a user or a group"});
+
+                    var storagePath = "./img/" + type + "/" + accountName + "." + imageFile.type;
+
+                    var results = { name: storagePath + '.jpg', filesize: ''};
+
+                    fs.rename(imageFile.path, storagePath, function(){
+                        fs.stat(storagePath, function (err, stats) {
+                            results.filesize = stats.size;
+                            console.log('File copied to: ' + storagePath + ' with storage size of ' + stats.size + ' bytes');
+                            callback(err, results);
+                        });
+                    });
+                }
+            }
+            catch (e) {
+                console.log("caught error " + e);
+                callback({user: null, error: e.toString(), status: 500});
+            }
+        }
+    });
+}
+
+

@@ -414,15 +414,15 @@ app.post('/users/:userid/images', passport.authenticate('basic', { session: fals
     if(!common.checkJID(userid)) res.send(400, { error: 'bad JID : ' + userid});
     userid = convertToRID(userid);
     var type = req.body['type'];
-    var file_image = req.files['image'];
-    var image_path = file_image.path;
+    var file_imageFile = req.files['imageFile'];
+    var imageFile_path = file_imageFile.path;
     common.ridCheck(
       [
             { rid: userid , objectClass: 'xUser'},
       ], 
       res,
       function(){
-        User.uploadUserImage(userid, type, image_path, function(data){
+        User.uploadAccountImage(userid, type, imageFile_path, function(data){
             var status = data.status || 200;
           if(status && status == 200){
           }
@@ -437,8 +437,8 @@ app.post('/users/:userid/images', passport.authenticate('basic', { session: fals
   // now catch random errors
   }
   catch (e){
-          console.log('error in handler for uploadUserImage : ' + e); 
-          res.send(500, {error : 'error in handler for uploadUserImage : ' + e}); 
+          console.log('error in handler for uploadAccountImage : ' + e); 
+          res.send(500, {error : 'error in handler for uploadAccountImage : ' + e}); 
   }
 }); // close handler
 
@@ -746,6 +746,38 @@ app.post('/agents/:agentid', passport.authenticate('basic', { session: false }) 
   }
 }); // close handler
 
+// Delete an Agent by Agent id. Requester must be agent owner, owner of group owning agent, or have admin permissions.
+app.delete('/agents/:agentid', passport.authenticate('basic', { session: false }) , function(req, res) {
+  try {
+    var agentid = req.params['agentid'];
+    if(!common.checkJID(agentid)) res.send(400, { error: 'bad JID : ' + agentid});
+    agentid = convertToRID(agentid);
+    common.ridCheck(
+      [
+            { rid: agentid , objectClass: 'xAgent'},
+      ], 
+      res,
+      function(){
+        Agent.deleteAgent(agentid, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          console.log('error in handler for deleteAgent : ' + e); 
+          res.send(500, {error : 'error in handler for deleteAgent : ' + e}); 
+  }
+}); // close handler
+
 // Add a group account
 app.post('/groups', passport.authenticate('basic', { session: false }) , function(req, res) {
   try {
@@ -984,7 +1016,7 @@ app.get('/groups/:groupid/members', passport.authenticate('basic', { session: fa
   }
 }); // close handler
 
-// toAccount creates a request to fromAccount.
+// toAccount creates a request to fromAccount. Requests mediate communication between accounts.  The current use cases are request/invitation to add a user to a group and request/grant of authorization for access to a network.  Actions happen when the recipient of the request processes the request.
 app.post('/requests', passport.authenticate('basic', { session: false }) , function(req, res) {
   try {
     var toid = req.body['toid'];
@@ -1092,7 +1124,7 @@ app.post('/requests/:requestid', passport.authenticate('basic', { session: false
   }
 }); // close handler
 
-// find requests that were made by the user or can be processed by the user
+// Find requests that were made by the user or can be processed by the user
 app.get('/users/:userid/requests', passport.authenticate('basic', { session: false }) , function(req, res) {
   try {
     var userid = req.params['userid'];

@@ -99,3 +99,4 @@ exports.checkJID = function(jid){
 	}
 	return false;
 };
+

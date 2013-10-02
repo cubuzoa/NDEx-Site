@@ -72,6 +72,7 @@ exports.createGroup = function(userRID, groupname, callback){
 
 
 exports.updateGroupProfile = function(groupRID, profile, callback){
+    console.log("calling updateGroupProfile for group " + groupRID + " with " + JSON.stringify(profile));
 	var profileStrings = [
 			"organizationName = '" + profile.organizationName + "'",
 			"website = '" + profile.website + "'",

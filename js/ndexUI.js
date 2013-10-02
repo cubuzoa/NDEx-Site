@@ -902,26 +902,26 @@
     };
 
     exports.addElements = function(item, index) {
-        var header = document.getElementById('name'),
-            link = document.getElementById('link'),
-            descrip = document.getElementById('descrip');
+        var userFullName = document.getElementById('userFullName'),
+            userWebsite = document.getElementById('userWebsite'),
+            userDescription = document.getElementById('userDescription');
 
         if ((index == "firstName") || (index == "lastName")) {
-            $(header).append(item + ' ');
+            $(userFullName).append(item + ' ');
         }
 
         if (index == "organizationName") {
-            $(header).append(item + ' ');
+            $(userFullName).append(item + ' ');
         }
 
         if (index == "website") {
-            $(link).attr('href', 'http://www.triptychjs.com')
+            $(userWebsite).attr('href', "http://" + item)
                 .attr('target', '_blank')
-                .append('website');
+                .append("website: " + item);
         }
 
         if (index == "description") {
-            $(descrip).append(item);
+            $(userDescription).append(item);
         }
 
 

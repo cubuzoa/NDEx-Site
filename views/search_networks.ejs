@@ -82,39 +82,22 @@ function doSearch(offset) {
 
             if (data.networks){
                 $.each(data.networks, function(index, item){
-                    $('#searchResults').append(formatNetworkDescriptor(item));
+                    $('#searchResults').append(ndexUI.formatNetworkDescriptor(item));
                 });
 
-                $('#searchResults').append(createPaginationModule(data.blockAmount, offset, 'doSearch'));
+                $('#searchResults').append(ndexUI.createPaginationModule(data.blockAmount, offset, 'doSearch'));
                 $('#searchPage').attr('placeholder', 'max value: ' + data.blockAmount);
             }
         },
 
         function(error){     // error handler
-            $('#searchResults').append(formatError(error));
+            $('#searchResults').append(ndexUI.formatError(error));
         });
     
     return false;
 }
 
-function updateWorkspaceTools(jid){
-//this is not in ndexUI.js because viewNetwork has a different version
-	var tempLink = document.getElementById('link'+jid),
-		tempIcon = document.getElementById('icon'+jid);
 
-	isOnWorkspace(jid, function(found) {
-		if (found) {
-			$(tempLink).attr('onclick','removeFromWorkspace(this)');//
-			$(tempIcon).attr('title','Remove from Workspace');
-			tempIcon.className='icon-remove';
-		}
-		else{
-			$(tempLink).attr('onclick','addToWorkspace(this)');
-			$(tempIcon).attr('title','Add to Workspace');
-			tempIcon.className='icon-plus icon-white';
-		}
-	});
-}
 
 </script>
 

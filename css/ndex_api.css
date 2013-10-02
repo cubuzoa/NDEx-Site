@@ -1,0 +1,28 @@
+.api_fn {
+    text-align:left;
+    font-size: 18px;
+    background-color:lightblue;
+    padding:5px;
+
+}
+
+.api_label {
+    text-align:right;
+    vertical-align:top;
+    padding:5px;
+    width:50px;
+
+}
+
+.api_value {
+    text-align:left;
+    vertical-align:top;
+    padding:5px;
+    width:450px;
+}
+
+table, th, td
+{
+    border: 1px solid black;
+    width:500;
+}

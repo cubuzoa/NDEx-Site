@@ -90,7 +90,7 @@ exports.User = [
 							oneOf: ["foreground", "background"]}
 				},
 		files: {
-				image : { doc : "image uploaded by user", filetypes : ["jpg", "gif", "png"], maxsize : 2000000}
+				imageFile : { doc : "image uploaded by user", filetypes : ["jpg", "gif", "png"], maxsize : 2000000}
 				},
 		response: {
 			},
@@ -343,8 +343,20 @@ exports.Agent = [
 		exceptions: [
 				"401 Requester not authorized",
 				"404 unknown Agent"]
-	}		
+	},
 
+    {	fn : "deleteAgent",
+        status : "active",
+        doc : "Delete an Agent by Agent id. Requester must be agent owner, owner of group owning agent, or have admin permissions.",
+        method : "DELETE",
+        route : "/agents/:agentid",
+        routeParams: {
+            agentid : { doc : "agent id", type : "JID", class : "xAgent"}
+        },
+        response: {},
+        exceptions: ["404 unknown agent id",
+            "401 Requester not authorized"]
+    }
 ];
 
 exports.Group = [
@@ -490,13 +502,11 @@ exports.Group = [
 				"400 invalid search expression", 
 				"400 invalid limit", 
 				"400 invalid offset"]
-	},		
-
-// Should this be a PUT specific to status instead?
+	},
 
 	{	fn : "updateGroupMember",
 		status : "inactive",
-		doc : "Update a User's membership in a group",
+		doc : "Update a User's membership in a Group, setting User as active or inactive member",
 		method : "POST",
 		route : "/groups/:groupid/members/:userid",
 		routeParams: {	
@@ -532,9 +542,7 @@ exports.Group = [
 				"400 unknown user",
 				"400 unknown group",
 				"401 Requester not authorized - must be group owner or member"]
-	},
-
-// TODO Group Ownership Permissions
+	}
 	
 ];
 
@@ -543,7 +551,7 @@ exports.Request = [
 
 	{	fn : "createRequest",
 		status : "active",
-		doc : "toAccount creates a request to fromAccount.",
+		doc : "toAccount creates a request to fromAccount. Requests mediate communication between accounts.  The current use cases are request/invitation to add a user to a group and request/grant of authorization for access to a network.  Actions happen when the recipient of the request processes the request.",
 		method : "POST",
 		route : "/requests",
 		postData: {	
@@ -598,7 +606,7 @@ exports.Request = [
 	
 	{	fn : "findRequests",
 		status : "active",
-		doc : "find requests that were made by the user or can be processed by the user",
+		doc : "Find requests that were made by the user or can be processed by the user",
 		method : "GET",
 		route : "/users/:userid/requests",
 		routeParams: {	
@@ -610,7 +618,7 @@ exports.Request = [
 		exceptions: [
 				"404 unknown request",
 				"401 Requester not authorized - requester must match account or be account owner"]
-	},	
+	}
 		
 ];			
 
@@ -804,10 +812,16 @@ exports.Network = [
 				networkid : { doc : "id of the network", type: "JID"}
 				},
 		postData: {	
-				accountid : { 	doc : "permitted account",
-							  	type : "JID",
-							  	required : true}, 
-					},
+			accountid : {
+                            doc : "permitted account",
+							type : "JID",
+							required : true},
+            permissionType : {
+                            doc : "permission granted: view, edit, own",
+                            type : "string",
+                            default : "view",
+                            required : true}
+        },
 		response: { },
 		exceptions: [
 				"404 unknown network",
