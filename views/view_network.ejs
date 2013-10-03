@@ -88,16 +88,20 @@ function formatEdge(edge, network){
 		predicate = network.terms[edge.p]; 
 		
 	console.log(subject.represents + " : " + JSON.stringify(network.terms[subject.represents]));
-	if (subject.represents && network.terms[subject.represents]){
+	if (subject.represents && network.terms[subject.represents] && network.terms[subject.represents].name){
 		var term = network.terms[subject.represents];
 		$(subjectSpan).addClass('term').html(term.name + ' ');
-	}
+	} else {
+        $(subjectSpan).addClass('term').html(subject.name + ' ');
+    }
 	
 	console.log(object.represents + " : " + JSON.stringify(network.terms[object.represents]));
-	if (object.represents && network.terms[object.represents]){
+	if (object.represents && network.terms[object.represents] && network.terms[object.represents].name){
 		var term = network.terms[object.represents];
 		$(objectSpan).addClass('term').html(' ' + term.name);
-	}
+	}  else {
+        $(subjectSpan).addClass('term').html(object.name + ' ');
+    }
 
 	$(idSpan).addClass('edgeId').html(edge.id);
 	//$(subjectSpan).addClass('nodeName').html(subject.name);
@@ -130,12 +134,15 @@ function formatNode(node, network){
 			  //.append(nameSpan);
 
 	console.log(node.represents + " : " + JSON.stringify(network.terms[node.represents]));
-	if (node.represents && network.terms[node.represents]){
+	if (node.represents && network.terms[node.represents] && network.terms[node.represents].name){
 		var term = network.terms[node.represents],
 			representsSpan = document.createElement('span');
 		$(representsSpan).addClass('term').html(term.name);
 		$(nodeDIV).append(representsSpan);
-	}
+	}    else {
+        $(representsSpan).addClass('term').html(node.name);
+        $(nodeDIV).append(representsSpan);
+    }
 	
 	return nodeDIV;
 

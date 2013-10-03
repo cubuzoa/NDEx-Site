@@ -16,7 +16,7 @@ TRIPTYCH.JDExGraphLoader.prototype.load = function(jdex){
 	
 		node = new TRIPTYCH.Node(index);
 		//node.type = type || "unknown";
-		if (jNode.represents && jdex.terms[jNode.represents]){
+		if (jNode.represents && jdex.terms[jNode.represents] && jdex.terms[jNode.represents].name){
 			var term = jdex.terms[jNode.represents];
 			node.label = term.name;
 		} else {
