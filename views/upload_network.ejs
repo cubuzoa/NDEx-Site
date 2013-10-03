@@ -1,195 +1,71 @@
 <% include head.ejs %>
 <% include nav.ejs %>
+<h1>Upload Network</h1>
 
 <div class="" id="holder">
-	<h3>Upload Network</h3>
-	<hr>
-	<form  class="form-horizontal" action="" method="post" enctype="multiipart/form-data" id="groupForm">
-		<div class="row-fluid">
-			<div class="btn-group span2">
-				<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-					<span id="type">File Type</span>
-					<span class="caret"></span>
-				</a>
-				<ul class="dropdown-menu" role="menu" arai-labelledby="dropdownMenu">
-					<li><a tabindex="-1" onclick="addForm(this)" title="openbel-document">OpenBEL Document </a></li>
-					<li><a tabindex="-1" onclick="addForm(this)" title="xgmml">XGMML </a></li>
-					<li><a tabindex="-1" onclick="addForm(this)" title="sif">SIF </a></li>
-				</ul>
-			</div>
-			<div class="span3">
-					<input type="file" id="fname" name="network" size="40">
-			</div>
-		</div>
-	
-	</form>
-	
-	
-	
+    <hr>
+    <form class="form-horizontal" action="" method="post" enctype="multiipart/form-data" id="networkUploadForm">
+        <div class="row-fluid">
+            <!--
+                        <div class="btn-group span2">
+                            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                                <span id="type">File Type</span>
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu" arai-labelledby="dropdownMenu">
+                                <li><a tabindex="-1" onclick="addForm(this)" title="openbel-document">OpenBEL Document </a></li>
+                                <li><a tabindex="-1" onclick="addForm(this)" title="sif">SIF </a></li>
+                            </ul>
+                        </div>
+            -->
+            <div class="span3">
+                <input type="file" id="fileForUpload" name="network" size="40">
+            </div>
+
+        </div>
+        <div class="row-fluid">
+            <div class="span3">
+                <input type="submit" value="Submit">
+            </div>
+        </div>
+    </form>
 </div>
 
-<div style="display:none" id="sif"><hr>
-				
-	<div class="control-group">
-		<label class="control-label" for="inputTitle">Title</label>
-		<div class="controls">
-			<input  type="text" id="inputTitle" name="title"></div></div>
-	<div class="control-group">
-		<label class="control-label" for="inputCreator">Creator</label>
-		<div class="controls">
-			<input  type="text" id="inputCreator" name="creator" ></div></div>
-	<div class="control-group">
-		<label class="control-label" for="inputSubject">Subject</label>
-		<div class="controls">
-			<input  type="text" id="inputSubject" name="subject"></div></div>
-	<div class="control-group">
-		<label class="control-label" for="inputDescription">Description</label>
-		<div class="controls">
-			<textarea rows="3" id="inputDescription" name="description"></textarea></div></div>
-	<div class="control-group">
-		<label class="control-label" for="inputPublisher">Publisher</label>
-		<div class="controls">
-			<input  type="text" id="inputPublisher" name="publisher"></div></div>
-	<div class="control-group">
-		<label class="control-label" for="inputContributor">Contributor</label>
-		<div class="controls">
-			<input  type="text" id="inputContributor" name="contributor"></div></div>
-	<div class="control-group">
-		<label class="control-label" for="inputDate">Date</label>
-		<div class="controls" id="inputDate">
-			<input type="text" name="day" class='day' placeholder="Day">
-			<select name="month" class='month'>
-				<option value="">Month</option>
-				<option value="january">January</option>
-				<option value="february">February</option>
-				<option value="march">March</option>
-				<option value="april">April</option>
-				<option value="may">May</option>
-				<option value="june">June</option>
-				<option value="july">July</option>
-				<option value="august">August</option>
-				<option value="september">September</option>
-				<option value="october">October</option>
-				<option value="november">November</option>
-				<option value="december">December</option>
-			</select>
-			<input type="text" name="year" class='year' placeholder="Year"></div></div>
-	<div class="control-group">
-		<label class="control-label" for="inputType">Type</label>
-		<div class="controls">
-			<input  type="text" id="inputType" name="type"></div></div>			
-	<div class="control-group">
-		<label class="control-label" for="inputFormat">Format</label>
-		<div class="controls">
-			<input  type="text" id="inputFormat" name="format"></div></div>
-	<div class="control-group">
-		<label class="control-label" for="inputIdentifer">Identifier</label>
-		<div class="controls">
-			<input  type="text" id="inputIdentifier" name="identifier"></div></div>
-	<div class="control-group">
-		<label class="control-label" for="inputSource">Source</label>
-		<div class="controls">
-			<input  type="text" id="inputSource" name="source"></div></div>
-	<div class="control-group">
-		<label class="control-label" for="inputLanguage">Language</label>
-		<div class="controls">
-			<input  type="text" id="inputLanguage" name="language"></div></div>
-	<div class="control-group">
-		<label class="control-label" for="inputRelation">Relation</label>
-		<div class="controls">
-			<input  type="text" id="inputRelation" name="relation"></div></div>	
-	<div class="control-group">
-		<label class="control-label" for="inputCoverage">Coverage</label>
-		<div class="controls">
-			<input  type="text" id="inputCoverage" name="coverage"></div></div>
-	<div class="control-group">
-		<label class="control-label" for="inputRights">Rights</label>
-		<div class="controls">
-			<input  type="text" id="inputRights" name="rights"></div></div>
-		<hr>
-	<input type="submit" value="Submit">	
-</div>
-<div style="display:none" id="xgmml"><hr>
-			<input type="submit" value="Submit">
-</div>
-<div style="display:none" id="openbel-document"><hr>
-	<div class="control-group">
-		<label class="control-label" for="inputTitle">Title</label>
-		<div class="controls">
-			<input  type="text" id="inputTitle" name="title"></div></div>
-	<div class="control-group">
-		<label class="control-label" for="inputDescription">Description</label>
-		<div class="controls">
-			<textarea rows="3" id="inputDescription" name="description"></textarea></div></div>
-	<div class="control-group">
-		<label class="control-label" for="inputDate">Date</label>
-		<div class="controls" id="inputDate">
-			<input type="text" name="day" class='day' placeholder="Day">
-			<select name="month" class='month'>
-				<option value="">Month</option>
-				<option value="january">January</option>
-				<option value="february">February</option>
-				<option value="march">March</option>
-				<option value="april">April</option>
-				<option value="may">May</option>
-				<option value="june">June</option>
-				<option value="july">July</option>
-				<option value="august">August</option>
-				<option value="september">September</option>
-				<option value="october">October</option>
-				<option value="november">November</option>
-				<option value="december">December</option>
-			</select>
-			<input type="text" name="year" class='year' placeholder="Year"></div></div>
-	<div class="control-group">
-		<label class="control-label" for="inputType">Type</label>
-		<div class="controls">
-			<input  type="text" id="inputType" name="type"></div></div>			
-	<div class="control-group">
-		<label class="control-label" for="inputFormat">Format</label>
-		<div class="controls">
-			<input  type="text" id="inputFormat" name="format"></div></div>
-	<div class="control-group">
-		<label class="control-label" for="inputIdentifer">Identifier</label>
-		<div class="controls">
-			<input  type="text" id="inputIdentifier" name="identifier"></div></div>
-	<div class="control-group">
-		<label class="control-label" for="inputSource">Source</label>
-		<div class="controls">
-			<input  type="text" id="inputSource" name="source"></div></div>	
-	<hr>
-	<input type="submit" value="Submit">
-</div>
 
 <script>
-	function addForm(type){
-		var ele = document.getElementById(type.title);
-		var formEle = document.getElementById('groupForm');
-		
-		var sif = document.getElementById('sif');
-		var xgmml = document.getElementById('xgmml');
-		var openBel = document.getElementById('openbel-document');
-		
-		if(sif.style.display == "block"){
-			$(document.getElementById('holder')).append(sif);
-			sif.style.display="none";
-		}
-		if(openBel.style.display == "block"){
-			$(document.getElementById('holder')).append(openBel);
-			openBel.style.display="none";
-		}
-		if(xgmml.style.display == "block"){
-			$(document.getElementById('holder')).append(xgmml);
-			xgmml.style.display="none";
-		}
-		
-		document.getElementById('type').innerHTML=type.title;
-		ele.style.display="block";
-		
-		$(formEle).append(ele);
-		
-	}
+    /* attach a submit handler to the form */
+    $('#networkUploadForm').submit(function (event) {
+        event.preventDefault();  // stop form from submitting normally
+        var data, file = document.getElementById("fileForUpload").files[0];
+        $('#message').html("Reading " + file.path);
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function (evt) {
 
+                data = JSON.parse(evt.target.result);
+                $('#message').html("Uploading " + file.path);
+                alert("ready to call create Network");
+                ndexClient.createNetwork(data, ndexUI.user.id,
+                        function (result) {
+                            //
+                            // Success: redirect to edit metadata for the new network
+                            //
+                            window.location = "/edit_network_metadata/" + result.jid;
+                        },
+                        function (error) {
+                            //
+                            // Failure: display message
+                            //
+                            $('#message').html(JSON.stringify(error));
+                        });
+
+            };
+            reader.onerror = function (evt) {
+                document.getElementById("message").innerHTML = "error reading file";
+            };
+            reader.readAsText(file, "UTF-8");
+        }
+    });
 
 
 </script>

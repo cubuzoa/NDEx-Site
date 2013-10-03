@@ -3,6 +3,249 @@
 
 <h1>Edit Network Metadata</h1>
 
-<p>in progress </p>
+<p id ="message"></p>
+<div class="" id="holder">
+    <div class="row-fluid">
+            <div class="span1">Format:</div>
+            <div class="span3" id="networkFormat"></div>
+     </div>
+</div>
 
-<% include foot.ejs %>
+<div class=''>
+    <hr>
+    <form name="Edit Network Metadata" id="updateNetworkMetadataForm">
+        <div class="control-group">
+            <div class="control-group">
+                <label class="control-label" for="inputTitle">Title</label>
+                <div class="controls">
+                    <textarea rows="3" id="inputTitle" name="Title" placeholder="the title of the network"></textarea></div></div>
+            <label class="control-label" for="inputSource">Source</label>
+            <div class="controls">
+                <input  type="text" id="inputSource" name="source"></div></div>
+        <div class="control-group">
+            <label class="control-label" for="inputDescription">Description</label>
+            <div class="controls">
+                <textarea rows="3" id="inputDescription" name="description" placeholder="a description of the network"></textarea></div></div>
+        <input type="submit" value="Submit">
+    </form>
+</div>
+
+
+<script>
+    // the group id passed from the ejs template
+    var networkId = '<%= networkId %>';
+
+    // update the form
+    console.log("calling getNetworkMetadata to initialize form");
+    $(ndexClient.getNetworkMetadata(networkId,
+            // success
+            function(data){
+                console.log("Got results from getNetworkMetadata");
+                console.log(data);
+                if (data.network.format){
+                    $('#networkFormat').html(data.network.format);
+                }
+                var properties = data.network.properties;
+                if (properties){
+                    if (properties.title) $('#inputTitle').val(properties.title);
+                    if (properties.description) $('#inputDescription').val(properties.description);
+                    if (properties.source) $('#inputSource').val(properties.source);
+                }
+
+            },
+            // error handler
+            function(error){
+                $('#error').append(ndexUI.formatError(error));
+            })
+    );
+
+
+    /* attach a submit handler to the form */
+    $('#updateNetworkMetadataForm').submit(function(event) {
+
+        event.preventDefault();  // stop form from submitting normally
+        var properties = {};
+
+        properties.title = $('#inputTitle').val();
+        properties.description = $('#inputDescription').val();
+        properties.source = $('#inputSource').val();
+
+        console.log("calling setNetworkMetadata");
+
+        ndexClient.setNetworkMetadata(networkId, {properties : properties},
+                function(data) {
+                    //
+                    // Success: redirect to view the network
+                    //
+                    console.log("success in setNetworkMetadata, redirecting");
+                    window.location = "/viewNetwork/" + networkId;
+                },
+                function(error) {
+                    //
+                    // Failure: display message
+                    //
+                    console.log("error in setNetworkMetadata");
+                    $('#message').html(JSON.stringify(error));
+                });
+    });
+
+    /*
+    function addForm(type){
+        var ele = document.getElementById(type.title);
+        var formEle = document.getElementById('groupForm');
+
+        var sif = document.getElementById('sif');
+        var openBel = document.getElementById('openbel-document');
+
+        if(sif.style.display == "block"){
+            $(document.getElementById('holder')).append(sif);
+            sif.style.display="none";
+        }
+        if(openBel.style.display == "block"){
+            $(document.getElementById('holder')).append(openBel);
+            openBel.style.display="none";
+        }
+
+        document.getElementById('type').innerHTML=type.title;
+        ele.style.display="block";
+
+        $(formEle).append(ele);
+
+    }
+    */
+</script>
+
+<!--
+
+<div style="display:none" id="sif"><hr>
+
+    <div class="control-group">
+        <label class="control-label" for="inputTitle">Title</label>
+        <div class="controls">
+            <input  type="text" id="inputTitle" name="title"></div></div>
+    <div class="control-group">
+        <label class="control-label" for="inputCreator">Creator</label>
+        <div class="controls">
+            <input  type="text" id="inputCreator" name="creator" ></div></div>
+    <div class="control-group">
+        <label class="control-label" for="inputSubject">Subject</label>
+        <div class="controls">
+            <input  type="text" id="inputSubject" name="subject"></div></div>
+    <div class="control-group">
+        <label class="control-label" for="inputDescription">Description</label>
+        <div class="controls">
+            <textarea rows="3" id="inputDescription" name="description"></textarea></div></div>
+    <div class="control-group">
+        <label class="control-label" for="inputPublisher">Publisher</label>
+        <div class="controls">
+            <input  type="text" id="inputPublisher" name="publisher"></div></div>
+    <div class="control-group">
+        <label class="control-label" for="inputContributor">Contributor</label>
+        <div class="controls">
+            <input  type="text" id="inputContributor" name="contributor"></div></div>
+    <div class="control-group">
+        <label class="control-label" for="inputDate">Date</label>
+        <div class="controls" id="inputDate">
+            <input type="text" name="day" class='day' placeholder="Day">
+            <select name="month" class='month'>
+                <option value="">Month</option>
+                <option value="january">January</option>
+                <option value="february">February</option>
+                <option value="march">March</option>
+                <option value="april">April</option>
+                <option value="may">May</option>
+                <option value="june">June</option>
+                <option value="july">July</option>
+                <option value="august">August</option>
+                <option value="september">September</option>
+                <option value="october">October</option>
+                <option value="november">November</option>
+                <option value="december">December</option>
+            </select>
+            <input type="text" name="year" class='year' placeholder="Year"></div></div>
+    <div class="control-group">
+        <label class="control-label" for="inputType">Type</label>
+        <div class="controls">
+            <input  type="text" id="inputType" name="type"></div></div>
+    <div class="control-group">
+        <label class="control-label" for="inputFormat">Format</label>
+        <div class="controls">
+            <input  type="text" id="inputFormat" name="format"></div></div>
+    <div class="control-group">
+        <label class="control-label" for="inputIdentifer">Identifier</label>
+        <div class="controls">
+            <input  type="text" id="inputIdentifier" name="identifier"></div></div>
+    <div class="control-group">
+        <label class="control-label" for="inputSource">Source</label>
+        <div class="controls">
+            <input  type="text" id="inputSource" name="source"></div></div>
+    <div class="control-group">
+        <label class="control-label" for="inputLanguage">Language</label>
+        <div class="controls">
+            <input  type="text" id="inputLanguage" name="language"></div></div>
+    <div class="control-group">
+        <label class="control-label" for="inputRelation">Relation</label>
+        <div class="controls">
+            <input  type="text" id="inputRelation" name="relation"></div></div>
+    <div class="control-group">
+        <label class="control-label" for="inputCoverage">Coverage</label>
+        <div class="controls">
+            <input  type="text" id="inputCoverage" name="coverage"></div></div>
+    <div class="control-group">
+        <label class="control-label" for="inputRights">Rights</label>
+        <div class="controls">
+            <input  type="text" id="inputRights" name="rights"></div></div>
+    <hr>
+    <input type="submit" value="Submit">
+</div>
+
+<div style="display:none" id="openbel-document"><hr>
+    <div class="control-group">
+        <label class="control-label" for="inputTitle">Title</label>
+        <div class="controls">
+            <input  type="text" id="inputTitle" name="title"></div></div>
+    <div class="control-group">
+        <label class="control-label" for="inputDescription">Description</label>
+        <div class="controls">
+            <textarea rows="3" id="inputDescription" name="description"></textarea></div></div>
+    <div class="control-group">
+        <label class="control-label" for="inputDate">Date</label>
+        <div class="controls" id="inputDate">
+            <input type="text" name="day" class='day' placeholder="Day">
+            <select name="month" class='month'>
+                <option value="">Month</option>
+                <option value="january">January</option>
+                <option value="february">February</option>
+                <option value="march">March</option>
+                <option value="april">April</option>
+                <option value="may">May</option>
+                <option value="june">June</option>
+                <option value="july">July</option>
+                <option value="august">August</option>
+                <option value="september">September</option>
+                <option value="october">October</option>
+                <option value="november">November</option>
+                <option value="december">December</option>
+            </select>
+            <input type="text" name="year" class='year' placeholder="Year"></div></div>
+    <div class="control-group">
+        <label class="control-label" for="inputType">Type</label>
+        <div class="controls">
+            <input  type="text" id="inputType" name="type"></div></div>
+    <div class="control-group">
+        <label class="control-label" for="inputFormat">Format</label>
+        <div class="controls">
+            <input  type="text" id="inputFormat" name="format"></div></div>
+    <div class="control-group">
+        <label class="control-label" for="inputIdentifer">Identifier</label>
+        <div class="controls">
+            <input  type="text" id="inputIdentifier" name="identifier"></div></div>
+    <div class="control-group">
+        <label class="control-label" for="inputSource">Source</label>
+        <div class="controls">
+            <input  type="text" id="inputSource" name="source"></div></div>
+    <hr>
+    <input type="submit" value="Submit">
+</div>
+-->
+<% include foot.ejs%>

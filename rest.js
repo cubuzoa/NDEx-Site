@@ -415,14 +415,13 @@ app.post('/users/:userid/images', passport.authenticate('basic', { session: fals
     userid = convertToRID(userid);
     var type = req.body['type'];
     var file_imageFile = req.files['imageFile'];
-    var imageFile_path = file_imageFile.path;
     common.ridCheck(
       [
             { rid: userid , objectClass: 'xUser'},
       ], 
       res,
       function(){
-        User.uploadAccountImage(userid, type, imageFile_path, function(data){
+        User.uploadUserImage(userid, type, file_imageFile, function(data){
             var status = data.status || 200;
           if(status && status == 200){
           }
@@ -437,8 +436,8 @@ app.post('/users/:userid/images', passport.authenticate('basic', { session: fals
   // now catch random errors
   }
   catch (e){
-          console.log('error in handler for uploadAccountImage : ' + e); 
-          res.send(500, {error : 'error in handler for uploadAccountImage : ' + e}); 
+          console.log('error in handler for uploadUserImage : ' + e); 
+          res.send(500, {error : 'error in handler for uploadUserImage : ' + e}); 
   }
 }); // close handler
 
@@ -853,14 +852,13 @@ app.post('/groups/:groupid/images', passport.authenticate('basic', { session: fa
     groupid = convertToRID(groupid);
     var type = req.body['type'];
     var file_image = req.files['image'];
-    var image_path = file_image.path;
     common.ridCheck(
       [
             { rid: groupid , objectClass: 'xGroup'},
       ], 
       res,
       function(){
-        Group.uploadGroupImage(groupid, type, image_path, function(data){
+        Group.uploadGroupImage(groupid, type, file_image, function(data){
             var status = data.status || 200;
           if(status && status == 200){
           }
@@ -1303,6 +1301,71 @@ app.get('/networks/:networkid/node', passport.authenticate('basic', { session: f
   catch (e){
           console.log('error in handler for getNetworkByNodes : ' + e); 
           res.send(500, {error : 'error in handler for getNetworkByNodes : ' + e}); 
+  }
+}); // close handler
+
+// Returns the Network JSON structure with only the meta data  - properties and format
+app.get('/networks/:networkid/metadata', passport.authenticate('basic', { session: false }) , function(req, res) {
+  try {
+    var networkid = req.params['networkid'];
+    if(!common.checkJID(networkid)) res.send(400, { error: 'bad JID : ' + networkid});
+    networkid = convertToRID(networkid);
+    common.ridCheck(
+      [
+            { rid: networkid , objectClass: 'xNetwork'},
+      ], 
+      res,
+      function(){
+        Network.getNetworkMetadata(networkid, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          console.log('error in handler for getNetworkMetadata : ' + e); 
+          res.send(500, {error : 'error in handler for getNetworkMetadata : ' + e}); 
+  }
+}); // close handler
+
+// Update network properties
+app.post('/network/:networkid/metadata', passport.authenticate('basic', { session: false }) , function(req, res) {
+  try {
+    var networkid = req.params['networkid'];
+    if(!common.checkJID(networkid)) res.send(400, { error: 'bad JID : ' + networkid});
+    networkid = convertToRID(networkid);
+    var network = req.body['network'];
+    common.ridCheck(
+      [
+            { rid: networkid , objectClass: 'xNetwork'},
+      ], 
+      res,
+      function(){
+        Network.setNetworkMetadata(networkid, network, function(data){
+            var status = data.status || 200;
+          if(status && status == 200){
+          }
+            res.send(status, data);
+
+        }) // close the route function
+
+      } // close the ridCheck callback
+
+    ); // close the ridCheck
+
+  // now catch random errors
+  }
+  catch (e){
+          console.log('error in handler for setNetworkMetadata : ' + e); 
+          res.send(500, {error : 'error in handler for setNetworkMetadata : ' + e}); 
   }
 }); // close handler
 

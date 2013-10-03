@@ -77,13 +77,13 @@ $('#updateGroupProfileForm').submit(function(event) {
 
     console.log("calling updateGroupProfile");
 
-	ndexClient.updateGroupProfile(groupId, profile,
-		    function(data) {
-    	        //
-    	        // Success: redirect to view the group
-    	        //
-    			window.location = "/viewGroup/" + groupId;
-    		},
+    ndexClient.updateGroupProfile(groupId, profile,
+            function(data) {
+                //
+                // Success: redirect to view the group
+                //
+                window.location = "/viewGroup/" + groupId;
+            },
             function(error) {
                 //
                 // Failure: display message

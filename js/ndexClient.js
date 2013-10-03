@@ -163,7 +163,7 @@
 
 
 // Set a new foreground image for user. Requester must be user or have admin permissions.
-    exports.uploadAccountImage = function(userid, type, callback, errorHandler){
+    exports.uploadUserImage = function(userid, type, callback, errorHandler){
         var mergedRoute = '/users/' + encodeURIComponent(userid) + '/images';
         exports.ndexPost(mergedRoute, {type: type}, callback, errorHandler);
     }
@@ -341,6 +341,20 @@
     exports.getNetworkByNodes = function(networkid, typeFilter, propertyFilter, limit, offset, callback, errorHandler){
         var mergedRoute = '/networks/' + encodeURIComponent(networkid) + '/node';
         exports.ndexGet(mergedRoute, {typeFilter: typeFilter, propertyFilter: propertyFilter, limit: limit, offset: offset}, callback, errorHandler);
+    }
+
+
+// Returns the Network JSON structure with only the meta data  - properties and format
+    exports.getNetworkMetadata = function(networkid, callback, errorHandler){
+        var mergedRoute = '/networks/' + encodeURIComponent(networkid) + '/metadata';
+        exports.ndexGet(mergedRoute, {},callback, errorHandler);
+    }
+
+
+// Update network properties
+    exports.setNetworkMetadata = function(networkid, network, callback, errorHandler){
+        var mergedRoute = '/network/' + encodeURIComponent(networkid) + '/metadata';
+        exports.ndexPost(mergedRoute, {network: network}, callback, errorHandler);
     }
 
 

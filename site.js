@@ -258,10 +258,11 @@ app.get('/editAgent', function(req, res) {
   			});
 });
 
-app.get('/editNetworkMetadata', function(req, res) {
+app.get('/editNetworkMetadata/:networkId', function(req, res) {
   res.render('edit_network_metadata', 
   			{	title: "Edit Network Metadata", 
-  				user: req.user 
+  				user: req.user,
+                networkId: req.params['networkId']
   			});
 });
 

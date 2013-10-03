@@ -738,23 +738,40 @@ exports.Network = [
 				"Invalid query parameters"]
 	},	
 	
-	{	fn : "getNetworkMetaInfo",
-		status : "inactive",
-		doc : "Returns the Network JSON structure with only the meta information",
-		method : "HEAD",
-		route : "/networks/:networkid",
+	{	fn : "getNetworkMetadata",
+		status : "active",
+		doc : "Returns the Network JSON structure with only the meta data  - properties and format",
+		method : "GET",
+		route : "/networks/:networkid/metadata",
 		routeParams: {	
 				networkid : {doc : "id of the network", type : "JID", class: "xNetwork"}
 				},
 		response: { 
-				networkMetadata : { doc : "Network, only containing metadata",
+				networkMetadata : { doc : "Network, only containing metadata - properties and format",
 									type : "JDEx"}
 				},
 		exceptions: [
 				"404 unknown network",
 				"401 requester not authorized - requester must meet Network Permission Criteria"]
-	},	
-	
+	},
+
+    {	fn : "setNetworkMetadata",
+        status : "active",
+        doc : "Update network properties",
+        method : "POST",
+        route : "/network/:networkid/metadata",
+        routeParams: {
+            networkid : { doc : "id of the network", type : "JID", class: "xNetwork"}
+        },
+        postData: {
+            network : { doc : "network containing properties to update in the target network",
+                type : "JDEx"}
+        },
+        response: { },
+        exceptions: [
+            "user does not have permission to modify network",
+            "no network by that id"]
+    },
 
 	{	fn : "getNetwork",
 		status : "active",
@@ -845,23 +862,7 @@ exports.Network = [
 				"401 requester not authorized - requester must own Network"]
 	},	
 
-	{	fn : "setNetworkMetadata",
-		status : "inactive",
-		doc : "Update metadata structure for a network",
-		method : "POST",
-		route : "/network/:networkid/metadata",
-		routeParams: {	
-				networkid : { doc : "id of the network", type : "JID"}
-					},
-		postData: {
-				network : { doc : "network containing metadata to update in the target network",
-							type : "JDEx"}
-					},
-		response: { },
-		exceptions: [
-				"user does not have permission to modify network",
-				"no network by that id"]
-	},		
+
 
 // TODO: define details of update Network. 
 // Elements can be added, deleted, or altered.

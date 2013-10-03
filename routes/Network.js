@@ -1,6 +1,7 @@
 module.db = null;
 
 var common = require("./Common.js");
+var extend = require('util')._extend;
 
 exports.init = function(orient, callback) {
     module.db = orient;   
@@ -253,7 +254,7 @@ function linkNodesToTerms(networkJDEx, networkIndex){
 			if (xNodeRID && xTermRID){
 				// insert the link asynchronously
 				var updateCmd = "update " + xNodeRID + " set represents = " + xTermRID;
-				console.log("Represents: " + updateCmd);
+				//console.log("Represents: " + updateCmd);
 				module.db.command(updateCmd, function(err2){
 					if (err2){
 						throw ("Failed to set represents for xNode to xTerm pair : " + err2);
@@ -337,6 +338,72 @@ exports.findNetworks = function (searchExpression, limit, offset, callback){
         callback({networks : networks, blockAmount: 5, error : err});
     });
 };
+
+// get the properties and other metadata of a network
+exports.setNetworkMetadata = function(networkRID, metadata, callback){
+    console.log("calling setNetworkMetadata with networkRID = '" + networkRID + "' and metadata = " + JSON.stringify(metadata));
+
+    // get the existing properties
+    var cmd = "select properties from " + networkRID + "";
+    console.log(cmd);
+    module.db.command(cmd, function(err, propertyList) {
+        if (common.checkErr(err, "finding network properties while updating", callback)){
+            try {
+                if (!propertyList || propertyList.length < 1){
+                    console.log("found no properties for network with id = '" + networkRID + "'");
+                    callback({status : 404});
+                } else {
+                    var properties = propertyList[0];
+                    console.log("about to update current properties = " + JSON.stringify(properties) + " for " + networkRID);
+
+                    var newProperties = extend({}, metadata.properties, properties);
+                    // merge the new properties with the existing properties
+                    var updateCmd = "update " + networkRID + " set properties = " + JSON.stringify(newProperties);
+                    console.log("property update command = " + updateCmd);
+                    module.db.command(updateCmd, function(err) {
+                        // update the properties
+                        if (err) {
+                            console.log("about to throw error " + err);
+                            throw ("Failed to update properties : " + err);
+                        }
+                        callback({jid: networkRID, error : err, status : 200});
+                        });
+                }
+            }
+            catch (e){
+                console.log("caught error " + e);
+                callback({network : null, error : e.toString(), status : 500});
+            }
+        }
+    }); // close getNetworkMetadata query
+};
+
+// get the properties and other metadata of a network
+exports.getNetworkMetadata = function(networkRID, callback){
+    console.log("calling getNetworkMetadata with networkRID = '" + networkRID + "'");
+    var cmd = "select properties, format from " + networkRID + "";
+    console.log(cmd);
+    module.db.command(cmd, function(err, metadataList) {
+        if (common.checkErr(err, "finding network metadata", callback)){
+            try {
+                if (!metadataList || metadataList.length < 1){
+                    console.log("found no metadata for network with id = '" + networkRID + "'");
+                    callback({status : 404});
+                } else {
+                    var metadata = metadataList[0];
+                    console.log("found format = " + metadata.format + " and " + JSON.stringify(metadata.properties) + " for " + networkRID);
+                    callback({network : metadata});
+                }
+            }
+            catch (e){
+                console.log("caught error " + e);
+                callback({network : null, error : e.toString(), status : 500});
+            }
+        }
+    }); // close getNetworkMetadata query
+};
+
+
 
 // get an entire network
 // TODO: handle all components of network, such as citations, supports, etc.

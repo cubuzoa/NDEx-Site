@@ -172,11 +172,11 @@ function getNodes(nodePage){
   			$('#nodes').append(formatNode(node, data.network));
   		});
   		
-  		$('#nodes').append(createPaginationModule(data.network.blockAmount, nodePage, 'getNodes'));
+  		$('#nodes').append(ndexUI.createPaginationModule(data.network.blockAmount, nodePage, 'getNodes'));
   		$('#nodePage').attr('placeholder', 'max value: ' + data.network.blockAmount);
 		},
 		function(error){
-			$('#error').append(formatError(error));
+			$('#error').append(ndexUI.formatError(error));
 		})
 	);
 }
@@ -202,11 +202,11 @@ function getEdges(edgePage){
   			$('#edges').append(formatEdge(edge, data.network));
   		});
   		
-  		$('#edges').append(createPaginationModule(data.network.blockAmount, edgePage, 'getEdges'));
+  		$('#edges').append(ndexUI.createPaginationModule(data.network.blockAmount, edgePage, 'getEdges'));
   		$('#edgePage').attr('placeholder', 'max value: ' + data.network.blockAmount);
 		},
 		function(error){
-			$('#error').append(formatError(error));
+			$('#error').append(ndexUI.formatError(error));
 		})
 	);
 }
