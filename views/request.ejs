@@ -1,7 +1,55 @@
 <% include head.ejs %>
 <% include nav.ejs %>
 
-<!----------------------------------------------------------------------------------------------------->
+<!--
+
+Inputs from request:
+
+< can have multiple recipients...>
+
+toAccountId
+toAccountName
+toAccountLongName - either the FirstName + LastName or OrganizationName
+
+requestType
+
+objectId
+objectType
+objectName
+objectLongName
+
+Cases Handled by this page:
+    User requests membership in group
+     object = group
+     toAccount = group
+     requestType = requestGroupMembership
+
+    User invites invitedUser to become group member
+    object = group
+    toAccount = invitedUser
+    requestType = inviteGroupMembership
+
+    User requestsViewAccess to network
+    object = network
+    toAccount = unspecified: routed to all owners
+    requestType = requestAccessView | requestAccess
+
+    User invites account to have view access to network
+    object = network
+    toAccount = invitedAccount
+    requestType = inviteAccessView | inviteAccessEdit | inviteAccessOwn
+
+
+----
+
+    Other Requests not made manually:
+
+    User denial of request
+    User refusal of invitation
+
+
+
+-->
 <!------------------------------------- All in One Request -------------------------------------------->
 
 <!--form-->
