@@ -1,3 +1,9 @@
+require('nodetime').profile({
+    accountKey: '4794cfcb618e0e93a6e7f4ecddea823669a7b8e8',
+    appName: 'NDEx REST Server'
+});
+
+
 var flash = require('connect-flash')
   , express = require('express')
   , passport = require('passport')

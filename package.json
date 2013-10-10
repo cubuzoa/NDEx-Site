@@ -17,7 +17,8 @@
         "request" : "2.20.x", 
         "xmldom" : "*",
         "validator" : "*",
-        "btoa" :"1.x.x"
+        "btoa" :"1.x.x",
+        "nodetime" : "*"
 
     }
 }

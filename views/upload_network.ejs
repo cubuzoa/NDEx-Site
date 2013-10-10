@@ -1,5 +1,6 @@
 <% include head.ejs %>
 <% include nav.ejs %>
+<script src="/js/jdex.js"></script>
 <h1>Upload Network</h1>
 
 <div class="" id="holder">
@@ -50,7 +51,7 @@
                             //
                             // Success: redirect to edit metadata for the new network
                             //
-                            window.location = "/edit_network_metadata/" + result.jid;
+                            window.location = "/editNetworkMetadata/" + result.jid;
                         },
                         function (error) {
                             //

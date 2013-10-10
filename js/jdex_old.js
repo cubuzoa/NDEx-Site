@@ -21,12 +21,13 @@
         $ = require('jquery');
     }
 
+/*
     if (typeof($) === 'undefined') {
         console.log("requiring xmldom DOMParser");
         DOMParser = require('xmldom').DOMParser;
     }
 
-
+*/
     /*
      //------------------------------------
      //	JDEx Graph Format
