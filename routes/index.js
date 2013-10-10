@@ -12,20 +12,7 @@ function ensureSchemaIsSetup(callback) {
 		ensureClass("xGroup", "xAccount");
 		ensureClass("xAgent", "xAccount");
 	});
-	
-	ensureClass("xNetwork", "V");
-	ensureClass("xNode", "V");
-	ensureClass("xTask", "V");
-	ensureClass("xRequest", "V");
-	ensureClass("xEdge", "E");
-	ensureClass("xOwnsNetwork", "E");
-	ensureClass("xTerm", "V", function(){
-		ensureClass("xBaseTerm", "xTerm");
-		ensureClass("xFunctionTerm", "xTerm");
-	});
-	
-	ensureClass("xCitation", "V");
-	ensureClass("xSupport", "V");
+
 	ensureClass("xPermission", "V");
 	ensureClass("xOwnsGroup", "E");
 	ensureClass("xOwnsAgent", "E");
@@ -43,9 +30,9 @@ function ensureClass(className, parentName, callback){
         });
     } else {
     	console.log(className + " exists");
-    	if (callback) callback();	
+    	if (callback) callback();
     }
-    
+
 }
 
 exports.init = function(orient, callback) {
