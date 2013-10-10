@@ -1,3 +1,58 @@
+if (typeof($) === 'undefined') {
+    console.log("requiring jquery");
+    $ = require('jquery');
+}
+
+if (typeof(btoa) === 'undefined') {
+    console.log("requiring btoa");
+    btoa = require('btoa');
+}
+
+
+exports.ndexGet = function (host, route, userName, userPassword, queryArgs, callback, errorHandler) {
+
+    $.ajax({
+        type: "GET",
+        /*
+         password: credentials.password,
+         username: credentials.username,
+         xhrFields: {
+         withCredentials: true
+         },
+         */
+        beforeSend: function(xhr){
+            xhr.setRequestHeader("Authorization", "Basic " + btoa(userName + ":" + userPassword));
+        },
+        url: host + route,
+        data: queryArgs,
+        dataType: "JSON",
+        success: callback,
+        error: errorHandler || exports.defaultNDExErrorHandler
+    });
+}
+
+exports.ndexPost = function (host, route, userName, userPassword, postData, callback, errorHandler) {
+    $.ajax({
+        type: "POST",
+        /*
+         password: credentials.password,
+         username: credentials.username,
+         xhrFields: {
+         withCredentials: true
+         },
+         */
+        beforeSend: function(xhr){
+            xhr.setRequestHeader("Authorization", "Basic " + btoa(userName + ":" + userPassword));
+        },
+        url: host + route,
+        data: JSON.stringify(postData),
+        dataType: "JSON",
+        contentType: 'application/json',
+        success: callback,
+        error: errorHandler || exports.defaultNDExErrorHandler
+    });
+}
+
 
 exports.init = function(orient, callback) {
     module.db = orient;   

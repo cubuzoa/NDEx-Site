@@ -1159,6 +1159,7 @@ app.post('/networks', passport.authenticate('basic', { session: false }) , funct
   try {
     var network = req.body['network'];
     var accountid = req.body['accountid'];
+
     if(!common.checkJID(accountid)) res.send(400, { error: 'bad JID : ' + accountid});
     accountid = convertToRID(accountid);
     common.ridCheck(
@@ -1167,11 +1168,8 @@ app.post('/networks', passport.authenticate('basic', { session: false }) , funct
       ], 
       res,
       function(){
-        Network.createNetwork(network, accountid, function(data){
+        Network.createNetwork(network, req.body['accountid'], function(data){
             var status = data.status || 200;
-          if(status && status == 200){
-            data.jid = convertFromRID(data.jid);
-          }
             res.send(status, data);
 
         }) // close the route function
@@ -1200,7 +1198,7 @@ app.delete('/networks/:networkid', passport.authenticate('basic', { session: fal
       ], 
       res,
       function(){
-        Network.deleteNetwork(networkid, function(data){
+        Network.deleteNetwork(req.params['networkid'], function(data){
             var status = data.status || 200;
           if(status && status == 200){
           }
@@ -1244,7 +1242,7 @@ app.get('/networks/:networkid/edge', passport.authenticate('basic', { session: f
       ], 
       res,
       function(){
-        Network.getNetworkByEdges(networkid, typeFilter, propertyFilter, subjectNodeFilter, objectNodeFilter, limit, offset, function(data){
+        Network.getNetworkByEdges(req.params['networkid'], typeFilter, propertyFilter, subjectNodeFilter, objectNodeFilter, limit, offset, function(data){
             var status = data.status || 200;
           if(status && status == 200){
           }
@@ -1284,7 +1282,7 @@ app.get('/networks/:networkid/node', passport.authenticate('basic', { session: f
       ], 
       res,
       function(){
-        Network.getNetworkByNodes(networkid, typeFilter, propertyFilter, limit, offset, function(data){
+        Network.getNetworkByNodes(req.params['networkid'], typeFilter, propertyFilter, limit, offset, function(data){
             var status = data.status || 200;
           if(status && status == 200){
           }
@@ -1381,7 +1379,7 @@ app.get('/networks/:networkid', passport.authenticate('basic', { session: false 
       ], 
       res,
       function(){
-        Network.getNetwork(networkid, function(data){
+        Network.getNetwork(req.params['networkid'], function(data){
             var status = data.status || 200;
           if(status && status == 200){
           }
