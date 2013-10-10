@@ -84,7 +84,7 @@ describe('user-workspace', function (done) {
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
-						res.should.have.status(404);
+						res.should.not.have.status(200);
 						done();
 					}
 				}
@@ -221,7 +221,7 @@ describe('user-workspace', function (done) {
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
-						res.should.have.status(404);
+						res.should.not.have.status(200);
 						//console.log(res.body);
 						done();
 					}
@@ -237,7 +237,7 @@ describe('user-workspace', function (done) {
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
-						res.should.have.status(404);
+						res.should.not.have.status(200);
 						//console.log(res.body);
 						done();
 					}

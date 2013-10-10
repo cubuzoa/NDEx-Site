@@ -148,6 +148,7 @@ exports.ridCheck = function (checklist, res, callback){
 }
 
 exports.checkJID = function(jid){
+    console.log("checking JID = " + jid);
 	if (jid){
 		var jidPattern=/^C{1}[0-9]{2}R[0-9]+$/g;
 		return jidPattern.test(jid);

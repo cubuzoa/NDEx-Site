@@ -37,7 +37,8 @@ describe('group-members', function () {
 					//console.log(JSON.stringify(body));
 					res.should.have.status(200);
 					groupOwner.jid = res.body.jid;
-					console.log('...1 user created...creating second user...');
+
+					console.log("...groupOwner created with id = " + groupOwner.jid + "...creating second user...");
 					ndex.post(
 						'/users',
 						{username : groupMember.username, password : groupMember.password},
@@ -48,7 +49,7 @@ describe('group-members', function () {
 								//console.log(JSON.stringify(body));
 								res.should.have.status(200);
 								groupMember.jid = res.body.jid;
-								console.log('...2 users created...creating group...');
+								console.log("...groupMember created with id = " + groupMember.jid + "...creating group...");
 								ndex.post(
 									'/groups/',
 									{userid : groupOwner.jid , groupName : group1.groupname},
@@ -58,6 +59,7 @@ describe('group-members', function () {
 										else {
 											res.should.have.status(200);
 											group1.jid = res.body.jid;
+                                            console.log("...group created with id = " + group1.jid + "...creating group...");
 											done();
 										}
 									}
@@ -82,6 +84,7 @@ describe('group-members', function () {
 					else {
 						//console.log(body.error);
 						res.should.have.status(200);
+                        console.log("request from group owner to group member created with id = " + res.body.jid);
 						request1.jid = res.body.jid;
 						done();
 					}

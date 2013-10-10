@@ -12,6 +12,7 @@ exports.init = function (orient, callback) {
 
 // Create a new network from JDEx, owned by the specified account
 exports.createNetwork = function (networkJDEx, accountRID, callback) {
+    console.log("calling createNetwork with accountRID = '" + accountRID + "'");
     var postData = {
         "network": networkJDEx,
         "accountid": accountRID
@@ -117,6 +118,7 @@ exports.getNetworkByEdges = function (networkid, typeFilter, propertyFilter, sub
         }
     );
 };
+
 //get a network via its nodes
 exports.getNetworkByNodes = function (networkid, typeFilter, propertyFilter, limit, offset, callback, errorHandler) {
     console.log("calling get network by nodes with arguments: " + limit + ', ' + offset);

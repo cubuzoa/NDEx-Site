@@ -14,15 +14,19 @@ describe('network-basic', function (done) {
 		console.log('setup: network test');
         network1 = {title : '', jid : ''};
         networkOwner = {username: 'NetworkOwner', password: 'password'};
+        console.log('loading testNetwork data to memory');
         data = fs.readFileSync('../test_db/test_networks/pc_sif/testNetwork.jdex', 'utf8');
         data = JSON.parse(data);
-
+        console.log('creating NetworkOwner User');
         ndex.post(
 			'/users',
             {username: networkOwner.username, password: networkOwner.password},
 			ndex.guest,
 			function(err, res, body){
-				if(err) { done(err) }
+				if(err){
+                        console.log("Error while setting up networkOwner User: " + err);
+                        done(err);
+                }
 				else{
 					res.should.have.status(200);
 					networkOwner.jid = res.body.jid;
@@ -42,7 +46,7 @@ describe('network-basic', function (done) {
 				function(err,res,body){
 					if(err) { done(err) }
 					else {
-						res.should.have.status(404);
+						res.should.not.have.status(200);
 						done();
 					}
 				}
@@ -58,7 +62,7 @@ describe('network-basic', function (done) {
 				function(err, res, body){
 					if(err) { done(err) }
 					else {
-						res.should.have.status(404);
+						res.should.not.have.status(200);
 						done();
 					}
 				}

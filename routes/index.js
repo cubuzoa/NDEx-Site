@@ -16,6 +16,8 @@ function ensureSchemaIsSetup(callback) {
 	ensureClass("xPermission", "V");
 	ensureClass("xOwnsGroup", "E");
 	ensureClass("xOwnsAgent", "E");
+    ensureClass("xRequest", "V");
+    ensureClass("xTask", "V");
 	callback();
 }
 

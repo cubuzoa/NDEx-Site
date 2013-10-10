@@ -55,7 +55,7 @@ describe('group-basic', function () {
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
-							res.should.have.status(404);
+							res.should.not.have.status(200);
 							done();
 						}
 					}
@@ -163,7 +163,7 @@ describe('group-basic', function () {
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
-							res.should.have.status(404);
+							res.should.not.have.status(200);
 							done();
 						}
 					}
