@@ -187,10 +187,10 @@ exports.findNetworks = function (searchExpression, limit, offset, callback) {
     common.ndexGet(module.dbHost, "ndexNetworkFind/ndex", module.dbUser, module.dbPassword,
         {searchExpression: searchExpression, limit: limit, offset: offset},
         function (result) {
-            callback({network: result});
+            callback({networks : result.networks, blockAmount: 5});
         },
         function (err) {
-            callback({network: null, error: err.toString(), status: 500});
+            callback({error: err.toString(), status: 500});
         }
     );
 };
