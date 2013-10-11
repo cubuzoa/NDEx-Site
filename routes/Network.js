@@ -151,3 +151,33 @@ exports.deleteNetwork = function (networkRID, callback) {
             callback({error: err.toString(), status: 500});
         });
 };
+
+
+//
+// Temporary: searchExpression is only used to match substrings in title and description fields of network
+// TODO : Redesign API to allow for more complex search expressions, including search based on network content
+exports.findNetworks = function (searchExpression, limit, offset, callback){
+    //TODO : determine size of search results in order to compute block size
+    console.log("calling findNetworks with arguments: '" + searchExpression + "' " + limit + " " + offset);
+    var start = (offset)*limit;
+    var where_clause = "";
+
+    if (searchExpression.length > 0){
+        where_clause = " where properties.title.toUpperCase() like '%" + searchExpression + "%' OR properties.description.toUpperCase() like '%" + searchExpression + "%'";
+    } else {
+        console.log("searchExpression.length = " + searchExpression.length);
+    }
+
+    var descriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount",
+        cmd = "select " + descriptors + " from xNetwork" + where_clause + " order by creation_date desc skip " +  start + " limit " + limit;
+
+    console.log(cmd);
+    module.db.command(cmd, function(err, networks) {
+        for (i in networks){
+            var network = networks[i];
+            network.jid = common.convertFromRID(network.jid);
+        }
+
+        callback({networks : networks, blockAmount: 5, error : err});
+    });
+};

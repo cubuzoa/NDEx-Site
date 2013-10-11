@@ -75,7 +75,10 @@ describe('network-basic', function (done) {
 				{network : data, accountid : networkOwner.jid},
 				networkOwner,
 				function(err, res, body){
-					if(err) { done(err) }
+					if(err) {
+                        console.log("Error creating network = " + err);
+                        done(err);
+                    }
 					else {
 						res.should.have.status(200);
 						network1.jid = res.body.jid;

@@ -41,11 +41,33 @@
         $('#message').html("Reading " + file.path);
         if (file) {
             var reader = new FileReader();
-            reader.onload = function (evt) {
 
-                data = JSON.parse(evt.target.result);
-                $('#message').html("Uploading " + file.path);
+            reader.onload = function (evt) {
+                $('#message').html("Reading " + file.path);
+
+                // Check file format by suffix
+                if (file.type.toLowerCase() == "xbel") {
+                    // XBEL Format  (convert to JDEx and upload)
+                    var xml = $.parseXML(evt.target.result);
+                    $('#message').html("Converting XBEL to JDEx for " + file.path);
+                    var graph = jdex.createGraphFromXBEL(xml);
+                    data = graph.serializeJDEx();
+
+                } else if (file.type.toLowerCase() == "sif") {
+                    // SIF Format  (convert to JDEx and upload)
+                    var lines = evt.target.result.split("\n");
+                    // SIF data is now an array of strings
+                    $('#message').html("Converting SIF to JDEx for " + file.path);
+                    var graph = jdex.createGraphFromSIF(lines);
+                    data = graph.serializeJDEx();
+
+
+                } else if (file.type.toLowerCase() == "jdex") {
+                    // JDEx Format (just upload)
+                    data = JSON.parse(evt.target.result);
+                }
                 alert("ready to call create Network");
+                $('#message').html("Uploading JDEx for " + file.path);
                 ndexClient.createNetwork(data, ndexUI.user.id,
                         function (result) {
                             //
