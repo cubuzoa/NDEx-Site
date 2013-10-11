@@ -1,11 +1,11 @@
 /*
 
 	Create a test database by loading it into a scratch copy of NDEx, then exporting it.
-	
+
 	To run this script, you need to run the NDEx server pointing it to a scratch db
-	
-	The NDEx server will initialize the required classes 
-	
+
+	The NDEx server will initialize the required classes
+
 */
 
 var fs = require('fs');
@@ -25,9 +25,9 @@ var ndex = require('../js/ndexClient.js')
 function getUserFilenames(){
 	return fs.readdirSync("./test_accounts");
 }
- 
+
 function readJSONFile(filename, directory){
-	var data = fs.readFileSync(directory + filename, 'utf8'); 
+	var data = fs.readFileSync(directory + filename, 'utf8');
 	//
  	data = JSON.parse(data);
  	console.log("JSON data: " + JSON.stringify(data));
@@ -37,23 +37,25 @@ function readJSONFile(filename, directory){
 function processUserFile(filename){
 
 	console.log("processing: " + filename);
-	
+
 	var userJSON = readJSONFile(filename, "./test_accounts/"),
 		username = userJSON.username,
 		password = userJSON.password,
         email = userJSON.recoveryEmail,
 		profile	= userJSON.profile;
 	console.log("Creating User: " + username + " pwd: " + password + " email: " + email);
-	ndex.createUser(username, password, email,
-        function(userData){  // success handler for create user
-            console.log("user created: " + username + " with id = " + userData.jid);
-            doUpdateProfile(userData, profile);
-            doCreateNetworks(userData,userJSON);
-            doCreateGroups(userData, userJSON);
-	    },
-        function(error){      // error handler for create user
-            console.log("Error in create user: " + JSON.stringify(error));
-        });
+        userData.jid = "C19R0";
+//	ndex.createUser(username, password, email,
+//        function(userData){  // success handler for create user
+//            console.log("user created: " + username + " with id = " + userData.jid);
+//            doUpdateProfile(userData, profile);
+//            doCreateNetworks(userData,userJSON);
+//            doCreateGroups(userData, userJSON);
+//	    },
+//        function(error){      // error handler for create user
+//            console.log("Error in create user: " + JSON.stringify(error));
+//        });
+
 
 	return true;
 }
