@@ -44,18 +44,16 @@ function processUserFile(filename){
         email = userJSON.recoveryEmail,
 		profile	= userJSON.profile;
 	console.log("Creating User: " + username + " pwd: " + password + " email: " + email);
-        userData.jid = "C19R0";
-//	ndex.createUser(username, password, email,
-//        function(userData){  // success handler for create user
-//            console.log("user created: " + username + " with id = " + userData.jid);
-//            doUpdateProfile(userData, profile);
-//            doCreateNetworks(userData,userJSON);
-//            doCreateGroups(userData, userJSON);
-//	    },
-//        function(error){      // error handler for create user
-//            console.log("Error in create user: " + JSON.stringify(error));
-//        });
-
+	ndex.createUser(username, password, email,
+        function(userData){  // success handler for create user
+            console.log("user created: " + username + " with id = " + userData.jid);
+            doUpdateProfile(userData, profile);
+            doCreateNetworks(userData,userJSON);
+            doCreateGroups(userData, userJSON);
+	    },
+        function(error){      // error handler for create user
+            console.log("Error in create user: " + JSON.stringify(error));
+        });
 
 	return true;
 }
@@ -114,7 +112,7 @@ function doCreateGroups(userData, userJSON){
             function (groupData){
                 console.log("created group with id: " + groupData.jid);
                 doUpdateGroupProfile(groupData, groupJSON.profile);
-                doCreateNetworks(groupData, groupJSON);
+                doCreateNetworks(userData, groupJSON);
             },
             function (error){
                 console.log("Error creating group: " + error);
