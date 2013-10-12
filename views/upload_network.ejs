@@ -32,6 +32,7 @@
     </form>
 </div>
 
+<div id="dataToUpload"></div>
 
 <script>
     /* attach a submit handler to the form */
@@ -39,6 +40,7 @@
         event.preventDefault();  // stop form from submitting normally
         var data, file = document.getElementById("fileForUpload").files[0];
         $('#message').html("Reading " + file.path);
+        $
         if (file) {
             var reader = new FileReader();
 
@@ -52,6 +54,7 @@
                     $('#message').html("Converting XBEL to JDEx for " + file.path);
                     var graph = jdex.createGraphFromXBEL(xml);
                     data = graph.serializeJDEx();
+                    $('#dataToUpload').html(data);
 
                 } else if (file.type.toLowerCase() == "sif") {
                     // SIF Format  (convert to JDEx and upload)
@@ -60,28 +63,14 @@
                     $('#message').html("Converting SIF to JDEx for " + file.path);
                     var graph = jdex.createGraphFromSIF(lines);
                     data = graph.serializeJDEx();
-
+                    $('#dataToUpload').html(data);
 
                 } else if (file.type.toLowerCase() == "jdex") {
                     // JDEx Format (just upload)
                     data = JSON.parse(evt.target.result);
+                    $('#dataToUpload').html(data);
+                    doUpload(data);
                 }
-                alert("ready to call create Network");
-                $('#message').html("Uploading JDEx for " + file.path);
-                ndexClient.createNetwork(data, ndexUI.user.id,
-                        function (result) {
-                            //
-                            // Success: redirect to edit metadata for the new network
-                            //
-                            window.location = "/editNetworkMetadata/" + result.jid;
-                        },
-                        function (error) {
-                            //
-                            // Failure: display message
-                            //
-                            $('#message').html(JSON.stringify(error));
-                        });
-
             };
             reader.onerror = function (evt) {
                 document.getElementById("message").innerHTML = "error reading file";
@@ -89,6 +78,24 @@
             reader.readAsText(file, "UTF-8");
         }
     });
+
+    function doUpload(data) {
+        alert("ready to call create Network");
+        $('#message').html("Uploading JDEx with account = " + ndexUI.user.id + " for " + file.path);
+        ndexClient.createNetwork(data, ndexUI.user.id,
+                function (result) {
+                    //
+                    // Success: redirect to edit metadata for the new network
+                    //
+                    window.location = "/editNetworkMetadata/" + result.jid;
+                },
+                function (error) {
+                    //
+                    // Failure: display message
+                    //
+                    $('#message').html(JSON.stringify(error));
+                });
+    }
 
 
 </script>
