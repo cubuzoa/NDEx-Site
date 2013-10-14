@@ -20,6 +20,8 @@
         console.log("requiring jquery");
         $ = require('jquery');
     }
+
+    exports.debug = null;
     /*
      if (typeof($) === 'undefined') {
      console.log("requiring xmldom DOMParser");
@@ -955,15 +957,17 @@
      ------------------------------------
      */
 
-    exports.createGraphFromXBEL = function (doc) {
+    exports.createGraphFromXBEL = function (xml) {
         var graph = new exports.Graph();
         //x var doc = new DOMParser().parseFromString(xml_text, 'text/xml');
 
         //x console.log("parsed XML text");
 
         // Process the header
-        //x var header = doc.documentElement.getElementsByTagName('bel:header').item(0);
-        var headers = $(doc).find('bel:header');
+        //x var header = doc.documentElement.getElementsByTagName('bel\\:header').item(0);
+        var doc = $(xml).find('document')[0];
+
+        var headers = $(doc).children('bel\\:header');
         if (headers.length == 0) throw new Error("no header in XBEL document");
         exports.processXBELHeader(graph, headers[0]);
 
@@ -972,33 +976,33 @@
 
 
         // Process the namespace group
-        //x var namespaceGroup = doc.documentElement.getElementsByTagName('bel:namespaceGroup').item(0);
-        var namespaceGroups = $(doc).find('bel:namespaceGroup');
+        //x var namespaceGroup = doc.documentElement.getElementsByTagName('bel\\:namespaceGroup').item(0);
+        var namespaceGroups = $(doc).children('bel\\:namespaceGroup');
         if (namespaceGroups.length == 0) throw new Error("no namespaceGroup in XBEL document");
         exports.processXBELNamespaceGroup(graph, namespaceGroups[0]);
 
 
         // Process the annotation definition
-        //x var annotationDefinitionGroup = doc.documentElement.getElementsByTagName('bel:annotationDefinitionGroup').item(0);
-        var annotationDefinitionGroups = $(doc).find('bel:annotationDefinitionGroup');
+        //x var annotationDefinitionGroup = doc.documentElement.getElementsByTagName('bel\\:annotationDefinitionGroup').item(0);
+        var annotationDefinitionGroups = $(doc).children('bel\\:annotationDefinitionGroup');
         if (annotationDefinitionGroups.length == 0) throw new Error("no annotationDefinitionGroup in XBEL document");
         exports.processXBELAnnotationDefinitionGroup(graph, annotationDefinitionGroups[0]);
 
         // Process the statementGroups
         // Note that we use the children method to only take the top level of statement groups
-        var statementGroups = $(doc).children('bel:statementGroup');
+        var statementGroups = $(doc).children('bel\\:statementGroup');
         //x var nStatementGroups = doc.documentElement.childNodes.length;
 
         $.each(statementGroups, function (index, statementGroup) {
             var context = {annotations: []};
-            console.log(index + " / " + nStatementGroups + " maxID: " + graph.maxInternalId);
+            console.log(index + " / " + statementGroups.length + " maxID: " + graph.maxInternalId);
             exports.processXBELStatementGroup(graph, statementGroup, context);
         });
 
 
         /*
          $.each(doc.documentElement.childNodes, function (index, statementGroup) {
-         if (statementGroup.tagName == 'bel:statementGroup') {
+         if (statementGroup.tagName == 'bel\\:statementGroup') {
          var context = {annotations: []};
          console.log(index + " / " + nStatementGroups + " maxID: " + graph.maxInternalId);
          exports.processXBELStatementGroup(graph, statementGroup, context);
@@ -1043,10 +1047,10 @@
 
         // Unary properties mapped from BEL to DC
         var Unary_Properties_XBEL_to_DC = {
-            "bel:name": {identifier: "DC:title", term: "title"},
-            "bel:description": {identifier: "DC:description", term: "description"},
-            "bel:version": {identifier: "DC:version", term: "version"},
-            "bel:copyright": {identifier: "DC:copyright", term: "copyright"}
+            "bel\\:name": {identifier: "DC:title", term: "title"},
+            "bel\\:description": {identifier: "DC:description", term: "description"},
+            "bel\\:version": {identifier: "DC:version", term: "version"},
+            "bel\\:copyright": {identifier: "DC:copyright", term: "copyright"}
         };
 
         $.each(Unary_Properties_XBEL_to_DC, function (tag, dc_info) {
@@ -1056,9 +1060,9 @@
             var elements = $(header).children(tag);
             if (elements && elements.length > 0) {
                 var header_element = elements[0],
-                    value = $(header_element).val(),
+                    value = $(header_element).text(),
                     predicate = graph.findOrCreateTerm(dc_info.term, dc_namespace_uri);
-                //console.log("adding graph property: " + predicate.identifier() + " : " + value);
+                console.log("adding graph property: " + predicate.identifier() + " : " + value);
                 graph.setProperty(predicate, value);
             }
 
@@ -1066,18 +1070,23 @@
     }
 
     exports.processXBELNamespaceGroup = function (graph, namespaceGroup) {
-        var elements = $(namespaceGroup).children('bel:namespace');
-        //x $.each(namespaceGroup.getElementsByTagName('bel:namespace'), function (index, ns_info) {
+        var elements = $(namespaceGroup).children('bel\\:namespace');
+        //x $.each(namespaceGroup.getElementsByTagName('bel\\:namespace'), function (index, ns_info) {
 
         $.each(elements, function (index, ns_info) {
             var uri = $(ns_info).attr('bel:resourceLocation'),
                 prefix = $(ns_info).attr('bel:prefix');
-            graph.findOrCreateNamespace(uri, prefix);
+            if (uri && prefix){
+                graph.findOrCreateNamespace(uri, prefix);
+            } else {
+                throw new Error ("attempt to create namespace with missing URI or prefix")
+            }
+
         });
     }
 
     exports.processXBELAnnotationDefinitionGroup = function (graph, AnnotationDefinitionGroup) {
-        var elements = $(AnnotationDefinitionGroup).children('bel:externalAnnotationDefinition');
+        var elements = $(AnnotationDefinitionGroup).children('bel\\:externalAnnotationDefinition');
         $.each(elements, function (index, extDef_info) {
             var uri = $(extDef_info).attr('bel:url'),
                 prefix = $(extDef_info).attr('bel:id');
@@ -1099,7 +1108,7 @@
          </bel:internalAnnotationDefinition>
          */
 
-        elements = $(AnnotationDefinitionGroup).children('bel:internalAnnotationDefinition');
+        elements = $(AnnotationDefinitionGroup).children('bel\\:internalAnnotationDefinition');
         $.each(elements, function (index, intDefElement) {
 
             var description = "",
@@ -1107,19 +1116,19 @@
                 termElements = [];
 
             // process the description element, if present
-            var descriptionElements = $(intDefElement).children('bel:description');
-            if (descriptionElements) description = $(descriptionElements).val();
+            var descriptionElements = $(intDefElement).children('bel\\:description');
+            if (descriptionElements) description = $(descriptionElements).text();
 
             var ns = graph.findOrCreateNamespace("internal", prefix, description);
             graph.findOrCreateTerm(prefix, graph.belNS);
 
-            var listAnnotationElements = $(intDefElement).children('bel:listAnnotation');
+            var listAnnotationElements = $(intDefElement).children('bel\\:listAnnotation');
             if (listAnnotationElements) {
                 termElements = $(listAnnotationElements).children();
 
-
                 $.each(termElements, function (j, termElement) {
-                    var termName = $(termElement).val();
+                    exports.debug = termElement;
+                    var termName = $(termElement).text();
                     console.log("creating internal annotation term: " + termName + " in " + ns.prefix);
                     graph.findOrCreateTerm(termName, ns);
                 });
@@ -1133,17 +1142,17 @@
 
 
         // process the annotation group
-        $(statementGroup).children('bel:annotationGroup').each(function (index, element) {
+        $(statementGroup).children('bel\\:annotationGroup').each(function (index, element) {
             exports.processXBELAnnotationGroup(graph, element, context);
         });
 
         // process statements, using the annotations
-        $(statementGroup).children('bel:statement').each(function (index, statement) {
+        $(statementGroup).children('bel\\:statement').each(function (index, statement) {
             exports.processXBELStatement(graph, statement, context);
         });
 
         // recurse into any statement groups
-        $(statementGroup).children('bel:statementGroup').each(function (index, innerGroup) {
+        $(statementGroup).children('bel\\:statementGroup').each(function (index, innerGroup) {
             var innerContext = {citation: context.citation, support: context.support, annotations: []};
             $.each(context.annotations, function (index, value) {
                 innerContext[index] = value;
@@ -1153,11 +1162,11 @@
     }
 
     exports.processXBELAnnotationGroup = function (graph, annotationGroup, context) {
-        $(annotationGroup).children('bel:annotation').each(function (index, element) {
+        $(annotationGroup).children('bel\\:annotation').each(function (index, element) {
 
 
-            var propertyName = element.getAttribute('bel:refID'),
-                value = element.textContent,
+            var propertyName = $(element).attr('bel:refID'),
+                value = $(element).text(),
                 ns = graph.namespaceByPrefix(propertyName);
 
             //console.log("processing annotation " + propertyName + " : " + value);
@@ -1175,10 +1184,10 @@
                 console.log("did not find namespace for " + propertyName);
             }
         });
-        $(annotationGroup).children('bel:citation').each(function (index, element) {
+        $(annotationGroup).children('bel\\:citation').each(function (index, element) {
             context.citation = exports.processXBELCitation(graph, element);
         });
-        $(annotationGroup).children('bel:evidence').each(function (index, element) {
+        $(annotationGroup).children('bel\\:evidence').each(function (index, element) {
             context.support = exports.processXBELEvidence(graph, element, context.citation);
         });
     }
@@ -1189,10 +1198,10 @@
         var s, o;
 
 
-        $(statement).children('bel:subject').each(function (index, nodeElement) {
+        $(statement).children('bel\\:subject').each(function (index, nodeElement) {
             s = exports.processXBELNodeElement(graph, nodeElement);
         });
-        $(statement).children('bel:object').each(function (index, nodeElement) {
+        $(statement).children('bel\\:object').each(function (index, nodeElement) {
             o = exports.processXBELNodeElement(graph, nodeElement);
         });
 
@@ -1241,7 +1250,7 @@
     }
 
     exports.processXBELNodeElement = function (graph, nodeElement) {
-        if ($(nodeElement).children('bel:statement').length > 0) return false;
+        if ($(nodeElement).children('bel\\:statement').length > 0) return false;
         var termElement = $(nodeElement).children().filter(":first");
         var term = exports.processXBELTermElement(graph, termElement);
         return graph.findOrCreateNodeByTerm(term, term.identifier());
@@ -1255,20 +1264,20 @@
         var fn = graph.findOrCreateTerm(functionName, graph.belNS),
             parameters = [];
 
-        $(termElement).children('bel:parameter').each(function (index, child) {
+        $(termElement).children('bel\\:parameter').each(function (index, child) {
             var nsPrefix = $(child).attr('bel:ns');
             if (nsPrefix) {
                 // child is a basic term
-                name = $(child).val(),
+                name = $(child).text(),
                     ns = graph.namespaceByPrefix(nsPrefix),
                     term = graph.findOrCreateTerm(name, ns);
                 parameters.push(term);
             } else {
                 // child is a literal value
-                parameters.push($(child).val());
+                parameters.push($(child).text());
             }
         });
-        $(termElement).children('bel:term').each(function (index, child) {
+        $(termElement).children('bel\\:term').each(function (index, child) {
             // child is a function term
             var childTerm = exports.processXBELTermElement(graph, child);
             parameters.push(childTerm);
@@ -1284,16 +1293,16 @@
         citationType = $(citationElement).attr('bel:type');
 
         // Get the reference identifier, if any
-        //var referenceElements = citationElement.getElementsByTagName('bel:reference');
+        //var referenceElements = citationElement.getElementsByTagName('bel\\:reference');
         //if (referenceElements) referenceIdentifier = referenceElements[0].textContent;
 
-        referenceIdentifier = $(citationElement).children('bel:reference').filter('first').val();
+        referenceIdentifier = $(citationElement).children('bel\\:reference').filter('first').text();
         // Get the bibliographic citation, if any
 
         // Get the title
-        //var nameElements = citationElement.getElementsByTagName('bel:name');
+        //var nameElements = citationElement.getElementsByTagName('bel\\:name');
         //if (nameElements) title = nameElements[0].textContent;
-        title = $(citationElement).children('bel:name').filter('first').val();
+        title = $(citationElement).children('bel\\:name').filter('first').text();
 
         // TODO - "find or create"
         var citation = new exports.Citation(citationType, referenceIdentifier, bibliographicCitation, title);
@@ -1302,17 +1311,17 @@
 
         // process the authors, if listed
         /*
-        var authorGroups = citationElement.getElementsByTagName('bel:authorGroup');
+        var authorGroups = citationElement.getElementsByTagName('bel\\:authorGroup');
         if (authorGroups && authorGroups.length > 0) {
-            $.each(authorGroups[0].getElementsByTagName('bel:author'), function (index, authorElement) {
+            $.each(authorGroups[0].getElementsByTagName('bel\\:author'), function (index, authorElement) {
                 citation.addContributor(authorElement.textContent);
             });
         }
         */
 
-        var authorGroup = $(citationElement).children('bel:authorGroup').filter('first');
+        var authorGroup = $(citationElement).children('bel\\:authorGroup').filter('first');
         if (authorGroup){
-            $(authorGroup).children('bel:author').each(function (index, author){
+            $(authorGroup).children('bel\\:author').each(function (index, author){
                 citation.addContributor(authorElement.textContent);
             });
         }
@@ -1323,7 +1332,7 @@
 
     exports.processXBELEvidence = function (graph, evidenceElement, citation) {
 
-        var text = $(evidenceElement).val();
+        var text = $(evidenceElement).text();
         // TODO - "find or create"
 
         var support = new exports.Support(text);

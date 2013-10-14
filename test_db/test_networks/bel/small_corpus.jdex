@@ -33567,10 +33567,10 @@
     },
     "nodeTypes": {},
     "properties": {
-        "DC:title": "BEL Framework Small Corpus Document",
-        "DC:description": "Approximately 2000 hand curated statements drawn from 57 PubMeds",
-        "DC:version": "1.2",
-        "DC:copyright": "Copyright (c) 2011, Selventa. All Rights Reserved."
+        "title": "BEL Framework Small Corpus Document",
+        "description": "Approximately 2000 hand curated statements drawn from 57 PubMeds",
+        "version": "1.2",
+        "copyright": "Copyright (c) 2011, Selventa. All Rights Reserved."
     },
     "citations": {
         "69": {

@@ -31,56 +31,76 @@
         </div>
     </form>
 </div>
-
-<div id="dataToUpload"></div>
+<div id="message">temp</div>
+<div id="dataToUpload">temp</div>
 
 <script>
+    var data, files, file, onloadEvent, xml;
+
+    function handleFileSelect(selectEvt) {
+        files = selectEvt.target.files; // FileList object
+        file = files[0];
+
+        var reader = new FileReader();
+        reader.onload = function (evt) {
+            onloadEvent = evt;
+            var name = file.name;
+            // Check file format by suffix
+            if (hasSuffix(name, ".xbel")) {
+                // XBEL Format  (convert to JDEx and upload)
+                $('#message').html("Converting text to XML (XBEL) for " + name);
+                xml = $.parseXML(evt.target.result);
+                $('#message').html("Converting XBEL to JDEx for " + name);
+                var graph = jdex.createGraphFromXBEL(xml);
+                data = graph.toJDEx();
+                $('#dataToUpload').html(data);
+
+            } else if (hasSuffix(name, ".sif")) {
+                // SIF Format  (convert to JDEx and upload)
+                var lines = evt.target.result.split("\n");
+                // SIF data is now an array of strings
+                $('#message').html("Converting SIF to JDEx for " + name);
+                var graph = jdex.createGraphFromSIF(lines);
+                data = graph.toJDEx();
+                $('#dataToUpload').html(data);
+
+            } else if (hasSuffix(name, ".jdex")) {
+                // JDEx Format (just upload)
+                data = JSON.parse(evt.target.result);
+                $('#dataToUpload').html(data);
+                //doUpload(data);
+            } else {
+                $('#message').html("Unsupported file type: " + type);
+            }
+        };
+
+        reader.onerror = function (evt) {
+            document.getElementById("message").innerHTML = "error reading file";
+        };
+
+        reader.readAsText(file, "UTF-8");
+
+    };
+
+    /*
+        // files is a FileList of File objects. List some properties.
+        var output = [];
+        for (var i = 0, f; f = files[i]; i++) {
+            output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
+                    f.size, ' bytes, last modified: ',
+                    f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
+                    '</li>');
+        }
+        document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+    }
+    */
+
+    /* attach the file select handler to the file element */
+    document.getElementById('fileForUpload').addEventListener('change', handleFileSelect, false);
+
     /* attach a submit handler to the form */
     $('#networkUploadForm').submit(function (event) {
         event.preventDefault();  // stop form from submitting normally
-        var data, file = document.getElementById("fileForUpload").files[0];
-        $('#message').html("Reading " + file.path);
-        $
-        if (file) {
-            var reader = new FileReader();
-
-            reader.onload = function (evt) {
-                $('#message').html("Reading " + file.path);
-
-                // Check file format by suffix
-                if (file.type.toLowerCase() == "xbel") {
-                    // XBEL Format  (convert to JDEx and upload)
-                    var xml = $.parseXML(evt.target.result);
-                    $('#message').html("Converting XBEL to JDEx for " + file.path);
-                    var graph = jdex.createGraphFromXBEL(xml);
-                    data = graph.serializeJDEx();
-                    $('#dataToUpload').html(data);
-
-                } else if (file.type.toLowerCase() == "sif") {
-                    // SIF Format  (convert to JDEx and upload)
-                    var lines = evt.target.result.split("\n");
-                    // SIF data is now an array of strings
-                    $('#message').html("Converting SIF to JDEx for " + file.path);
-                    var graph = jdex.createGraphFromSIF(lines);
-                    data = graph.serializeJDEx();
-                    $('#dataToUpload').html(data);
-
-                } else if (file.type.toLowerCase() == "jdex") {
-                    // JDEx Format (just upload)
-                    data = JSON.parse(evt.target.result);
-                    $('#dataToUpload').html(data);
-                    doUpload(data);
-                }
-            };
-            reader.onerror = function (evt) {
-                document.getElementById("message").innerHTML = "error reading file";
-            };
-            reader.readAsText(file, "UTF-8");
-        }
-    });
-
-    function doUpload(data) {
-        alert("ready to call create Network");
         $('#message').html("Uploading JDEx with account = " + ndexUI.user.id + " for " + file.path);
         ndexClient.createNetwork(data, ndexUI.user.id,
                 function (result) {
@@ -95,8 +115,14 @@
                     //
                     $('#message').html(JSON.stringify(error));
                 });
-    }
+    });
 
+    function hasSuffix(str, suffix){
+        if(str.indexOf(suffix, str.length - suffix.length) !== -1){
+            return true;
+        }
+        return false;
+    }
 
 </script>
 <% include foot.ejs %>

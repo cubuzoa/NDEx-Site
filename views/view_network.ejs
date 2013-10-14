@@ -1,7 +1,11 @@
 <% include head.ejs %>
 <% include nav.ejs %>
 
-
+<div class="holder">
+   <div id="networkTitle"></div>
+    <div id="networkDescription"></div>
+    <div id="networkSource"></div>
+</div>
 
 <div class="tabbable">
 	<div class="pageTitle">
@@ -73,9 +77,30 @@
 var networkRID = '<%= networkId %>';
 var thisNetwork = {jid : networkRID}; //object to be used for workspace functions
 
-function formatError(error){
+console.log("calling getNetworkMetadata for viewNetwork");
+$(ndexClient.getNetworkMetadata(networkRID,
+        // success
+        function(data){
+            console.log("Got results from getNetworkMetadata");
+            console.log(data);
+            if (data.network.format){
+                $('#networkFormat').html(data.network.format);
+            }
+            var properties = data.network.properties;
+            if (properties){
+                if (properties.title) $('#networkTitle').html(properties.title);
+                if (properties.description) $('#networkDescription').html(properties.description);
+                if (properties.source) $('#networkSource').html(properties.source);
+            }
 
-}
+        },
+        // error handler
+        function(error){
+            $('#error').append(ndexUI.formatError(error));
+        })
+);
+
+
 
 function formatEdge(edge, network){
 	var edgeDIV = document.createElement('div'),
