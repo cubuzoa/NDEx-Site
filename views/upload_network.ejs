@@ -53,7 +53,8 @@
                 $('#message').html("Converting XBEL to JDEx for " + name);
                 var graph = jdex.createGraphFromXBEL(xml);
                 data = graph.toJDEx();
-                $('#dataToUpload').html(data);
+                $('#message').html("Ready to upload " + name);
+                //$('#dataToUpload').html(data);
 
             } else if (hasSuffix(name, ".sif")) {
                 // SIF Format  (convert to JDEx and upload)
@@ -62,12 +63,14 @@
                 $('#message').html("Converting SIF to JDEx for " + name);
                 var graph = jdex.createGraphFromSIF(lines);
                 data = graph.toJDEx();
-                $('#dataToUpload').html(data);
+                //$('#dataToUpload').html(data);
+                $('#message').html("Ready to upload " + name);
 
             } else if (hasSuffix(name, ".jdex")) {
                 // JDEx Format (just upload)
                 data = JSON.parse(evt.target.result);
-                $('#dataToUpload').html(data);
+                //$('#dataToUpload').html(data);
+                $('#message').html("Ready to upload " + name);
                 //doUpload(data);
             } else {
                 $('#message').html("Unsupported file type: " + type);
