@@ -127,7 +127,7 @@ if(ndexUI.user.id && (ndexUI.user.id === userJID)){
 //----------------------------//
 
 $(ndexClient.getUser(userJID, function(data){
-		console.log("Got results from getUser");
+		console.log("Got results from getUser called with " + userJID);
 		console.log(data);
 
 		ndexUI.addProfileImages(data.user.username);

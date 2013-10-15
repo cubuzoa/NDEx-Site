@@ -137,7 +137,9 @@ exports.getUser = function (userRID, callback) {
                     if (user.backgroundImg) profile.backgroundImg = user.backgroundImg;
                     if (user.description) profile.description = user.description;
 
-                    result = {username: user.username, profile: profile, ownedNetworks: {}, ownedGroups: {}};
+                    var result = {username: user.username, profile: profile, ownedNetworks: {}, ownedGroups: {}};
+
+
 
                     // get owned networks
                     var networkDescriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount";
@@ -170,7 +172,7 @@ exports.getUser = function (userRID, callback) {
                                     }
                                     result.ownedGroups = groups;
                                 }
-
+                                console.log("callback: " + JSON.stringify(result));
                                 callback({user: result, error: err});
 
                             });

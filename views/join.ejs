@@ -1,50 +1,84 @@
 <% include head.ejs %>
 <% include nav.ejs %>
 <h1>Join NDEx</h1>
-<p>TODO: form validation, reject bad passwords, be sure user is not logged in </p>
 
+<div id="message"></div>
 <form action="/users" id="joinForm">
-	<div>
-	<label>Username:</label>
-	<input type="text" name="username"/><br/>
-	</div>
-	<div>
-	<label>Password:</label>
-	<input type="password" name="password"/>
-	</div>
-	<div>
-	<input type="submit" value="Submit"/>
-	</div>
+    <div>
+        <label>Username:</label>
+        <input type="text" name="username" id="username"/><br/>
+    </div>
+    <div>
+        <label>Password:</label>
+        <input type="password" name="password" id="password"/>
+    </div>
+    <div>
+        <label>Email:</label>
+        <input type="recoveryEmail" name="recoveryEmail" id="recoveryEmail"/>
+    </div>
+    <div>
+        <input type="submit" value="Submit"/>
+    </div>
 </form>
 
 <script>
-/* attach a submit handler to the form */
-$("#joinForm").submit(function(event) {
-  
-  /* stop form from submitting normally */
-  event.preventDefault();
-  
-  /* get some values from elements on the page: */
-  var $form = $( this ),
-      username = $form.find( 'input[name="username"]' ).val(),
-      password = $form.find( 'input[name="password"]' ).val(),
-      url = $form.attr( 'action' );
-      
-  /* Post the data via Ajax and process the returned JSON*/
-    $.ajax({
-           type: "POST",
-           url: url,
-           data: $form.serialize(), // serializes the form's elements.
-           dataType: "JSON",
-           success: function(data)
-           {
-               alert("OK : " + JSON.stringify(data)); // show response
-           },
-           error: function(data){
-           		alert("Error : " + JSON.stringify(data));
-           }
-         });
-          
-});
+    // verify that we have local storage before proceeding
+    if (typeof(Storage) == "undefined"){
+        alert("Local storage not available, can't store user credentials, will redirect to home page");
+        window.location = "/";
+    }
+
+    // Sign out if a user is currently signed in:
+    if (ndexUI.user.id || ndexUI.user.username){
+        ndexUI.signOut();
+    }
+
+    /* attach a submit handler to the form */
+        $('#joinForm').submit(function (event) {
+            /* stop form from submitting normally */
+            event.preventDefault();
+            doCreateUser();
+        });
+
+    function doCreateUser() {
+
+        var u = $('#username').val();
+        var p = $('#password').val();
+        var recoveryEmail = $('#recoveryEmail').val();
+
+        if (u && p && recoveryEmail) {
+            ndexClient.createUser(u, p, recoveryEmail,
+                    function (data) {
+//
+// Success: Auto-login: Set localStorage variables and redirect
+//
+                        console.log("Created user: " + JSON.stringify(data));
+                        if (data && (typeof(Storage) !== "undefined")) {
+                            localStorage['ndexUsername'] = u;
+                            localStorage['ndexPassword'] = p;
+                            localStorage['ndexJid'] = data.jid;
+                            window.location = "/editProfile";
+                        } else {
+                            alert("Local storage not available, can't store login information");
+                        }
+                    },
+                    function (error) {
+//
+// Failure: clear localStorage variables and display message
+//
+                        if (error.status == 401) {
+                            $('#message').html('Invalid password');
+                        } else {
+                            console.log(JSON.stringify(error));
+                            $('#message').html("Error (" + error.status + ") : " + JSON.stringify(error));
+                        }
+//console.log(JSON.stringify(error));
+                    }
+            );
+        } else {
+            $('#message').html("Valid username, password, and email required");
+        }
+    }
 </script>
 
+<% include foot.ejs %>
