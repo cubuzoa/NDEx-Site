@@ -38,7 +38,7 @@ $('#createGroupForm').submit(function(event) {
     		    //
     		    // Failure: display message
     		    //
-    			$('#message').html(JSON.stringify(error));
+    			ndexUI.formatError(error);
     		});
 });
 

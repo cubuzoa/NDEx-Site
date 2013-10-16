@@ -2,7 +2,6 @@
 <% include nav.ejs %>
 
 <h1>Edit My Profile</h1>
-
 <p id ="message"></p>
 <div class=''>
     <hr>
@@ -66,7 +65,7 @@
             },
             // error handler
             function(error){
-                $('#error').append(ndexUI.formatError(error));
+                ndexUI.formatError(error);
             })
     );
 
@@ -95,7 +94,7 @@
                     //
                     // Failure: display message
                     //
-                    $('#message').html(JSON.stringify(error));
+                    ndexUI.formatError(error);
                 });
     });
 

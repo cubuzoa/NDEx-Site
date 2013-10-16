@@ -57,7 +57,7 @@
 				<li> <a href = "/editAgent" class = "accountMiniMenu" style="display:none"> Edit/Create Agent </a></li>
 			</ul>
 	</div>
-	<div id="error"></div>
+	<div id="message"></div>
 </div>
 
 <!--- Modal for Display Options ---->
@@ -133,7 +133,7 @@ $(ndexClient.getUser(userJID, function(data){
 		ndexUI.addProfileImages(data.user.username);
 	
   		$.each(data.user.profile, function(index, item){
-			ndexUI.addElements(item, index);
+			ndexUI.updateUserProfileElements(item, index);
 			//$('#profile').append(index + image);
 		});  
 
@@ -148,7 +148,7 @@ $(ndexClient.getUser(userJID, function(data){
     },
     // error handler
     function(error){
-    	$('#error').append(ndexUI.formatError(error));
+    	ndexUI.formatError(error);
     })
 );
 

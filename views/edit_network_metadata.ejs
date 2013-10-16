@@ -55,7 +55,7 @@
             },
             // error handler
             function(error){
-                $('#error').append(ndexUI.formatError(error));
+                ndexUI.formatError(error);
             })
     );
 
@@ -85,7 +85,7 @@
                     // Failure: display message
                     //
                     console.log("error in setNetworkMetadata");
-                    $('#message').html(JSON.stringify(error));
+                    ndexUI.formatError(error);
                 });
     });
 

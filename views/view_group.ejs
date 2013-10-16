@@ -28,17 +28,18 @@
 		</div>
 	</div>
 	<div id="profile" class="span3">
-		<h3 id = "name"> </h3>
-		<p><a  id = "link" target = "_blank"> </a></p>
-		<p id = "descrip"> </p>
-		<div id = "notifications" class = "notifications" style="display:none">
-			<div class = "notificationsHeader">
-			Notifications
-			</div>
-			<div id = "notifContent" style = "background-color:white" >
-			Requests
-			</div>
-		</div>
+        <h3 id = "organizationName"> </h3>
+        <p><a  id = "groupWebsite" target = "_blank"> </a></p>
+        <p id = "groupDescription"> </p>
+        <div id = "notifications" class = "notifications" style="display:none">
+            <div class = "notificationsHeader">
+                Notifications
+            </div>
+            <div id = "notifContent" style = "background-color:white" >
+                Requests
+            </div>
+        </div>
+
 	</div>
 	<div class = "span2 dropdown">
 			<a class = "ndex-options dropdown-toggle" data-toggle="dropdown"> 
@@ -54,7 +55,7 @@
 				<li> <a href = "/editAgent" class = "accountMiniMenu" style="display:none"> Edit/Create Agent </a></li>
 			</ul>
 	</div>
-	<div id="error"></div>
+	<div id="message"></div>
 </div>
 
 <!--- Modal for Display Options ---->
@@ -90,11 +91,6 @@ $('.nav-tabs a').on('shown', function (e) {
     window.location.hash = e.target.hash.replace("#", "#" + prefix);
 });
 
-
-function formatError(error){
-	
-}
-
 //----------------------------/
 if(ndexUI.user.id){// && ndexUI.isOwnedGroup(groupJID)){  <---waiting for fix on xownsgroup edge
 	//$('#showGroups').attr('style', 'display:block');
@@ -104,7 +100,6 @@ if(ndexUI.user.id){// && ndexUI.isOwnedGroup(groupJID)){  <---waiting for fix on
 	$('#showOwnedAgentAccounts').attr('style', 'display:block');
 
 }
-
 
 //----------------------------//
 
@@ -116,8 +111,7 @@ $(ndexClient.getGroup(groupJID, function(data){
   		ndexUI.addProfileImages(data.group.groupname);
 
   		$.each(data.group.profile, function(index, item){
-			ndexUI.addElements(item, index);
-			//$('#profile').append(index + ' ' );
+			ndexUI.updateGroupProfileElements(item, index);
 		});  
 
   		$.each(data.group.ownedNetworks, function(index, network){
@@ -127,7 +121,7 @@ $(ndexClient.getGroup(groupJID, function(data){
     },
     // error handler
     function(error){
-    	$('#error').append(formatError(error));
+        ndexUI.formatError(error);
     })
 );
 

@@ -5,7 +5,7 @@
 //-----------------------------------------------------
 //				Sign In / Out
 //-----------------------------------------------------
-    exports.checkSignIn = function() {
+    exports.checkSignIn = function () {
         if (localStorage['ndexUsername'] == '') {
             console.log('not signed in');
             exports.user = {};
@@ -18,7 +18,7 @@
         }
     };
 
-    exports.signOut = function() {
+    exports.signOut = function () {
 
         localStorage['ndexUsername'] = '';
         localStorage['ndexPassword'] = '';
@@ -29,7 +29,7 @@
         //console.log(JSON.stringify(localStorage));
     };
 
-    exports.isOwnedNetwork = function(networkId) {
+    exports.isOwnedNetwork = function (networkId) {
         if (exports.user.ownedNetworks && exports.user.ownedNetworks.length > 0) {
             $.each(exports.user.ownedNetworks, function (index, network) {
                 if (network.jid == networkId) return true;
@@ -38,7 +38,7 @@
         return false;
     };
 
-    exports.isSharedNetwork = function(networkId) {
+    exports.isSharedNetwork = function (networkId) {
         //TODO shared network implementation?
         return false;
     };
@@ -56,17 +56,33 @@
 //		Utilities
 //-----------------------------------------------------
 
-// TODO
-// decide what to do with errors...
-    exports.formatError = function(error){
-       alert("Error: " + error);
+    exports.formatError = function (error) {
+        console.log(JSON.stringify(error));
+        // First, figure out if we can get the error text from the error
+        var errorString = '(problem getting error text)'
+        if (typeof(error) == 'string') {
+            errorString = error;
+        } else if (typeof(error) == 'object' && error.responseJSON && error.responseJSON.error) {
+            errorString = error.responseJSON.error;
+        } else {
+            errorString = JSON.stringify(error);
+        }
 
-    } ;
+        // Second, check whether we have an element with the id "message".
+        // If we do, then use it to display the error.
+        var messageDiv = document.getElementById('message');
+        if (messageDiv) {
+            messageDiv.innerHTML = "<span class='errorMessage'>Error: " + errorString + "</span>";
+        } else {
+            // fall back to an alert if we don't have a messageDiv
+            alert("Error: " + errorString);
+        }
+    };
 
 //-----------------------------------------------------
 //		Pagination function
 //-----------------------------------------------------
-    exports.createPaginationModule = function(pageAmount, page, searchFunction) {
+    exports.createPaginationModule = function (pageAmount, page, searchFunction) {
         //searchFunction must name of function in string format
 
         var pagDiv = document.createElement('div');
@@ -129,7 +145,7 @@
 //	Network List Interface
 //--------------------------------------
 
-    exports.networkToggle = function(obj) {
+    exports.networkToggle = function (obj) {
         // toggle the network list item between closed and open
         var elementIDs = $(obj).data('elementIDs');
         var element = document.getElementById(elementIDs.div);
@@ -146,7 +162,7 @@
         exports.updateNetworkWorkSurfaceButton(elementIDs.jid);
     };
 
-    exports.updateViewNetworkWorkSurfaceButtons = function(networkId){
+    exports.updateViewNetworkWorkSurfaceButtons = function (networkId) {
         //
         // Used on viewNetwork page
         //
@@ -155,38 +171,38 @@
         $(netStatusElement).html('');
         $(netStatusLink).data('networkProperties', networkId);
 
-        if (exports.isOnWorkSurface(networkId)){
-            $(netStatusLink).attr('onclick',"ndexUI.removeFromWorkSurface('" + networkId + "')").html('Remove from WorkSurface');
+        if (exports.isOnWorkSurface(networkId)) {
+            $(netStatusLink).attr('onclick', "ndexUI.removeFromWorkSurface('" + networkId + "')").html('Remove from WorkSurface');
             $(netStatusElement).append(netStatusLink);
         }
-        else{
-            $(netStatusLink).attr('onclick',"ndexUI.addToWorkSurface('" + networkId + "')").html('Add to WorkSurface');
+        else {
+            $(netStatusLink).attr('onclick', "ndexUI.addToWorkSurface('" + networkId + "')").html('Add to WorkSurface');
             $(netStatusElement).append(netStatusLink);
         }
     };
 
 
-    exports.updateNetworkWorkSurfaceButton = function(networkId){
+    exports.updateNetworkWorkSurfaceButton = function (networkId) {
         //
         // Used for network list items
         //
         var tempLink = document.getElementById('link' + networkId),
             tempIcon = document.getElementById('icon' + networkId);
 
-        if(exports.isOnWorkSurface(networkId)) {
-            $(tempLink).attr('onclick',"ndexUI.removeFromWorkSurface('" + networkId + "')");
-            $(tempIcon).attr('title','Remove from WorkSurface');
-            tempIcon.className='icon-remove';
+        if (exports.isOnWorkSurface(networkId)) {
+            $(tempLink).attr('onclick', "ndexUI.removeFromWorkSurface('" + networkId + "')");
+            $(tempIcon).attr('title', 'Remove from WorkSurface');
+            tempIcon.className = 'icon-remove';
         }
-        else{
-            $(tempLink).attr('onclick',"ndexUI.addToWorkSurface('" + networkId + "')");
-            $(tempIcon).attr('title','Add to WorkSurface');
-            tempIcon.className='icon-plus icon-white';
+        else {
+            $(tempLink).attr('onclick', "ndexUI.addToWorkSurface('" + networkId + "')");
+            $(tempIcon).attr('title', 'Add to WorkSurface');
+            tempIcon.className = 'icon-plus icon-white';
         }
     };
 
     // Create the element with all the actions for network when toggled open
-    exports.createNetworkButtonToolElement = function(item) {
+    exports.createNetworkButtonToolElement = function (item) {
         var buttonDiv = document.createElement('div'),
             wkSpaceLink = document.createElement('a'),
             viewLink = document.createElement('a'),
@@ -260,7 +276,7 @@
     };
 
 
-    exports.formatNetworkDescriptor = function(networkItem) {
+    exports.formatNetworkDescriptor = function (networkItem) {
         var networkDIV = document.createElement('div'),
             nodeSpan = document.createElement('span'),
             edgeSpan = document.createElement('span'),
@@ -315,22 +331,22 @@
 //			WorkSurface Functions
 //---------------------------------------------------
 
-    exports.initUserWorkSurface = function(){
-        if (exports.user.id){
+    exports.initUserWorkSurface = function () {
+        if (exports.user.id) {
 
             ndexClient.getUserWorkSurface(exports.user.id,
-                function(data){
+                function (data) {
                     // Success
                     if (data.networks) updateWorkSurface(data.networks);
                 },
-                function (error){
+                function (error) {
                     // failure
                     exports.formatError("while initializing WorkSurface: " + error);
                 });
         }
     };
 
-    exports.isOnWorkSurface = function(networkId) {
+    exports.isOnWorkSurface = function (networkId) {
 
         // check workSurface element for network.
         // will return false if the workSurface element is not initialized
@@ -345,8 +361,8 @@
         return found;
     };
 
-    exports.removeFromWorkSurface = function(networkId) {
-        if (exports.user.id && networkId){
+    exports.removeFromWorkSurface = function (networkId) {
+        if (exports.user.id && networkId) {
             ndexClient.deleteNetworkFromUserWorkSurface(exports.user.id, networkId,
                 function (data) {
                     // if successful
@@ -356,7 +372,7 @@
                     }
 
                 },
-                function (error){
+                function (error) {
                     // if failure
                     exports.formatError("while removing network from workSurface: " + error);
                 });
@@ -364,28 +380,28 @@
 
 
         /*
-        var parent = document.getElementById('workSurface');
+         var parent = document.getElementById('workSurface');
 
-        //loop through all input element in sidebar.ejs until desire element is found
-        $("input").each(function (index, value) {
-            if ($(this).attr('title') == network.jid) {
-                ndexClient.deleteNetworkFromUserWorkSurface(user.jid, network.jid,
-                    function (data) {
-                        // if successful
-                        updateWorkSurface();
-                    },
-                    function (error){
-                        // if failure
-                    });
-                var child = document.getElementById('thumbnail' + network.jid);
-                parent.removeChild(child);
-                updateWorkSurfaceTools(network.jid);
-            }
-        });
-        */
+         //loop through all input element in sidebar.ejs until desire element is found
+         $("input").each(function (index, value) {
+         if ($(this).attr('title') == network.jid) {
+         ndexClient.deleteNetworkFromUserWorkSurface(user.jid, network.jid,
+         function (data) {
+         // if successful
+         updateWorkSurface();
+         },
+         function (error){
+         // if failure
+         });
+         var child = document.getElementById('thumbnail' + network.jid);
+         parent.removeChild(child);
+         updateWorkSurfaceTools(network.jid);
+         }
+         });
+         */
     };
 
-    exports.addToWorkSurface = function(networkId) {
+    exports.addToWorkSurface = function (networkId) {
 
         ndexClient.addNetworkToUserWorkSurface(exports.user.id, networkId,
             function (data) {
@@ -396,7 +412,7 @@
                     exports.updateNetworkWorkSurfaceButton(networkId);
                 }
             },
-            function (error){
+            function (error) {
                 // if failure
                 exports.formatError("while adding Network to workSurface: " + error);
             });
@@ -404,23 +420,23 @@
         //
     };
 
-    var updateWorkSurface = function(workSurfaceNetworks){
+    var updateWorkSurface = function (workSurfaceNetworks) {
 
         // Clear the networkElements  (need specific class assignment...)
         $('.thumbnails').remove();
         /*
-        $('#workSurface').children().each(function(index, element){
-            $('#workSurface').remove('.thumbnail');
-        });
-        */
+         $('#workSurface').children().each(function(index, element){
+         $('#workSurface').remove('.thumbnail');
+         });
+         */
         // create a new networkElement for each workSurfaceNetwork
-        $.each(workSurfaceNetworks, function(index, network){
+        $.each(workSurfaceNetworks, function (index, network) {
             $('#workSurface').append(createWorkSurfaceNetworkElement(network));
         });
 
     };
 
-    var createWorkSurfaceNetworkElement = function(network){
+    var createWorkSurfaceNetworkElement = function (network) {
         // ul, li are for bootstrap thumbnail css
         var networkElement = document.createElement('ul'),
             lst = document.createElement('li'),
@@ -545,7 +561,7 @@
 //					Group List Interface
 //--------------------------------------------------------------------
 
-    exports.groupButtonTools = function(item) {
+    exports.groupButtonTools = function (item) {
         var buttonDiv = document.createElement('div'),
             viewLink = document.createElement('a'),
             viewIcon = document.createElement('i'),
@@ -596,7 +612,7 @@
     };
 
 
-    exports.formatGroupDescriptor = function(item) {
+    exports.formatGroupDescriptor = function (item) {
         var groupDIV = document.createElement('div'),
             titleSpan = document.createElement('span'),
             iconSpan = document.createElement('span'),
@@ -643,7 +659,7 @@
 //--------------------------------------------------------------------
 
 
-    exports.userButtonTools = function(item) {
+    exports.userButtonTools = function (item) {
         var buttonDiv = document.createElement('div'),
             viewLink = document.createElement('a'),
             viewIcon = document.createElement('i'),
@@ -688,7 +704,7 @@
     };
 
 
-    exports.formatUserDescriptor = function(item) {
+    exports.formatUserDescriptor = function (item) {
         var userDIV = document.createElement('div'),
             titleSpan = document.createElement('span'),
             iconSpan = document.createElement('span'),
@@ -734,7 +750,7 @@
 // 				User Notification Functions
 //--------------------------------------------------------------------
 
-    exports.addInvite = function(name, id) {
+    exports.addInvite = function (name, id) {
         //adds invite to notifContent div in user or group home page
         //requires that the page have div with id notifContent
         //requires running create modal in conjunction for now
@@ -755,7 +771,7 @@
         return unlist;
     };
 
-    exports.respondInvite = function(obj) {
+    exports.respondInvite = function (obj) {
         //function for onclick attribute of modal buttons for request
         //requires notifications div to have id 'notifcontent'
 
@@ -776,7 +792,7 @@
         }
     };
 
-    exports.createModal = function(name, id) {
+    exports.createModal = function (name, id) {
         //essentially using js to create html modal for bootstrap
         //parameters may change in order to handle full body of a request or invite
 
@@ -884,7 +900,7 @@
 //				Profile Functions
 //---------------------------------------------------------
 
-    exports.addProfileImages = function(accountname){
+    exports.addProfileImages = function (accountname) {
 
         var foregroundImage = document.createElement('img'),
             backgroundImage = document.createElement('img'),
@@ -901,7 +917,7 @@
         $(imgDiv).append(foregroundImage).append(fImg);
     };
 
-    exports.addElements = function(item, index) {
+    exports.updateUserProfileElements = function (item, index) {
         var userFullName = document.getElementById('userFullName'),
             userWebsite = document.getElementById('userWebsite'),
             userDescription = document.getElementById('userDescription');
@@ -928,6 +944,29 @@
     };
 
 
-})(typeof exports === 'undefined'? this['ndexUI']={}: exports);
+    exports.updateGroupProfileElements = function (item, index) {
+        var organizationName = document.getElementById('organizationName'),
+            groupWebsite = document.getElementById('groupWebsite'),
+            groupDescription = document.getElementById('groupDescription');
+
+        if (index == "organizationName") {
+            $(organizationName).append(item + ' ');
+        }
+
+        if (index == "website") {
+            $(groupWebsite).attr('href', "http://" + item)
+                .attr('target', '_blank')
+                .append("website: " + item);
+        }
+
+        if (index == "description") {
+            $(groupDescription).append(item);
+        }
+
+
+    };
+
+
+})(typeof exports === 'undefined' ? this['ndexUI'] = {} : exports);
 
 

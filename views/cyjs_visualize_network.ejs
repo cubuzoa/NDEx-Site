@@ -15,11 +15,7 @@
 <script>
 
 // the network id passed from the ejs template
-var networkRID = '<%= networkId %>';
-
-function formatError(error){
-
-}
+var networkRID = '<%= networkId %>'
 
 //				'text-outline-width': 2,
 //				'text-outline-color': '#888'
@@ -88,7 +84,7 @@ $(ndexClient.getNetwork(networkRID, function(data){
     },
     // error handler
     function(error){
-    	$('#results').append(formatError(error));
+    	ndexUI.formatError(error);
     })
 );
 </script>
@@ -97,11 +93,9 @@ $(ndexClient.getNetwork(networkRID, function(data){
 
 <body>
 
-<div id="back"><a href="/">Return to NDEx Home Page</a></div>
+<div id="back"><a href="/">Return to NDEx Home Page</a><span id="message"></span></div>
 
 <div id="cy"></div>
-
-
 
 </body>
 </html>

@@ -53,10 +53,6 @@
 var network1RID = '<%= network1Id %>';
 var network2RID = '<%= network2Id %>';
 
-function formatError(error){
-
-}
-
 /*
 	Animation 
 */
@@ -356,12 +352,12 @@ $(ndexClient.getNetwork(network1RID, function(data1){
 		},
 		// error handler
     	function(error){
-    		$('#error').append(formatError(error));
+            ndexUI.formatError(error);
     	});
 	},
 	
 	function(error){
-    		$('#error').append(formatError(error));
+        ndexUI.formatError(error);
     }
 	
 ));

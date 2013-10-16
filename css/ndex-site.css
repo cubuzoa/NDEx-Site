@@ -313,3 +313,10 @@ a.ndex-options:hover{
 .accountMiniMenu{}
 
 .networkMiniMenu{}
+
+
+/*-----------------------------------*/
+
+.errorMessage{
+    color: #FF0000;
+}

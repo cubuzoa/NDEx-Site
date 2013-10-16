@@ -2,6 +2,7 @@
 <% include nav.ejs %>
 
 <h1>Find Networks</h1>
+<p id ="message"></p>
 <!-- btn-group from twitter allows for next div to be aligned and pulled right, easy fix-->
 <div class="btn-group">
 	<form onsubmit="return doSearch();" id="searchForm">
@@ -91,7 +92,7 @@ function doSearch(offset) {
         },
 
         function(error){     // error handler
-            $('#searchResults').append(ndexUI.formatError(error));
+            ndexUI.formatError(error);
         });
     
     return false;
