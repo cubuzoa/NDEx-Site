@@ -31,8 +31,9 @@
         </div>
     </form>
 </div>
-<div id="message">temp</div>
-<div id="dataToUpload">temp</div>
+<div id="message"></div>
+<hr>
+<div id="dataToUpload"></div>
 
 <script>
     var data, files, file, onloadEvent, xml;
@@ -53,8 +54,9 @@
                 $('#message').html("Converting XBEL to JDEx for " + name);
                 var graph = jdex.createGraphFromXBEL(xml);
                 data = graph.toJDEx();
+                $('#dataToUpload').html(graph.serializeJDEx());
                 $('#message').html("Ready to upload " + name);
-                //$('#dataToUpload').html(data);
+
 
             } else if (hasSuffix(name, ".sif")) {
                 // SIF Format  (convert to JDEx and upload)
@@ -62,8 +64,13 @@
                 // SIF data is now an array of strings
                 $('#message').html("Converting SIF to JDEx for " + name);
                 var graph = jdex.createGraphFromSIF(lines);
+                graph.properties.name = name;
+                graph.properties.format = "sif";
+                graph.properties.title = name;
+                graph.properties.source = "unknown";
+                graph.properties.description = "sif network";
                 data = graph.toJDEx();
-                //$('#dataToUpload').html(data);
+                //$('#dataToUpload').html(graph.serializeJDEx());
                 $('#message').html("Ready to upload " + name);
 
             } else if (hasSuffix(name, ".jdex")) {
@@ -104,7 +111,7 @@
     /* attach a submit handler to the form */
     $('#networkUploadForm').submit(function (event) {
         event.preventDefault();  // stop form from submitting normally
-        $('#message').html("Uploading JDEx with account = " + ndexUI.user.id + " for " + file.path);
+        $('#message').html("Uploading JDEx with account = " + ndexUI.user.id + " for " + file.name);
         ndexClient.createNetwork(data, ndexUI.user.id,
                 function (result) {
                     //

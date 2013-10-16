@@ -74,6 +74,7 @@
 
     // the network id passed from the ejs template
     var networkRID = '<%= networkId %>';
+    var networkPage;
     var thisNetwork = {jid: networkRID}; //object to be used for workspace functions
 
     console.log("calling getNetworkMetadata for viewNetwork");
@@ -110,7 +111,7 @@
                 object = network.nodes[edge.o],
                 predicate = network.terms[edge.p];
 
-        console.log(subject.represents + " : " + JSON.stringify(network.terms[subject.represents]));
+        console.log("subject: " + subject.name + " represents " + subject.represents + " : " + JSON.stringify(network.terms[subject.represents]));
         if (subject.represents && network.terms[subject.represents] && network.terms[subject.represents].name) {
             var term = network.terms[subject.represents];
             $(subjectSpan).addClass('term').html(term.name + ' ');
@@ -118,12 +119,12 @@
             $(subjectSpan).addClass('term').html(subject.name + ' ');
         }
 
-        console.log(object.represents + " : " + JSON.stringify(network.terms[object.represents]));
+        console.log("object: " + object.name + " represents " + object.represents + " : " + JSON.stringify(network.terms[object.represents]));
         if (object.represents && network.terms[object.represents] && network.terms[object.represents].name) {
             var term = network.terms[object.represents];
             $(objectSpan).addClass('term').html(' ' + term.name);
         } else {
-            $(subjectSpan).addClass('term').html(object.name + ' ');
+            $(objectSpan).addClass('term').html(object.name + ' ');
         }
 
         $(idSpan).addClass('edgeId').html(edge.id);
@@ -155,13 +156,14 @@
                 .append(idSpan);
         //.append(nameSpan);
 
-        console.log(node.represents + " : " + JSON.stringify(network.terms[node.represents]));
+        console.log(node.name + " represents " + node.represents + " : " + JSON.stringify(network.terms[node.represents]));
         if (node.represents && network.terms[node.represents] && network.terms[node.represents].name) {
             var term = network.terms[node.represents],
                     representsSpan = document.createElement('span');
             $(representsSpan).addClass('term').html(term.name);
             $(nodeDIV).append(representsSpan);
         } else {
+            var representsSpan = document.createElement('span');
             $(representsSpan).addClass('term').html(node.name);
             $(nodeDIV).append(representsSpan);
         }
@@ -235,6 +237,7 @@
 
         $(ndexClient.getNetworkByEdges(networkRID, '', '', '', '', edgeCount, edgePage, function (data) {
                     $('#edges').html('');
+                    networkPage = data.network;
                     $.each(data.network.edges, function (index, edge) {
                         $('#edges').append(formatEdge(edge, data.network));
                     });

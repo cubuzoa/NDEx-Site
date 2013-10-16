@@ -756,7 +756,10 @@
 
     function termIdentifier(name, ns) {
         if (ns) {
-            if (ns.prefix) {
+            // treat 'internal' namespace like null for identifier
+            if (ns.uri == 'internal') {
+                return name;
+            } else if (ns.prefix) {
                 return ns.prefix + ":" + name;
             } else {
                 return ns.uri + name;
@@ -764,7 +767,7 @@
         } else {
             return name;
         }
-    }
+    };
 
     exports.Term.prototype = {
 
@@ -933,20 +936,53 @@
     exports.createGraphFromSIF = function (data) {
         var graph = new exports.Graph();
 
+        // get the BEL relationship namespace
+        var internalNS = graph.findOrCreateNamespace('internal', 'internal');
+
+        //graph.name = pathwayName;
         // data is assumed to be an array of lines
-        $.each(data, function (index, line) {
-            var tokens = line.split("\t"),
-                subjectIdentifier = tokens[0],
-                predicateIdentifier = tokens[1],
-                objectIdentifier = tokens[2];
+        // and that tokens on a line are separated by whitespace of some kind
+        for (i = 1; i < data.length; i++) {
+            var line = data[i];
+            if (line.trim().length != 0) {
+                var tokens = line.split(/\s+/),
+                    subjectIdentifier = tokens[0],
+                    predicateIdentifier = tokens[1],
+                    objectIdentifier = tokens[2];
 
-            var predicate = graph.findOrCreateTerm(predicateIdentifier);
-            var subjectNode = graph.findOrCreateNodeByIdentifier(subjectIdentifier);
-            var objectNode = graph.findOrCreateNodeByIdentifier(objectIdentifier);
-            graph.findOrCreateEdge(subjectNode, predicate, objectNode);
+                if (subjectIdentifier && predicateIdentifier && objectIdentifier) {
+                    var predicate = graph.findOrCreateTerm(predicateIdentifier, internalNS);
 
-        });
+                    var subjectTerm = graph.findOrCreateTerm(subjectIdentifier, internalNS);
+                    var subjectNode = graph.findOrCreateNodeByIdentifier(subjectIdentifier);
+                    subjectNode.represents = subjectTerm;
 
+                    var objectTerm = graph.findOrCreateTerm(objectIdentifier);
+                    var objectNode = graph.findOrCreateNodeByIdentifier(objectIdentifier);
+                    objectNode.represents = objectTerm;
+
+                    graph.findOrCreateEdge(subjectNode, predicate, objectNode);
+                } else {
+                    console.log("Malformed SIF triple:" + subjectIdentifier + " - " + predicateIdentifier + " - " + objectIdentifier);
+                    //console.log(internalNS);
+                }
+            }
+        }
+        /*
+         // data is assumed to be an array of lines
+         $.each(data, function (index, line) {
+         var tokens = line.split("\t"),
+         subjectIdentifier = tokens[0],
+         predicateIdentifier = tokens[1],
+         objectIdentifier = tokens[2];
+
+         var predicate = graph.findOrCreateTerm(predicateIdentifier);
+         var subjectNode = graph.findOrCreateNodeByIdentifier(subjectIdentifier);
+         var objectNode = graph.findOrCreateNodeByIdentifier(objectIdentifier);
+         graph.findOrCreateEdge(subjectNode, predicate, objectNode);
+
+         });
+         */
         return graph;
     }
 
@@ -1062,8 +1098,9 @@
                 var header_element = elements[0],
                     value = $(header_element).text(),
                     predicate = graph.findOrCreateTerm(dc_info.term, dc_namespace_uri);
-                console.log("adding graph property: " + predicate.identifier() + " : " + value);
-                graph.setProperty(predicate, value);
+                //console.log("adding graph property: " + predicate.identifier() + " : " + value);
+                //graph.setProperty(predicate, value);
+                graph.properties[dc_info.term] = value;
             }
 
         });
@@ -1076,10 +1113,10 @@
         $.each(elements, function (index, ns_info) {
             var uri = $(ns_info).attr('bel:resourceLocation'),
                 prefix = $(ns_info).attr('bel:prefix');
-            if (uri && prefix){
+            if (uri && prefix) {
                 graph.findOrCreateNamespace(uri, prefix);
             } else {
-                throw new Error ("attempt to create namespace with missing URI or prefix")
+                throw new Error("attempt to create namespace with missing URI or prefix")
             }
 
         });
@@ -1311,17 +1348,17 @@
 
         // process the authors, if listed
         /*
-        var authorGroups = citationElement.getElementsByTagName('bel\\:authorGroup');
-        if (authorGroups && authorGroups.length > 0) {
-            $.each(authorGroups[0].getElementsByTagName('bel\\:author'), function (index, authorElement) {
-                citation.addContributor(authorElement.textContent);
-            });
-        }
-        */
+         var authorGroups = citationElement.getElementsByTagName('bel\\:authorGroup');
+         if (authorGroups && authorGroups.length > 0) {
+         $.each(authorGroups[0].getElementsByTagName('bel\\:author'), function (index, authorElement) {
+         citation.addContributor(authorElement.textContent);
+         });
+         }
+         */
 
         var authorGroup = $(citationElement).children('bel\\:authorGroup').filter('first');
-        if (authorGroup){
-            $(authorGroup).children('bel\\:author').each(function (index, author){
+        if (authorGroup) {
+            $(authorGroup).children('bel\\:author').each(function (index, author) {
                 citation.addContributor(authorElement.textContent);
             });
         }
