@@ -67,10 +67,11 @@
 // Failure: clear localStorage variables and display message
 //
                         if (error.status == 401) {
-                            $('#message').html('Invalid password');
+                            ndexUI.formatError(error);
+                            //$('#message').html('Invalid password');
                         } else {
                             console.log(JSON.stringify(error));
-                            $('#message').html("Error (" + error.status + ") : " + JSON.stringify(error));
+                            ndexUI.formatError(error);
                         }
 //console.log(JSON.stringify(error));
                     }
