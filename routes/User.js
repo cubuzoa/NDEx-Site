@@ -142,7 +142,7 @@ exports.getUser = function (userRID, callback) {
 
 
                     // get owned networks
-                    var networkDescriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount";
+                    var networkDescriptors = "properties.title as title, @rid as jid, nodesCount as nodeCount, edgesCount as edgeCount";
                     var traverseExpression = "select flatten(out(xOwnsNetwork)) from " + userRID;
 
                     var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
@@ -193,7 +193,7 @@ exports.getUser = function (userRID, callback) {
 
 
 function getWorkSurfaceInternal(userRID, callback){
-    var networkDescriptors = "properties.title as title, @rid as rid, nodes.size() as nodeCount, edges.size() as edgeCount";
+    var networkDescriptors = "properties.title as title, @rid as rid, nodesCount as nodeCount, edgesCount as edgeCount";
     var traverseExpression = "select flatten(workspace) from " + userRID;
     var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
 

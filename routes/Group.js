@@ -154,7 +154,7 @@ exports.getGroup = function(groupRID, callback){
 					var result = {groupname: group.groupname, profile : profile, ownedNetworks: {}};
 					
 					// get owned networks
-					var networkDescriptors = "properties.title as title, @rid as jid, nodes.size() as nodeCount, edges.size() as edgeCount";
+					var networkDescriptors = "properties.title as title, @rid as jid, nodesCount as nodeCount, edgesCount as edgeCount";
 					var traverseExpression = "select flatten(out(xOwnsNetwork)) from " + groupRID
 			 
 					var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
