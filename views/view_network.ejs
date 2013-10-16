@@ -1,16 +1,13 @@
 <% include head.ejs %>
 <% include nav.ejs %>
 
-<div class="holder">
-    <div id="networkTitle"></div>
-    <div id="networkDescription"></div>
-    <div id="networkSource"></div>
-</div>
+<div id="networkSource"></div>
+<div id="networkDescription"></div>
 
 <div class="tabbable">
     <div class="pageTitle">
         <div class="btn-group">
-            <h4 id="viewNetTitle"> Network Title </h4>
+            <h3 id="viewNetTitle"> Network Title </h3>
         </div>
         <div class="dropdown pull-right">
             <a class="ndex-options" href="../visualizeNetwork/<%= networkId %>">
@@ -23,8 +20,7 @@
             <ul class="dropdown-menu">
                 <li id="netStatus"></li>
                 <li><a href="#networkDisplay" data-toggle="modal"> Network Display </a></li>
-                <li><a href="/editNetworkMetadata" class="networkMiniMenu" style="display:none"> Edit Network
-                        MetaData </a></li>
+                <li><a href="/editNetworkMetadata/<%= networkId %>" class="networkMiniMenu"> Edit Network MetaData </a></li>
                 <li><a href="#" class="networkMiniMenu" style="display:none"> Edit Network Permissions </a></li>
                 <li><a href="#" class="networkMiniMenu" style="display:none"> Publish Network </a></li>
             </ul>
@@ -91,9 +87,9 @@
                 }
                 var properties = data.network.properties;
                 if (properties) {
-                    if (properties.title) $('#networkTitle').html(properties.title);
+                    if (properties.title) $('#networkTitle').html("<h3>" + properties.title + "</h3>");
                     if (properties.description) $('#networkDescription').html(properties.description);
-                    if (properties.source) $('#networkSource').html(properties.source);
+                    if (properties.source) $('#networkSource').html("Source:" + properties.source);
                 }
 
             },
