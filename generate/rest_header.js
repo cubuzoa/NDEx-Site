@@ -1,8 +1,43 @@
-require('nodetime').profile({
-    accountKey: '4794cfcb618e0e93a6e7f4ecddea823669a7b8e8',
-    appName: 'NDEx REST Server'
+//-----------------------------------------------------------
+//
+//				Load rest.js configuration from ./config/rest_config.json
+//
+//              if not found, configuration is set to default
+//
+//-----------------------------------------------------------
+
+var fs = require('fs');
+var rest_config = './config/rest_config.json';
+var config = {};
+
+fs.exists(rest_config, function (exists) {
+    if (exists){
+        console.log("Found rest_config.json, will take NDEx REST Configuration from that file.");
+        var config_text = fs.readFileSync(rest_config);
+        config = JSON.parse(config_text);
+    } else {
+        console.log("Using Default NDEx REST Configuration.");
+        config = {nodetime: 'disabled'}
+    }
 });
 
+console.log("NDEX REST Configuration: " + JSON.stringify(config));
+
+//-----------------------------------------------------------
+//
+//				Nodetime
+//
+//-----------------------------------------------------------
+
+if (config.nodetime == 'enabled'){
+    require('nodetime').profile({
+        accountKey: '4794cfcb618e0e93a6e7f4ecddea823669a7b8e8',
+        appName: 'NDEx REST Server'
+    });
+    console.log("Nodetime enabled!");
+} else {
+    console.log("Nodetime NOT enabled");
+}
 
 var flash = require('connect-flash')
   , express = require('express')

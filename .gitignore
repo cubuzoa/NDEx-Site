@@ -4,6 +4,7 @@ account_img/users/foreground/*
 account_img/users/background/*
 account_img/groups/foreground/*
 account_img/groups/background/*
+config/rest_config.json
 unit_test/node_modules/*
 .idea/*
 .idea
