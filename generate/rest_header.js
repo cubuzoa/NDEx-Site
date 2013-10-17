@@ -31,7 +31,8 @@ console.log("NDEX REST Configuration: " + JSON.stringify(config));
 
 if (config.nodetime == 'enabled'){
     require('nodetime').profile({
-        accountKey: '4794cfcb618e0e93a6e7f4ecddea823669a7b8e8',
+        // TODO - make this a config param
+        accountKey: '9a4972a10721812f0c8185a8712a117e53af605f',
         appName: 'NDEx REST Server'
     });
     console.log("Nodetime enabled!");
