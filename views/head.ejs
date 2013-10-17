@@ -21,7 +21,7 @@
         if (document.location.hostname == "www.dev.ndexbio.org"){
             ndexClient.host = "http://www.ndexbio.org:3333";
             console.log("Special case: REST server at http://www.ndexbio.org:3333");
-        } else {}
+        } else {
 		    ndexClient.host = "http://"  + document.location.hostname + ":3333" ;
         }
 	</script>
