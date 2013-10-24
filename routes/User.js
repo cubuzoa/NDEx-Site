@@ -159,8 +159,8 @@ exports.getUser = function (userRID, callback) {
 
                             // get owned groups
                             var groupDescriptors = "organizationName as organizationName, @rid as jid";
-                            var traverseExpression = "select flatten(out(xOwnsGroup)) from " + userRID;
-                            var groups_cmd = "select " + groupDescriptors + " from (" + traverseExpression + ") where @class = 'xGroup'";
+                            var traverseExpression2 = "select flatten(out(xOwnsGroup)) from " + userRID;
+                            var groups_cmd = "select " + groupDescriptors + " from (" + traverseExpression2 + ") where @class = 'xGroup'";
                             console.log("groups_cmd = " + groups_cmd);
                             module.db.command(groups_cmd, function (err, groups) {
                                 if (common.checkErr(err, "getting owned groups", callback)) {

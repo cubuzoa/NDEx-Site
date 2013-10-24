@@ -81,7 +81,7 @@ exports.setNetworkMetadata = function(networkRID, metadata, callback){
 // get the properties and other metadata of a network
 exports.getNetworkMetadata = function(networkRID, callback){
     console.log("calling getNetworkMetadata with networkRID = '" + networkRID + "'");
-    var cmd = "select properties, format from " + networkRID + "";
+    var cmd = "select properties, format, nodecount, edgecount from " + networkRID + "";
     console.log(cmd);
     module.db.command(cmd, function(err, metadataList) {
         if (common.checkErr(err, "finding network metadata", callback)){
@@ -91,7 +91,7 @@ exports.getNetworkMetadata = function(networkRID, callback){
                     callback({status : 404});
                 } else {
                     var metadata = metadataList[0];
-                    console.log("found format = " + metadata.format + " and " + JSON.stringify(metadata.properties) + " for " + networkRID);
+                    console.log("found format = " + metadata.format + " nodecount = " + metadata.nodecount + " edgecount = " + metatdata.edgecount + " and " + JSON.stringify(metadata.properties) + " for " + networkRID);
                     callback({network : metadata});
                 }
             }
@@ -183,10 +183,11 @@ exports.deleteNetwork = function (networkRID, callback) {
 //};
 
 exports.findNetworks = function (searchExpression, limit, offset, callback) {
-    console.log("calling get network by nodes with arguments: " + limit + ', ' + offset);
+    console.log("calling findNetworks with searchExpression = : " + searchExpression + " limit = " + limit + " offset = " + offset);
     common.ndexGet(module.dbHost, "ndexNetworkFind/ndex", module.dbUser, module.dbPassword,
         {searchExpression: searchExpression, limit: limit, offset: offset},
         function (result) {
+            console.log("found networks: " + JSON.stringify(result.networks));
             callback({networks : result.networks, blockAmount: 5});
         },
         function (err) {

@@ -68,7 +68,8 @@ function doSearch(offset) {
 	var searchExpression = $('#searchExpression').val().toUpperCase();
 
 	console.log("Calling findNetworks with '" + searchExpression + "' " + limit + " " + offset);
-	
+
+    var networks;
 	ndexClient.findNetworks(searchExpression, limit, offset,
         function(data){   // success handler
             console.log("Got results from findNetworks");
@@ -82,6 +83,7 @@ function doSearch(offset) {
             $('#searchResults').html('<h3>Networks Found:</h3>');
 
             if (data.networks){
+                networks = data.networks;
                 $.each(data.networks, function(index, item){
                     $('#searchResults').append(ndexUI.formatNetworkDescriptor(item));
                 });

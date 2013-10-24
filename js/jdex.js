@@ -935,6 +935,7 @@
 
     exports.createGraphFromSIF = function (data) {
         var graph = new exports.Graph();
+        graph.format = "SIF";
 
         // get the BEL relationship namespace
         var internalNS = graph.findOrCreateNamespace('internal', 'internal');
@@ -995,6 +996,7 @@
 
     exports.createGraphFromXBEL = function (xml) {
         var graph = new exports.Graph();
+        graph.format = "BEL";
         //x var doc = new DOMParser().parseFromString(xml_text, 'text/xml');
 
         //x console.log("parsed XML text");
