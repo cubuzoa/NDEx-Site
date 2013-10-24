@@ -2,6 +2,7 @@ module.db = null;
 module.dbHost = "http://localhost:2480/";
 module.dbUser = "admin";
 module.dbPassword = "admin";
+module.dbName = "ndex";
 
 var common = require("./Common.js");
 var extend = require('util')._extend;
@@ -17,7 +18,7 @@ exports.createNetwork = function (networkJDEx, accountRID, callback) {
         "network": networkJDEx,
         "accountid": accountRID
     };
-    common.ndexPost(module.dbHost, "ndexNetworkCreate/ndex", module.dbUser, module.dbPassword, postData,
+    common.ndexPost(module.dbHost, "ndexNetworkCreate/" + module.dbName, module.dbUser, module.dbPassword, postData,
         function (result) {
             callback({jid: result.jid, ownedBy: result.ownedBy, error: null, status: 200});
         },
@@ -29,7 +30,7 @@ exports.createNetwork = function (networkJDEx, accountRID, callback) {
 
 exports.getNetwork = function (networkRID, callback) {
     console.log("calling getNetwork with networkRID = '" + networkRID + "'");
-    common.ndexGet(module.dbHost, "ndexNetworkGet/ndex", module.dbUser, module.dbPassword, {networkid: networkRID},
+    common.ndexGet(module.dbHost, "ndexNetworkGet/" + module.dbName, module.dbUser, module.dbPassword, {networkid: networkRID},
         function (result) {
             callback({network: result});
         },
@@ -108,7 +109,7 @@ exports.getNetworkMetadata = function(networkRID, callback){
 // get a network via its edges
 exports.getNetworkByEdges = function (networkid, typeFilter, propertyFilter, subjectNodeFilter, objectNodeFilter, limit, offset, callback, errorHandler) {
     console.log("calling get network by edges with arguments: " + limit + ', ' + offset);
-    common.ndexGet(module.dbHost, "ndexNetworkGetByEdges/ndex", module.dbUser, module.dbPassword,
+    common.ndexGet(module.dbHost, "ndexNetworkGetByEdges/" + module.dbName, module.dbUser, module.dbPassword,
         {networkid: networkid, limit: limit, offset: offset},
         function (result) {
             callback({network: result});
@@ -122,7 +123,7 @@ exports.getNetworkByEdges = function (networkid, typeFilter, propertyFilter, sub
 //get a network via its nodes
 exports.getNetworkByNodes = function (networkid, typeFilter, propertyFilter, limit, offset, callback, errorHandler) {
     console.log("calling get network by nodes with arguments: " + limit + ', ' + offset);
-    common.ndexGet(module.dbHost, "ndexNetworkGetByNodes/ndex", module.dbUser, module.dbPassword,
+    common.ndexGet(module.dbHost, "ndexNetworkGetByNodes/" + module.dbName, module.dbUser, module.dbPassword,
         {networkid: networkid, limit: limit, offset: offset},
         function (result) {
             callback({network: result});
@@ -140,7 +141,7 @@ exports.deleteNetwork = function (networkRID, callback) {
         "networkid": networkRID
     };
 
-    common.ndexPost(module.dbHost, "ndexNetworkDelete/ndex", module.dbUser, module.dbPassword, postData,
+    common.ndexPost(module.dbHost, "ndexNetworkDelete/" + module.dbName, module.dbUser, module.dbPassword, postData,
         function (result) {
             if (result.deleted)
                 callback({error: null, status: 200});
@@ -184,7 +185,7 @@ exports.deleteNetwork = function (networkRID, callback) {
 
 exports.findNetworks = function (searchExpression, limit, offset, callback) {
     console.log("calling findNetworks with searchExpression = : " + searchExpression + " limit = " + limit + " offset = " + offset);
-    common.ndexGet(module.dbHost, "ndexNetworkFind/ndex", module.dbUser, module.dbPassword,
+    common.ndexGet(module.dbHost, "ndexNetworkFind/" + module.dbName, module.dbUser, module.dbPassword,
         {searchExpression: searchExpression, limit: limit, offset: offset},
         function (result) {
             console.log("found networks: " + JSON.stringify(result.networks));
