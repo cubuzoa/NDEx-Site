@@ -2,105 +2,139 @@
 <% include nav.ejs %>
 
 <h1>Find Networks</h1>
-<p id ="message"></p>
+<p id="message"></p>
 <!-- btn-group from twitter allows for next div to be aligned and pulled right, easy fix-->
 <div class="btn-group">
-	<form onsubmit="return doSearch();" id="searchForm">
-		<div>
-		<label>Query:</label>
-		<input type="text" name="searchExpression" id="searchExpression"/><br/>
-		</div>
+    <form id="searchForm">
+        <div>
+            <label>Query:</label>
+            <input type="text" name="searchExpression" id="searchExpression"/><br/>
+        </div>
 
-		<div>
-		<input type="submit" value="Search"/>
-		</div>
-	</form>
+        <div>
+            <input type="submit" value="Search"/>
+        </div>
+    </form>
 </div>
-<div class = "pull-right">
-	<a class = "ndex-options" href = "#searchOptions" data-toggle="modal"> 
-		<i class="icon-cog icon-large"></i> 
-	</a>
+
+<div class="pull-right">
+    <a class="ndex-options" href="#searchOptions" data-toggle="modal">
+        <i class="icon-cog icon-large"></i>
+    </a>
 </div>
 
 <div id="searchResults">
 
 </div>
 
-<div id = "searchOptions" class = " modal hide fade" tabindex = "-1" role = "dialog" aria-labelledby = "myModalLabel" aria-hidden = "true">
-	<div class = "modal-header">
-		<h4 id = "myModalLabel"> Network Search Options </h4>
-	</div>
-	<div class="modal-body">
-		
-		<label class = "span2">Search results per page: </label>
-		<input id = "searchCount" type = "text" class = "span2" pattern = "" min = "1"> <br>
-		<label class = "span2">Current page: </label>
-		<input id = "searchPage" type = "text" class = "span2" pattern = "" min = "1" placeholder = "0"> <br>
-		
-	</div>
-	<div class = "modal-footer">
-		<button class = "btn" onclick = "doSearch()" data-dismiss = "modal" aria-hidden = "true"> Save Changes </button>
-		<button class = "btn" data-dismiss = "modal" aria-hidden = "true"> Cancel </button>
-	</div>
+<div id="searchOptions" class=" modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-header">
+        <h4 id="myModalLabel"> Network Search Options </h4>
+    </div>
+    <div class="modal-body">
+
+        <label class="span2">Search results per page: </label>
+        <input id="networksPerPage" type="text" class="span2" pattern="" min="1"> <br>
+        <label class="span2">Current page: </label>
+        <input id="currentPage" type="text" class="span2" pattern="" min="1" placeholder="0"> <br>
+
+    </div>
+    <div class="modal-footer">
+        <button class="btn" onclick="handleSearchOptionModal()" data-dismiss="modal" aria-hidden="true"> Save Changes</button>
+        <button class="btn" data-dismiss="modal" aria-hidden="true"> Cancel</button>
+    </div>
 </div>
 
 <script>
-// On form submit, send the search expression to findNetworks
-// with a limit of 100.
-//TODO 
-//DOM Elements depend on object JID for identification, consider using names instead.
-
-function doSearch(offset) {
-	var limitInput = document.getElementById('searchCount');
-	var limit = $(limitInput).val();
-
-	if(!offset) { offset = $('#searchPage').val(); }
-
-	if(!limit) { 
-		$(limitInput).val(2);
-		limit = 2;
-	}
-	if(!offset) { offset = 1; }
-	
-	$('#searchPage').val(offset);
-	offset = offset - 1;
-
-	var searchExpression = $('#searchExpression').val().toUpperCase();
-
-	console.log("Calling findNetworks with '" + searchExpression + "' " + limit + " " + offset);
-
+    // global var for convenience in debugging
     var networks;
-	ndexClient.findNetworks(searchExpression, limit, offset,
-        function(data){   // success handler
-            console.log("Got results from findNetworks");
-            console.log(data);
-            for (i in data.networks){
-                var network = data.networks[i];
-                console.log(network.title);
-            }
 
-            // Clears the searchResults div
-            $('#searchResults').html('<h3>Networks Found:</h3>');
+    function handleSearchOptionModal() {
+        var networksPerPage = document.getElementById('networksPerPage');
+        var currentPage = document.getElementById('currentPage') | 1;
+        if (!currentPage)
+        // Update the user's profile if there has been a change
+        if (networksPerPage != ndexUser.profile.networksPerPage) {
+            var profileChanges = {networksPerPage : networksPerPage};
+            updateFindNetworkProfileItems(profile, function () {
+                doSearch();
+            });
+        } else {
+            doSearch(currentPage);
+        }
+    };
 
-            if (data.networks){
-                networks = data.networks;
-                $.each(data.networks, function(index, item){
-                    $('#searchResults').append(ndexUI.formatNetworkDescriptor(item));
+    function updateFindNetworkProfileItems(profile, callback) {
+        ndexClient.updateUserProfile(ndexUI.user.id, profile,
+                function (data) {
+                    //
+                    // Success
+                    //
+                    ndexUser.profile.networksPerPage = data.profile.networksPerPage;
+                    callback();
+                },
+                function (error) {
+                    //
+                    // Failure: display message
+                    //
+                    ndexUI.formatError(error);
+                });
+    };
+
+    function doSearch(currentPage) {
+        var networksPerPage = ndexUI.user.profile.networksPerPage | 10;
+
+        // The page number inputs are "1-based", but internally we are "0-based"
+        if (currentPage && currentPage > 0) {
+            currentPage = currentPage -1;
+        } else {
+            currentPage = 0;
+        }
+
+        var searchExpression = $('#searchExpression').val().toUpperCase();
+
+        console.log("Calling findNetworks with '" + searchExpression + "' networksPerPage = " + networksPerPage + " currentPage = " + currentPage);
+
+
+        ndexClient.findNetworks(searchExpression, networksPerPage, currentPage,
+                function (data) {   // success handler
+                    console.log("Got results from findNetworks");
+                    console.log(data);
+                    for (i in data.networks) {
+                        var network = data.networks[i];
+                        console.log(network.title);
+                    }
+
+                    // Clears the searchResults div
+                    $('#searchResults').html('<h3>Networks Found:</h3>');
+
+                    if (data.networks) {
+                        networks = data.networks;
+                        $.each(data.networks, function (index, item) {
+                            $('#searchResults').append(ndexUI.formatNetworkDescriptor(item));
+                        });
+
+                        var networksPerPage = ndexUI.user.profile.networksPerPage | 10;
+
+                        $('#searchResults').append(ndexUI.createPaginationModule(networksPerPage, currentPage, data.networks.length, 'doSearch'));
+                        $('#searchPage').attr('placeholder', 'max value: ' + data.blockAmount);
+                    }
+                },
+
+                function (error) {     // error handler
+                    ndexUI.formatError(error);
                 });
 
-                $('#searchResults').append(ndexUI.createPaginationModule(data.blockAmount, offset, 'doSearch'));
-                $('#searchPage').attr('placeholder', 'max value: ' + data.blockAmount);
-            }
-        },
+        return false;
+    }
 
-        function(error){     // error handler
-            ndexUI.formatError(error);
-        });
-    
-    return false;
-}
+    /* attach a submit handler to the form */
+    $('#searchForm').submit(function(event) {
 
-
+        event.preventDefault();
+        doSearch();
+    });
 
 </script>
 

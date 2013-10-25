@@ -2,6 +2,7 @@
 <% include nav.ejs %>
 
 <div id="networkSource"></div>
+<div id="networkFormat"></div>
 <div id="networkDescription"></div>
 
 <div class="tabbable">
@@ -77,30 +78,6 @@
     var networkPage;
     var thisNetwork = {jid: networkRID}; //object to be used for workspace functions
 
-    console.log("calling getNetworkMetadata for viewNetwork");
-    $(ndexClient.getNetworkMetadata(networkRID,
-            // success
-            function (data) {
-                console.log("Got results from getNetworkMetadata");
-                console.log(data);
-                if (data.network.format) {
-                    $('#networkFormat').html(data.network.format);
-                }
-                var properties = data.network.properties;
-                if (properties) {
-                    if (properties.title) $('#networkTitle').html("<h3>" + properties.title + "</h3>");
-                    if (properties.description) $('#networkDescription').html(properties.description);
-                    if (properties.source) $('#networkSource').html("Source:" + properties.source);
-                }
-
-            },
-            // error handler
-            function (error) {
-                ndexUI.formatError(error);
-            })
-    );
-
-
     function formatEdge(edge, network) {
         var edgeDIV = document.createElement('div'),
                 idSpan = document.createElement('span'),
@@ -111,7 +88,7 @@
                 object = network.nodes[edge.o],
                 predicate = network.terms[edge.p];
 
-        console.log("subject: " + subject.name + " represents " + subject.represents + " : " + JSON.stringify(network.terms[subject.represents]));
+        //console.log("subject: " + subject.name + " represents " + subject.represents + " : " + JSON.stringify(network.terms[subject.represents]));
         if (subject.represents && network.terms[subject.represents] && network.terms[subject.represents].name) {
             var term = network.terms[subject.represents];
             $(subjectSpan).addClass('term').html(term.name + ' ');
@@ -119,7 +96,7 @@
             $(subjectSpan).addClass('term').html(subject.name + ' ');
         }
 
-        console.log("object: " + object.name + " represents " + object.represents + " : " + JSON.stringify(network.terms[object.represents]));
+        //console.log("object: " + object.name + " represents " + object.represents + " : " + JSON.stringify(network.terms[object.represents]));
         if (object.represents && network.terms[object.represents] && network.terms[object.represents].name) {
             var term = network.terms[object.represents];
             $(objectSpan).addClass('term').html(' ' + term.name);
@@ -178,26 +155,17 @@
         getEdges();
     }
 
-    function getNodes(nodePage) {
-        var nodeInput = document.getElementById('nodeCount');
-        var nodeCount = $(nodeInput).val();
+    function getNodes(currentPage) {
+        console.log("profile = " + JSON.stringify(ndexUI.user.profile));
+        var nodesPerPage = ndexUI.user.profile.nodesPerPage | 15;
 
-        if (!nodePage) {
-            nodePage = $('#nodePage').val();
+        if (!currentPage) {
+            currentPage = 1;
         }
 
-        if (!nodeCount) {
-            $(nodeInput).val(15);
-            nodeCount = 15;
-        }
-        if (!nodePage) {
-            nodePage = 1;
-        }
+        currentPage = currentPage - 1;
 
-        $('#nodePage').val(nodePage);
-        nodePage = nodePage - 1;
-
-        $(ndexClient.getNetworkByNodes(networkRID, '', '', nodeCount, nodePage, function (data) {
+        $(ndexClient.getNetworkByNodes(networkRID, '', '', nodesPerPage, currentPage, function (data) {
                     $('#nodes').html('');
                     $('#viewNetTitle').html('');
                     $('#viewNetTitle').append(data.network.title);
@@ -207,8 +175,8 @@
                         $('#nodes').append(formatNode(node, data.network));
                     });
 
-                    $('#nodes').append(ndexUI.createPaginationModule(data.network.blockAmount, nodePage, 'getNodes'));
-                    $('#nodePage').attr('placeholder', 'max value: ' + data.network.blockAmount);
+                    $('#nodes').append(ndexUI.createPaginationModule(nodesPerPage, currentPage, data.network.nodes.length, 'getNodes'));
+                    //$('#nodePage').attr('placeholder', 'max value: ' + data.network.blockAmount);
                 },
                 function (error) {
                     ndexUI.formatError(error);
@@ -216,34 +184,24 @@
         );
     }
 
-    function getEdges(edgePage) {
-        var edgeInput = document.getElementById('edgeCount');
-        var edgeCount = $(edgeInput).val();
+    function getEdges(currentPage) {
+        var edgesPerPage = ndexUI.user.profile.edgesPerPage | 15;
 
-        if (!edgePage) {
-            edgePage = $('#edgePage').val();
+        if (!currentPage) {
+            currentPage = 1;
         }
 
-        if (!edgeCount) {
-            $(edgeInput).val(15);
-            edgeCount = 15;
-        }
-        if (!edgePage) {
-            edgePage = 1;
-        }
+        currentPage = currentPage - 1;
 
-        $('#edgePage').val(edgePage);
-        edgePage = edgePage - 1;
-
-        $(ndexClient.getNetworkByEdges(networkRID, '', '', '', '', edgeCount, edgePage, function (data) {
+        $(ndexClient.getNetworkByEdges(networkRID, '', '', '', '', edgesPerPage, currentPage, function (data) {
                     $('#edges').html('');
                     networkPage = data.network;
                     $.each(data.network.edges, function (index, edge) {
                         $('#edges').append(formatEdge(edge, data.network));
                     });
 
-                    $('#edges').append(ndexUI.createPaginationModule(data.network.blockAmount, edgePage, 'getEdges'));
-                    $('#edgePage').attr('placeholder', 'max value: ' + data.network.blockAmount);
+                    $('#edges').append(ndexUI.createPaginationModule(edgesPerPage, currentPage, data.network.edges.length, 'getEdges'));
+                    //$('#edgePage').attr('placeholder', 'max value: ' + data.network.blockAmount);
                 },
                 function (error) {
                     ndexUI.formatError(error);
@@ -258,7 +216,35 @@
         e.stopPropagation();
     });
 
-    getNetwork();
+    ndexUI.initPage(function(){
+
+        console.log("calling getNetworkMetadata for viewNetwork");
+        $(ndexClient.getNetworkMetadata(networkRID,
+                // success
+                function (data) {
+                    console.log("Got results from getNetworkMetadata");
+                    console.log(data);
+                    if (data.network.format) {
+                        $('#networkFormat').html(data.network.format);
+                    }
+                    var properties = data.network.properties;
+                    if (properties) {
+                        if (properties.title) $('#networkTitle').html("<h3>" + properties.title + "</h3>");
+                        if (properties.description) $('#networkDescription').html("description: " + properties.description);
+                        if (properties.source) $('#networkSource').html("Source: " + properties.source);
+                    }
+
+                    getNetwork();
+
+                },
+                // error handler
+                function (error) {
+                    ndexUI.formatError(error);
+                })
+        );
+    });
+
+
     setTimeout(function () {
                 if (ndexUI.user.id && ndexUI.isOwnedNetwork(networkRID)) {
                     $('.networkMiniMenu').attr('style', 'display:block');
@@ -266,6 +252,7 @@
             },
             1000
     );
+
 </script>
 
 

@@ -52,6 +52,46 @@
         return false;
     };
 
+exports.initPage = function(callback){
+    if (ndexUI.checkSignIn()) {
+        //assigning a class, ex: signInOnly, can eliminate a lot of lines of code
+        $('#myAccount').attr('style', 'display:block');
+        $('#manageTasks').attr('style', 'display:block');
+        $('#signOut').attr('style', 'display:block');
+        $('#navUploadNetwork').attr('style', 'display:block');
+        $('#navNewGroup').attr('style', 'display:block');
+        $('#signIn').attr('style', 'display:none');
+        $('#signUp').attr('style', 'display:none');
+
+        $('#toAccount').attr('href', '/viewUser/' + ndexUI.user.id);
+        $('#toGroups').attr('href', '/viewUser/' + ndexUI.user.id + '/#tab_ownedGroups');
+        $('#toNetworks').attr('href', '/viewUser/' + ndexUI.user.id + '/#tab_ownedNetworks');
+
+        $('#navname').html(localStorage['ndexUsername']);
+
+        ndexClient.getUser(ndexUI.user.id, function (data) {
+            console.log(JSON.stringify(data));
+            ndexUI.user.profile = data.user.profile;
+            ndexUI.user.ownedNetworks = data.user.ownedNetworks;
+            ndexUI.user.ownedGroups = data.user.ownedGroups;
+            callback();
+            //console.log('----' + JSON.stringify(ndexUI.user));
+        });
+
+    } else {
+        $('#myAccount').attr('style', 'display:none');
+        $('#manageTasks').attr('style', 'display:none');
+        $('#signOut').attr('style', 'display:none');
+        $('#navUploadNetwork').attr('style', 'display:none');
+        $('#navNewGroup').attr('style', 'display:none');
+        $('#signIn').attr('style', 'display:block');
+        $('#signUp').attr('style', 'display:block');
+
+        $('#navname').html('');
+        callback();
+    };
+
+}
 //-----------------------------------------------------
 //		Utilities
 //-----------------------------------------------------
@@ -82,60 +122,85 @@
 //-----------------------------------------------------
 //		Pagination function
 //-----------------------------------------------------
-    exports.createPaginationModule = function (pageAmount, page, searchFunction) {
-        //searchFunction must name of function in string format
+    exports.createPaginationModule = function (itemsPerPage, currentPage, numberOfItemsInCurrentPage, searchFunction) {
+        //searchFunction is the name of a function as a string
 
+        // Strategy:
+        // - create buttons as List elements - using Bootstrap.js methodology.
+        // - create "First" and "Prev" buttons unless we are on first page.
         var pagDiv = document.createElement('div');
         var pagUl = document.createElement('ul');
 
-        var prevLi = document.createElement('li');
-        var prev = document.createElement('a');
-        var nextLi = document.createElement('li');
-        var next = document.createElement('a');
-        var firstLi = document.createElement('li');
-        var first = document.createElement('a');
-        var lastLi = document.createElement('li');
-        var last = document.createElement('a');
+        if (currentPage > 1) {
 
-        //disable links when already on page
-        if (page == 0) $(prevLi).addClass('active');
-        if (page == 0) $(firstLi).addClass('active');
-        if (page == (pageAmount - 1)) $(nextLi).addClass('active');
-        if (page == (pageAmount - 1)) $(lastLi).addClass('active');
 
-        //create first, previous, next, and last links
-        $(prev).attr('onclick', searchFunction + '(Number(this.id))').attr('id', page).html('<');
-        $(next).attr('onclick', searchFunction + '(Number(this.id))').attr('id', page + 2).html('>');
-        $(first).attr('onclick', searchFunction + '(1)').attr('rel', 'tooltip').attr('title', 'page 1').html('<<');
-        $(last).attr('onclick', searchFunction + '(Number(this.id))').attr('id', pageAmount).attr('rel', 'tooltip').attr('title', 'page ' + pageAmount).html('>>');
+            // First
+            var firstLi = document.createElement('li');
+            var first = document.createElement('a');
+            $(first).attr('onclick', searchFunction + '(1)').attr('rel', 'tooltip').attr('title', 'page 1').html('<<');
+            $(firstLi).append(first);
+            $(pagUl).append(firstLi);
+            $(firstLi).addClass('active');
 
-        $(firstLi).append(first);
-        $(pagUl).append(firstLi);
-        $(prevLi).addClass('prev').append(prev);
-        $(pagUl).append(prevLi);
-        $(nextLi).addClass('next').append(next);
-        $(lastLi).append(last);
+            // Prev
+            var prevLi = document.createElement('li');
+            var prev = document.createElement('a');
+            var prevPage = currentPage - 1;
+            $(prev).attr('onclick', searchFunction + '(' + prevPage + ')').html('<');
+            $(prevLi).addClass('prev').append(prev);
+            $(pagUl).append(prevLi);
+            $(prevLi).addClass('active');
 
-        //create links for 2 pages before and after current page
-        for (var ii = 0; ii < pageAmount; ii++) {
-            //skip if not near current page
-            if (ii < (page - 2)) continue;
-            if (ii > (page + 2)) continue;
-            var pagLi = document.createElement('li');
-            var pagA = document.createElement('a');
-
-            if (ii == page) {
-                $(pagLi).addClass('active')
-            }
-            ;
-
-            $(pagA).attr('onclick', searchFunction + '(Number(this.innerHTML))').html(ii + 1);
-            $(pagLi).append(pagA);
-            $(pagUl).append(pagLi);
         }
+        // Next
+        // don't display next button if the current page is not full, since that would mean we were at the end.
+        if (numberOfItemsInCurrentPage >= itemsPerPage) {
+            var nextLi = document.createElement('li');
+            var next = document.createElement('a');
+            var nextPage = currentPage + 1;
+            $(next).attr('onclick', searchFunction + '(' + nextPage + ')').html('>');
+            $(nextLi).addClass('next').append(next);
+            $(pagUl).append(nextLi);
+            $(nextLi).addClass('active');
+        }
+        /*
 
-        $(pagUl).append(nextLi);
-        $(pagUl).append(lastLi);
+         Problem: we don't know how many pages we have total.
+
+         var lastLi = document.createElement('li');
+         var last = document.createElement('a');
+         $(last).attr('onclick', searchFunction + '(Number(this.id))').attr('id', numItemsPerPage).attr('rel', 'tooltip').attr('title', 'page ' + numItemsPerPage).html('>>');
+         $(lastLi).append(last);
+         $(pagUl).append(lastLi);
+         */
+
+        /*
+         //disable links when already on page
+         if (pageNumber == 0) $(prevLi).addClass('active');
+         if (pageNumber == 0) $(firstLi).addClass('active');
+         if (pageNumber == (numItemsPerPage - 1)) $(nextLi).addClass('active');
+         if (pageNumber == (numItemsPerPage - 1)) $(lastLi).addClass('active');
+
+         //create first, previous, next, and last links
+
+         //create links for 2 pages before and after current page
+         for (var ii = 0; ii < numItemsPerPage; ii++) {
+         //skip if not near current page
+         if (ii < (pageNumber - 2)) continue;
+         if (ii > (pageNumber + 2)) continue;
+         var pagLi = document.createElement('li');
+         var pagA = document.createElement('a');
+
+         if (ii == pageNumber) {
+         $(pagLi).addClass('active')
+         }
+         ;
+
+         $(pagA).attr('onclick', searchFunction + '(Number(this.innerHTML))').html(ii + 1);
+         $(pagLi).append(pagA);
+         $(pagUl).append(pagLi);
+         }
+         */
 
         $(pagDiv).addClass('pagination pagination-centered').append(pagUl);
         return pagDiv;
@@ -377,28 +442,6 @@
                     exports.formatError("while removing network from workSurface: " + error);
                 });
         }
-
-
-        /*
-         var parent = document.getElementById('workSurface');
-
-         //loop through all input element in sidebar.ejs until desire element is found
-         $("input").each(function (index, value) {
-         if ($(this).attr('title') == network.jid) {
-         ndexClient.deleteNetworkFromUserWorkSurface(user.jid, network.jid,
-         function (data) {
-         // if successful
-         updateWorkSurface();
-         },
-         function (error){
-         // if failure
-         });
-         var child = document.getElementById('thumbnail' + network.jid);
-         parent.removeChild(child);
-         updateWorkSurfaceTools(network.jid);
-         }
-         });
-         */
     };
 
     exports.addToWorkSurface = function (networkId) {
@@ -421,14 +464,7 @@
     };
 
     var updateWorkSurface = function (workSurfaceNetworks) {
-
-        // Clear the networkElements  (need specific class assignment...)
         $('.thumbnails').remove();
-        /*
-         $('#workSurface').children().each(function(index, element){
-         $('#workSurface').remove('.thumbnail');
-         });
-         */
         // create a new networkElement for each workSurfaceNetwork
         $.each(workSurfaceNetworks, function (index, network) {
             $('#workSurface').append(createWorkSurfaceNetworkElement(network));
@@ -468,74 +504,6 @@
 
         return networkElement;
     };
-
-    /*
-     function updateWorkspaceTools(jid){
-     //this is not in ndexUI.js because viewNetwork has a different version
-     var tempLink = document.getElementById('link'+jid),
-     tempIcon = document.getElementById('icon'+jid);
-
-     isOnWorkspace(jid, function(found) {
-     if (found) {
-     $(tempLink).attr('onclick','removeFromWorkspace(this)');//
-     $(tempIcon).attr('title','Remove from Workspace');
-     tempIcon.className='icon-remove';
-     }
-     else{
-     $(tempLink).attr('onclick','addToWorkspace(this)');
-     $(tempIcon).attr('title','Add to Workspace');
-     tempIcon.className='icon-plus icon-white';
-     }
-     });
-     }
-
-     function updateWorkspaceTools(jid){
-     //this is not in ndexUI.js because viewNetwork has a different version
-     var tempLink = document.getElementById('link'+jid),
-     tempIcon = document.getElementById('icon'+jid);
-
-     isOnWorkspace(jid, function(found) {
-     if (found) {
-     $(tempLink).attr('onclick','removeFromWorkspace(this)');//
-     $(tempIcon).attr('title','Remove from Workspace');
-     tempIcon.className='icon-remove';
-     }
-     else{
-     $(tempLink).attr('onclick','addToWorkspace(this)');
-     $(tempIcon).attr('title','Add to Workspace');
-     tempIcon.className='icon-plus icon-white';
-     }
-     });
-     }
-
-
-     //--------------------------------------------
-     //		Workspace Functions
-     //--------------------------------------------
-     if (ndexUI.user.id) {
-
-     function updateWorkspaceTools(jid){
-     var tempEle = document.getElementById('netStatus');
-     var tempLnk = document.createElement('a');
-     $(tempEle).html('');
-     $(tempLnk).data('networkProperties', thisNetwork);
-
-     isOnWorkspace(jid, function(found) {
-     if (found) {
-     $(tempLnk).attr('onclick','removeFromWorkspace(this)').html('Remove from Workspace');
-     $(tempEle).append(tempLnk);
-     }
-     else{
-     $(tempLnk).attr('onclick','addToWorkspace(this)').html('Add to Workspace');
-     $(tempEle).append(tempLnk);
-     }
-     });
-
-     }
-
-     } //close if is signed in conditional
-
-     */
 
 //--------------------------------------------------------------------
 //				shared function by group and user interface

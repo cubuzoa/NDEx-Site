@@ -70,7 +70,7 @@ function doSearch(offset) {
 				$('#searchResults').append(ndexUI.formatGroupDescriptor(item));
 			}); 
  			
-			$('#searchResults').append(ndexUI.createPaginationModule('2', offset, 'doSearch'));
+			$('#searchResults').append(ndexUI.createPaginationModule('2', offset, data.groups.length, 'doSearch'));
   			//$('#searchPage').attr('placeholder', 'max value: ' + data.blockAmount);
 		}
     },

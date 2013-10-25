@@ -82,7 +82,7 @@ exports.setNetworkMetadata = function(networkRID, metadata, callback){
 // get the properties and other metadata of a network
 exports.getNetworkMetadata = function(networkRID, callback){
     console.log("calling getNetworkMetadata with networkRID = '" + networkRID + "'");
-    var cmd = "select properties, format, nodecount, edgecount from " + networkRID + "";
+    var cmd = "select properties, format, nodesCount as nodeCount, edgesCount as edgeCount from " + networkRID + "";
     console.log(cmd);
     module.db.command(cmd, function(err, metadataList) {
         if (common.checkErr(err, "finding network metadata", callback)){
@@ -92,7 +92,7 @@ exports.getNetworkMetadata = function(networkRID, callback){
                     callback({status : 404});
                 } else {
                     var metadata = metadataList[0];
-                    console.log("found format = " + metadata.format + " nodecount = " + metadata.nodecount + " edgecount = " + metatdata.edgecount + " and " + JSON.stringify(metadata.properties) + " for " + networkRID);
+                    console.log("found format = " + metadata.format + " nodeCount = " + metadata.nodeCount + " edgeCount = " + metadata.edgeCount + " and " + JSON.stringify(metadata.properties) + " for " + networkRID);
                     callback({network : metadata});
                 }
             }

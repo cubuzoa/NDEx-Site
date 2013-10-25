@@ -47,6 +47,17 @@ exports.createUser = function (username, password, recoveryEmail, callback) {
  if (common.checkErr(err, "uploading foreground image", callback)){
  profile.backgroundImg = results.name;
  */
+
+var knownProfileFields = [
+    "firstName",
+    "lastName",
+    "website",
+    "description",
+    "networksPerPage",
+    "edgesPerPage",
+    "nodesPerPage"
+];
+
 exports.updateUserProfile = function (userRID, profile, callback) {
     //TODO add uploader for background img
     var cmd = "select from xUser where @rid = " + userRID + "";
@@ -54,33 +65,52 @@ exports.updateUserProfile = function (userRID, profile, callback) {
     module.db.command(cmd, function (err, users) {
         if (common.checkErr(err, "finding user", callback)) {
             var user = users[0];
+
+            // we check to see what fields are set in the profile and only construct strings for those.
+            // we also only accept known fields
+
+            var profileStrings = [];
+            for (key in profile) {
+                if (common.contains(knownProfileFields, key)) {
+                    var value = profile[key];
+                    profileStrings.push(key + " = '" + value + "'");
+                }
+            }
+            /*
             var profileStrings = [
                     "firstName = '" + profile.firstName + "'",
                     "lastName = '" + profile.lastName + "'",
                     "website = '" + profile.website + "'",
                     "description = '" + profile.description + "'"],
-                setString = profileStrings.join(", "),
-                updateCmd = "update " + userRID + " set " + setString;
 
-            console.log(updateCmd);
-            module.db.command(updateCmd, function (err, result) {
-                callback({profile: profile, error: err, status: 200})
-            });
+            */
+
+            if (profileStrings.length > 0){
+                var setString = profileStrings.join(", "),
+                    updateCmd = "update " + userRID + " set " + setString;
+                console.log(updateCmd);
+                module.db.command(updateCmd, function (err, result) {
+                    callback({profile: profile, error: err, status: 200})
+                });
+            } else {
+                callback({profile: profile, error: "no recognized profile fields in updateUserProfile", status: 500});
+            }
+
         }
     });
 };
 
 exports.findUsers = function (searchExpression, limit, offset, callback) {
     console.log("calling findUsers with arguments: " + searchExpression + " " + limit + " " + offset);
-    var start = (offset)*limit;
-	var descriptors = " username as username, @rid as jid ";
-    var cmd = "select" + descriptors + "from xUser where username.toUpperCase()  like  '%" + searchExpression + "%' order by creation_date desc skip " +  start + " limit " + limit;
+    var start = (offset) * limit;
+    var descriptors = " username as username, @rid as jid ";
+    var cmd = "select" + descriptors + "from xUser where username.toUpperCase()  like  '%" + searchExpression + "%' order by creation_date desc skip " + start + " limit " + limit;
     console.log(cmd);
     module.db.command(cmd, function (err, users) {
-		for (i in users){
-			var user = users[i];
-			user.jid = common.convertFromRID(user.jid);
-		}
+        for (i in users) {
+            var user = users[i];
+            user.jid = common.convertFromRID(user.jid);
+        }
         callback({users: users, error: err});
     });
 };
@@ -130,15 +160,22 @@ exports.getUser = function (userRID, callback) {
 
                     console.log("found user " + user["@rid"]);
 
+                    for (key in user) {
+                        if (common.contains(knownProfileFields, key)) {
+                            var value = user[key];
+                            profile[key] = value;
+                        }
+                    }
+                    /*
                     if (user.firstName) profile.firstName = user.firstName;
                     if (user.lastName) profile.lastName = user.lastName;
                     if (user.website) profile.website = user.website;
                     if (user.foregroundImg) profile.foregroundImg = user.foregroundImg;
                     if (user.backgroundImg) profile.backgroundImg = user.backgroundImg;
                     if (user.description) profile.description = user.description;
+                    */
 
                     var result = {username: user.username, profile: profile, ownedNetworks: {}, ownedGroups: {}};
-
 
 
                     // get owned networks
@@ -191,8 +228,7 @@ exports.getUser = function (userRID, callback) {
 };
 
 
-
-function getWorkSurfaceInternal(userRID, callback){
+function getWorkSurfaceInternal(userRID, callback) {
     var networkDescriptors = "properties.title as title, @rid as rid, nodesCount as nodeCount, edgesCount as edgeCount";
     var traverseExpression = "select flatten(workspace) from " + userRID;
     var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
@@ -205,9 +241,9 @@ function getWorkSurfaceInternal(userRID, callback){
 
 exports.getUserWorkSurface = function (userRID, callback) {
     console.log("calling getUserWorkSurface with userRID = '" + userRID + "'");
-    getWorkSurfaceInternal(userRID, function(err, worksurface_networks){
+    getWorkSurfaceInternal(userRID, function (err, worksurface_networks) {
         if (common.checkErr(err, "getting user worksurface networks", callback)) {
-        // process the worksurface_networks
+            // process the worksurface_networks
             for (i in worksurface_networks) {
                 var network = worksurface_networks[i];
                 network.jid = common.convertFromRID(network.rid);
@@ -219,12 +255,12 @@ exports.getUserWorkSurface = function (userRID, callback) {
 
 exports.addNetworkToUserWorkSurface = function (userRID, networkRID, callback) {
     console.log("calling addNetworkToUserWorkSurface with userRID = '" + userRID + "' and networkRID = '" + networkRID + "'");
-    getWorkSurfaceInternal(userRID, function(err, worksurface_networks){
+    getWorkSurfaceInternal(userRID, function (err, worksurface_networks) {
         if (common.checkErr(err, "getting user worksurface networks", callback)) {
             // return error if networkRID already on workSurface
             for (i in worksurface_networks) {
                 var network = worksurface_networks[i];
-                if (network.rid == networkRID){
+                if (network.rid == networkRID) {
                     callback({status: 400, error: "network " + networkRID + " already in user worksurface"});
                 }
             }
@@ -234,7 +270,7 @@ exports.addNetworkToUserWorkSurface = function (userRID, networkRID, callback) {
             console.log(updateCmd);
             module.db.command(updateCmd, function (err, worksurface) {
                 if (common.checkErr(err, "adding network " + networkRID + " to worksurface of user " + userRID, callback)) {
-                    getWorkSurfaceInternal(userRID, function(err, worksurface_networks){
+                    getWorkSurfaceInternal(userRID, function (err, worksurface_networks) {
                         // return the worksurface if successful
                         for (i in worksurface_networks) {
                             var network = worksurface_networks[i];
@@ -251,13 +287,13 @@ exports.addNetworkToUserWorkSurface = function (userRID, networkRID, callback) {
 
 exports.deleteNetworkFromUserWorkSurface = function (userRID, networkRID, callback) {
     console.log("calling deleteNetworkFromUserWorkSurface with userRID = '" + userRID + "' and networkRID = '" + networkRID + "'");
-    getWorkSurfaceInternal(userRID, function(err, worksurface_networks){
+    getWorkSurfaceInternal(userRID, function (err, worksurface_networks) {
         if (common.checkErr(err, "getting user worksurface networks", callback)) {
             // return error if networkRID already on workSurface
             var missing = true;
             for (i in worksurface_networks) {
                 var network = worksurface_networks[i];
-                if (network.rid == networkRID){
+                if (network.rid == networkRID) {
                     missing = false;
                 }
             }
@@ -267,8 +303,8 @@ exports.deleteNetworkFromUserWorkSurface = function (userRID, networkRID, callba
             var updateCmd = "update " + userRID + " remove workspace = " + networkRID;
             console.log(updateCmd);
             module.db.command(updateCmd, function (err, worksurface) {
-                if (common.checkErr(err, "removing network " + networkRID + " from worksurface of user " + userRID, callback)){
-                    getWorkSurfaceInternal(userRID, function(err, worksurface_networks){
+                if (common.checkErr(err, "removing network " + networkRID + " from worksurface of user " + userRID, callback)) {
+                    getWorkSurfaceInternal(userRID, function (err, worksurface_networks) {
                         // return the worksurface if successful
                         for (i in worksurface_networks) {
                             var network = worksurface_networks[i];
@@ -314,7 +350,7 @@ exports.deleteUser = function (userRID, callback) {
     });
 };
 
-exports.uploadAccountImage = function(accountId, type, imageFile, callback) {
+exports.uploadAccountImage = function (accountId, type, imageFile, callback) {
     console.log('File uploaded to: ' + imageFile.path + ' - ' + imageFile.size + ' bytes');
 
     // First, find accountName for accountId
@@ -338,7 +374,7 @@ exports.uploadAccountImage = function(accountId, type, imageFile, callback) {
 
                     var results = { name: storagePath + '.jpg', filesize: ''};
 
-                    fs.rename(imageFile.path, storagePath, function(){
+                    fs.rename(imageFile.path, storagePath, function () {
                         fs.stat(storagePath, function (err, stats) {
                             results.filesize = stats.size;
                             console.log('File copied to: ' + storagePath + ' with storage size of ' + stats.size + ' bytes');
