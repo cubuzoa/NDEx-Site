@@ -14,42 +14,58 @@
 -->
 
 <div class=''>
-	<h3>Send Invitation</h3>
-	<hr>
-	<p>Send and invitation to a fellow colleague! Once recipients accept invitaions, they will become members of the group.</p>
-	<p>Group Admin will have the right to assign the group ownership rights to any network they create.</p> 
-	<br>
-	<form  class="form-horizontal" action="" method="post" enctype="multiipart/form-data">
-		<div class="control-group">
-				<label class="control-label" for="inputGroup">Select Group</label>
-				<div class="controls">
-					<select name="group" id="inputGroup">
-						<option value="">Select group</option>
-						<option value="group1">Group 1</option>
-						<option value="group2">Group 2</option>
-						<option value="group3">Group 3</option>
-					</select></div></div>
-		<div class="control-group">
-				<label class="control-label" for="inputPermissions">Group Permissions</label>
-				<div class="controls">
-					<select name="permissions" id="inputPermissions">
-						<option value="">Select Permissions</option>
-						<option value="groupAdmin">Group Admin</option>
-						<option value="groupMember">Group Member</option>
-					</select></div></div>
-		<div class="control-group">
-				<label class="control-label" for="inputSubject">Subject</label>
-				<div class="controls">
-					<input  class="span4" type="text" id="inputSubject" name="subject"></div></div>
-		<div class="control-group">
-				<label class="control-label" for="inputMessage">Message</label>
-				<div class="controls">
-					<textarea class="span4" rows="3" id="inputMessage" name="message" placeholder="Add a welcome message!"></textarea></div></div>
-		<hr>
-		<input type="submit" value="Send Invite">
-	</form>
-	
+    <h3>Send Invitation</h3>
+    <hr>
+    <p>Send and invitation to a fellow colleague! Once recipients accept invitaions, they will become members of the
+        group.</p>
+
+    <p>Group Admin will have the right to assign the group ownership rights to any network they create.</p>
+    <br>
+
+    <form class="form-horizontal" action="" method="post" enctype="multiipart/form-data">
+        <div class="control-group">
+            <label class="control-label" for="inputGroup">Select Group</label>
+
+            <div class="controls">
+                <select name="group" id="inputGroup">
+                    <option value="">Select group</option>
+                    <option value="group1">Group 1</option>
+                    <option value="group2">Group 2</option>
+                    <option value="group3">Group 3</option>
+                </select></div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="inputPermissions">Group Permissions</label>
+
+            <div class="controls">
+                <select name="permissions" id="inputPermissions">
+                    <option value="">Select Permissions</option>
+                    <option value="groupAdmin">Group Admin</option>
+                    <option value="groupMember">Group Member</option>
+                </select></div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="inputSubject">Subject</label>
+
+            <div class="controls">
+                <input class="span4" type="text" id="inputSubject" name="subject"></div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="inputMessage">Message</label>
+
+            <div class="controls">
+                <textarea class="span4" rows="3" id="inputMessage" name="message"
+                          placeholder="Add a welcome message!"></textarea></div>
+        </div>
+        <hr>
+        <input type="submit" value="Send Invite">
+    </form>
+
 </div>
 
+<script>
+    ndexUI.initPage();
 
-<% include foot.ejs%>
+</script>
+
+<% include foot.ejs %>

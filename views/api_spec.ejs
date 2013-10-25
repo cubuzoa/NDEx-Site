@@ -5,71 +5,92 @@
 
 <h1>NDEx REST API Specification</h1>
 
-<% for(var i=0; i<spec.resourceTypes.length; i++) { %>
-    <% var resourceType = spec.resourceTypes[i]; %>
-    <% var resourceSpecs = spec[resourceType]; %>
-    <h2><%= resourceType %></h2>
-    <% for (var j=0; j<resourceSpecs.length; j++){  %>
-    	<% var method = resourceSpecs[j]; %>
-        <table>
-        <tr><th colspan=2 class='api_fn'><%= method.fn %></th></tr>
-        <tr><td class='api_label'>documentation</td><td class='api_value'><%= method.doc %></td</tr>
-        <tr><td class='api_label'>method</td><td class='api_value'><%= method.method.toUpperCase() %></td</tr>
-        <tr><td class='api_label'>route</td><td class='api_value'><%= method.route %></td</tr>
+<% for(var i = 0; i < spec.resourceTypes.length; i++) { %>
+<% var resourceType = spec.resourceTypes[i]; %>
+<% var resourceSpecs = spec[resourceType]; %>
+<h2><%= resourceType %></h2>
+<% for (var j = 0; j < resourceSpecs.length; j++){ %>
+<% var method = resourceSpecs[j]; %>
+<table>
+    <tr>
+        <th colspan=2 class='api_fn'><%= method.fn %></th>
+    </tr>
+    <tr>
+        <td class='api_label'>documentation</td>
+        <td class='api_value'><%= method.doc %></td
+    </tr>
+    <tr>
+        <td class='api_label'>method</td>
+        <td class='api_value'><%= method.method.toUpperCase() %></td
+    </tr>
+    <tr>
+        <td class='api_label'>route</td>
+        <td class='api_value'><%= method.route %></td
+    </tr>
 
-        <% if (method.routeParams) { %>
-        <tr><td class='api_label'>route params</td><td class='api_value'>
+    <% if (method.routeParams) { %>
+    <tr>
+        <td class='api_label'>route params</td>
+        <td class='api_value'>
             <ul>
-            <% for (n in method.routeParams){ %>
-    			<% var param = method.routeParams[n]; %>
-    			<li><%= n + " (" + param.type + ")" %></li>
-    		<%} %>
-    		</ul>
-    		</td>
-    	</tr>
-    	<%} %>
+                <% for (n in method.routeParams){ %>
+                <% var param = method.routeParams[n]; %>
+                <li><%= n + " (" + param.type + ")" %></li>
+                <% } %>
+            </ul>
+        </td>
+    </tr>
+    <% } %>
 
-        <% if (method.queryParams ) { %>
-        <tr><td class='api_label'>query params</td><td class='api_value'>
+    <% if (method.queryParams ) { %>
+    <tr>
+        <td class='api_label'>query params</td>
+        <td class='api_value'>
             <ul>
-            <% for (n in method.queryParams){ %>
-    			<% var param = method.queryParams[n]; %>
-    			<li><%= n + " (" + param.type + ")" %></li>
-    		<%} %>
-    		</ul>
-    		</td>
-    	</tr>
-    	<%} %>
+                <% for (n in method.queryParams){ %>
+                <% var param = method.queryParams[n]; %>
+                <li><%= n + " (" + param.type + ")" %></li>
+                <% } %>
+            </ul>
+        </td>
+    </tr>
+    <% } %>
 
-    	<% if (method.postData ) { %>
-        <tr><td class='api_label'>post data</td><td class='api_value'>
+    <% if (method.postData ) { %>
+    <tr>
+        <td class='api_label'>post data</td>
+        <td class='api_value'>
             <ul>
-            <% for (n in method.postData){ %>
-    			<% var param = method.postData[n]; %>
-    			<li><%= n + " (" + param.type + ")" %></li>
-    		<%} %>
-    		</ul>
-    		</td>
-    	</tr>
-        <%} %>
+                <% for (n in method.postData){ %>
+                <% var param = method.postData[n]; %>
+                <li><%= n + " (" + param.type + ")" %></li>
+                <% } %>
+            </ul>
+        </td>
+    </tr>
+    <% } %>
 
-        <% if (method.exceptions && method.exceptions.length > 0) { %>
-        <tr><td class='api_label'>exceptions</td><td class='api_value'>
+    <% if (method.exceptions && method.exceptions.length > 0) { %>
+    <tr>
+        <td class='api_label'>exceptions</td>
+        <td class='api_value'>
             <ul>
-            <% for (n in method.exceptions){ %>
-    			<% var exception = method.exceptions[n]; %>
-    			<li><%= exception %></li>
-    		<%} %>
-    		</ul>
-    		</td>
-    	</tr>
-        <%} %>
+                <% for (n in method.exceptions){ %>
+                <% var exception = method.exceptions[n]; %>
+                <li><%= exception %></li>
+                <% } %>
+            </ul>
+        </td>
+    </tr>
+    <% } %>
 
-        </table>
-        <p>&nbsp;</p>
-        <% } %>
+</table>
+<p>&nbsp;</p>
+<% } %>
 <% } %>
 
-
+<script>
+    ndexUI.initPage();
+</script>
 
 <% include foot.ejs %>

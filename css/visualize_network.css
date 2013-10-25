@@ -20,7 +20,7 @@ a:active { color:gray; text-decoration:none;}
   background-color:rgb(40,40,40);
 }
 
-#back { 
+#message {
 	font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
 	position:absolute; 
 	color: white;
@@ -29,3 +29,7 @@ a:active { color:gray; text-decoration:none;}
 	margin:1em 0 -4.5em 0; 
 	z-index:1010; 
 	}
+
+.errorMessage{
+    color: #FF0000;
+}

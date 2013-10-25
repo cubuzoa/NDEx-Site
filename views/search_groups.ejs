@@ -2,86 +2,92 @@
 <% include nav.ejs %>
 <h1>Find Groups</h1>
 <div class="btn-group">
-	<form onsubmit="return doSearch();" id="searchForm">
-		<div>
-		<label>Query:</label>
-		<input type="text" name="searchExpression" id="searchExpression"/><br/>
-		</div>
+    <form onsubmit="return doSearch();" id="searchForm">
+        <div>
+            <label>Query:</label>
+            <input type="text" name="searchExpression" id="searchExpression"/><br/>
+        </div>
 
-		<div>
-		<input type="submit" value="Search"/>
-		</div>
-	</form>
+        <div>
+            <input type="submit" value="Search"/>
+        </div>
+    </form>
 </div>
-<div class = "pull-right">
-	<a class = "ndex-options" href = "#searchOptions" data-toggle="modal"> 
-		<i class="icon-cog icon-large"></i> 
-	</a>
+<div class="pull-right">
+    <a class="ndex-options" href="#searchOptions" data-toggle="modal">
+        <i class="icon-cog icon-large"></i>
+    </a>
 </div>
 
 <div id="searchResults">
 
 </div>
 
-<div id = "searchOptions" class = " modal hide fade" tabindex = "-1" role = "dialog" aria-labelledby = "myModalLabel" aria-hidden = "true">
-	<div class = "modal-header">
-		<h4 id = "myModalLabel"> Group Search Options </h4>
-	</div>
-	<div class="modal-body">
-		
-		<label class = "span2">Search results per page: </label>
-		<input id = "searchCount" type = "text" class = "span2" pattern = "" min = "1"> <br>
-		<label class = "span2">Current page: </label>
-		<input id = "searchPage" type = "text" class = "span2" pattern = "" min = "1" placeholder = "0"> <br>
-		
-	</div>
-	<div class = "modal-footer">
-		<button class = "btn" onclick = "doSearch()" data-dismiss = "modal" aria-hidden = "true"> Save Changes </button>
-		<button class = "btn" data-dismiss = "modal" aria-hidden = "true"> Cancel </button>
-	</div>
+<div id="searchOptions" class=" modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-header">
+        <h4 id="myModalLabel"> Group Search Options </h4>
+    </div>
+    <div class="modal-body">
+
+        <label class="span2">Search results per page: </label>
+        <input id="searchCount" type="text" class="span2" pattern="" min="1"> <br>
+        <label class="span2">Current page: </label>
+        <input id="searchPage" type="text" class="span2" pattern="" min="1" placeholder="0"> <br>
+
+    </div>
+    <div class="modal-footer">
+        <button class="btn" onclick="doSearch()" data-dismiss="modal" aria-hidden="true"> Save Changes</button>
+        <button class="btn" data-dismiss="modal" aria-hidden="true"> Cancel</button>
+    </div>
 </div>
 
 <script>
 
 
-function doSearch(offset) {
-	var limitInput = document.getElementById('searchCount');
-	var limit = $(limitInput).val();
+    function doSearch(offset) {
+        var limitInput = document.getElementById('searchCount');
+        var limit = $(limitInput).val();
 
-	if(!offset) { offset = $('#searchPage').val(); }
+        if (!offset) {
+            offset = $('#searchPage').val();
+        }
 
-	if(!limit) { 
-		$(limitInput).val(2);
-		limit = 2;
-	}
-	if(!offset) { offset = 1; }
-	
-	$('#searchPage').val(offset);
-	offset = offset - 1;
+        if (!limit) {
+            $(limitInput).val(2);
+            limit = 2;
+        }
+        if (!offset) {
+            offset = 1;
+        }
 
-	var searchExpression = $('#searchExpression').val().toUpperCase();
-	
-	ndexClient.findGroups(searchExpression, limit, offset, function(data){
-		$('#searchResults').html('');
-		
-		if (data.groups){
-			$('#searchResults').append('Available Groups');
-			$.each(data.groups, function(index, item){
-				$('#searchResults').append(ndexUI.formatGroupDescriptor(item));
-			}); 
- 			
-			$('#searchResults').append(ndexUI.createPaginationModule('2', offset, data.groups.length, 'doSearch'));
-  			//$('#searchPage').attr('placeholder', 'max value: ' + data.blockAmount);
-		}
-    },
-    // error handler
-    function(error){
-    	$('#searchResults').append();
-    });
-    
-    return false;
-}
+        $('#searchPage').val(offset);
+        offset = offset - 1;
 
+        var searchExpression = $('#searchExpression').val().toUpperCase();
+
+        ndexClient.findGroups(searchExpression, limit, offset, function (data) {
+                    $('#searchResults').html('');
+
+                    if (data.groups) {
+                        $('#searchResults').append('Available Groups');
+                        $.each(data.groups, function (index, item) {
+                            $('#searchResults').append(ndexUI.formatGroupDescriptor(item));
+                        });
+
+                        $('#searchResults').append(ndexUI.createPaginationModule('2', offset, data.groups.length, 'doSearch'));
+                        //$('#searchPage').attr('placeholder', 'max value: ' + data.blockAmount);
+                    }
+                },
+                // error handler
+                function (error) {
+                    $('#searchResults').append();
+                });
+
+        return false;
+    }
+
+    ndexUI.initPage();
 
 </script>
 

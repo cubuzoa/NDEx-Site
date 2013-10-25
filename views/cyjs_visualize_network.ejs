@@ -2,101 +2,113 @@
 <html lang="en">
 
 <head>
-	<meta charset="utf-8">
-	<title>NDEx:<%= title %></title>
-	<meta name="description" content="">
-	<meta name="author" content="">
+    <meta charset="utf-8">
+    <title>NDEx: Visualize Network</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-	<script src="/js/jquery-1.10.2.min.js"></script>
-	<script src="/js/ndexClient.js"></script>
+    <script src="/js/jquery-1.10.2.min.js"></script>
+    <script src="/js/ndexClient.js"></script>
     <script src="/js/ndexUI.js"></script>
-	<script src="/js/cytoscape.js"></script>
-	<link rel="stylesheet" type="text/css" href="/css/visualize_network.css" />
-
+    <script src="/js/cytoscape.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/visualize_network.css"/>
+</head>
+<body>
 <script>
 
-// the network id passed from the ejs template
-var networkRID = '<%= networkId %>'
+    // the network id passed from the ejs template
+    var networkRID = '<%= networkId %>'
 
-//				'text-outline-width': 2,
-//				'text-outline-color': '#888'
+    //				'text-outline-width': 2,
+    //				'text-outline-color': '#888'
 
-var cyNetworkParams = {
+    var cyNetworkParams = {
 
-		  layout: {
-			name: 'circle'
-		  },
-		  style: cytoscape.stylesheet()
-			.selector('node')
-			  .css({
-				'content': 'data(name)',
-				'text-valign': 'center',
-				'color': 'white',
+        layout: {
+            name: 'circle'
+        },
+        style: cytoscape.stylesheet()
+                .selector('node')
+                .css({
+                    'content': 'data(name)',
+                    'text-valign': 'center',
+                    'color': 'white',
 
-			  })
-			.selector('edge')
-			  .css({
-				'target-arrow-shape': 'triangle',
-				'line-color': '#33ff33'
-			  })
-			.selector(':selected')
-			  .css({
-				'background-color': 'red',
-				'line-color': 'red', 
-				'target-arrow-color': 'red',
-				'source-arrow-color': 'red'
-			  })
-			.selector('.faded')
-			  .css({
-				'opacity': 0.25,
-				'text-opacity': 0
-			  }), 
-		  
+                })
+                .selector('edge')
+                .css({
+                    'target-arrow-shape': 'triangle',
+                    'line-color': '#33ff33'
+                })
+                .selector(':selected')
+                .css({
+                    'background-color': 'red',
+                    'line-color': 'red',
+                    'target-arrow-color': 'red',
+                    'source-arrow-color': 'red'
+                })
+                .selector('.faded')
+                .css({
+                    'opacity': 0.25,
+                    'text-opacity': 0
+                }),
 
-		};
 
-// On load, we get the network, then push it to cytoscape.js on the callback
-$(ndexClient.getNetwork(networkRID, function(data){
-		console.log("Got results from getNetwork");
-		console.log(data);
-	
-  		var elements = {nodes: [], edges: []};
-  		
-  		$.each(data.network.nodes, function(index, node){
-  			var label = node.name;
-  			if (node.represents && data.network.terms && data.network.terms[node.represents]){
-				var term = data.network.terms[node.represents];
-				label = term.name;
-			} 
-  			var cyNode = {data:{id: "n" + index, name: label}};
-  			elements.nodes.push(cyNode);
-  		
-  		});
-  		
-  		$.each(data.network.edges, function(index, edge){
-  			var cyEdge = {data: {source: "n" + edge.s, target: "n" + edge.o}};
-  			elements.edges.push(cyEdge);
-  		});
-  		
-  		cyNetworkParams.elements = elements;
-  		
-  		$('#cy').cytoscape(cyNetworkParams);
+    };
 
-    },
-    // error handler
-    function(error){
-    	ndexUI.formatError(error);
-    })
-);
+    var visualizationMax = 1000;
+
+    // On load, we get the network, then push it to cytoscape.js on the callback
+    $(ndexUI.initPage(function () {
+
+        ndexClient.getNetworkMetadata(networkRID, function (networkMetadata) {
+
+            // Check to be sure network is less than visualizationMAX edges
+            if (networkMetadata.network.edgeCount && networkMetadata.network.edgeCount > visualizationMax) {
+                $('#message').html("<span class='errorMessage'>Network has " + networkMetadata.network.edgeCount + " edges, more than current maximum of " + visualizationMax + "</span>");
+            } else {
+
+                ndexClient.getNetwork(networkRID, function (data) {
+                            console.log("Got results from getNetwork");
+                            console.log(data);
+
+                            var elements = {nodes: [], edges: []};
+
+                            $.each(data.network.nodes, function (index, node) {
+                                var label = node.name;
+                                if (node.represents && data.network.terms && data.network.terms[node.represents]) {
+                                    var term = data.network.terms[node.represents];
+                                    label = term.name;
+                                }
+                                var cyNode = {data: {id: "n" + index, name: label}};
+                                elements.nodes.push(cyNode);
+
+                            });
+
+                            $.each(data.network.edges, function (index, edge) {
+                                var cyEdge = {data: {source: "n" + edge.s, target: "n" + edge.o}};
+                                elements.edges.push(cyEdge);
+                            });
+
+                            cyNetworkParams.elements = elements;
+
+                            $('#cy').cytoscape(cyNetworkParams);
+
+                        },
+                        // error handler
+                        function (error) {
+                            ndexUI.formatError(error);
+                        });
+            }
+        });
+    }));
 </script>
 
-</head>
-
-<body>
 
 <!--
 <div id="back"><a href="/">Return to NDEx Home Page</a><span id="message"></span></div>
 -->
+<div id="message"></div>
 <div id="cy"></div>
 
 </body>

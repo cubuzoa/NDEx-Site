@@ -22,23 +22,14 @@
 </form>
 
 <script>
-    // verify that we have local storage before proceeding
-    if (typeof(Storage) == "undefined"){
-        alert("Local storage not available, can't store user credentials, will redirect to home page");
-        window.location = "/";
-    }
 
-    // Sign out if a user is currently signed in:
-    if (ndexUI.user.id || ndexUI.user.username){
-        ndexUI.signOut();
-    }
 
     /* attach a submit handler to the form */
-        $('#joinForm').submit(function (event) {
-            /* stop form from submitting normally */
-            event.preventDefault();
-            doCreateUser();
-        });
+    $('#joinForm').submit(function (event) {
+        /* stop form from submitting normally */
+        event.preventDefault();
+        doCreateUser();
+    });
 
     function doCreateUser() {
 
@@ -80,6 +71,20 @@
             $('#message').html("Valid username, password, and email required");
         }
     }
+
+    ndexUI.initPage(function () {
+        // verify that we have local storage before proceeding
+        if (typeof(Storage) == "undefined") {
+            alert("Local storage not available, can't store user credentials, will redirect to home page");
+            window.location = "/";
+        }
+
+        // Sign out if a user is currently signed in:
+        if (ndexUI.user.id || ndexUI.user.username) {
+            ndexUI.signOut();
+        }
+    });
+
 </script>
 
 <% include foot.ejs %>

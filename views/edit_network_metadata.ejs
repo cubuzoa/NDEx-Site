@@ -3,12 +3,12 @@
 
 <h1>Edit Network Metadata</h1>
 
-<p id ="message"></p>
+<p id="message"></p>
 <div class="" id="holder">
     <div class="row-fluid">
-            <div class="span1">Format:</div>
-            <div class="span3" id="networkFormat"></div>
-     </div>
+        <div class="span1">Format:</div>
+        <div class="span3" id="networkFormat"></div>
+    </div>
 </div>
 
 <div class=''>
@@ -17,15 +17,23 @@
         <div class="control-group">
             <div class="control-group">
                 <label class="control-label" for="inputTitle">Title</label>
+
                 <div class="controls">
-                    <textarea rows="3" id="inputTitle" name="Title" placeholder="the title of the network"></textarea></div></div>
+                    <textarea rows="3" id="inputTitle" name="Title" placeholder="the title of the network"></textarea>
+                </div>
+            </div>
             <label class="control-label" for="inputSource">Source</label>
+
             <div class="controls">
-                <input  type="text" id="inputSource" name="source"></div></div>
+                <input type="text" id="inputSource" name="source"></div>
+        </div>
         <div class="control-group">
             <label class="control-label" for="inputDescription">Description</label>
+
             <div class="controls">
-                <textarea rows="3" id="inputDescription" name="description" placeholder="a description of the network"></textarea></div></div>
+                <textarea rows="3" id="inputDescription" name="description"
+                          placeholder="a description of the network"></textarea></div>
+        </div>
         <input type="submit" value="Submit">
     </form>
 </div>
@@ -35,33 +43,9 @@
     // the group id passed from the ejs template
     var networkId = '<%= networkId %>';
 
-    // update the form
-    console.log("calling getNetworkMetadata to initialize form");
-    $(ndexClient.getNetworkMetadata(networkId,
-            // success
-            function(data){
-                console.log("Got results from getNetworkMetadata");
-                console.log(data);
-                if (data.network.format){
-                    $('#networkFormat').html(data.network.format);
-                }
-                var properties = data.network.properties;
-                if (properties){
-                    if (properties.title) $('#inputTitle').val(properties.title);
-                    if (properties.description) $('#inputDescription').val(properties.description);
-                    if (properties.source) $('#inputSource').val(properties.source);
-                }
-
-            },
-            // error handler
-            function(error){
-                ndexUI.formatError(error);
-            })
-    );
-
 
     /* attach a submit handler to the form */
-    $('#updateNetworkMetadataForm').submit(function(event) {
+    $('#updateNetworkMetadataForm').submit(function (event) {
 
         event.preventDefault();  // stop form from submitting normally
         var properties = {};
@@ -72,15 +56,15 @@
 
         console.log("calling setNetworkMetadata");
 
-        ndexClient.setNetworkMetadata(networkId, {properties : properties},
-                function(data) {
+        ndexClient.setNetworkMetadata(networkId, {properties: properties},
+                function (data) {
                     //
                     // Success: redirect to view the network
                     //
                     console.log("success in setNetworkMetadata, redirecting");
                     window.location = "/viewNetwork/" + networkId;
                 },
-                function(error) {
+                function (error) {
                     //
                     // Failure: display message
                     //
@@ -88,31 +72,31 @@
                     ndexUI.formatError(error);
                 });
     });
+    // update the form
+    ndexUI.initPage(function () {
+        console.log("calling getNetworkMetadata to initialize form");
+        $(ndexClient.getNetworkMetadata(networkId,
+                // success
+                function (data) {
+                    console.log("Got results from getNetworkMetadata");
+                    console.log(data);
+                    if (data.network.format) {
+                        $('#networkFormat').html(data.network.format);
+                    }
+                    var properties = data.network.properties;
+                    if (properties) {
+                        if (properties.title) $('#inputTitle').val(properties.title);
+                        if (properties.description) $('#inputDescription').val(properties.description);
+                        if (properties.source) $('#inputSource').val(properties.source);
+                    }
 
-    /*
-    function addForm(type){
-        var ele = document.getElementById(type.title);
-        var formEle = document.getElementById('groupForm');
-
-        var sif = document.getElementById('sif');
-        var openBel = document.getElementById('openbel-document');
-
-        if(sif.style.display == "block"){
-            $(document.getElementById('holder')).append(sif);
-            sif.style.display="none";
-        }
-        if(openBel.style.display == "block"){
-            $(document.getElementById('holder')).append(openBel);
-            openBel.style.display="none";
-        }
-
-        document.getElementById('type').innerHTML=type.title;
-        ele.style.display="block";
-
-        $(formEle).append(ele);
-
-    }
-    */
+                },
+                // error handler
+                function (error) {
+                    ndexUI.formatError(error);
+                })
+        );
+    });
 </script>
 
 <!--
@@ -248,4 +232,4 @@
     <input type="submit" value="Submit">
 </div>
 -->
-<% include foot.ejs%>
+<% include foot.ejs %>

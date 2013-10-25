@@ -186,7 +186,7 @@ Cases Handled by this page:
 //should get JID from server/ logged in user
 var userId = localStorage['ndexJid'];
 
-function populateFrom(userObject) {
+function populateFrom() {
     //show username, owned networks, and owned groups
     var selectFrom = document.getElementById('from');
     var userOption = document.createElement('option');
@@ -194,10 +194,10 @@ function populateFrom(userObject) {
     $(userOption).data('type', {type: 'user'})
             .attr('value', userObject.jid)
             .attr('onclick', 'populateTo(this)')
-            .html(userObject.username); // values sent in request will be JIDs
+            .html(ndexUI.user.username); // values sent in request will be JIDs
     $(selectFrom).append(userOption);
 
-    $.each(userObject.ownedNetworks, function (index, network) {
+    $.each(ndexUI.user.ownedNetworks, function (index, network) {
         var networkOption = document.createElement('option');
 
         $(networkOption).data('type', {type: 'network'})
@@ -207,7 +207,7 @@ function populateFrom(userObject) {
         $(selectFrom).append(networkOption);
     });
 
-    $.each(userObject.ownedGroups, function (index, group) {
+    $.each(ndexUI.user.ownedGroups, function (index, group) {
         var groupOption = document.createElement('option');
 
         $(groupOption).data('type', {type: 'group'})
@@ -429,21 +429,15 @@ function doGroupSearch() {
     return false;
 }
 
-if (ndexUI.user.id) {
-    $('#allRequest').attr('style', 'display:block');
-}
+ndexUI.initPage(function () {
 
-ndexClient.getUser(userId,
-        function (data) {
-            var user = data.user;
-            user.jid = userId;
-            populateFrom(user);
-            //$('#allRequest').append('test3');
-        },
-        function (error) {
-            ndexUI.formatError(error);
-        }
-);
+    if (ndexUI.user.id) {
+        $('#allRequest').attr('style', 'display:block');
+    }
+
+    populateFrom();
+
+});
 
 
 </script>

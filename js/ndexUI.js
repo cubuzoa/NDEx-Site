@@ -74,7 +74,7 @@ exports.initPage = function(callback){
             ndexUI.user.profile = data.user.profile;
             ndexUI.user.ownedNetworks = data.user.ownedNetworks;
             ndexUI.user.ownedGroups = data.user.ownedGroups;
-            callback();
+            if (callback) callback();
             //console.log('----' + JSON.stringify(ndexUI.user));
         });
 
@@ -88,7 +88,7 @@ exports.initPage = function(callback){
         $('#signUp').attr('style', 'display:block');
 
         $('#navname').html('');
-        callback();
+        if (callback) callback();
     };
 
 }

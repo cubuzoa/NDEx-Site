@@ -131,35 +131,36 @@
 
     var ownedNetworks, ownedGroups, profile;
 
-    $(ndexClient.getUser(userJID, function (data) {
-                console.log("Got results from getUser called with " + userJID);
-                console.log(data);
+    $(ndexUI.initPage(function () {
+        ndexClient.getUser(userJID, function (data) {
+                    console.log("Got results from getUser called with " + userJID);
+                    console.log(data);
 
-                ndexUI.addProfileImages(data.user.username);
-                // for convenience...
-                profile = data.user.profile;
-                ownedGroups = data.user.ownedGroups;
-                ownedNetworks = data.user.ownedNetworks;
+                    ndexUI.addProfileImages(data.user.username);
+                    // for convenience...
+                    profile = data.user.profile;
+                    ownedGroups = data.user.ownedGroups;
+                    ownedNetworks = data.user.ownedNetworks;
 
-                $.each(data.user.profile, function (index, item) {
-                    ndexUI.updateUserProfileElements(item, index);
-                    //$('#profile').append(index + image);
-                });
+                    $.each(data.user.profile, function (index, item) {
+                        ndexUI.updateUserProfileElements(item, index);
+                        //$('#profile').append(index + image);
+                    });
 
-                $.each(data.user.ownedNetworks, function (index, network) {
-                    $('#ownedNetworks').append(ndexUI.formatNetworkDescriptor(network));
-                });
+                    $.each(data.user.ownedNetworks, function (index, network) {
+                        $('#ownedNetworks').append(ndexUI.formatNetworkDescriptor(network));
+                    });
 
-                $.each(data.user.ownedGroups, function (index, group) {
-                    $('#ownedGroups').append(ndexUI.formatGroupDescriptor(group));
-                });
+                    $.each(data.user.ownedGroups, function (index, group) {
+                        $('#ownedGroups').append(ndexUI.formatGroupDescriptor(group));
+                    });
 
-            },
-            // error handler
-            function (error) {
-                ndexUI.formatError(error);
-            })
-    );
+                },
+                // error handler
+                function (error) {
+                    ndexUI.formatError(error);
+                })
+    }));
 
     /*
      $('#notifContent').append(ndexUI.addInvite('group1','G1'))
