@@ -1,8 +1,8 @@
 <% include head.ejs %>
 <% include nav.ejs %>
 
-<div id="networkSource"></div>
-<div id="networkFormat"></div>
+<div ><span id="networkSource"></span><span id="networkFormat"></span></div>
+<div ><span id="nodeCount"></span><span id="edgeCount"></span></div>
 <div id="networkDescription"></div>
 
 <div class="tabbable">
@@ -163,9 +163,9 @@
             currentPage = 1;
         }
 
-        currentPage = currentPage - 1;
+        var pageOffset = currentPage - 1;
 
-        $(ndexClient.getNetworkByNodes(networkRID, '', '', nodesPerPage, currentPage, function (data) {
+        $(ndexClient.getNetworkByNodes(networkRID, '', '', nodesPerPage, pageOffset, function (data) {
                     $('#nodes').html('');
                     $('#viewNetTitle').html('');
                     $('#viewNetTitle').append(data.network.title);
@@ -191,9 +191,9 @@
             currentPage = 1;
         }
 
-        currentPage = currentPage - 1;
+        var pageOffset = currentPage - 1;
 
-        $(ndexClient.getNetworkByEdges(networkRID, '', '', '', '', edgesPerPage, currentPage, function (data) {
+        $(ndexClient.getNetworkByEdges(networkRID, '', '', '', '', edgesPerPage, pageOffset, function (data) {
                     $('#edges').html('');
                     networkPage = data.network;
                     $.each(data.network.edges, function (index, edge) {
@@ -225,13 +225,15 @@
                     console.log("Got results from getNetworkMetadata");
                     console.log(data);
                     if (data.network.format) {
-                        $('#networkFormat').html(data.network.format);
+                        $('#networkFormat').html("&nbsp;<b>Format:</b> " + data.network.format);
                     }
+                    if (data.network.edgeCount) $('#edgeCount').html("&nbsp;<b>Edges:</b> " + data.network.edgeCount);
+                    if (data.network.nodeCount) $('#nodeCount').html("<b>Nodes:</b> " + data.network.nodeCount);
                     var properties = data.network.properties;
                     if (properties) {
                         if (properties.title) $('#networkTitle').html("<h3>" + properties.title + "</h3>");
-                        if (properties.description) $('#networkDescription').html("description: " + properties.description);
-                        if (properties.source) $('#networkSource').html("Source: " + properties.source);
+                        if (properties.description) $('#networkDescription').html("<b>Description: </b> " + properties.description);
+                        if (properties.source) $('#networkSource').html("<b>Source:</b> " + properties.source);
                     }
 
                     getNetwork();
