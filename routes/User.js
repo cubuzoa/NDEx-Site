@@ -3,321 +3,123 @@ module.db = null;
 var common = require("./Common.js");
 var fs = require('fs');
 
+module.dbHost = "http://localhost:2480/";
+module.dbUser = "admin";
+module.dbPassword = "admin";
+module.dbName = "ndex";
+
 exports.init = function (orient, callback) {
     module.db = orient;
 };
 
 exports.createUser = function (username, password, recoveryEmail, callback) {
     console.log("calling createUser with arguments: '" + username + "' '" + password + "'");
-    var selectUserByUserNameCmd = "select from xUser where username = '" + username + "'";
-    var insertUserCmd = "insert into xUser (username, password) values('" + username + "', '" + password + "')";
-    //console.log("first checking that username is not taken");
-    module.db.command(selectUserByUserNameCmd, function (err, users) {
-        if (err) {
-            callback({error: err, status: 500});
-        } else {
-            //console.log("Existing users: " + JSON.stringify(users));
-            if (users && users.length > 0) {
-                callback({error: "username '" + username + "' is already in use", status: 500});
-            } else {
-                //console.log("now inserting the new user");
-                //console.log(insertUserCmd);
-                module.db.command(insertUserCmd, function (err, results) {
-                    if (err) {
-                        console.log("insert of new user yields error : " + err);
-                        callback({error: err});
-                    } else {
-                        var user = results[0];
-                        //console.log(JSON.stringify(user));
-                        callback({status: 200, error: err, jid: user['@rid'], username: user['username']});
-                    }
 
-                });
-            }
-        }
-    });
+    var postData = {
+        "username": username,
+        "password": password
+    };
+
+    common.ndexPost(module.dbHost, "ndexCreateUser/" + module.dbName, module.dbUser, module.dbPassword, postData,
+        function (result) {
+            callback({status: 200, jid: result.jid, username: result.username});
+        },
+        function (err) {
+            callback({error: err.toString(), status: 500});
+        });
 };
 
-/*
- uploadImg(profile.foregroundImg,'account_img/users/foreground/', user.username, function(err, results){
- if (common.checkErr(err, "uploading foreground image", callback)){
- profile.foregroundImg = results.name;
-
- uploadImg(profile.backgroundImg,'account_img/users/background/', user.username, function(err, results){
- if (common.checkErr(err, "uploading foreground image", callback)){
- profile.backgroundImg = results.name;
- */
-
-var knownProfileFields = [
-    "firstName",
-    "lastName",
-    "website",
-    "description",
-    "networksPerPage",
-    "edgesPerPage",
-    "nodesPerPage"
-];
-
 exports.updateUserProfile = function (userRID, profile, callback) {
-    //TODO add uploader for background img
-    var cmd = "select from xUser where @rid = " + userRID + "";
-    console.log(cmd);
-    module.db.command(cmd, function (err, users) {
-        if (common.checkErr(err, "finding user", callback)) {
-            var user = users[0];
+    var postData = {
+        "profile": profile,
+        "userJid": userRID
+    };
 
-            // we check to see what fields are set in the profile and only construct strings for those.
-            // we also only accept known fields
-
-            var profileStrings = [];
-            for (key in profile) {
-                if (common.contains(knownProfileFields, key)) {
-                    var value = profile[key];
-                    profileStrings.push(key + " = '" + value + "'");
-                }
-            }
-            /*
-            var profileStrings = [
-                    "firstName = '" + profile.firstName + "'",
-                    "lastName = '" + profile.lastName + "'",
-                    "website = '" + profile.website + "'",
-                    "description = '" + profile.description + "'"],
-
-            */
-
-            if (profileStrings.length > 0){
-                var setString = profileStrings.join(", "),
-                    updateCmd = "update " + userRID + " set " + setString;
-                console.log(updateCmd);
-                module.db.command(updateCmd, function (err, result) {
-                    callback({profile: profile, error: err, status: 200})
-                });
-            } else {
-                callback({profile: profile, error: "no recognized profile fields in updateUserProfile", status: 500});
-            }
-
-        }
-    });
+    common.ndexPost(module.dbHost, "ndexUpdateUserProfile/" + module.dbName, module.dbUser, module.dbPassword, postData,
+        function (result) {
+            callback({status: 200, profile: profile});
+        },
+        function (err) {
+            callback({error: err.toString(), status: 500});
+        });
 };
 
 exports.findUsers = function (searchExpression, limit, offset, callback) {
     console.log("calling findUsers with arguments: " + searchExpression + " " + limit + " " + offset);
-    var start = (offset) * limit;
-    var descriptors = " username as username, @rid as jid ";
-    var cmd = "select" + descriptors + "from xUser where username.toUpperCase()  like  '%" + searchExpression + "%' order by creation_date desc skip " + start + " limit " + limit;
-    console.log(cmd);
-    module.db.command(cmd, function (err, users) {
-        for (i in users) {
-            var user = users[i];
-            user.jid = common.convertFromRID(user.jid);
-        }
-        callback({users: users, error: err});
-    });
-};
 
-exports.getUserByName = function (username, callback) {
-    console.log("calling getUserByName with username = '" + username + "'");
-    var cmd = "select @rid as jid from xUser where username = '" + username + "'";
-    console.log(cmd);
-    module.db.command(cmd, function (err, users) {
-        // TODO - case where more than one user returned...
-        if (err) {
-            console.log("caught orient db error " + e);
-            callback({user: null, error: err, status: 500});
-        } else {
-            try {
-                if (!users || users.length < 1) {
-                    console.log("found no users by '" + username + "'");
-                    callback({status: 404});
-                } else {
-                    console.log("found " + users.length + " users, first one is " + users[0].inspect);
-                    callback({user: users[0]});
-                }
-            }
-            catch (e) {
-                console.log("caught error " + e);
-                callback({user: null, error: e.toString(), status: 500});
-            }
+    common.ndexGet(module.dbHost, "ndexFindUsers/" + module.dbName, module.dbUser, module.dbPassword,
+        {searchExpression: searchExpression, limit: limit, offset: offset},
+        function (result) {
+            callback({users: result.users});
+        },
+        function (err) {
+            callback({error: err.toString(), status: 500});
         }
-    });
+    );
 };
 
 exports.getUser = function (userRID, callback) {
     console.log("calling getUser with userRID = '" + userRID + "'");
-    module.db.loadRecord(userRID, function (err, user) {
 
-        if (common.checkErr(err, "finding user", callback)) {
-            try {
-                if (!user) {
-                    console.log("found no users by id = '" + userRID + "'");
-                    callback({status: 404});
-                } else {
-
-                    var profile = {};
-
-                    if (user["@class"] !== "xUser")
-                        throw new Error("Document " + userRID + " is not a user. (actual class is '" + user["@class"] + "')");
-
-                    console.log("found user " + user["@rid"]);
-
-                    for (key in user) {
-                        if (common.contains(knownProfileFields, key)) {
-                            var value = user[key];
-                            profile[key] = value;
-                        }
-                    }
-                    /*
-                    if (user.firstName) profile.firstName = user.firstName;
-                    if (user.lastName) profile.lastName = user.lastName;
-                    if (user.website) profile.website = user.website;
-                    if (user.foregroundImg) profile.foregroundImg = user.foregroundImg;
-                    if (user.backgroundImg) profile.backgroundImg = user.backgroundImg;
-                    if (user.description) profile.description = user.description;
-                    */
-
-                    var result = {username: user.username, profile: profile, ownedNetworks: {}, ownedGroups: {}};
-
-
-                    // get owned networks
-                    var networkDescriptors = "properties.title as title, @rid as jid, nodesCount as nodeCount, edgesCount as edgeCount";
-                    var traverseExpression = "select flatten(out(xOwnsNetwork)) from " + userRID;
-
-                    var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
-                    module.db.command(networks_cmd, function (err, networks) {
-                        if (common.checkErr(err, "getting owned networks", callback)) {
-
-                            // process the networks
-                            for (i in networks) {
-                                var network = networks[i];
-                                network.jid = common.convertFromRID(network.jid);
-                            }
-                            result.ownedNetworks = networks;
-
-
-                            // get owned groups
-                            var groupDescriptors = "organizationName as organizationName, @rid as jid";
-                            var traverseExpression2 = "select flatten(out(xOwnsGroup)) from " + userRID;
-                            var groups_cmd = "select " + groupDescriptors + " from (" + traverseExpression2 + ") where @class = 'xGroup'";
-                            console.log("groups_cmd = " + groups_cmd);
-                            module.db.command(groups_cmd, function (err, groups) {
-                                if (common.checkErr(err, "getting owned groups", callback)) {
-
-                                    // process the groups
-                                    for (i in groups) {
-                                        var group = groups[i];
-                                        group.jid = common.convertFromRID(group.jid);
-                                    }
-                                    result.ownedGroups = groups;
-                                }
-                                console.log("callback: " + JSON.stringify(result));
-                                callback({user: result, error: err});
-
-                            });
-
-                        }
-                    });
-                }
-            }
-
-            catch (e) {
-                console.log("caught error " + e);
-                callback({network: null, error: e.toString(), status: 500});
-            }
+    common.ndexGet(module.dbHost, "ndexGetUserById/" + module.dbName, module.dbUser, module.dbPassword,
+        {userJid: userRID},
+        function (result) {
+            callback({user: result.user});
+        },
+        function (err) {
+            callback({error: err.toString(), status: 500});
         }
-    });
+    );
 };
 
 
-function getWorkSurfaceInternal(userRID, callback) {
-    var networkDescriptors = "properties.title as title, @rid as rid, nodesCount as nodeCount, edgesCount as edgeCount";
-    var traverseExpression = "select flatten(workspace) from " + userRID;
-    var networks_cmd = "select " + networkDescriptors + " from (" + traverseExpression + ") where  @class = 'xNetwork'";
-
-    console.log(networks_cmd);
-    module.db.command(networks_cmd, function (err, worksurface_networks) {
-        callback(err, worksurface_networks);
-    });
-}
-
 exports.getUserWorkSurface = function (userRID, callback) {
     console.log("calling getUserWorkSurface with userRID = '" + userRID + "'");
-    getWorkSurfaceInternal(userRID, function (err, worksurface_networks) {
-        if (common.checkErr(err, "getting user worksurface networks", callback)) {
-            // process the worksurface_networks
-            for (i in worksurface_networks) {
-                var network = worksurface_networks[i];
-                network.jid = common.convertFromRID(network.rid);
-            }
-            callback({networks: worksurface_networks, error: err});
+
+    common.ndexGet(module.dbHost, "ndexGetUserWorkSurface/" + module.dbName, module.dbUser, module.dbPassword,
+        {userJid: userRID},
+        function (result) {
+            callback({networks: result.networks});
+        },
+        function (err) {
+            callback({error: err.toString(), status: 500});
         }
-    });
-}
+    );
+};
 
 exports.addNetworkToUserWorkSurface = function (userRID, networkRID, callback) {
     console.log("calling addNetworkToUserWorkSurface with userRID = '" + userRID + "' and networkRID = '" + networkRID + "'");
-    getWorkSurfaceInternal(userRID, function (err, worksurface_networks) {
-        if (common.checkErr(err, "getting user worksurface networks", callback)) {
-            // return error if networkRID already on workSurface
-            for (i in worksurface_networks) {
-                var network = worksurface_networks[i];
-                if (network.rid == networkRID) {
-                    callback({status: 400, error: "network " + networkRID + " already in user worksurface"});
-                }
-            }
+    var postData = {
+        "networkJid": networkRID,
+        "userJid": userRID
+    };
 
-            // Otherwise, update the workSurface
-            var updateCmd = "update " + userRID + " add workspace = " + networkRID;
-            console.log(updateCmd);
-            module.db.command(updateCmd, function (err, worksurface) {
-                if (common.checkErr(err, "adding network " + networkRID + " to worksurface of user " + userRID, callback)) {
-                    getWorkSurfaceInternal(userRID, function (err, worksurface_networks) {
-                        // return the worksurface if successful
-                        for (i in worksurface_networks) {
-                            var network = worksurface_networks[i];
-                            network.jid = common.convertFromRID(network.rid);
-                        }
-                        callback({networks: worksurface_networks, error: err});
+    common.ndexPost(module.dbHost, "ndexAddNetworkToUserWorkSurface/" + module.dbName, module.dbUser, module.dbPassword, postData,
+        function (result) {
+            exports.getUserWorkSurface(userRID, callback);
+        },
+        function (err) {
+            callback({error: err.toString(), status: 500});
+        });
+};
 
-                    });
-                }
-            });
-        }
-    });
-}
 
 exports.deleteNetworkFromUserWorkSurface = function (userRID, networkRID, callback) {
     console.log("calling deleteNetworkFromUserWorkSurface with userRID = '" + userRID + "' and networkRID = '" + networkRID + "'");
-    getWorkSurfaceInternal(userRID, function (err, worksurface_networks) {
-        if (common.checkErr(err, "getting user worksurface networks", callback)) {
-            // return error if networkRID already on workSurface
-            var missing = true;
-            for (i in worksurface_networks) {
-                var network = worksurface_networks[i];
-                if (network.rid == networkRID) {
-                    missing = false;
-                }
-            }
-            if (missing) callback({status: 400, error: "network " + networkRID + " not in user worksurface"});
 
-            // Otherwise, update the workSurface
-            var updateCmd = "update " + userRID + " remove workspace = " + networkRID;
-            console.log(updateCmd);
-            module.db.command(updateCmd, function (err, worksurface) {
-                if (common.checkErr(err, "removing network " + networkRID + " from worksurface of user " + userRID, callback)) {
-                    getWorkSurfaceInternal(userRID, function (err, worksurface_networks) {
-                        // return the worksurface if successful
-                        for (i in worksurface_networks) {
-                            var network = worksurface_networks[i];
-                            network.jid = common.convertFromRID(network.rid);
-                        }
-                        callback({networks: worksurface_networks, error: err});
+    var postData = {
+        "networkJid": networkRID,
+        "userJid": userRID
+    };
 
-                    });
-                }
-            });
-        }
-    });
-}
+    common.ndexPost(module.dbHost, "ndexDeleteNetworkFromUserWorkSurface/" + module.dbName, module.dbUser, module.dbPassword, postData,
+        function (result) {
+            exports.getUserWorkSurface(userRID, callback);
+        },
+        function (err) {
+            callback({error: err.toString(), status: 500});
+        });
+};
 
 //
 // TODO: clean up links from user.
@@ -327,27 +129,17 @@ exports.deleteNetworkFromUserWorkSurface = function (userRID, networkRID, callba
 exports.deleteUser = function (userRID, callback) {
     console.log("calling delete user with userRID = '" + userRID + "'");
 
-    //checking if user exists
-    var cmd = "select from xUser where @rid = " + userRID + "";
-    module.db.command(cmd, function (err, users) {
-        if (common.checkErr(err, "checking existence of user " + userRID, callback)) {
-            console.log("users found " + users.length);
-            if (!users || users.length < 1) {
-                console.log("found no users by id = '" + userRID + "'");
-                callback({status: 404, error: "Found no user by id = '" + userRID + "'"});
-            }
-            else {
-                //deleting user
-                var updateCmd = "delete from " + userRID + " where @class = 'xUser'";
-                console.log(updateCmd);
-                module.db.command(updateCmd, function (err) {
-                    if (common.checkErr(err, "deleting user " + userRID, callback)) {
-                        callback({status: 200});
-                    }
-                });
-            }
-        }
-    });
+    var postData = {
+        "userJid": userRID
+    };
+
+    common.ndexPost(module.dbHost, "ndexDeleteUser/" + module.dbName, module.dbUser, module.dbPassword, postData,
+        function (result) {
+            callback({status: 200});
+        },
+        function (err) {
+            callback({error: err.toString(), status: 500});
+        });
 };
 
 exports.uploadAccountImage = function (accountId, type, imageFile, callback) {

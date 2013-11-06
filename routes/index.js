@@ -7,17 +7,10 @@ module.db = null;
 //	xNetwork
 //
 function ensureSchemaIsSetup(callback) {
-	ensureClass("xAccount", "V", function(){
-		ensureClass("xUser", "xAccount");
-		ensureClass("xGroup", "xAccount");
-		ensureClass("xAgent", "xAccount");
-	});
-
 	ensureClass("xPermission", "V");
 	ensureClass("xOwnsGroup", "E");
 	ensureClass("xOwnsAgent", "E");
     ensureClass("xRequest", "V");
-    ensureClass("xTask", "V");
 	callback();
 }
 

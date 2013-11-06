@@ -2,6 +2,11 @@ var check = require('validator').check;
 
 module.db = null;
 
+module.dbHost = "http://localhost:2480/";
+module.dbUser = "admin";
+module.dbPassword = "admin";
+module.dbName = "ndex";
+
 var common = require("./Common.js");
 
 exports.init = function(orient, callback) {
