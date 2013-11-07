@@ -21,7 +21,7 @@ exports.createGroup = function(userRID, groupname, callback){
     };
     common.ndexPost(module.dbHost, "ndexGroupCreate/" + module.dbName, module.dbUser, module.dbPassword, postData,
         function (result) {
-            callback({jid: result.groupId, groupname: result.groupname, error: null, status: 200});
+            callback({jid: result.jid, groupname: result.groupname, error: null, status: 200});
         },
         function (err) {
             callback({error: err.toString(), status: 500});
