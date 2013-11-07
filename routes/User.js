@@ -59,6 +59,8 @@ exports.findUsers = function (searchExpression, limit, offset, callback) {
 };
 
 exports.getUser = function (userRID, callback) {
+    userRID = common.convertFromRID(userRID);
+
     console.log("calling getUser with userRID = '" + userRID + "'");
 
     common.ndexGet(module.dbHost, "ndexGetUserById/" + module.dbName, module.dbUser, module.dbPassword,
@@ -128,6 +130,7 @@ exports.deleteNetworkFromUserWorkSurface = function (userRID, networkRID, callba
 // 
 exports.deleteUser = function (userRID, callback) {
     console.log("calling delete user with userRID = '" + userRID + "'");
+    userRID = common.convertFromRID(userRID);
 
     var postData = {
         "userJid": userRID
