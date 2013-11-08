@@ -25,7 +25,7 @@ exports.createUser = function (username, password, recoveryEmail, callback) {
             callback({status: 200, jid: result.jid, username: result.username});
         },
         function (err) {
-            callback({error: err.toString(), status: 500});
+            callback({error: JSON.stringify(err), status: (err.status)?err.status:500});
         });
 };
 
@@ -40,7 +40,7 @@ exports.updateUserProfile = function (userRID, profile, callback) {
             callback({status: 200, profile: profile});
         },
         function (err) {
-            callback({error: err.toString(), status: 500});
+            callback({error: JSON.stringify(err), status: (err.status)?err.status:500});
         });
 };
 
@@ -53,7 +53,7 @@ exports.findUsers = function (searchExpression, limit, offset, callback) {
             callback({users: result.users});
         },
         function (err) {
-            callback({error: err.toString(), status: 500});
+            callback({error: JSON.stringify(err), status: (err.status)?err.status:500});
         }
     );
 };
@@ -69,7 +69,7 @@ exports.getUser = function (userRID, callback) {
             callback({user: result.user});
         },
         function (err) {
-            callback({error: err.toString(), status: 500});
+            callback({error: JSON.stringify(err), status: (err.status)?err.status:500});
         }
     );
 };
@@ -84,7 +84,7 @@ exports.getUserWorkSurface = function (userRID, callback) {
             callback({networks: result.networks});
         },
         function (err) {
-            callback({error: err.toString(), status: 500});
+            callback({error: JSON.stringify(err), status: (err.status)?err.status:500});
         }
     );
 };
@@ -101,7 +101,7 @@ exports.addNetworkToUserWorkSurface = function (userRID, networkRID, callback) {
             exports.getUserWorkSurface(userRID, callback);
         },
         function (err) {
-            callback({error: err.toString(), status: 500});
+            callback({error: JSON.stringify(err), status: (err.status)?err.status:500});
         });
 };
 
@@ -119,7 +119,7 @@ exports.deleteNetworkFromUserWorkSurface = function (userRID, networkRID, callba
             exports.getUserWorkSurface(userRID, callback);
         },
         function (err) {
-            callback({error: err.toString(), status: 500});
+            callback({error: JSON.stringify(err), status: (err.status)?err.status:500});
         });
 };
 
@@ -141,7 +141,7 @@ exports.deleteUser = function (userRID, callback) {
             callback({status: 200});
         },
         function (err) {
-            callback({error: err.toString(), status: 500});
+            callback({error: JSON.stringify(err), status: (err.status)?err.status:500});
         });
 };
 
@@ -180,7 +180,7 @@ exports.uploadAccountImage = function (accountId, type, imageFile, callback) {
             }
             catch (e) {
                 console.log("caught error " + e);
-                callback({user: null, error: e.toString(), status: 500});
+                callback({user: null, error: e.toString(), status: (err.status)?err.status:500});
             }
         }
     });

@@ -584,24 +584,14 @@ app.get('/users/:userid/worksurface', passport.authenticate('basic', { session: 
     try {
         var userid = req.params['userid'];
         if (!common.checkJID(userid)) res.send(400, { error: 'bad JID : ' + userid});
-        userid = convertToRID(userid);
-        common.ridCheck(
-            [
-                { rid: userid, objectClass: 'xUser'},
-            ],
-            res,
-            function () {
-                User.getUserWorkSurface(userid, function (data) {
-                    var status = data.status || 200;
-                    if (status && status == 200) {
-                    }
-                    res.send(status, data);
+        User.getUserWorkSurface(userid, function (data) {
+            var status = data.status || 200;
+            if (status && status == 200) {
+            }
+            res.send(status, data);
 
-                }) // close the route function
+        }) // close the route function
 
-            } // close the ridCheck callback
-
-        ); // close the ridCheck
 
         // now catch random errors
     }
@@ -616,28 +606,18 @@ app.post('/users/:userid/worksurface', passport.authenticate('basic', { session:
     try {
         var userid = req.params['userid'];
         if (!common.checkJID(userid)) res.send(400, { error: 'bad JID : ' + userid});
-        userid = convertToRID(userid);
         var networkid = req.body['networkid'];
         if (!common.checkJID(networkid)) res.send(400, { error: 'bad JID : ' + networkid});
-        networkid = convertToRID(networkid);
-        common.ridCheck(
-            [
-                { rid: userid, objectClass: 'xUser'},
-                { rid: networkid, objectClass: 'xNetwork'},
-            ],
-            res,
-            function () {
-                User.addNetworkToUserWorkSurface(userid, networkid, function (data) {
-                    var status = data.status || 200;
-                    if (status && status == 200) {
-                    }
-                    res.send(status, data);
 
-                }) // close the route function
+        User.addNetworkToUserWorkSurface(userid, networkid, function (data) {
+                var status = data.status || 200;
+                if (status && status == 200) {
+                }
+                res.send(status, data);
 
-            } // close the ridCheck callback
+            } // close the route function
 
-        ); // close the ridCheck
+        );
 
         // now catch random errors
     }
@@ -652,28 +632,15 @@ app.delete('/users/:userid/worksurface/:networkid', passport.authenticate('basic
     try {
         var userid = req.params['userid'];
         if (!common.checkJID(userid)) res.send(400, { error: 'bad JID : ' + userid});
-        userid = convertToRID(userid);
         var networkid = req.params['networkid'];
         if (!common.checkJID(networkid)) res.send(400, { error: 'bad JID : ' + networkid});
-        networkid = convertToRID(networkid);
-        common.ridCheck(
-            [
-                { rid: userid, objectClass: 'xUser'},
-                { rid: networkid, objectClass: 'xNetwork'},
-            ],
-            res,
-            function () {
-                User.deleteNetworkFromUserWorkSurface(userid, networkid, function (data) {
-                    var status = data.status || 200;
-                    if (status && status == 200) {
-                    }
-                    res.send(status, data);
+        User.deleteNetworkFromUserWorkSurface(userid, networkid, function (data) {
+            var status = data.status || 200;
+            if (status && status == 200) {
+            }
+            res.send(status, data);
 
-                }) // close the route function
-
-            } // close the ridCheck callback
-
-        ); // close the ridCheck
+        }) // close the route function
 
         // now catch random errors
     }

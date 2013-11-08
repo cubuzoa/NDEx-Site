@@ -109,10 +109,10 @@ describe('find-networks', function (done) {
 			);	
 		});
 
-		it("should get 200 and 2 different results searching on '' with limit = 2, offset = 2", function(done){
+		it("should get 200 and 2 different results searching on '' with limit = 2, offset = 1", function(done){
 			ndex.get(
 				'/networks/',
-				{searchExpression: '', limit: 2, offset: 2},
+				{searchExpression: '', limit: 2, offset: 1},
 				networkOwner,
 				function(err,res,body){
 					if(err) { done(err) }

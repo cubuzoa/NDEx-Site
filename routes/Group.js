@@ -9,12 +9,12 @@ module.dbName = "ndex";
 
 var common = require("./Common.js");
 
-exports.init = function(orient, callback) {
-    module.db = orient;   
+exports.init = function (orient, callback) {
+    module.db = orient;
 };
 
-exports.createGroup = function(userRID, groupname, callback){
-    console.log("calling createGroup with userRID = '" + userRID + "' and groupname = '" + groupname +"'");
+exports.createGroup = function (userRID, groupname, callback) {
+    console.log("calling createGroup with userRID = '" + userRID + "' and groupname = '" + groupname + "'");
     var postData = {
         "userRID": userRID,
         "groupname": groupname
@@ -24,12 +24,12 @@ exports.createGroup = function(userRID, groupname, callback){
             callback({jid: result.jid, groupname: result.groupname, error: null, status: 200});
         },
         function (err) {
-            callback({error: err.toString(), status: 500});
+            callback({error: JSON.stringify(err), status: (err.status) ? err.status : 500});
         });
 };
 
 
-exports.updateGroupProfile = function(groupRID, profile, callback){
+exports.updateGroupProfile = function (groupRID, profile, callback) {
     console.log("calling updateGroupProfile for group " + groupRID + " with " + JSON.stringify(profile));
 
     var postData = {
@@ -41,11 +41,11 @@ exports.updateGroupProfile = function(groupRID, profile, callback){
             callback({profile: result.profile, error: null, status: 200});
         },
         function (err) {
-            callback({error: err.toString(), status: 500});
+            callback({error: JSON.stringify(err), status: (err.status) ? err.status : 500});
         });
 };
 
-exports.findGroups = function (searchExpression, limit, offset, callback){
+exports.findGroups = function (searchExpression, limit, offset, callback) {
     console.log("calling findGroups with arguments: " + searchExpression + " " + limit + " " + offset);
 
     var parameters = {
@@ -58,11 +58,11 @@ exports.findGroups = function (searchExpression, limit, offset, callback){
             callback({groups: result.groups, error: null, status: 200});
         },
         function (err) {
-            callback({error: err.toString(), status: 500});
+            callback({error: JSON.stringify(err), status: (err.status) ? err.status : 500});
         });
 };
 
-exports.getGroupByName = function(groupname, callback){
+exports.getGroupByName = function (groupname, callback) {
     console.log("calling getGroupByName with groupname = '" + groupname + "'");
 
     var parameters = {
@@ -73,12 +73,12 @@ exports.getGroupByName = function(groupname, callback){
             callback({group: result.group, error: null, status: 200});
         },
         function (err) {
-            callback({error: err.toString(), status: 500});
+            callback({error: JSON.stringify(err), status: (err.status) ? err.status : 500});
         });
 };
 
-exports.getGroup = function(groupRID, callback){
-	console.log("calling getGroup with groupRID = '" + groupRID + "'");
+exports.getGroup = function (groupRID, callback) {
+    console.log("calling getGroup with groupRID = '" + groupRID + "'");
 
 
     var parameters = {
@@ -89,12 +89,12 @@ exports.getGroup = function(groupRID, callback){
             callback({group: result.group, error: null, status: 200});
         },
         function (err) {
-            callback({error: err.toString(), status: 500});
+            callback({error: JSON.stringify(err), status: (err.status) ? err.status : 500});
         });
 };
 
-exports.deleteGroup = function (groupRID, callback){
-	console.log("calling delete group with groupRID = '" + groupRID + "'");
+exports.deleteGroup = function (groupRID, callback) {
+    console.log("calling delete group with groupRID = '" + groupRID + "'");
 
     var postData = {
         "groupRID": groupRID
@@ -104,7 +104,7 @@ exports.deleteGroup = function (groupRID, callback){
             callback({error: null, status: 200});
         },
         function (err) {
-            callback({error: err.toString(), status: 500});
+            callback({error: JSON.stringify(err), status: (err.status) ? err.status : 500});
         });
 };
 

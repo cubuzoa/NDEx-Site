@@ -78,7 +78,7 @@ describe('user-workspace', function (done) {
 		this.timeout(10000);// occasionally, requests take longer
 		it("should get 404 getting workspace for non-existent User Id", function(done){
 			ndex.get(
-				'/users/C21R4444/workspace',
+				'/users/C21R4444/worksurface',
                 {},
                 workspaceOwner,
 				function(err,res,body){
@@ -94,7 +94,7 @@ describe('user-workspace', function (done) {
 
 		it("should get 200 and empty workspace on getting workspace of new user WorkspaceOwner", function(done){
 			ndex.get(
-				'/users/'+ workspaceOwner.jid +'/workspace',
+				'/users/'+ workspaceOwner.jid +'/worksurface',
                 {},
 				workspaceOwner,
 				function(err,res,body){
@@ -136,7 +136,7 @@ describe('user-workspace', function (done) {
 				if(ii == (networkArray.length -1)) { isFin = done }
 				(function(tempNet, isFinished){
 					ndex.post(
-						'/users/'+ workspaceOwner.jid +'/workspace',
+						'/users/'+ workspaceOwner.jid +'/worksurface',
 						{networkid: tempNet.jid},
                         workspaceOwner,
 						function(err,res,body){
@@ -154,7 +154,7 @@ describe('user-workspace', function (done) {
 
 		it("should get 200 and workspace on getting workspace of new user WorkspaceOwner", function(done){
 			ndex.get(
-				'/users/'+ workspaceOwner.jid +'/workspace',
+				'/users/'+ workspaceOwner.jid +'/worksurface',
                 {},
 				workspaceOwner,
 				function(err,res,body){
@@ -181,7 +181,7 @@ describe('user-workspace', function (done) {
 						cell_map = res.body.networks;
 						cell_map = cell_map[0];
 						ndex.delete(
-							'/users/'+ workspaceOwner.jid +'/workspace/' + cell_map.jid,
+							'/users/'+ workspaceOwner.jid +'/worksurface/' + cell_map.jid,
                             workspaceOwner,
 							function(err,res,body){
 								if(err) { done(err) }
@@ -199,7 +199,7 @@ describe('user-workspace', function (done) {
 		it("should get 400 attempting to add network already in workspace", function(done){
 			var tempNet = networkArray[0];
 			ndex.post(
-				'/users/'+ workspaceOwner.jid +'/workspace',
+				'/users/'+ workspaceOwner.jid +'/worksurface',
 				{networkid: tempNet.jid},
 				workspaceOwner,
 				function(err,res,body){
@@ -215,7 +215,7 @@ describe('user-workspace', function (done) {
 
 		it("should get 404 attempting to add non-existent Network Id", function(done){
 			ndex.post(
-				'/users/'+ workspaceOwner.jid +'/workspace',
+				'/users/'+ workspaceOwner.jid +'/worksurface',
 				{networkid: 'C11R4444444'},
 				workspaceOwner,
 				function(err,res,body){
@@ -231,7 +231,7 @@ describe('user-workspace', function (done) {
 
 		it("should get 404 attempting to add using non-existent User Id", function(done){
 			ndex.post(
-				'/users/C21R4444444/workspace',
+				'/users/C21R4444444/worksurface',
 				{networkid: 'C11R3'},
 				workspaceOwner,
 				function(err,res,body){
@@ -247,7 +247,7 @@ describe('user-workspace', function (done) {
 
 		it("should get 200 adding new network to workspace", function(done){
 			ndex.post(
-				'/users/' + workspaceOwner.jid + '/workspace',
+				'/users/' + workspaceOwner.jid + '/worksurface',
 				{networkid: newNetwork.jid},
 				workspaceOwner,
 				function(err,res,body){
@@ -262,7 +262,7 @@ describe('user-workspace', function (done) {
 
 		it("should get 200 and network descriptors including new network when getting workspace", function(done){
 			ndex.get(
-				'/users/'+ workspaceOwner.jid +'/workspace',
+				'/users/'+ workspaceOwner.jid +'/worksurface',
                 {},
 				workspaceOwner,
 				function(err,res,body){
@@ -296,7 +296,7 @@ describe('user-workspace', function (done) {
 
 		it("should get 200 and network descriptors NOT including new network when getting workspace", function(done){
 			ndex.get(
-				'/users/'+ workspaceOwner.jid +'/workspace',
+				'/users/'+ workspaceOwner.jid +'/worksurface',
                 {},
 				workspaceOwner,
 				function(err,res,body){

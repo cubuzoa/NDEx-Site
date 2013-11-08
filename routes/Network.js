@@ -23,7 +23,7 @@ exports.createNetwork = function (networkJDEx, accountRID, callback) {
             callback({jid: result.jid, ownedBy: result.ownedBy, error: null, status: 200});
         },
         function (err) {
-            callback({network: null, error: err.toString(), status: 500});
+            callback({network: null, error: JSON.stringify(err), status: (err.status)?err.status:500});
         });
 };
 
@@ -35,7 +35,7 @@ exports.getNetwork = function (networkRID, callback) {
             callback({network: result});
         },
         function (err) {
-            callback({network: null, error: err.toString(), status: 500});
+            callback({network: null, error: JSON.stringify(err), status: (err.status)?err.status:500});
         }
     );
 };
@@ -115,7 +115,7 @@ exports.getNetworkByEdges = function (networkid, typeFilter, propertyFilter, sub
             callback({network: result});
         },
         function (err) {
-            callback({network: null, error: err.toString(), status: 500});
+            callback({network: null, error: JSON.stringify(err), status: (err.status)?err.status:500});
         }
     );
 };
@@ -129,7 +129,7 @@ exports.getNetworkByNodes = function (networkid, typeFilter, propertyFilter, lim
             callback({network: result});
         },
         function (err) {
-            callback({network: null, error: err.toString(), status: 500});
+            callback({network: null, error: JSON.stringify(err), status: (err.status)?err.status:500});
         }
     );
 };
@@ -149,7 +149,7 @@ exports.deleteNetwork = function (networkRID, callback) {
                 callback({error: null, status: 404});
         },
         function (err) {
-            callback({error: err.toString(), status: 500});
+            callback({error: JSON.stringify(err), status: (err.status)?err.status:500});
         });
 };
 
@@ -192,7 +192,7 @@ exports.findNetworks = function (searchExpression, limit, offset, callback) {
             callback({networks : result.networks, blockAmount: 5});
         },
         function (err) {
-            callback({error: err.toString(), status: 500});
+            callback({error: JSON.stringify(err), status: (err.status)?err.status:500});
         }
     );
 };
