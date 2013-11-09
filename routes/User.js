@@ -145,6 +145,7 @@ exports.deleteUser = function (userRID, callback) {
         });
 };
 
+/*
 exports.uploadAccountImage = function (accountId, type, imageFile, callback) {
     console.log('File uploaded to: ' + imageFile.path + ' - ' + imageFile.size + ' bytes');
 
@@ -185,5 +186,5 @@ exports.uploadAccountImage = function (accountId, type, imageFile, callback) {
         }
     });
 }
-
+*/
 

@@ -1,3 +1,5 @@
+/*
+
 module.db = null;
 
 var common = require("./Common.js");
@@ -6,7 +8,7 @@ exports.init = function(orient, callback) {
     module.db = orient;   
 };
 
-/*
+
 
 createAgent
 

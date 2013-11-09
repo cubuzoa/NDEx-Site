@@ -1,15 +1,19 @@
 module.db = null;
 
-// Ensure that we find or create the required classes:
+// Schema initialization now in ndex-java
+//
+// This code will be completely eliminated as soon as Requests are handled there.
 //
 //	xUser
 //	xGroup
 //	xNetwork
 //
+// ensureClass("xPermission", "V");
+// ensureClass("xOwnsGroup", "E");
+// ensureClass("xOwnsAgent", "E");
+
 function ensureSchemaIsSetup(callback) {
-	ensureClass("xPermission", "V");
-	ensureClass("xOwnsGroup", "E");
-	ensureClass("xOwnsAgent", "E");
+
     ensureClass("xRequest", "V");
 	callback();
 }

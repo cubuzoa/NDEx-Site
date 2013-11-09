@@ -217,7 +217,7 @@ exports.User = [
 exports.Agent = [
 
 	{	fn : "createAgent",
-		status : "active",
+		status : "inactive",
 		doc : "Add a programmatic access account, generate credentials",
 		method : "POST",
 		route : "/agents",
@@ -241,7 +241,7 @@ exports.Agent = [
 	},
 
 	{	fn : "getAgent",
-		status : "active",
+		status : "inactive",
 		doc : "Get information about an Agent",
 		method : "GET",
 		route : "/agents/:agentid",
@@ -314,7 +314,7 @@ exports.Agent = [
 	},	
 
 	{	fn : "updateAgent",
-		status : "active",
+		status : "inactive",
 		doc : "Update the credentials and/or status for an Agent",
 		method : "POST",
 		route : "/agents/:agentid",
@@ -346,7 +346,7 @@ exports.Agent = [
 	},
 
     {	fn : "deleteAgent",
-        status : "active",
+        status : "inactive",
         doc : "Delete an Agent by Agent id. Requester must be agent owner, owner of group owning agent, or have admin permissions.",
         method : "DELETE",
         route : "/agents/:agentid",

@@ -1,7 +1,6 @@
-module.db = null;
 
 exports.init = function(orient, callback) {
-    module.db = orient;
+   // no op
 };
 
 exports.index = function(callback){
