@@ -116,6 +116,11 @@ exports.deleteNetworkFromUserWorkSurface = function (userRID, networkRID, callba
 
     common.ndexPost(module.dbHost, "ndexDeleteNetworkFromUserWorkSurface/" + module.dbName, module.dbUser, module.dbPassword, postData,
         function (result) {
+            if(!result.deleted) {
+                callback({status: 404});
+                return;
+            }
+
             exports.getUserWorkSurface(userRID, callback);
         },
         function (err) {
