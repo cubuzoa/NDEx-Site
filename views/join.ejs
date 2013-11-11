@@ -45,9 +45,9 @@
 //
                         console.log("Created user: " + JSON.stringify(data));
                         if (data && (typeof(Storage) !== "undefined")) {
-                            localStorage['ndexUsername'] = u;
-                            localStorage['ndexPassword'] = p;
-                            localStorage['ndexJid'] = data.jid;
+                            localStorage.username = u;
+                            localStorage.password = p;
+                            localStorage.ndexJid = data.jid;
                             window.location = "/editProfile";
                         } else {
                             alert("Local storage not available, can't store login information");

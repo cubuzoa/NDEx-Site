@@ -1,26 +1,26 @@
+<div id="divSidebar">
+  <a onClick="toggle2(this)" href="#">
+    <i id="btnSidebar" class="icon-chevron-left"></i>
+  </a>
 
-<div id= "sidebar" >
-	<div id="stay" class="well" data-spy="affix">
-		<a onClick="toggle2(this)" href="#"><i id="sidebarButton" class="icon-chevron-left"></i></a>
-		<h4 style="text-align:center" >Work Surface</h4>
-		<div id="workSurface" style="display: none">
-			
-		</div>
-		<div id="tools" class="btn-group">
-			<a id="viewNet" onclick="viewNetwork()" class = "btn" rel = "tooltip" title = "View Network" data-placement = "top" >
-				<i class="icon-folder-open icon-white"> </i> 
-			</a>
-			<a id="visualizeNet" onclick="visualizeNetwork()" class="btn" rel="tooltip" title="Visualize Network" data-placement="top">
-				<i class="icon-eye-open icon-white"> </i> 
-			</a>	
-			<a id="compareNets" onclick="compareNetworks()" class="btn" rel="tooltip" title="Compare Networks" data-placement="top">
-				<i class="icon-retweet icon-white"> </i> 
-			</a>
-			<a onclick="removeNetwork()" class="btn" rel="tooltip" title="Remove Network"  data-placement="left top">
-				<i class="icon-remove icon-white"> </i> 
-			</a>
-		</div>
-	</div>
+  <h4 class="AlignCenter">Work Surface</h4>
+
+  <div id="divWorkSurface"></div>
+
+  <div id="divTools">
+    <a id="viewNet" onclick="viewNetwork()" class = "btn" rel = "tooltip" title = "View Network" data-placement = "top" >
+      <i class="icon-folder-open icon-white"> </i>
+    </a>
+    <a id="visualizeNet" onclick="visualizeNetwork()" class="btn" rel="tooltip" title="Visualize Network" data-placement="top">
+      <i class="icon-eye-open icon-white"> </i>
+    </a>
+    <a id="compareNets" onclick="compareNetworks()" class="btn" rel="tooltip" title="Compare Networks" data-placement="top">
+      <i class="icon-retweet icon-white"> </i>
+    </a>
+    <a onclick="removeNetwork()" class="btn" rel="tooltip" title="Remove Network"  data-placement="left top">
+      <i class="icon-remove icon-white"> </i>
+    </a>
+  </div>
 </div>
 
 <script>
@@ -31,18 +31,15 @@
 // add icon representations for thumbnails?
 
 function toggle2(obj) {
-	var ele = document.getElementById('workSurface');
-	var prnt = document.getElementById('sidebar');
-	var but = document.getElementById('sidebarButton');
-	if(ele.style.display == "block") {
-		ele.style.display = "none";
-		prnt.style.width = "20px";
-		but.className = 'icon-chevron-left';
+	if(parseInt($("#divSidebar").css("width")) > 0)
+  {
+    $("#divSidebar").css("width", 0);
+    $("#btnSidebar").attr("class", "icon-chevron-left");
 	}
-	else {
-		ele.style.display = "block";
-		prnt.style.width = "200px";
-		but.className = 'icon-chevron-right';
+	else
+  {
+    $("#divSidebar").css("width", "170px");
+    $("#btnSidebar").attr("class", "icon-chevron-right");
 	}
 }
 
@@ -65,7 +62,6 @@ function addNetworkIcon(ntwkObj){
 		.append(titleSpan);
 	$(lst).append(cnt);
 	$(unlst).attr('id','thumbnail' + ntwkObj.jid)
-		.addClass('thumbnails')
 		.append(lst);
 	
 	return unlst;
@@ -140,7 +136,7 @@ function compareNetworks(){
 }
 
 function removeNetwork(){
-	var parent = document.getElementById('workSurface');
+	var parent = document.getElementById('divWorkSurface');
 	
 	$("input").each(function(index,value){
 		if($(this).is(':checked')){
@@ -156,11 +152,9 @@ function removeNetwork(){
 //
 //------------------------------------
 		
-if (ndexUI.user.id) {
-    ndexUI.initUserWorkSurface();
-} else {
-	$('#sidebar').attr('style','display:none');
-}
-
-</script>    
+if (ndexUI.user.id)
+  ndexUI.initUserWorkSurface();
+else
+	$('#divSidebar').attr('style','display:none');
+</script>
  

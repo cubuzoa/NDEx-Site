@@ -1,0 +1,212 @@
+<% include head.ejs %>
+<% include nav.ejs %>
+<% include sidebar.ejs %>
+
+<div id="divNetwork">
+  <div id="divMetadata" data-bind="with: Network.Metadata">
+    <h3 data-bind="text: properties.title"></h3>
+
+    <p data-bind="text: properties.description"></p>
+
+    <div>
+      <label class="Attribute">Source:</label>
+      <span data-bind="text: properties.source"></span>
+    </div>
+
+    <div>
+      <label class="Attribute">Format:</label>
+      <span data-bind="text: format"></span>
+    </div>
+
+    <div>
+      <label class="Attribute">Nodes:</label>
+      <span data-bind="text: nodeCount"></span>
+    </div>
+
+    <div>
+      <label class="Attribute">Edges:</label>
+      <span data-bind="text: edgeCount"></span>
+    </div>
+  </div>
+
+  <div id="divSearchNetwork" data-bind="with: Search">
+    <form>
+      <div id="divSearch">
+        <i class="icon-search"></i>
+        <input type="search" placeholder="Search keywords" data-bind="value: Keywords" />
+
+        <div>
+          <button type="submit" class="btn" data-bind="enabled: Keywords.length > 0">Search</button>
+        </div>
+      </div>
+
+      <dl class="Accordion">
+        <dt>Limit What's Displayed</dt>
+        <dd>
+          <div>
+            <label class="Attribute-Editable">Max Nodes:</label>
+            <input type="range" min="1" max="100" step="1" data-bind="value: MaxNodes, valueUpdate: 'mousemove'" />
+            <span data-bind="text: MaxNodes"></span>
+          </div>
+
+          <div>
+            <label class="Attribute-Editable">Max Edges:</label>
+            <input type="range" id="txtMaxEdges" min="1" max="100" step="1" data-bind="value: MaxEdges, valueUpdate: 'mousemove'" />
+            <span data-bind="text: MaxEdges"></span>
+          </div>
+
+          <div>
+            <label class="Attribute-Editable" for="">Max Paths:</label>
+            <input type="range" min="1" max="100" step="1" data-bind="value: MaxPaths, valueUpdate: 'mousemove'" />
+            <span data-bind="text: MaxPaths"></span>
+          </div>
+
+          <div>
+            <label class="Attribute-Editable">Retain Paths:</label>
+            <input type="checkbox" data-bind="checked: RetainPaths" />
+          </div>
+
+          <div>
+            <label class="Attribute-Editable" for="ddlFuzziness">Fuzziness:</label>
+            <select id="ddlFuzziness">
+              <option value="STRICT">Strict</option>
+              <option value="FUNCTIONAL">Functional</option>
+              <option value="PERMISSIVE">Permissive</option>
+            </select>
+          </div>
+        </dd>
+        <dt>Filter Results</dt>
+        <dd>
+          <select>
+            <option>Canned filter settings?</option>
+          </select>
+
+          <h4>Terms</h4>
+
+          <ul id="ulFilterableTerms" data-bind="foreach: $root.Network.Terms">
+            <li>
+              <i class="icon-reorder"></i>
+              <span data-bind="text: name"></span>
+            </li>
+          </ul>
+
+          <h4>Included</h4>
+
+          <ul id="ulTermsIncluded" data-bind="foreach: Terms.Included">
+            <li>
+              <i class="icon-reorder"></i>
+              <span data-bind="text: name"></span>
+            </li>
+          </ul>
+
+          <h4>Excluded</h4>
+
+          <ul id="ulTermsExcluded" data-bind="foreach: Terms.Excluded">
+            <li>
+              <i class="icon-reorder"></i>
+              <span data-bind="text: name"></span>
+            </li>
+          </ul>
+        </dd>
+        <dt>Restrict Graph Traversal</dt>
+        <dd>
+          <div>
+            <label class="Attribute-Editable">Direction:</label>
+            <select data-bind="value: Direction">
+              <option value="DEFAULT">Default</option>
+              <option value="UPSTREAM">Upstream</option>
+              <option value="DOWNSTREAM">Downstream</option>
+              <option value="BOTH">Both</option>
+              <option value="INTERCONNECT">Interconnect</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="Attribute-Editable">Max Depth:</label>
+            <input type="range" min="1" max="10" step="1" data-bind="value: MaxDepth, valueUpdate: 'mousemove'" />
+            <span data-bind="text: MaxDepth"></span>
+          </div>
+
+          <h4>Terms</h4>
+
+          <ul id="ulTraversalTerms" data-bind="foreach: $root.Network.Terms">
+            <li>
+              <i class="icon-reorder"></i>
+              <span data-bind="text: name"></span>
+            </li>
+          </ul>
+
+          <h4>Starting Terms</h4>
+
+          <ul id="ulStartingTerms" data-bind="foreach: Terms.Starting">
+            <li>
+              <i class="icon-reorder"></i>
+              <span data-bind="text: name"></span>
+            </li>
+          </ul>
+
+          <h4>Target Terms</h4>
+
+          <ul id="ulTargetTerms" data-bind="foreach: Terms.Target">
+            <li>
+              <i class="icon-reorder"></i>
+              <span data-bind="text: name"></span>
+            </li>
+          </ul>
+        </dd>
+      </dl>
+    </form>
+  </div>
+
+  <div id="divNetworkResults">
+    <ul class="nav nav-tabs tab-title">
+      <li class="active">
+        <a href="#divEdges" data-toggle="tab">
+          <i class="icon-star-empty"></i>
+          Edges
+        </a>
+      </li>
+      <li>
+        <a href="#divNodes" data-toggle="tab">
+          <i class="icon-star"></i>
+          Nodes
+        </a>
+      </li>
+      <li>
+        <a href="#divVisualize" data-toggle="tab">
+          <i class="icon-eye-open"></i>
+          Visualize
+        </a>
+      </li>
+    </ul>
+
+    <div class="tab-content" data-bind="with: Network">
+      <div class="tab-pane active" id="divEdges">
+        <ul data-bind="foreach: Edges">
+          <li>
+            <em data-bind="text: subject.term.name"></em>
+            <strong data-bind="text: predicate.name"></strong>
+            <em data-bind="text: object.term.name"></em>
+          </li>
+        </ul>
+      </div>
+
+      <div class="tab-pane" id="divNodes">
+        <ul data-bind="foreach: Nodes">
+          <li data-bind="text: term.name"></li>
+        </ul>
+      </div>
+
+      <div class="tab-pane" id="divVisualize">
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="/js/view-network.js"></script>
+<script>
+  ViewNetwork.ViewModel.Network.Id("<%=networkId%>");
+</script>
+
+<% include foot.ejs %>
