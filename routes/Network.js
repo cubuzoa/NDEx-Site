@@ -44,44 +44,33 @@ exports.getNetwork = function (networkRID, callback) {
 exports.setNetworkMetadata = function(networkRID, metadata, callback){
     console.log("calling setNetworkMetadata with networkRID = '" + networkRID + "' and metadata = " + JSON.stringify(metadata));
 
-    // get the existing properties
-    var cmd = "select properties from " + networkRID + "";
-    console.log(cmd);
-    module.db.command(cmd, function(err, propertyList) {
-        if (common.checkErr(err, "finding network properties while updating", callback)){
-            try {
-                if (!propertyList || propertyList.length < 1){
-                    console.log("found no properties for network with id = '" + networkRID + "'");
-                    callback({status : 404});
-                } else {
-                    var properties = propertyList[0];
-                    console.log("about to update current properties = " + JSON.stringify(properties) + " for " + networkRID);
-
-                    var newProperties = extend({}, metadata.properties, properties);
-                    // merge the new properties with the existing properties
-                    var updateCmd = "update " + networkRID + " set properties = " + JSON.stringify(newProperties);
-                    console.log("property update command = " + updateCmd);
-                    module.db.command(updateCmd, function(err) {
-                        // update the properties
-                        if (err) {
-                            console.log("about to throw error " + err);
-                            throw ("Failed to update properties : " + err);
-                        }
-                        callback({jid: networkRID, error : err, status : 200});
-                        });
-                }
-            }
-            catch (e){
-                console.log("caught error " + e);
-                callback({network : null, error : e.toString(), status : 500});
-            }
-        }
-    }); // close getNetworkMetadata query
+    var postData = {
+        "networkRID": common.convertFromRID(networkRID),
+        "metadata": metadata
+    };
+    common.ndexPost(module.dbHost, "ndexSetNetworkMetadata/" + module.dbName, module.dbUser, module.dbPassword, postData,
+        function (result) {
+            callback({jid: result.networkJid, error: null, status: 200});
+        },
+        function (err) {
+            callback({error: JSON.stringify(err), status: (err.status)?err.status:500});
+        });
 };
 
 // get the properties and other metadata of a network
 exports.getNetworkMetadata = function(networkRID, callback){
     console.log("calling getNetworkMetadata with networkRID = '" + networkRID + "'");
+
+    common.ndexGet(module.dbHost, "ndexGetNetworkMetadata/" + module.dbName, module.dbUser, module.dbPassword, {networkid: common.convertFromRID(networkRID)},
+        function (result) {
+            callback({network: result});
+        },
+        function (err) {
+            callback({network: null, error: JSON.stringify(err), status: (err.status)?err.status:500});
+        }
+    );
+
+
     var cmd = "select properties, format, nodesCount as nodeCount, edgesCount as edgeCount from " + networkRID + "";
     console.log(cmd);
     module.db.command(cmd, function(err, metadataList) {
