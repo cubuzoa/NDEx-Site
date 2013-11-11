@@ -15,8 +15,11 @@ exports.init = function (orient, callback) {
 
 exports.createGroup = function (userRID, groupname, callback) {
     console.log("calling createGroup with userRID = '" + userRID + "' and groupname = '" + groupname + "'");
+
+    userRID = common.convertFromRID(userRID);
+
     var postData = {
-        "userRID": userRID,
+        "userJid": userRID,
         "groupname": groupname
     };
     common.ndexPost(module.dbHost, "ndexGroupCreate/" + module.dbName, module.dbUser, module.dbPassword, postData,
@@ -32,8 +35,10 @@ exports.createGroup = function (userRID, groupname, callback) {
 exports.updateGroupProfile = function (groupRID, profile, callback) {
     console.log("calling updateGroupProfile for group " + groupRID + " with " + JSON.stringify(profile));
 
+    groupRID = common.convertFromRID(groupRID);
+
     var postData = {
-        "groupRID": groupRID,
+        "groupJid": groupRID,
         "profile": profile
     };
     common.ndexPost(module.dbHost, "ndexGroupUpdateProfile/" + module.dbName, module.dbUser, module.dbPassword, postData,
@@ -80,9 +85,10 @@ exports.getGroupByName = function (groupname, callback) {
 exports.getGroup = function (groupRID, callback) {
     console.log("calling getGroup with groupRID = '" + groupRID + "'");
 
+    groupRID = common.convertFromRID(groupRID);
 
     var parameters = {
-        "groupRID": groupRID
+        "groupJid": groupRID
     };
     common.ndexGet(module.dbHost, "ndexGetGroup/" + module.dbName, module.dbUser, module.dbPassword, parameters,
         function (result) {
@@ -96,8 +102,10 @@ exports.getGroup = function (groupRID, callback) {
 exports.deleteGroup = function (groupRID, callback) {
     console.log("calling delete group with groupRID = '" + groupRID + "'");
 
+    groupRID = common.convertFromRID(groupRID);
+
     var postData = {
-        "groupRID": groupRID
+        "groupJid": groupRID
     };
     common.ndexPost(module.dbHost, "ndexGroupDelete/" + module.dbName, module.dbUser, module.dbPassword, postData,
         function (result) {
