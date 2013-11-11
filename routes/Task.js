@@ -1,115 +1,131 @@
 module.db = null;
 
+module.dbHost = "http://localhost:2480/";
+module.dbUser = "admin";
+module.dbPassword = "admin";
+module.dbName = "ndex";
+
+
 var common = require("./Common.js");
 
-exports.init = function(orient, callback) {
-    module.db = orient;   
+exports.init = function (orient, callback) {
+    module.db = orient;
 };
 
 /*
-createTask
+ createTask
 
-User creates a Task
+ User creates a Task
 
-POST /tasks
+ POST /tasks
 
-Post Data Parameters:
+ Post Data Parameters:
 
-task (JSON)
-userid (JID)
-*/
-exports.createTask = function( task, userid, callback, errorHandler ) {
-	console.log("calling createTask with arguments '" + task + "' '" + userid + "'");
-	
-	var cmd = "insert into xTask (owner, status, startTime) values( '" + userid + "', '" + "'active'" + "', sysdate('yyyy-MM-dd HH:mm:ss'))";
-	
-	module.db.command(cmd, function(err, results) {
-		if (common.checkErr(err, "insert of new task causes : " + err, callback)){
-			var task = results[0];
-			var updateCmd = "update " + userid + " add task = " + task['@rid'];
-			module.db.command(updateCmd, function(err, results) {
-				if (common.checkErr(err, "update of task causes : " + err, callback)){
-					callback({status: 200, error : err, jid: task['@rid']});
-				}
-			});//close update command
-		}
-					
-	});  // close insert command
+ task (JSON)
+ userid (JID)
+ */
+exports.createTask = function (task, userid, callback, errorHandler) {
+    console.log("calling createTask with arguments '" + task + "' '" + userid + "'");
+
+    userid = common.convertFromRID(userid);
+    var postData = {
+        "userJid": userid
+    };
+
+    common.ndexPost(module.dbHost, "ndexTaskCreate/" + module.dbName, module.dbUser, module.dbPassword, postData,
+        function (result) {
+            callback({jid: result.taskJid, status: 200});
+        },
+        function (err) {
+            callback({error: JSON.stringify(err), status: (err.status) ? err.status : 500});
+        });
 };
 
 /*
-getTask
+ getTask
 
-Get the parameters and status of a task
+ Get the parameters and status of a task
 
-GET /tasks/:taskid
+ GET /tasks/:taskid
 
-Route Parameters:
+ Route Parameters:
 
-taskid (JID)
-*/
-exports.getTask = function( taskid, callback, errorHandler ) {
-	console.log("calling getTask with RID = '" + taskid + "'");
-	var cmd = "select from xTask where @rid = " + taskid + "";
-	console.log(cmd);
-	module.db.command(cmd, function(err, requests) {
+ taskid (JID)
+ */
+exports.getTask = function (taskid, callback, errorHandler) {
+    console.log("calling getTask with RID = '" + taskid + "'");
 
-		if (common.checkErr(err, "finding task", callback)){
-			var task = requests[0];
-			//console.log(JSON.stringify(request));
-			callback({	status: 200, 
-					error : err, 
-					task : task	});
-		}
-	});
+    taskid = common.convertFromRID(taskid);
+
+    common.ndexGet(module.dbHost, "ndexTaskGet/" + module.dbName, module.dbUser, module.dbPassword, {taskJid: taskid},
+        function (result) {
+            callback({task: result});
+        },
+        function (err) {
+            callback({error: JSON.stringify(err), status: (err.status) ? err.status : 500});
+        }
+    );
 };
 
 /*
-updateTask
+ updateTask
 
-Set the status and potentially other parameters of a task. Can inactivate an active task or activate an inactive task
+ Set the status and potentially other parameters of a task. Can inactivate an active task or activate an inactive task
 
-POST /tasks/:taskid
+ POST /tasks/:taskid
 
-Route Parameters:
+ Route Parameters:
 
-taskid (JID) 
+ taskid (JID)
 
-Post data Parameters:
-status (string)
+ Post data Parameters:
+ status (string)
 
-*/
-exports.updateTask = function( taskid, taskStatus, callback, errorHandler ) {
-	console.log("calling updateTask with arguments " + "'" + taskid + "' " + "'" + taskStatus + "'");
-	var setString = "status = '" + taskStatus + "'";
-	var updateCmd = "update " + taskid + " set " + setString;
-	
-	module.db.command(updateCmd, function(err, result){
-		if (common.checkErr(err, "updating task", callback)){
-			callback({error: err, status : 200});
-		}
-	});
+ */
+exports.updateTask = function (taskid, taskStatus, callback, errorHandler) {
+    console.log("calling updateTask with arguments " + "'" + taskid + "' " + "'" + taskStatus + "'");
+
+    taskid = common.convertFromRID(taskid);
+
+    var postData = {
+        "taskJid": taskid,
+        "taskStatus": taskStatus
+    };
+
+    common.ndexPost(module.dbHost, "ndexTaskUpdate/" + module.dbName, module.dbUser, module.dbPassword, postData,
+        function (result) {
+            callback({status: 200});
+        },
+        function (err) {
+            callback({error: JSON.stringify(err), status: (err.status) ? err.status : 500});
+        });
 };
 
 /*
-deleteTask
+ deleteTask
 
-Delete an inactive or completed task
+ Delete an inactive or completed task
 
-DELETE /tasks/:taskid
+ DELETE /tasks/:taskid
 
-Route Parameters:
+ Route Parameters:
 
-taskid (JID)
+ taskid (JID)
 
-*/
-exports.deleteTask = function( taskid, callback, errorHandler ) {
-	console.log("calling deleteTask for  " + taskid);
-	var cmd = "delete from " + taskid + " where @class = 'xTask' ";
-	console.log(cmd);
-	module.db.command(cmd, function(err, requests) {
-		if (common.checkErr(err, "deleting task", callback)){
-			callback({status: 200, error : err});
-		}
-	});
+ */
+exports.deleteTask = function (taskid, callback, errorHandler) {
+    console.log("calling deleteTask for  " + taskid);
+    taskid = common.convertFromRID(taskid);
+
+    var postData = {
+        "taskJid": taskid,
+    };
+
+    common.ndexPost(module.dbHost, "ndexTaskDelete/" + module.dbName, module.dbUser, module.dbPassword, postData,
+        function (result) {
+            callback({status: 200});
+        },
+        function (err) {
+            callback({error: JSON.stringify(err), status: (err.status) ? err.status : 500});
+        });
 };
