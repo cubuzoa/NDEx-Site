@@ -47,12 +47,12 @@ app.configure(function ()
 ******************************************************************************/
 app.get("/", function (httpRequest, httpResponse)
 {
-    res.render("home", { user: httpRequest.user, title: "Home" });
+    httpResponse.render("home", { user: httpRequest.user, title: "Home" });
 });
 
 app.get("/login", function (httpRequest, httpResponse)
 {
-    res.render("login", { user: httpRequest.user, title: "Login" });
+    httpResponse.render("login", { user: httpRequest.user, title: "Login" });
 });
 
 app.get("/logout", function (httpRequest, httpResponse)
