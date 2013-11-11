@@ -30,6 +30,8 @@ exports.createUser = function (username, password, recoveryEmail, callback) {
 };
 
 exports.updateUserProfile = function (userRID, profile, callback) {
+    userRID = common.convertFromRID(userRID);
+
     var postData = {
         "profile": profile,
         "userJid": userRID
