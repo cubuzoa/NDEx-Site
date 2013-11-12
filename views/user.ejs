@@ -1,0 +1,162 @@
+<% include head.ejs %>
+<% include nav.ejs %>
+
+<div class="row-fluid">
+    <div class="span7">
+        <div id="image">
+            <div id="foreground"></div>
+            <div id="background"></div>
+        </div>
+
+        <div class="tabbable">
+            <ul class="nav nav-tabs tab-title">
+                <li class="active">
+                    <a href="#ownedNetworks" data-toggle="tab">My Networks</a>
+                </li>
+                <li>
+                    <a href="#ownedGroups" data-toggle="tab">My Groups</a>
+                </li>
+                <li id="showGroups" class="hide">
+                    <a href="#groups" data-toggle="tab">My Memberships</a>
+                </li>
+                <li id="showOwnedAgentAccounts" class="hide">
+                    <a href="#ownedAgentAccounts" data-toggle="tab"> My Agents </a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div id="ownedNetworks" class="tab-pane active"></div>
+                <div id="ownedGroups" class="tab-pane"></div>
+                <div id="groups" class="tab-pane"></div>
+                <div id="ownedAgentAccounts" class="tab-pane"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="profile" class="span3">
+        <h3 id="userFullName"></h3>
+
+        <p>
+            <a id="userWebsite" target="_blank"></a>
+        </p>
+
+        <p id="userDescription"></p>
+
+        <div id="notifications" class="notifications" style="display:none">
+            <div class="notificationsHeader">Notifications</div>
+
+            <div id="notifContent" style="background-color: #FFF">Requests</div>
+        </div>
+    </div>
+
+    <div class="span2 dropdown">
+        <a class="ndex-options dropdown-toggle" data-toggle="dropdown">
+            <i class="icon-cog icon-large"></i>
+        </a>
+
+        <ul class="dropdown-menu">
+            <li><a href="#displayOptions" data-toggle="modal">Display Options</a></li>
+            <li><a href="/editProfile" class="accountMiniMenu" class="hide">Edit Profile</a></li>
+            <li><a href="#" class="accountMiniMenu" class="hide">New Profile Image</a></li>
+            <li><a href="#" class="accountMiniMenu" class="hide">New Background Image</a></li>
+            <li><a href="/sendRequest" class="accountMiniMenu" class="hide">Create a Request</a></li>
+            <li><a href="/editAgent" class="accountMiniMenu" class="hide">Edit/Create Agent</a></li>
+        </ul>
+    </div>
+
+    <div id="message"></div>
+</div>
+
+<!--- Modal for Display Options ---->
+<div id="displayOptions" class=" modal hide fade" tabindex="-1" role="dialog">
+    <div class="modal-header">
+        <h4 id="myModalLabel"> Network Search Options </h4>
+    </div>
+
+    <div class="modal-body">In progress</div>
+
+    <div class="modal-footer">
+        <button class="btn" onclick="" data-dismiss="modal" aria-hidden="true"> Save Changes</button>
+        <button class="btn" data-dismiss="modal" aria-hidden="true"> Cancel</button>
+    </div>
+</div>
+
+<script>
+
+    // TODO
+    //   update notifications div to use bootstrap collapse css
+    //   work on modal css
+    //   update href relative urls for networks
+
+    // the user id to display is passed from the ejs template
+    var userJID = '<%= userId %>';
+
+    // Display tab based on location hash
+    var hash = document.location.hash;
+    var prefix = "tab_";
+
+    // If the document.location.hash is set,
+    // then take the value and replace the prefix with blank to compute which tab we want to display
+    // look up the nav tab with that href and invoke the method to show the tab
+    if (hash)
+        $('.nav-tabs a[href=' + hash.replace(prefix, "") + ']').tab('show');
+
+    // Set location hash to persist tab over page-reload
+    //
+    // For all of the nav tabs, add an on 'shown' method
+    // to update the window.location.hash
+    //
+    // That way, the desired tab will be displayed on page reload
+    //
+    $('.nav-tabs a').on('shown', function (e)
+    {
+        window.location.hash = e.target.hash.replace("#", "#" + prefix);
+    });
+
+    // Show additional elements if the viewed user is the same as the signedin user
+    if (ndexUI.user.id && (ndexUI.user.id === userJID))
+    {
+        $('#showGroups').attr('style', 'display:block');
+        $('#showOwnedAgentAccounts').attr('style', 'display:block');
+        $('#notifications').attr('style', 'display:block');
+        $('.accountMiniMenu').attr('style', 'display:block');
+    }
+
+    var ownedNetworks, ownedGroups, profile;
+
+        ndexClient.getUser(userJID, function (data)
+        {
+            console.log("Got results from getUser called with " + userJID);
+            console.log(data);
+
+            ndexUI.addProfileImages(data.user.username);
+            // for convenience...
+            profile = data.user.profile;
+            ownedGroups = data.user.ownedGroups;
+            ownedNetworks = data.user.ownedNetworks;
+
+            $.each(data.user.profile, function (index, item)
+            {
+                ndexUI.updateUserProfileElements(item, index);
+                //$('#profile').append(index + image);
+            });
+
+            $.each(data.user.ownedNetworks, function (index, network)
+            {
+                $('#ownedNetworks').append(ndexUI.formatNetworkDescriptor(network));
+            });
+
+            $.each(data.user.ownedGroups, function (index, group)
+            {
+                $('#ownedGroups').append(ndexUI.formatGroupDescriptor(group));
+            });
+        },
+        // error handler
+        function (error)
+        {
+            ndexUI.formatError(error);
+        });
+</script>
+
+<% include sidebar.ejs %>
+<% include foot.ejs %>
