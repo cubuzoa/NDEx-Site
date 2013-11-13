@@ -1,0 +1,162 @@
+<% include head.ejs %>
+<% include navigation.ejs %>
+
+<div id="divUser" class="row-flud" data-bind="with: User">
+    <div class="span2 dropdown pull-right">
+        <a class="ndex-options dropdown-toggle Hand" data-toggle="dropdown">
+            <i class="icon-cog icon-large"></i>
+        </a>
+
+        <ul class="dropdown-menu">
+            <li><a href="#displayOptions" data-toggle="modal">Display Options</a></li>
+            <!-- ko if: NdexWeb.ViewModel.User().jId === User.ViewModel.UserId() -->
+            <li><a href="/editProfile" class="accountMiniMenu">Edit Profile</a></li>
+            <li><a href="#" class="accountMiniMenu">New Profile Image</a></li>
+            <li><a href="#" class="accountMiniMenu">New Background Image</a></li>
+            <li><a href="/sendRequest" class="accountMiniMenu">Create a Request</a></li>
+            <li><a href="/editAgent" class="accountMiniMenu">Edit/Create Agent</a></li>
+            <!-- /ko -->
+        </ul>
+    </div>
+
+    <div class="span7">
+        <div id="divProfileImages">
+            <div>
+                <img class="Profile" data-bind="attr: { src: '../img/foreground/' + username() + '.jpg' }" />
+            </div>
+
+            <div>
+                <img class="ProfileBackground" data-bind="attr: { src: '../img/background/' + username() + '.jpg' }" />
+            </div>
+        </div>
+
+        <div class="tabbable">
+            <ul class="nav nav-tabs tab-title">
+                <li class="active">
+                    <a href="#divNetworks" data-toggle="tab">Networks</a>
+                </li>
+                <li>
+                    <a href="#divGroups" data-toggle="tab">Groups</a>
+                </li>
+                <li id="divMemberships" class="hide">
+                    <a href="#groups" data-toggle="tab">Memberships</a>
+                </li>
+                <li id="divAgentAccounts" class="hide">
+                    <a href="#ownedAgentAccounts" data-toggle="tab">Agents</a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div id="divNetworks" class="tab-pane active">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th colspan="2">Name</th>
+                                <th>Nodes</th>
+                                <th>Edges</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: ownedNetworks">
+                            <tr>
+                                <td>
+                                    <i class="icon-chevron-right"></i>
+                                </td>
+                                <td>
+                                    <a data-bind="text: title, attr: { href: '/network/' + jid() }"></a>
+                                </td>
+                                <td class="AlignRight" data-bind="text: nodeCount"></td>
+                                <td class="AlignRight" data-bind="text: edgeCount"></td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="javascript:void()" class="btn" title="Add to Work Surface" rel="tooltip">
+                                            <!-- ko if: !WorkSurface.isOnWorkSurface(jid()) -->
+                                            <i class="icon-plus icon-white" data-bind="click: WorkSurface.addNetwork"></i>
+                                            <!-- /ko -->
+                                            <!-- ko if: WorkSurface.isOnWorkSurface(jid()) -->
+                                            <i class="icon-remove icon-white" data-bind="click: WorkSurface.removeNetwork"></i>
+                                            <!-- /ko -->
+                                        </a>
+                                        <a href="javascript:void()" class="btn" title="Request access" rel="tooltip">
+                                            <i class="icon-exchange" data-bind="click: User.requestNetworkAccess"></i>
+                                        </a>
+                                        <a data-bind="attr: { href: '/network/' + jid() + '/visualize' }" class="btn" target="_blank" title="Visualize network" rel="tooltip">
+                                            <i class="icon-eye-open"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="divGroups" class="tab-pane">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th colspan="2">Name</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: ownedGroups">
+                            <tr>
+                                <td>
+                                    <i class="icon-chevron-right"></i>
+                                </td>
+                                <td>
+                                    <a data-bind="text: groupname, attr: { href: '/group/' + jid() }"></a>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="javascript:void()" class="btn" title="Request access" rel="tooltip">
+                                            <i class="icon-exchange" data-bind="click: User.requestGroupAccess"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="divMemberships" class="tab-pane">
+
+                </div>
+
+                <div id="divAgentAccounts" class="tab-pane">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="span3" data-bind="with: profile">
+        <h3>
+            <span data-bind="text: firstName"></span>
+            <span data-bind="text: lastName"></span>
+            <!-- ko if: $parent.organizationName -->
+            <span data-bind="text: organiziationName"></span>
+            <!-- /ko -->
+        </h3>
+
+        <p>
+            <strong>Web Site:</strong>
+            <a target="_blank" data-bind="text: website, attr: { href: website() }"></a>
+        </p>
+
+        <p data-bind="text: description"></p>
+
+        <div id="notifications" class="notifications">
+            <div class="notificationsHeader">Notifications</div>
+
+            <div id="notifContent" style="background-color: #FFF">Requests</div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/js/user.js"></script>
+<script type="text/javascript">
+    User.ViewModel.UserId("<%=userId%>");
+</script>
+
+<% include worksurface.ejs %>
+<% include footer.ejs %>

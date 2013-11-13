@@ -117,7 +117,14 @@ for (n in specs.resourceTypes){
 																"callback, errorHandler){";
 				actionLine = "        exports.ndexPost(mergedRoute, " + makeHashStringFromParams(spec.postData) + "callback, errorHandler);";
 				
-			} else if (spec.method === "GET"){
+			} else if (spec.method === "PUT"){
+
+                functionLine = "    exports." + spec.fn + " = function(" + makeArgsFromParams(spec.routeParams) +
+                    makeArgsFromParams(spec.putData) +
+                    "callback, errorHandler){";
+                actionLine = "        exports.ndexPut(mergedRoute, " + makeHashStringFromParams(spec.putData) + "callback, errorHandler);";
+
+            } else if (spec.method === "GET"){
 				var routeArgs = makeArgsFromParams(spec.routeParams),
 					queryArgs = makeArgsFromParams(spec.queryParams),
 					args = routeArgs + queryArgs;

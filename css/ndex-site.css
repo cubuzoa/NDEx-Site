@@ -1,323 +1,792 @@
-@font-face {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+/******************************************************************************
+* Styling by element
+******************************************************************************/
+{
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
 }
 
-html, body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-weight: 400
-    font-size: 12px;
-    background-color:white;
-   p:
-  
+@font-face
+{
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-body {
-padding-top: 60px;
-padding-bottom: 40px;
+html, body
+{
+  background-color: white;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-.slide {
-padding-top: 30px;
-padding-bottom: 30px;
+body
+{
+  padding: 60px 0 40px 0;
 }
 
+a:hover
+{
+  text-decoration: underline;
+}
 
-h1,h2,h3,h4,h5 {
+b, strong
+{
+  font-weight: bold;
+}
+
+fieldset
+{
+  border: 1px solid #999;
+  border-radius: 5px;
+  display: inline-block;
+  margin-bottom: 1.5em;
+  padding: 1em;
+}
+
+footer
+{
+  background: #FFF;
+  padding: 0 10%;
+  z-index: 3;
+}
+
+h1, h2, h3, h4, h5, h6
+{
     "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
+    font-weight: bold;
 }
 
-h4 {
-    font-weight: 300;
+legend
+{
+  font-size: 1.5em;
 }
 
-.brand {
-vertical-align: middle;
-font-size: 20px;
-   font-weight: 700;
+label
+{
+  display: inline-block;
 }
 
-.main-nav {
-vertical-align: middle;
-font-size: 18px;
-   font-weight: 350;
+input[type="number"]
+{
+  width: 5em;
 }
 
-.ndex-section {
-font-size: 18px;
+section
+{
+  position: relative;
+}
+
+table
+{
+    width: 100%;
+}
+
+tbody > tr:nth-child(odd)
+{
+    background: #DDD;
+    background: linear-gradient(center top, #FFF, #DDD);
+    background: -moz-linear-gradient(center top, #FFF, #DDD);
+    background: -ms-linear-gradient(center top, #FFF, #DDD);
+    background: -o-linear-gradient(center top, #FFF, #DDD);
+    background: -webkit-linear-gradient(top, #FFF, #DDD);
+    border-top: 1px solid #666;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#FFF", endColorstr="#DDD");
+}
+
+tbody > tr:nth-child(even)
+{
+    background: #BBB;
+    background: linear-gradient(center top, #DDD, #BBB);
+    background: -moz-linear-gradient(center top, #DDD, #BBB);
+    background: -ms-linear-gradient(center top, #DDD, #BBB);
+    background: -o-linear-gradient(center top, #DDD, #BBB);
+    background: -webkit-linear-gradient(top, #DDD, #BBB);
+    border-top: 1px solid #666;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#DDD", endColorstr="#BBB");
+}
+
+td
+{
+    margin: 0;
+    padding: 3px 7px;
+}
+
+th
+{
+    font-size: 1.15em;
+    font-weight: bold;
+    margin: 0;
+    padding: 3px 7px;
+}
+
+/******************************************************************************
+* Styling by class
+******************************************************************************/
+.AlignCenter
+{
+  TEXT-ALIGN: center;
+}
+
+.AlignLeft
+{
+  TEXT-ALIGN: left;
+}
+
+.AlignRight
+{
+  TEXT-ALIGN: right;
+}
+
+.Hand
+{
+    cursor: pointer;
+}
+
+label.Attribute
+{
+  display: inline-block;
+  font-weight: bold;
+  margin-right: 5px;
+  text-align: right;
+  vertical-align: top;
+  width: 7em;
+}
+
+label.Attribute-Editable
+{
+  display: inline-block;
+  font-weight: bold;
+  margin: 0.25em 5px 0 0;
+  text-align: right;
+  vertical-align: top;
+  width: 7em;
+}
+
+/******************************************************************************
+* Work Surface styling
+******************************************************************************/
+#divSidebar
+{
+  background: #EEE;
+  height: 100%;
+  margin: 0;
+  padding: 0 0 0 10px;
+  position: fixed;
+  right: 0px;
+  top: 40px;
+  width: 0;
+  z-index: 2;
+}
+
+#divSidebar > a:first-child
+{
+  left: 0;
+  position: absolute;
+  top: 0;
+}
+
+#divWorkSurface
+{
+  height: 250px;
+  margin: 5px;
+  padding-left: 13px;
+  overflow-y: auto;
+  width: 150px;
+}
+
+#divWorkSurface > ul
+{
+    margin: 0;
+}
+
+#divTools
+{
+  font-size: 0;
+  text-align: center;
+}
+
+/******************************************************************************
+* Modal styling
+******************************************************************************/
+#divModalBackground
+{
+  background: #666;
+  display: none;
+  filter: alpha(opacity=50);
+  height: 100%;
+  left: 0;
+  opacity: 0.5;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 4;
+}
+
+#divModal
+{
+  background: #FFF;
+  border: 1px solid #666;
+  border-radius: 8px;
+  box-shadow: 0 0 8px #999;
+  display: none;
+  height: auto;
+  left: 50%;
+  margin-left: -20%;
+  overflow: hidden;
+  position: fixed;
+  top: 15%;
+  width: 40%;
+  z-index: 5;
+}
+
+#divModal > div.Title
+{
+  background: #0E5177;
+  background: linear-gradient(center top, #438EB9, #0E5177);
+  background: -moz-linear-gradient(center top, #438EB9, #0E5177);
+  background: -ms-linear-gradient(center top, #438EB9, #0E5177);
+  background: -o-linear-gradient(center top, #438EB9, #0E5177);
+  background: -webkit-linear-gradient(top, #438EB9, #0E5177);
+  border-radius: 6px 6px 0 0;
+  color: #FFF;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#438EB9", endColorstr="#0E5177");
+  font-size: 1.75em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  padding: 0.25em 0;
+  position: relative;
+  text-align: center;
+}
+
+#btnCloseModal
+{
+  position: absolute;
+  right: 3px;
+  top: 3px;
+}
+
+#divModalContent
+{
+  overflow-y: auto;
+  padding: 10px;
+  position: relative;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/******************************************************************************
+* Search styling
+******************************************************************************/
+#divSearch
+{
+  position: relative;
+  text-align: center;
+}
+
+#divSearch input[type="search"]
+{
+  left: -1.2em;
+  position: relative;
+  padding-left: 1.25em;
+}
+
+#divSearch i.icon-search
+{
+  position: relative;
+  left: 0.3em;
+  top: -0.3em;
+  z-index: 2;
+}
+
+/******************************************************************************
+* Accordion styling
+******************************************************************************/
+dl.Accordion
+{
+  display: block;
+}
+
+dl.Accordion > dt
+{
+  background: #0E5177;
+  background: linear-gradient(center top, #438EB9, #0E5177);
+  background: -moz-linear-gradient(center top, #438EB9, #0E5177);
+  background: -ms-linear-gradient(center top, #438EB9, #0E5177);
+  background: -o-linear-gradient(center top, #438EB9, #0E5177);
+  background: -webkit-linear-gradient(top, #438EB9, #0E5177);
+  color: #FFF;
+  cursor: pointer;
+  filter: progid : DXImageTransform . Microsoft . gradient(startColorstr = "#438EB9", endColorstr = "#0E5177");
+  font-size: 1.2em;
+  font-weight: bold;
+  padding: 0.3em 0.6em;
+}
+
+dl.Accordion > dt.Expanded
+{
+  background: #246E98;
+  background: linear-gradient(center top, #3CA0D9, #246E98);
+  background: -moz-linear-gradient(center top, #3CA0D9, #246E98);
+  background: -ms-linear-gradient(center top, #3CA0D9, #246E98);
+  background: -o-linear-gradient(center top, #3CA0D9, #246E98);
+  background: -webkit-linear-gradient(top, #3CA0D9, #246E98);
+  cursor: default;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#3CA0D9", endColorstr="#246E98");
+}
+
+dl.Accordion > dd
+{
+  background: #EEE;
+  line-height: 1.5em;
+  overflow: hidden;
+  margin: 0;
+  padding: 1em;
+}
+
+/******************************************************************************
+* View Network styling
+******************************************************************************/
+#divNetwork ul
+{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#divNetwork ul > li > i
+{
+  color: #FFF;
+  cursor: move;
+}
+
+#divSearchNetwork
+{
+  float: left;
+  margin: 20px 50px 0 0;
+  width: 40%;
+}
+
+#divSearchNetwork #divSearch input
+{
+  width: 250px;
+}
+
+#divNetworkResults
+{
+  float: left;
+  width: 55%;
+}
+
+#divNetworkResults ul:not(.nav) > li
+{
+  background: #E7F6FE;
+  border-top: 1px solid #246E98;
+  display: block;
+  padding: 1px 3px;
+}
+
+#divEdges > ul em
+{
+  color: #246E98;
+  font-style: none;
+}
+
+#divEdges > ul strong
+{
+  color: #FF8E08;
+  font-weight: normal;
+}
+
+#divNodes > ul li
+{
+  color: #246E98;
+}
+
+#divSearchNetwork ul
+{
+  border: 1px dashed #C0C0C0;
+  display: inline-block;
+  height: 8.75em;
+  min-width: 200px;
+  overflow-y: auto;
+}
+
+#divSearchNetwork ul > li
+{
+  color: #FFF;
+  font-size: 0.8em;
+  padding: 1px 3px;
+}
+
+#ulFilterableTerms > li,
+#ulTraversalTerms > li
+{
+  background: #555;
+  background: linear-gradient(center top, #444, #555);
+  background: -moz-linear-gradient(center top, #444, #555);
+  background: -ms-linear-gradient(center top, #444, #555);
+  background: -o-linear-gradient(center top, #444, #555);
+  background: -webkit-linear-gradient(top, #444, #555);
+  border-top: 1px solid #333;
+  filter: progid : DXImageTransform . Microsoft . gradient(startColorstr = "#444", endColorstr = "#555");
+}
+
+#ulTermsIncluded > li,
+#ulTermFunctionsIncluded > li,
+#ulStartingTerms > li
+{
+  background: #005500;
+  background: linear-gradient(center top, #004400, #005500);
+  background: -moz-linear-gradient(center top, #004400, #005500);
+  background: -ms-linear-gradient(center top, #004400, #005500);
+  background: -o-linear-gradient(center top, #004400, #005500);
+  background: -webkit-linear-gradient(top, #004400, #005500);
+  border-top: 1px solid #003300;
+  filter: progid : DXImageTransform . Microsoft . gradient(startColorstr = "#004400", endColorstr = "#005500");
+}
+
+#ulTermsExcluded > li,
+#ulTermFunctionsExcluded > li,
+#ulTargetTerms > li
+{
+  background: #550000;
+  background: linear-gradient(center top, #440000, #550000);
+  background: -moz-linear-gradient(center top, #440000, #550000);
+  background: -ms-linear-gradient(center top, #440000, #550000);
+  background: -o-linear-gradient(center top, #440000, #550000);
+  background: -webkit-linear-gradient(top, #440000, #550000);
+  border-top: 1px solid #330000;
+  filter: progid : DXImageTransform . Microsoft . gradient(startColorstr = "#440000", endColorstr = "#550000");
+}
+
+/******************************************************************************
+* Request modal styling
+******************************************************************************/
+#txtMessage
+{
+    height: 100px;
+    width: 60%;
+}
+
+
+
+/******************************************************************************
+*
+* OLD STYLES
+*
+******************************************************************************/
+
+.slide
+{
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+
+
+.brand
+{
+  vertical-align: middle;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.main-nav
+{
+  vertical-align: middle;
+  font-size: 18px;
+  font-weight: 350;
+}
+
+.ndex-section
+{
+  font-size: 18px;
 
 }
 
-.networkTitle{
-font-size: 14px;
-font-weight: 350;
+.networkTitle
+{
+  font-size: 14px;
+  font-weight: 350;
 }
 
-.elementCount{
-font-weight: 500;
+.elementCount
+{
+  font-weight: 500;
 }
 
-.tab-title{
-font-size: 16px;
-font-weight: 300;
+.tab-title
+{
+  font-size: 16px;
+  font-weight: 300;
 }
 
-.background-contrast {
-background-color:white;
+.background-contrast
+{
+  background-color: white;
 }
 
-#cy {
+#cy
+{
   font: 14px helvetica neue, helvetica, arial, sans-serif;
   height: 100%;
   width: 100%;
   position: absolute;
   left: 0;
   top: 0;
-  background-color:rgb(100,100,100);
+  background-color: rgb(100, 100, 100);
 }
 
 /*---------Windows Style Icon Classes---------------*/
-.win8{
-	min-height: 20px;
- 	padding: 19px;
- 	margin-bottom: 20px;
-  	border: 1px solid #e3e3e3;
-  	-webkit-border-radius: 4px;
- 	 -moz-border-radius: 4px;
-  	border-radius: 4px;
-  	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
-  	-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
-  	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
-	padding:50px;
-	position:relative;
-	height:30em;
+.win8
+{
+  min-height: 20px;
+  padding: 19px;
+  margin-bottom: 20px;
+  border: 1px solid #E3E3E3;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  padding: 50px;
+  position: relative;
+  height: 30em;
 }
 
-
-.lightGray{
-	background-color:#D7FCFF;
+.lightGray
+{
+  background-color: #D7FCFF;
 }
 
-.lightGrayBlue{
-	background-color:#E3F7FF;
+.lightGrayBlue
+{
+  background-color: #E3F7FF;
 }
 
-#mainP{
-	margin-right:8%;
-	position:absolute;
-	top:50%;
+#mainP
+{
+  margin-right: 8%;
+  position: absolute;
+  top: 50%;
 }
 
-.win8 h2{
-	text-align: center;
-	padding-bottom:1em;
+.win8 h2
+{
+  text-align: center;
+  padding-bottom: 1em;
 }
 
-.win8 button {
-	width:50%;
-	position:absolute;	/*--setting parent tag to a relative position and target tag to absolue position allows for fixed position to bottom of parent tag.*/
-	bottom: 3em;
-	right:25%;
-	left:25%;
+.win8 button
+{
+  width: 50%;
+  position: absolute; /*--setting parent tag to a relative position and target tag to absolue position allows for fixed position to bottom of parent tag.*/
+  bottom: 3em;
+  right: 25%;
+  left: 25%;
 }
+
 /*--------------------------------------------------------*/
-.footer{
-	background-color:white;
-	width:100%;
-	height:2em;
-}
-.footer p{
-	margin:0% 10% 0%;
-}
-.searchInfo{
-	min-height: 20px;
- 	padding: 19px;
- 	margin-bottom: 20px;
-  	border: 1px solid #e3e3e3;
-  	-webkit-border-radius: 4px;
- 	 -moz-border-radius: 4px;
-  	border-radius: 4px;
-  	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
-  	-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
-  	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+.searchInfo
+{
+  min-height: 20px;
+  padding: 19px;
+  margin-bottom: 20px;
+  border: 1px solid #E3E3E3;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
 }
 
-.profie{
-	
-}
-
-.profile h3{
-	text-align:center;
-	padding-bottom:1em;
-}
-
-.term{
-	font-size:14px;
-	color:#00B8D9;
-}
-
-.predicateName{
-	color:#FF8E08;
-}
-
-.edge{
-	padding-bottom:1em;
-}
-.node{
-	padding-bottom:1em;
-}
-
-#workSurface{
-/*This fixed position along with overflow attribute create constant size for div and add scrollbar*/
-	position:absolute;
-	top:75px;
-	right: 10px;
-	bottom:175px;
-        width: 160px;
-        overflow-y: auto;
-        margin:5px;
-}
-#sidebar{
-/*Used to position the sidebar on the side of the page, not sure if so many divs are needed*/
-	position:absolute;
-	top:40px;
-	right:0px;
-	bottom:150px;
-	width:20px;
-	padding:0px;
-	margin:0;
-}
-#stay{
-/*Used to keep the sidebar fixed in the window regardless of the where the scroll is moved*/
-	height:100%;
-	width:200px;
-	margin:0;
-	padding:0;
-}
-#tools{
-	/*sidebar*/
-	position:absolute;
-	height:100px;
-	bottom:50px;
-	right:5px;
-	width:170px;
+.profie
+{
 
 }
-#image{
-	width:100%;
-	min-width:100%;
-	padding:0;
-	margin:0;
-	position:relative;
-	}
-.bckImg{
-	width:100%;
-	height:200px;
-	padding:0;
-	position:relative;
-	left:0;
-	top:0;
+
+.profile h3
+{
+  text-align: center;
+  padding-bottom: 1em;
 }
-.foreImg{
-	width:15%;
-	position:absolute;
-	left:5%;
-	top:15%;
-	border-width:3px;
-	border-color:blue;
+
+.term
+{
+  font-size: 14px;
+  color: #00B8D9;
 }
+
+.predicateName
+{
+  color: #FF8E08;
+}
+
+.edge
+{
+  padding-bottom: 1em;
+}
+
+.node
+{
+  padding-bottom: 1em;
+}
+
+#divProfileImages
+{
+  width: 100%;
+  min-width: 100%;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+
+img.ProfileBackground
+{
+  width: 100%;
+  height: 200px;
+  padding: 0;
+  position: relative;
+  left: 0;
+  top: 0;
+}
+
+img.Profile
+{
+  width: 15%;
+  position: absolute;
+  left: 5%;
+  top: 15%;
+  border-width: 3px;
+  border-color: blue;
+  z-index: 2;
+}
+
 /*--for the sidebar-- */
-.workspace{
-	border:2px solid;
-	border-color:black;
-	-webkit-border-radius: 4px;
- 	 -moz-border-radius: 4px;
-  	border-radius: 4px;
+.workspace
+{
+  border: 2px solid;
+  border-color: black;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
 }
-.thumbText{
-	font-size:10px;
-	font-weight:600;
-	text-align:center;
+
+.thumbText
+{
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
 }
-.thumbIcon{
-	width:120px;
-	height:100px;
-	background:white;
+
+.thumbIcon
+{
+  width: 120px;
+  height: 100px;
+  background: white;
 }
+
 /*-- --*/
-.pageTitle{
-    font-size:16px;
-    font-weight:600;
-	padding-bottom:10px;
+.pageTitle
+{
+  font-size: 16px;
+  font-weight: 600;
+  padding-bottom: 10px;
 }
-.day{
-	width:2em;
+
+.day
+{
+  width: 2em;
 }
-.year{
-	width:3em;
+
+.year
+{
+  width: 3em;
 }
-.month{
-	width:7.5em;
+
+.month
+{
+  width: 7.5em;
 }
+
 /*---- --*/
-.notifications{
-	/*-add left and right margins, maybe grey background color*/ 
-	background-color: white;
-	padding:0px 0px;
-	border: 2px solid #EBEBEB;
-  	-webkit-border-radius: 2px;
- 	 -moz-border-radius: 2px;
-  	border-radius: 2px;
-  	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
-  	-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
-  	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+.notifications
+{
+  /*-add left and right margins, maybe grey background color*/
+  background-color: white;
+  padding: 0px 0px;
+  border: 2px solid #EBEBEB;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
 }
-.notificationsHeader{
-	background-color: #f5f5f5;
-	margin:0px;
-	padding:5px;
-	font-size:14px;
-	font-weight:600;
+
+.notificationsHeader
+{
+  background-color: #F5F5F5;
+  margin: 0px;
+  padding: 5px;
+  font-size: 14px;
+  font-weight: 600;
 }
-.unread{
-	font-weight:600;
+
+.unread
+{
+  font-weight: 600;
 }
-.read{
-	font-weight:200;
+
+.read
+{
+  font-weight: 200;
 }
-.requestModalLabel{
-	font-weight:900;
-	text-align:right;
+
+.requestModalLabel
+{
+  font-weight: 900;
+  text-align: right;
 }
+
 /*--- page menus --*/
-a.ndex-options{
-	padding: 19px 15px;
-	font-size: 23px;
-	margin-top: 4px;
-	color: #1F1D1D ;
+a.ndex-options
+{
+  padding: 19px 15px;
+  font-size: 23px;
+  margin-top: 4px;
+  color: #1F1D1D;
 }
-a.ndex-options:hover{
-	color: #3366BB;
-	text-decoration:none;
+
+a.ndex-options:hover
+{
+  color: #36B;
+  text-decoration: none;
 }
+
 /*----------------------*/
 
-.requestFormat{
-	margin: 5px;
+.requestFormat
+{
+  margin: 5px;
 }
 
 /*-----------------------------------*/
 
-.accountMiniMenu{}
+.accountMiniMenu
+{
+}
 
-.networkMiniMenu{}
-
+.networkMiniMenu
+{
+}
 
 /*-----------------------------------*/
 
-.errorMessage{
-    color: #FF0000;
+.errorMessage
+{
+  color: #F00;
 }

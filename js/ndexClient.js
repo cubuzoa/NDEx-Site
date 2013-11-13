@@ -111,6 +111,28 @@
         });
     }
 
+    exports.ndexPut = function (route, putData, callback, errorHandler) {
+        $.ajax({
+            type: "PUT",
+            /*
+                        password: credentials.password,
+                        username: credentials.username,
+                        xhrFields: {
+                            withCredentials: true
+                        },
+            */
+            beforeSend: function(xhr){
+                xhr.setRequestHeader("Authorization", "Basic " + encodedCredentials());
+            },
+            url: exports.host + route,
+            data: JSON.stringify(putData),
+            dataType: "JSON",
+            contentType: 'application/json',
+            success: callback,
+            error: errorHandler || exports.defaultNDExErrorHandler
+        });
+    }
+
     exports.authenticate = function(username, password, callback, errorHandler){
         var route = '/authenticate';
 
@@ -149,9 +171,9 @@
 
 
 // Create a User Account
-    exports.createUser = function(username, password, recoveryEmail, callback, errorHandler){
+    exports.createUser = function(username, password, email, callback, errorHandler){
         var mergedRoute = '/users';
-        exports.ndexPost(mergedRoute, {username: username, password: password, recoveryEmail: recoveryEmail}, callback, errorHandler);
+        exports.ndexPut(mergedRoute, {username: username, password: password, email: email}, callback, errorHandler);
     }
 
 
@@ -207,34 +229,6 @@
 // Delete a network from the user's WorkSurface. Requester must be user or have admin permissions
     exports.deleteNetworkFromUserWorkSurface = function(userid, networkid, callback, errorHandler){
         var mergedRoute = '/users/' + encodeURIComponent(userid) + '/worksurface/' + encodeURIComponent(networkid) + '';
-        exports.ndexDelete(mergedRoute, callback, errorHandler);
-    }
-
-
-// Add a programmatic access account, generate credentials
-    exports.createAgent = function(name, owner, callback, errorHandler){
-        var mergedRoute = '/agents';
-        exports.ndexPost(mergedRoute, {name: name, owner: owner}, callback, errorHandler);
-    }
-
-
-// Get information about an Agent
-    exports.getAgent = function(agentid, callback, errorHandler){
-        var mergedRoute = '/agents/' + encodeURIComponent(agentid) + '';
-        exports.ndexGet(mergedRoute, {},callback, errorHandler);
-    }
-
-
-// Update the credentials and/or status for an Agent
-    exports.updateAgent = function(agentId, credentials, status, name, callback, errorHandler){
-        var mergedRoute = '/agents/' + encodeURIComponent(agentid) + '';
-        exports.ndexPost(mergedRoute, {credentials: credentials, status: status, name: name}, callback, errorHandler);
-    }
-
-
-// Delete an Agent by Agent id. Requester must be agent owner, owner of group owning agent, or have admin permissions.
-    exports.deleteAgent = function(agentid, callback, errorHandler){
-        var mergedRoute = '/agents/' + encodeURIComponent(agentid) + '';
         exports.ndexDelete(mergedRoute, callback, errorHandler);
     }
 

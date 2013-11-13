@@ -59,8 +59,8 @@
     var visualizationMax = 1000;
 
     // On load, we get the network, then push it to cytoscape.js on the callback
-    $(ndexUI.initPage(function () {
-
+    $(document).ready(function()
+    {
         ndexClient.getNetworkMetadata(networkRID, function (networkMetadata) {
 
             // Check to be sure network is less than visualizationMAX edges
@@ -101,7 +101,7 @@
                         });
             }
         });
-    }));
+    });
 </script>
 
 

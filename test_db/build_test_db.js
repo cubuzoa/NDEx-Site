@@ -30,7 +30,6 @@ function readJSONFile(filename, directory){
 	var data = fs.readFileSync(directory + filename, 'utf8');
 	//
  	data = JSON.parse(data);
- 	console.log("JSON data: " + JSON.stringify(data));
 	return data;
 }
 

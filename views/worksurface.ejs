@@ -1,0 +1,38 @@
+<!-- ko if: NdexWeb.ViewModel.User().jId -->
+<div id="divSidebar">
+  <a href="javascript:void()">
+    <i id="btnSidebar" class="icon-chevron-left"></i>
+  </a>
+
+  <h4 class="AlignCenter">Work Surface</h4>
+
+  <div id="divWorkSurface">
+      <ul data-bind="foreach: Networks">
+          <li class="thumbnail thumbIcon">
+              <label>
+                  <input type="checkbox" data-bind="value: jid">
+                  <div class="thumbText" data-bind="text: title"></div>
+              </label>
+          </li>
+      </ul>
+  </div>
+
+  <div id="divTools">
+    <a href="javascript: void()" class="btn" data-bind="event: { mousedown: WorkSurface.viewNetwork }" title="View network" rel="tooltip">
+      <i class="icon-folder-open icon-white"> </i>
+    </a>
+    <a href="javascript: void()" class="btn" data-bind="event: { mousedown: WorkSurface.visualizeNetwork }" title="Visualize network" rel="tooltip">
+      <i class="icon-eye-open icon-white"> </i>
+    </a>
+    <a href="javascript: void()" class="btn" data-bind="event: { mousedown: WorkSurface.compareNetworks }" title="Compare networks" rel="tooltip">
+      <i class="icon-retweet icon-white"> </i>
+    </a>
+    <a href="javascript: void()" class="btn" data-bind="click: WorkSurface.removeNetwork" title="Remove network" rel="tooltip">
+      <i class="icon-remove icon-white"> </i>
+    </a>
+  </div>
+</div>
+<!-- /ko -->
+
+<script type="text/javascript" src="/js/worksurface.js"></script>
+ 
