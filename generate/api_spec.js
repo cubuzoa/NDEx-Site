@@ -17,7 +17,7 @@ exports.resourceTypes = [
 exports.System = [
 
 	{	fn : "index",
-		status : "active",
+		status : "inactive",
 		doc : "GET server description",
 		method: "GET",
 		route: "/",
@@ -27,7 +27,7 @@ exports.System = [
 	},
 	
 	{	fn : "status",
-		status : "active",
+		status : "inactive",
 		doc : "GET status",
 		method: "GET",
 		route: "/status",
@@ -42,6 +42,7 @@ exports.User = [
 
 
 	{	fn : "createUser",
+        ndexjava : "ndexCreateUser",
 		status : "active",
 		doc : "Create a User Account",
 		method : "POST",
@@ -67,6 +68,7 @@ exports.User = [
 	},
 
 	{	fn : "updateUserProfile",
+        ndexjava : "ndexUpdateUserProfile",
 		status : "active",
 		doc : "Set new profile for user. Requester must be user or have admin permissions.",
 		method : "POST",
@@ -79,7 +81,7 @@ exports.User = [
 	},
 	
 	{	fn : "uploadUserImage",
-		status : "active",
+		status : "inactive",
 		doc : "Set a new foreground image for user. Requester must be user or have admin permissions.",
 		method : "POST",
 		route : "/users/:userid/images",
@@ -121,6 +123,7 @@ exports.User = [
 	},	
 
 	{	fn : "findUsers",
+        ndexjava : "ndexFindUsers",
 		status : "active",
 		doc : "Find users matching search expression",
 		method : "GET",
@@ -147,6 +150,7 @@ exports.User = [
 	},	
 	
 	{	fn : "getUser",
+        ndexjava : "ndexGetUserById",
 		status : "active",
 		doc : "Get a user by userid. Content returned depends on requester permissions.",
 		method : "GET",
@@ -158,6 +162,7 @@ exports.User = [
 	},	
 	
 	{	fn : "deleteUser",
+        ndexjava : "ndexDeleteUser",
 		status : "active",
 		doc : "Delete a user by user id. Requester must be user or have admin permissions.",
 		method : "DELETE",
@@ -169,6 +174,7 @@ exports.User = [
 	},
 
 	{	fn : "getUserWorkSurface",
+        ndexjava : "ndexGetUserWorksurface",
 		status : "active",
 		//requiresAuthentication : true,
 		doc : "Get the user's WorkSurface. Requester must be user or have admin permissions.",
@@ -182,6 +188,7 @@ exports.User = [
 
 	{	fn : "addNetworkToUserWorkSurface",
 		status : "active",
+        ndexjava : "ndexAddNetworkToUserWorkSurface",
 		//requiresAuthentication : true,
 		doc : "Add a network to the user's WorkSurface. Requester must be user or have admin permissions. User must have permission to access network",
 		method : "POST",
@@ -196,6 +203,7 @@ exports.User = [
 	},
 
 	{	fn : "deleteNetworkFromUserWorkSurface",
+        ndexjava : "ndexDeleteNetworkFromUserWorkSurface",
 		status : "active",
 		//requiresAuthentication : true,
 		doc : "Delete a network from the user's WorkSurface. Requester must be user or have admin permissions",
@@ -362,6 +370,7 @@ exports.Agent = [
 exports.Group = [
 
 	{	fn : "createGroup",
+        ndexjava : "ndexGroupCreate",
 		status : "active",
 		doc : "Add a group account",
 		method : "POST",
@@ -385,6 +394,7 @@ exports.Group = [
 	},	
 
 	{	fn : "updateGroupProfile",
+        ndexjava : "ndexGroupUpdateProfile",
 		status : "active",
 		doc : "Set new group profile information. Requester must be group owner or have admin permissions.",
 		method : "POST",
@@ -404,7 +414,7 @@ exports.Group = [
 	},	
 
 	{	fn : "uploadGroupImage",
-		status : "active",
+		status : "inactive",
 		doc : "Set a new foreground image for group. Requester must be group owner or have admin permissions.",
 		method : "POST",
 		route : "/groups/:groupid/images",
@@ -424,6 +434,7 @@ exports.Group = [
 	},
 
 	{	fn : "findGroups",
+        ndexjava : "ndexFindGroups",
 		status : "active",
 		doc : "Find groups by search expression",
 		method : "GET",
@@ -450,6 +461,7 @@ exports.Group = [
 	},	
 	
 	{	fn : "getGroup",
+        ndexjava : "ndexGetGroup",
 		status : "active",
 		doc : "Get a group by group id. Information returned depends on whether requester is group owner.",
 		method : "GET",
@@ -463,6 +475,7 @@ exports.Group = [
 	},	
 	
 	{	fn : "deleteGroup",
+        ndexjava : "ndexGroupDelete",
 		status : "active",
 		doc : "Delete a group by group id. Requester must be group owner or have admin permissions.",
 		method : "DELETE",
@@ -476,7 +489,7 @@ exports.Group = [
 	},
 	
 	{	fn : "getGroupMembers",
-		status : "active",
+		status : "inactive",
 		doc : "Find Users who are members of a group, optionally filter by search expression. Group owners see all members, non-owners see only members who allow themselves to be visible.",
 		method : "GET",
 		route : "/groups/:groupid/members",
@@ -550,6 +563,7 @@ exports.Group = [
 exports.Request = [
 
 	{	fn : "createRequest",
+        ndexjava : "ndexCreateRequest",
 		status : "active",
 		doc : "toAccount creates a request to fromAccount. Requests mediate communication between accounts.  The current use cases are request/invitation to add a user to a group and request/grant of authorization for access to a network.  Actions happen when the recipient of the request processes the request.",
 		method : "POST",
@@ -571,6 +585,7 @@ exports.Request = [
 	},		
 
 	{	fn : "getRequest",
+        ndexjava : "ndexGetRequest",
 		status : "active",
 		doc : "Get the parameters of a request",
 		method : "GET",
@@ -587,6 +602,7 @@ exports.Request = [
 	},	
 	
 	{	fn : "processRequest",
+        ndexjava : "ndexProcessRequest",
 		status : "active",
 		doc : "toAccount approves or disapproves a request. Approval causes requested action. Processing deletes request",
 		method : "POST",
@@ -605,6 +621,7 @@ exports.Request = [
 	},
 	
 	{	fn : "findRequests",
+        ndexjava : "ndexFindRequests",
 		status : "active",
 		doc : "Find requests that were made by the user or can be processed by the user",
 		method : "GET",
@@ -627,6 +644,7 @@ exports.Request = [
 exports.Network = [
 
 	{	fn : "createNetwork",
+        ndexjava : "ndexNetworkCreate",
 		status : "active",
 		doc : "Create a new network in the specified account",
 		method : "POST",
@@ -654,6 +672,7 @@ exports.Network = [
 	//TODO: dependent resource cleanup? Permissions?
 	
 	{	fn : "deleteNetwork",
+        ndexjava : "ndexNetworkDelete",
 		status : "active",
 		doc : "delete a network",
 		method : "DELETE",
@@ -668,6 +687,7 @@ exports.Network = [
 	},	
 			
 	{	fn : "getNetworkByEdges",
+        ndexjava : "ndexNetworkGetByEdges",
 		status : "active",
 		doc : "Returns all or part of a Network based on edge parameters",
 		method : "GET",
@@ -707,6 +727,7 @@ exports.Network = [
 
 
 	{	fn : "getNetworkByNodes",
+        ndexjava : "ndexNetworkGetByNodes",
 		status : "active",
 		doc : "Returns nodes and meta information of a Network based on node parameters",
 		method : "GET",
@@ -739,6 +760,7 @@ exports.Network = [
 	},	
 	
 	{	fn : "getNetworkMetadata",
+        ndexjava : "ndexGetNetworkMetadata",
 		status : "active",
 		doc : "Returns the Network JSON structure with only the meta data  - properties and format",
 		method : "GET",
@@ -756,6 +778,7 @@ exports.Network = [
 	},
 
     {	fn : "setNetworkMetadata",
+        ndexjava : "ndexSetNetworkMetadata",
         status : "active",
         doc : "Update network properties",
         method : "POST",
@@ -774,6 +797,7 @@ exports.Network = [
     },
 
 	{	fn : "getNetwork",
+        ndexjava : "ndexNetworkGet",
 		status : "active",
 		doc : "Returns the Network JDEx",
 		method : "GET",
@@ -795,6 +819,7 @@ exports.Network = [
 	// by owners
 	// by text in name or description
 	{	fn : "findNetworks",
+        ndexjava : "ndexNetworkFind",
 		status : "active",
 		doc : "Find Networks by search expression",
 		method : "GET",
@@ -925,6 +950,7 @@ exports.Network = [
 exports.Task = [
 
 	{	fn : "createTask",
+        ndexjava : "ndexTaskCreate",
 		status : "active",
 		doc : "User creates a Task",
 		method : "POST",
@@ -947,6 +973,7 @@ exports.Task = [
 	},		
 
 	{	fn : "getTask",
+        ndexjava : "ndexTaskGet",
 		status : "active",
 		doc : "Get the parameters and status of a task",
 		method : "GET",
@@ -965,6 +992,7 @@ exports.Task = [
 
 
 	{	fn : "updateTask",
+        ndexjava : "ndexTaskUpdate",
 		status : "active",
 		doc : "Set the parameters (such as status) of a task. Can inactivate an active task or activate an inactive task",
 		method : "POST",
@@ -989,6 +1017,7 @@ exports.Task = [
 	},	
 	
 	{	fn : "deleteTask",
+        ndexjava : "ndexTaskDelete",
 		status : "active",
 		doc : "Delete an inactive or completed task",
 		method : "DELETE",

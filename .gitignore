@@ -6,6 +6,7 @@ account_img/groups/foreground/*
 account_img/groups/background/*
 config/rest_config.json
 unit_test/node_modules/*
+test_db/node_modules/*
 .idea/*
 .idea
 .idea/*/*

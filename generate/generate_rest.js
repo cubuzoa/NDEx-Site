@@ -34,8 +34,61 @@ for (n in specs.resourceTypes){
 	lines.push("var " + resourceType + " = require('./routes/" + resourceType + ".js');");
 }
 
+function indentedLine(string, indentLevel){
+    var indentString = "  ";
+    var outputString = string;
+    for(i = 0; i < indentLevel; i++){
+        outputString = indentString + outputString;
+    }
+    return outputString;
+}
 
-// create the handlers
+function ndexJavaLines(spec, parameters, indent){
+    var lines = [];
+    if (spec.method == "POST" || spec.method == "DELETE" ){
+        lines.push(indentedLine("var postData = {", indent));
+    } else if (spec.method == "GET"){
+        lines.push(indentedLine("var queryArgs = {", indent));
+    } else {
+        throw new Error("Unknown request method " + spec.method);
+    }
+
+    for (key in parameters ){
+       var val = parameters[key];
+       lines.push(indentedLine(key + " : " + val + ",", indent+1));
+    }
+    lines.push(indentedLine("};", indent));
+
+    // Now format the ajax query
+/*
+ common.ndexPost(module.dbHost, "ndexUpdateUserProfile/" + module.dbName, module.dbUser, module.dbPassword, postData,
+ function (result) {
+ callback({status: 200, profile: profile});
+ },
+ function (err) {callback({error: JSON.stringify(err), status: (err.status)?err.status:500});});
+ */
+    if (spec.method == "POST" || spec.method == "DELETE" ){
+        lines.push(indentedLine("common.ndexPost(dbHost, '" + spec.ndexjava + "/' + dbName, dbUser, dbPassword, postData,", indent));
+        lines.push(indentedLine("function (result) { res.send(200, result); },", indent+1));
+        lines.push(indentedLine("function (err) {res.send((err.status)?err.status:500, {error: JSON.stringify(err)} )}", indent+1));
+        lines.push(indentedLine(");", indent));
+    } else if (spec.method == "GET"){
+        lines.push(indentedLine("common.ndexGet(dbHost, '" + spec.ndexjava + "/' + dbName, dbUser, dbPassword, queryArgs,", indent));
+        lines.push(indentedLine("function (result) { res.send(200, result); },", indent+1));
+        lines.push(indentedLine("function (err) { res.send((err.status)?err.status:500, {error: JSON.stringify(err)} )}", indent+1));
+        lines.push(indentedLine(");", indent));
+    }
+
+    return lines;
+}
+
+/*
+
+The handlers in rest.js communicate to the ndex-java module using "JID" format ids.
+
+These ids are translated and, as necessary, checked vs. the database within ndex-java
+
+ */
 for (n in specs.resourceTypes){
 	resourceType = specs.resourceTypes[n];
 	resourceSpecs = specs[resourceType];
@@ -47,47 +100,39 @@ for (n in specs.resourceTypes){
 				lines.push("// " + spec.doc);
 			}
 			var arguments = [];
-			var argumentLines = [];
-			var ridCheckLines = [];
-			var handleJIDParam = function(param){
-				if (param.type && param.type == "JID"){
-					argumentLines.push("    if(!common.checkJID(" + n + ")) res.send(400, { error: 'bad JID : ' + " + n + "});");
-
-					argumentLines.push("    " + n + " = convertToRID(" + n + ");");
-					ridCheckLines.push("            { rid: " + n + " , objectClass: '" + param.class + "'},");
-				}				
-			};
+			var errorCheckLines = [];
+            var parameters = {};
 			
 			for (n in spec.routeParams){
 				arguments.push(n);
-				argumentLines.push("    var " + n + " = req.params['" + n + "'];");
+				//argumentLines.push("    var " + n + " = req.params['" + n + "'];");
 				var param = spec.routeParams[n];
-				handleJIDParam(param);
+				parameters[n] = "req.params['" + n + "']";
 			}
 			for (n in spec.queryParams){
 				arguments.push(n);
-				argumentLines.push("    var " + n + " = req.query['" + n + "'];");
+				//argumentLines.push("    var " + n + " = req.query['" + n + "'];");
 				var param = spec.queryParams[n];
+                parameters[n] = "req.query['" + n + "']";
 				var defaultVal = param.default;
 				var type = param.type;
 				if (defaultVal === undefined){
-					argumentLines.push("    if(" + n + " === undefined){res.send(400, { error: 'value for " + n + " is required' })};");
+					errorCheckLines.push(indentedLine("if(queryArgs[" + n + "] === undefined){res.send(400, { error: 'value for " + n + " is required' })};", 2));
 				} else {
 					if (type == "string"){
 						defaultVal = "'" + defaultVal + "'";
 					}
-					argumentLines.push("    " + n + " = " + n + " || " + defaultVal + ";");
+                    errorCheckLines.push(indentedLine("queryArgs[" + n + "] = queryArgs[" + n + "] || " + defaultVal + ";", 2));
 				}
-				handleJIDParam(param);
 				
 			}
 			for (n in spec.postData){
 				arguments.push(n);
-				argumentLines.push("    var " + n + " = req.body['" + n + "'];");
+				//argumentLines.push("    var " + n + " = req.body['" + n + "'];");
 				var param = spec.postData[n];
-				handleJIDParam(param);
+                parameters[n] = "req.body['" + n + "']";
 			}
-
+      /*
 			for (n in spec.files){
                 var fileArg = "file_" + n;
 				arguments.push(fileArg);
@@ -96,84 +141,47 @@ for (n in specs.resourceTypes){
 					argumentLines.push("     if (" + fileArg + ".size > " + spec.maxsize + "){res.send(400, { error: 'file size too large, max allowed = " + spec.maxsize + "' });");
 				}
 			}
-						
-			var argumentString = "";
-			if (arguments.length > 0){
-				argumentString = arguments.join(", ") + ", ";
-			}
-			
-			var responseModifierLines = [];
-			responseModifierLines.push("          if(status && status == 200){");
-			for (n in spec.response){
-				var responseParams = spec.response[n];
-				if (responseParams.type && responseParams.type == "JID"){
-					responseModifierLines.push("            data." + n + " = convertFromRID(data." + n + ");");
-				}
-			}
-			responseModifierLines.push("          }");
-			
+	*/
+
 			var authenticator = ", passport.authenticate('basic', { session: false }) ";
 			
 			lines = lines.concat(
 								
 						[
 						"app." + spec.method.toLowerCase() + "('" + spec.route + "'" + authenticator + ", function(req, res) {",
-						"  try {",
+						indentedLine("try {", 1)
 						],
+
+                        errorCheckLines,
 						
-						argumentLines,
-					
+						ndexJavaLines(spec, parameters, 2),
 						[
-						"    common.ridCheck(",
-						"      ["
-						],
-						
-						ridCheckLines,
-						
-						[
-						"      ], ",
-						"      res,",
-						"      function(){",
-						"        " + resourceType + "." + spec.fn + "(" + argumentString + "function(data){",
-						"            var status = data.status || 200;"
-						],
-						
-						responseModifierLines,
-						
-						[
-						"            res.send(status, data);",
-						"",
-						"        }) // close the route function", 						
-						"",
-						"      } // close the ridCheck callback", 
-						"",
-						"    ); // close the ridCheck",
-						"",
-						"  // now catch random errors",
-						"  }",
-						"  catch (e){",
-						"          console.log('error in handler for " + spec.fn + " : ' + e); ",
-						"          res.send(500, {error : 'error in handler for " + spec.fn + " : ' + e}); ",
-						"  }",
-						
-						"}); // close handler"
+						indentedLine("}", 1),
+						indentedLine("catch (e){", 1),
+                        indentedLine("console.log('error in handler for " + spec.fn + " : ' + e); ", 2),
+                        indentedLine("res.send(500, {error : 'error in handler for " + spec.fn + " : ' + e}); ", 2),
+                        indentedLine("}", 1),
+						"});",
 						]);
 		}
 	}
 }
 
-
+/*
 var connect_to_db_lines = [
     "var server = new orientdb.Server(serverConfig);",
     "var db = new orientdb.GraphDb(ndexDatabaseName, server, dbConfig); ",
     "db.open(function(err) {  ",
     "    if (err)  throw err; ",
-    "console.log('Successfully connected to OrientDB');",
-    "routes.init(db, function(err) {if (err) {throw err;}});"
+    "    console.log('Successfully connected to OrientDB');",
+    "  });"
+    //"routes.init(db, function(err) {if (err) {throw err;}});"
     ];
 
-lines = lines.concat(connect_to_db_lines);
 
+lines = lines.concat(connect_to_db_lines);
+ */
+/*
 // init the resource types
 
 lines.push("common.init(db, function(err) {if (err) {throw err;}});");
@@ -182,9 +190,11 @@ for (n in specs.resourceTypes){
 	lines.push("	" + resourceType + ".init(db, function(err) {if (err) {throw err;}});");
 }
 
+
 // close off the initialization
 lines.push("});");
 
+ */
 
 // add the footer, including the call to run the server
 var footer_lines = fs.readFileSync('./rest_footer.js').toString().split("\n");
@@ -198,7 +208,7 @@ for (index in lines){
 				
 var restContent = lines.join("\n");
 
-var restPath = restPath + "rest.js";
+var restPath = restPath + "rest2.js";
 console.log("outputting to " + restPath);
 
 // write the file	

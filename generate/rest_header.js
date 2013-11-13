@@ -29,6 +29,7 @@ console.log("NDEX REST Configuration: " + JSON.stringify(config));
 //
 //-----------------------------------------------------------
 
+/*
 if (config.nodetime == 'enabled'){
     require('nodetime').profile({
         // TODO - make this a config param
@@ -39,9 +40,10 @@ if (config.nodetime == 'enabled'){
 } else {
     console.log("Nodetime NOT enabled");
 }
+*/
 
-var flash = require('connect-flash')
-  , express = require('express')
+//var flash = require('connect-flash')
+var express = require('express')
   , passport = require('passport')
   , BasicStrategy = require('passport-http').BasicStrategy;
 
@@ -53,6 +55,7 @@ var flash = require('connect-flash')
 
 var ndexDatabaseName = process.argv[2] || 'ndex';
 
+/*
 var orientdb = require('orientdb');
 
 var dbConfig = {
@@ -64,6 +67,11 @@ var serverConfig = {
 	host: 'localhost',
 	port: 2424
 };
+*/
+var dbHost = "http://localhost:2480/";
+var dbUser = "admin";
+var dbPassword = "admin";
+var dbName = "ndex";
 
 //-----------------------------------------------------------
 //
@@ -157,7 +165,7 @@ passport.use(new BasicStrategy({
             if(username == "guest" && password == "guestpassword"){
                 console.log("authenticating guest user");
                 return done(null, {username: "guest", jid: 'guestjid'});
-            } else findByUsername(username, function (err, users) {
+            } else findByUsername(username, password, function (err, users) {
                 console.log("found users " + JSON.stringify(users));
                 if (err) {
                     return done(err);
@@ -257,9 +265,13 @@ app.get('/authenticate',
     function(req, res){
         res.json({ username: req.user.username,
                     password: req.user.password,
-                   jid: convertFromRID(req.user.rid)
+                   jid: req.user.jid
                    });
     });
+
+app.get('/status', function(req, res){
+    res.send(200, null);
+});
 
 /*
 // Simple route middleware checks passport flags to ensure user is authenticated.
@@ -300,7 +312,7 @@ app.post('/authenticate',
 //				Utilities
 //
 //-----------------------------------------------------------
-
+/*
 function convertToRID(JID){
 	return JID.replace("C","#").replace("R", ":");
 }
@@ -308,6 +320,7 @@ function convertToRID(JID){
 function convertFromRID(RID){
 	return RID.replace("#","C").replace(":", "R");
 }
+*/
 
 var routes = require('./routes');
 
