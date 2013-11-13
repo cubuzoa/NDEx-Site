@@ -59,22 +59,22 @@
                 </li>
               </ul>
             </li>
-            <li id="myAccount" class="dropdown" data-bind="css: { hide: !User().jId }">
+            <li class="dropdown" data-bind="css: { hide: !User().jId }">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Account</a>
 
               <ul class="dropdown-menu" role="menu">
                 <li>
-                  <a id="toAccount" href="/viewUser">My Account</a>
+                  <a data-bind="attr: { href: '/user/' + User().jId }">My Account</a>
                 </li>
                 <li>
-                  <a id="toGroups" href="#">My Groups</a>
+                  <a data-bind="attr: { href: '/user/' + User().jId + '/#Groups' }">My Groups</a>
                 </li>
                 <li>
-                  <a id="toNetworks" href="#">My Networks</a>
+                  <a data-bind="attr: { href: '/user/' + User().jId + '/#Networks' }">My Networks</a>
                 </li>
               </ul>
             </li>
-            <li id="Tasks" class="dropdown hide">
+            <li class="dropdown hide">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tasks</a>
 
               <ul class="dropdown-menu" role="menu">
@@ -86,20 +86,20 @@
                 </li>
               </ul>
             </li>
-            <li id="signIn" data-bind="css: { hide: User().jId }">
+            <li data-bind="css: { hide: User().jId }">
               <a href="/login">Sign in</a>
             </li>
-            <li id="signOut" data-bind="css: { hide: !User().jId }">
+            <li data-bind="css: { hide: !User().jId }">
               <a href="#">Sign out</a>
             </li>
-            <li id="signUp" data-bind="css: { hide: User().jId }">
+            <li data-bind="css: { hide: User().jId }">
               <a href="/join">Join NDEx</a>
             </li>
           </ul>
 
           <ul class="nav pull-right main-nav">
             <li>
-              <a href='#' id="navname"></a>
+              <a href='#'></a>
             </li>
           </ul>
         </div>

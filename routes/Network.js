@@ -103,7 +103,7 @@ exports.getNetworkMetadata = function (networkRID, callback)
         }
     );
 
-    var cmd = "select properties, format, nodesCount as nodeCount, edgesCount as edgeCount from " + networkRID + "";
+    var cmd = "select properties, format, nodesCount as nodeCount, edgesCount as edgeCount from " + networkRID.replace("C", "#").replace("R", ":");
     console.log(cmd);
 
     module.db.command(cmd, function (err, metadataList)

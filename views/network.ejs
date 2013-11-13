@@ -1,6 +1,6 @@
 <% include head.ejs %>
-<% include nav.ejs %>
-<% include sidebar.ejs %>
+<% include navigation.ejs %>
+<% include worksurface.ejs %>
 
 <div id="divNetwork">
   <div id="divMetadata" data-bind="with: Network.Metadata">
@@ -204,9 +204,9 @@
   </div>
 </div>
 
-<script type="text/javascript" src="/js/view-network.js"></script>
+<script type="text/javascript" src="/js/network.js"></script>
 <script>
-  ViewNetwork.ViewModel.Network.Id("<%=networkId%>");
+  Network.ViewModel.Network.Id("<%=networkId%>");
 </script>
 
-<% include foot.ejs %>
+<% include footer.ejs %>

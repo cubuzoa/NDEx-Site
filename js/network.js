@@ -1,4 +1,4 @@
-var ViewNetwork =
+var Network =
 {
     ViewModel:
     {
@@ -79,7 +79,7 @@ var ViewNetwork =
                 }
 
                 edgeArray = ko.mapping.fromJS(edgeArray);
-                ViewNetwork.ViewModel.Network.Edges(edgeArray());
+                Network.ViewModel.Network.Edges(edgeArray());
             });
     },
 
@@ -94,9 +94,9 @@ var ViewNetwork =
             function(metadata)
             {
                 var networkMetadata = ko.mapping.fromJS(metadata.network);
-                ViewNetwork.ViewModel.Network.Metadata(networkMetadata);
-                ViewNetwork.getNodes();
-                ViewNetwork.getEdges();
+                Network.ViewModel.Network.Metadata(networkMetadata);
+                Network.getNodes();
+                Network.getEdges();
             });
     },
 
@@ -129,7 +129,7 @@ var ViewNetwork =
                 }
 
                 nodeArray = ko.mapping.fromJS(nodeArray);
-                ViewNetwork.ViewModel.Network.Nodes(nodeArray());
+                Network.ViewModel.Network.Nodes(nodeArray());
 
                 //Convert the terms dictionary into an array
                 var termArray = [];
@@ -141,7 +141,7 @@ var ViewNetwork =
                 }
 
                 termArray = ko.mapping.fromJS(termArray);
-                ViewNetwork.ViewModel.Network.Terms(termArray());
+                Network.ViewModel.Network.Terms(termArray());
             });
     },
 
@@ -211,5 +211,5 @@ var ViewNetwork =
 
 $(document).ready(function()
 {
-    ViewNetwork._init();
+    Network._init();
 });

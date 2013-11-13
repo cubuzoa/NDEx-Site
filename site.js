@@ -66,11 +66,6 @@ app.get("/join", function (httpRequest, httpResponse)
     httpResponse.render("join", { title: "Join", user: httpRequest.user });
 });
 
-app.get("/myAccount", function (httpRequest, httpResponse)
-{
-    httpResponse.render("my_account", { title: "My Account", user: httpRequest.user });
-});
-
 app.get("/searchNetworks", function (httpRequest, httpResponse)
 {
     httpResponse.render("search_networks", { title: "Networks", user: httpRequest.user });
@@ -121,9 +116,9 @@ app.get("/api", function (httpRequest, httpResponse)
     });
 });
 
-app.get("/viewUser/:userId", function (httpRequest, httpResponse)
+app.get("/user/:userId", function (httpRequest, httpResponse)
 {
-    httpResponse.render("view_user",
+    httpResponse.render("user",
     {
         title: "User",
         userId: httpRequest.params["userId"],
@@ -131,9 +126,9 @@ app.get("/viewUser/:userId", function (httpRequest, httpResponse)
     });
 });
 
-app.get("/viewGroup/:groupId", function (httpRequest, httpResponse)
+app.get("/group/:groupId", function (httpRequest, httpResponse)
 {
-    httpResponse.render("view_group",
+    httpResponse.render("group",
     {
         title: "Group",
         groupId: httpRequest.params["groupId"],
@@ -141,9 +136,9 @@ app.get("/viewGroup/:groupId", function (httpRequest, httpResponse)
     });
 });
 
-app.get("/viewNetwork/:networkId", function (httpRequest, httpResponse)
+app.get("/network/:networkId", function (httpRequest, httpResponse)
 {
-    httpResponse.render("view_network",
+    httpResponse.render("network",
     {
         title: "Network",
         networkId: httpRequest.params["networkId"],
@@ -151,7 +146,7 @@ app.get("/viewNetwork/:networkId", function (httpRequest, httpResponse)
     });
 });
 
-app.get("/visualizeNetwork/:networkId", function (httpRequest, httpResponse)
+app.get("/network/:networkId/visualize", function (httpRequest, httpResponse)
 {
     httpResponse.render("cyjs_visualize_network",
     {
@@ -161,7 +156,7 @@ app.get("/visualizeNetwork/:networkId", function (httpRequest, httpResponse)
     });
 });
 
-app.get("/compareNetworks/:network1Id/:network2Id", function (httpRequest, httpResponse)
+app.get("/network/:network1Id/compare/:network2Id", function (httpRequest, httpResponse)
 {
     httpResponse.render("triptych_compare_networks",
     {

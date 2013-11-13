@@ -111,6 +111,28 @@
         });
     }
 
+    exports.ndexPut = function (route, putData, callback, errorHandler) {
+        $.ajax({
+            type: "PUT",
+            /*
+                        password: credentials.password,
+                        username: credentials.username,
+                        xhrFields: {
+                            withCredentials: true
+                        },
+            */
+            beforeSend: function(xhr){
+                xhr.setRequestHeader("Authorization", "Basic " + encodedCredentials());
+            },
+            url: exports.host + route,
+            data: JSON.stringify(putData),
+            dataType: "JSON",
+            contentType: 'application/json',
+            success: callback,
+            error: errorHandler || exports.defaultNDExErrorHandler
+        });
+    }
+
     exports.authenticate = function(username, password, callback, errorHandler){
         var route = '/authenticate';
 

@@ -1,12 +1,9 @@
-//TODO: Update notifications div to use bootstrap collapse css
-//TODO: Work on modal css
-//TODO: Update href relative urls for networks
-var User =
+var Group =
 {
     ViewModel:
     {
-        UserId: ko.observable(),
-        User: ko.observable()
+        GroupId: ko.observable(),
+        Group: ko.observable()
     },
 
     /****************************************************************************
@@ -14,10 +11,10 @@ var User =
     ****************************************************************************/
     _init: function()
     {
-        ko.applyBindings(this.ViewModel, $("#divUser")[0]);
+        ko.applyBindings(this.ViewModel, $("#divGroup")[0]);
 
         this.autoSelectTab();
-        this.loadUser();
+        this.loadGroup();
         this.wireEvents();
     },
 
@@ -40,33 +37,17 @@ var User =
     },
 
     /****************************************************************************
-    * Loads the user's information.
+    * Loads the group.
     ****************************************************************************/
-    loadUser: function()
+    loadGroup: function()
     {
-        NdexWeb.get("/users/" + encodeURIComponent(User.ViewModel.UserId()),
+        NdexWeb.get("/groups/" + encodeURIComponent(Group.ViewModel.GroupId()),
             null,
-            function (userData)
+            function (groupData)
             {
-                userData = ko.mapping.fromJS(userData);
-                User.ViewModel.User(userData.user);
+                groupData = ko.mapping.fromJS(groupData);
+                Group.ViewModel.Group(groupData.group);
             });
-    },
-
-    /****************************************************************************
-    * Requests group access.
-    ****************************************************************************/
-    requestGroupAccess: function()
-    {
-        //TODO:
-    },
-
-    /****************************************************************************
-    * Requests network access.
-    ****************************************************************************/
-    requestNetworkAccess: function()
-    {
-        //TODO:
     },
 
     /****************************************************************************
@@ -79,5 +60,5 @@ var User =
 
 $(document).ready(function()
 {
-    User._init();
+   Group._init();
 });

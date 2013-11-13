@@ -1,90 +1,34 @@
 <% include head.ejs %>
-<% include nav.ejs %>
+<% include navigation.ejs %>
+
 <h1>Join NDEx</h1>
 
-<div id="message"></div>
-<form action="/users" id="joinForm">
+<form id="frmJoin">
     <div>
-        <label>Username:</label>
-        <input type="text" name="username" id="username"/><br/>
+        <label class="Attribute-Editable">Username:</label>
+        <input type="text" data-bind="value: Username" placeholder="dpratt" />
     </div>
+
     <div>
-        <label>Password:</label>
-        <input type="password" name="password" id="password"/>
+        <label class="Attribute-Editable">Password:</label>
+        <input type="password" data-bind="value: Password" placeholder="Password" />
     </div>
+
     <div>
-        <label>Email:</label>
-        <input type="recoveryEmail" name="recoveryEmail" id="recoveryEmail"/>
+        <label class="Attribute-Editable">Confirm:</label>
+        <input type="password" data-bind="value: PasswordConfirmation" placeholder="Confirm password" />
     </div>
+
     <div>
-        <input type="submit" value="Submit"/>
+        <label class="Attribute-Editable">Email:</label>
+        <input type="email" data-bind="value: Email" placeholder="dpratt@cytoscape.com" />
+    </div>
+
+    <div class="AlignCenter" style="width: 350px;">
+        <button type="submit">Submit</button>
     </div>
 </form>
 
-<script>
+<script type="text/javascript" src="/js/join.js"></script>
 
-
-    /* attach a submit handler to the form */
-    $('#joinForm').submit(function (event) {
-        /* stop form from submitting normally */
-        event.preventDefault();
-        doCreateUser();
-    });
-
-    function doCreateUser() {
-
-        var u = $('#username').val();
-        var p = $('#password').val();
-        var recoveryEmail = $('#recoveryEmail').val();
-
-        if (u && p && recoveryEmail) {
-            ndexClient.createUser(u, p, recoveryEmail,
-                    function (data) {
-//
-// Success: Auto-login: Set localStorage variables and redirect
-//
-                        console.log("Created user: " + JSON.stringify(data));
-                        if (data && (typeof(Storage) !== "undefined")) {
-                            localStorage.username = u;
-                            localStorage.password = p;
-                            localStorage.ndexJid = data.jid;
-                            window.location = "/editProfile";
-                        } else {
-                            alert("Local storage not available, can't store login information");
-                        }
-                    },
-                    function (error) {
-//
-// Failure: clear localStorage variables and display message
-//
-                        if (error.status == 401) {
-                            ndexUI.formatError(error);
-                            //$('#message').html('Invalid password');
-                        } else {
-                            console.log(JSON.stringify(error));
-                            ndexUI.formatError(error);
-                        }
-//console.log(JSON.stringify(error));
-                    }
-            );
-        } else {
-            $('#message').html("Valid username, password, and email required");
-        }
-    }
-
-    ndexUI.initPage(function () {
-        // verify that we have local storage before proceeding
-        if (typeof(Storage) == "undefined") {
-            alert("Local storage not available, can't store user credentials, will redirect to home page");
-            window.location = "/";
-        }
-
-        // Sign out if a user is currently signed in:
-        if (ndexUI.user.id || ndexUI.user.username) {
-            ndexUI.signOut();
-        }
-    });
-
-</script>
-
-<% include foot.ejs %>
+<% include footer.ejs %>

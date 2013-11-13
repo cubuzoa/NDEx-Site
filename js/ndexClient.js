@@ -1,172 +1,158 @@
-/******************************************************************************
-* ndexClient can be used either as an node.js module or as a client library
-* JQuery is passed to the closure as $.
-* Expected to be a global for the client, expected to be undefined and then
-* required for node.js
-******************************************************************************/
+/*
 
-(function(exports)
-{
-  if (typeof($) === "undefined")
-  {
-    console.log("jQuery is required");
-    $ = require("jquery");
-  }
+ ndexClient can be used either as an node.js module or as a client library
 
-  if (typeof(btoa) === "undefined")
-  {
-    console.log("btoa is required");
-    btoa = require("btoa");
-  }
+ JQuery is passed to the closure as $.
 
-  exports.host = "http://localhost:3333";
+ Expected to be a global for the client, expected to be undefined and then required for node.js
 
-  /****************************************************************************
-  * Retrieves the user's credentials from local storage (if they exist).
-  ****************************************************************************/
-  function currentCredentials()
-  {
-    try
-    {
-      //Can't use normal detection of localStorage, it can throw an exception
-      if (localStorage.password && localStorage.username)
-        return { password: localStorage.password, username: localStorage.username };
-    }
-    catch (e)
-    {
-      return null;
+ */
+
+
+(function (exports) {
+
+    if (typeof($) === 'undefined') {
+        console.log("requiring jquery");
+        $ = require('jquery');
     }
 
-    return null;
-  }
+    if (typeof(btoa) === 'undefined') {
+        console.log("requiring btoa");
+        btoa = require('btoa');
+    }
 
-  /****************************************************************************
-  * Returns a user's credentials as required by Basic Authentication base64
-  * encoded.
-  ****************************************************************************/
-  function encodedCredentials(credentials)
-  {
-    if (!credentials)
-      credentials = currentCredentials();
+    exports.host = "http://localhost:3333";
 
-    if (credentials)
-      return btoa(credentials.username + ":" + credentials.password);
-    else
-      return null;
-  }
+    exports.guest = {username: 'guest', password: 'guestpassword'}
 
-  /****************************************************************************
-  * Authenticates credentials entered by a user.
-  ****************************************************************************/
-  exports.authenticate = function (username, password, callback, errorHandler)
-  {
-    //TODO: This should be using HTTPS since it's Basic Auth
-    $.ajax(
-    {
-      type: "GET",
-      url: exports.host + "/authenticate",
-      dataType: "JSON",
-      beforeSend: function (xhr)
-      {
-        xhr.setRequestHeader("Authorization", "Basic " + encodedCredentials(
-          {
-            username: username,
-            password: password
-          }));
-      },
-      success: callback,
-      error: errorHandler || exports.defaultNDExErrorHandler
-    });
-  }
+    function currentCredentials() {
+        if (typeof(localStorage) != 'undefined' && localStorage) {
+            if (localStorage.password, localStorage.username) {
+                return {password: localStorage.ndexPassword, username: localStorage.ndexUsername};
+            } else {
+                return exports.guest;
+            }
+        }
+        return exports.guest;
 
-  /****************************************************************************
-  * Default error handling.
-  ****************************************************************************/
-  exports.defaultNDExErrorHandler = function(data)
-  {
-    console.log("Error in ndexClient caught by default handler : " + JSON.stringify(data));
-    //alert("Error : " + JSON.stringify(data));
-  }
+    }
 
-  /****************************************************************************
-  * AJAX GET request.
-  ****************************************************************************/
-  exports.ndexGet = function (route, queryArgs, callback, errorHandler)
-  {
-    $.ajax(
-    {
-      type: "GET",
-      url: exports.host + route,
-      data: queryArgs,
-      dataType: "JSON",
-      beforeSend: function (xhr)
-      {
-        xhr.setRequestHeader("Authorization", "Basic " + encodedCredentials());
-      },
-      success: callback,
-      error: errorHandler || exports.defaultNDExErrorHandler
-    });
-  }
+    function encodedCredentials(credentials){
+        if (!credentials) credentials = currentCredentials();
+        return btoa(credentials.username + ":" + credentials.password);
+    }
 
-  /****************************************************************************
-  * AJAX DELETE request.
-  ****************************************************************************/
-  exports.ndexDelete = function(route, callback, errorHandler)
-  {
-    $.ajax(
-    {
-      type: "DELETE",
-      url: exports.host + route,
-      beforeSend: function (xhr)
-      {
-        xhr.setRequestHeader("Authorization", "Basic " + encodedCredentials());
-      },
-      success: callback,
-      error: errorHandler || exports.defaultNDExErrorHandler
-    });
-  }
 
-  /****************************************************************************
-  * AJAX POST request.
-  ****************************************************************************/
-  exports.ndexPost = function (route, postData, callback, errorHandler)
-  {
-    $.ajax(
-    {
-      type: "POST",
-      url: exports.host + route,
-      data: JSON.stringify(postData),
-      dataType: "JSON",
-      contentType: 'application/json',
-      beforeSend: function (xhr)
-      {
-        xhr.setRequestHeader("Authorization", "Basic " + encodedCredentials());
-      },
-      success: callback,
-      error: errorHandler || exports.defaultNDExErrorHandler
-    });
-  }
+    exports.defaultNDExErrorHandler = function (data) {
+        console.log("Error in ndexClient caught by default handler : " + JSON.stringify(data));
+        //alert("Error : " + JSON.stringify(data));
+    }
 
-  /****************************************************************************
-  * AJAX PUT request.
-  ****************************************************************************/
-  exports.ndexPut = function(route, putData, callback, errorHandler)
-  {
-    $.ajax(
-    {
-      type: "PUT",
-      url: NdexClient.ApiHost + route,
-      contentType: "application/json",
-      data: JSON.stringify(putData),
-      dataType: "JSON",
-      beforeSend: function(xhr)
-      {
-        xhr.setRequestHeader("Authorization", "Basic " + encodedCredentials());
-      },
-      success: callback,
-      error: errorHandler || exports.defaultNDExErrorHandler
-    });
-  }
+    exports.ndexGet = function (route, queryArgs, callback, errorHandler) {
+
+        $.ajax({
+            type: "GET",
+            /*
+             password: credentials.password,
+             username: credentials.username,
+             xhrFields: {
+             withCredentials: true
+             },
+             */
+            beforeSend: function(xhr){
+                xhr.setRequestHeader("Authorization", "Basic " + encodedCredentials());
+            },
+            url: exports.host + route,
+            data: queryArgs,
+            dataType: "JSON",
+            success: callback,
+            error: errorHandler || exports.defaultNDExErrorHandler
+        });
+    }
+
+    exports.ndexPost = function (route, postData, callback, errorHandler) {
+        $.ajax({
+            type: "POST",
+/*
+            password: credentials.password,
+            username: credentials.username,
+            xhrFields: {
+                withCredentials: true
+            },
+*/
+            beforeSend: function(xhr){
+                xhr.setRequestHeader("Authorization", "Basic " + encodedCredentials());
+            },
+            url: exports.host + route,
+            data: JSON.stringify(postData),
+            dataType: "JSON",
+            contentType: 'application/json',
+            success: callback,
+            error: errorHandler || exports.defaultNDExErrorHandler
+        });
+    }
+
+    exports.ndexDelete = function (route, callback, errorHandler) {
+        $.ajax({
+            type: "DELETE",
+            /*
+             password: credentials.password,
+             username: credentials.username,
+             xhrFields: {
+             withCredentials: true
+             },
+             */
+            beforeSend: function(xhr){
+                xhr.setRequestHeader("Authorization", "Basic " + encodedCredentials());
+            },
+            url: exports.host + route,
+            success: callback,
+            error: errorHandler || exports.defaultNDExErrorHandler
+        });
+    }
+
+    exports.ndexPut = function (route, putData, callback, errorHandler) {
+        $.ajax({
+            type: "PUT",
+            /*
+                        password: credentials.password,
+                        username: credentials.username,
+                        xhrFields: {
+                            withCredentials: true
+                        },
+            */
+            beforeSend: function(xhr){
+                xhr.setRequestHeader("Authorization", "Basic " + encodedCredentials());
+            },
+            url: exports.host + route,
+            data: JSON.stringify(putData),
+            dataType: "JSON",
+            contentType: 'application/json',
+            success: callback,
+            error: errorHandler || exports.defaultNDExErrorHandler
+        });
+    }
+
+    exports.authenticate = function(username, password, callback, errorHandler){
+        var route = '/authenticate';
+
+        $.ajax({
+            type: "GET",
+
+            beforeSend: function(xhr){
+                xhr.setRequestHeader(
+                    "Authorization",
+                    "Basic " + encodedCredentials({username: username, password: password}));
+            },
+            url: exports.host + route,
+            dataType: "JSON",
+            success: callback,
+            error: errorHandler || exports.defaultNDExErrorHandler
+        });
+    }
+
+
+
 
 
 
@@ -185,9 +171,9 @@
 
 
 // Create a User Account
-    exports.createUser = function(username, password, recoveryEmail, callback, errorHandler){
+    exports.createUser = function(username, password, email, callback, errorHandler){
         var mergedRoute = '/users';
-        exports.ndexPost(mergedRoute, {username: username, password: password, recoveryEmail: recoveryEmail}, callback, errorHandler);
+        exports.ndexPut(mergedRoute, {username: username, password: password, email: email}, callback, errorHandler);
     }
 
 
@@ -243,34 +229,6 @@
 // Delete a network from the user's WorkSurface. Requester must be user or have admin permissions
     exports.deleteNetworkFromUserWorkSurface = function(userid, networkid, callback, errorHandler){
         var mergedRoute = '/users/' + encodeURIComponent(userid) + '/worksurface/' + encodeURIComponent(networkid) + '';
-        exports.ndexDelete(mergedRoute, callback, errorHandler);
-    }
-
-
-// Add a programmatic access account, generate credentials
-    exports.createAgent = function(name, owner, callback, errorHandler){
-        var mergedRoute = '/agents';
-        exports.ndexPost(mergedRoute, {name: name, owner: owner}, callback, errorHandler);
-    }
-
-
-// Get information about an Agent
-    exports.getAgent = function(agentid, callback, errorHandler){
-        var mergedRoute = '/agents/' + encodeURIComponent(agentid) + '';
-        exports.ndexGet(mergedRoute, {},callback, errorHandler);
-    }
-
-
-// Update the credentials and/or status for an Agent
-    exports.updateAgent = function(agentId, credentials, status, name, callback, errorHandler){
-        var mergedRoute = '/agents/' + encodeURIComponent(agentid) + '';
-        exports.ndexPost(mergedRoute, {credentials: credentials, status: status, name: name}, callback, errorHandler);
-    }
-
-
-// Delete an Agent by Agent id. Requester must be agent owner, owner of group owning agent, or have admin permissions.
-    exports.deleteAgent = function(agentid, callback, errorHandler){
-        var mergedRoute = '/agents/' + encodeURIComponent(agentid) + '';
         exports.ndexDelete(mergedRoute, callback, errorHandler);
     }
 
