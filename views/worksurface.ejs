@@ -18,13 +18,13 @@
   </div>
 
   <div id="divTools">
-    <a href="javascript: void()" class="btn" data-bind="click: WorkSurface.viewNetwork" title="View network" rel="tooltip">
+    <a href="javascript: void()" class="btn" data-bind="event: { mousedown: WorkSurface.viewNetwork }" title="View network" rel="tooltip">
       <i class="icon-folder-open icon-white"> </i>
     </a>
-    <a href="javascript: void()" class="btn" data-bind="click: WorkSurface.visualizeNetwork" title="Visualize network" rel="tooltip">
+    <a href="javascript: void()" class="btn" data-bind="event: { mousedown: WorkSurface.visualizeNetwork }" title="Visualize network" rel="tooltip">
       <i class="icon-eye-open icon-white"> </i>
     </a>
-    <a href="javascript: void()" class="btn" data-bind="click: WorkSurface.compareNetworks" title="Compare networks" rel="tooltip">
+    <a href="javascript: void()" class="btn" data-bind="event: { mousedown: WorkSurface.compareNetworks }" title="Compare networks" rel="tooltip">
       <i class="icon-retweet icon-white"> </i>
     </a>
     <a href="javascript: void()" class="btn" data-bind="click: WorkSurface.removeNetwork" title="Remove network" rel="tooltip">

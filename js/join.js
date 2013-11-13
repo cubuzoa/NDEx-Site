@@ -36,9 +36,12 @@ var Join =
             return;
         }
 
-        ndexClient.createUser(Join.ViewModel.Username(),
-            Join.ViewModel.Password(),
-            Join.ViewModel.Email(),
+        NdexWeb.put("/users",
+            {
+                username: Join.ViewModel.Username(),
+                password: Join.ViewModel.Password(),
+                email: Join.ViewModel.Email()
+            },
             function(newUser)
             {
                 if (newUser)

@@ -52,6 +52,12 @@ footer
   z-index: 3;
 }
 
+h1, h2, h3, h4, h5, h6
+{
+    "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
+    font-weight: bold;
+}
+
 legend
 {
   font-size: 1.5em;
@@ -138,7 +144,6 @@ th
     cursor: pointer;
 }
 
-
 label.Attribute
 {
   display: inline-block;
@@ -188,7 +193,7 @@ label.Attribute-Editable
   margin: 5px;
   padding-left: 13px;
   overflow-y: auto;
-  width: 130px;
+  width: 150px;
 }
 
 #divWorkSurface > ul
@@ -207,7 +212,7 @@ label.Attribute-Editable
 ******************************************************************************/
 #divModalBackground
 {
-  background: #75ACC8;
+  background: #666;
   display: none;
   filter: alpha(opacity=50);
   height: 100%;
@@ -228,11 +233,11 @@ label.Attribute-Editable
   display: none;
   height: auto;
   left: 50%;
-  margin-left: -350px;
+  margin-left: -20%;
   overflow: hidden;
   position: fixed;
-  top: 50px;
-  width: 800px;
+  top: 15%;
+  width: 40%;
   z-index: 5;
 }
 
@@ -244,31 +249,22 @@ label.Attribute-Editable
   background: -ms-linear-gradient(center top, #438EB9, #0E5177);
   background: -o-linear-gradient(center top, #438EB9, #0E5177);
   background: -webkit-linear-gradient(top, #438EB9, #0E5177);
-  border-radius: 6px;
+  border-radius: 6px 6px 0 0;
   color: #FFF;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#438EB9", endColorstr="#0E5177");
   font-size: 1.75em;
   font-weight: bold;
   margin-bottom: 10px;
-  padding: 5px 0 8px;
+  padding: 0.25em 0;
   position: relative;
   text-align: center;
-}
-
-#divModal > div.Title > div.BorderRadiusFix
-{
-  background: #42719C;
-  bottom: 0;
-  height: 5px;
-  position: absolute;
-  width: 100%;
 }
 
 #btnCloseModal
 {
   position: absolute;
-  right: -2px;
-  top: -2px;
+  right: 3px;
+  top: 3px;
 }
 
 #divModalContent
@@ -424,11 +420,6 @@ dl.Accordion > dd
   padding: 1px 3px;
 }
 
-/*
-* //TODO: Apply a gradient to the list items for the lists below
-* //TODO: Make these lists all have a minimum height
-* //TODO: Add a border to these lists
-*/
 #ulFilterableTerms > li,
 #ulTraversalTerms > li
 {
@@ -470,6 +461,15 @@ dl.Accordion > dd
   filter: progid : DXImageTransform . Microsoft . gradient(startColorstr = "#440000", endColorstr = "#550000");
 }
 
+/******************************************************************************
+* Request modal styling
+******************************************************************************/
+#txtMessage
+{
+    height: 100px;
+    width: 60%;
+}
+
 
 
 /******************************************************************************
@@ -484,15 +484,6 @@ dl.Accordion > dd
   padding-bottom: 30px;
 }
 
-h1, h2, h3, h4, h5
-{
-"Century Gothic", CenturyGothic, AppleGothic, sans-serif;
-}
-
-h4
-{
-  font-weight: 300;
-}
 
 .brand
 {

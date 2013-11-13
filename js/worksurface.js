@@ -20,31 +20,31 @@ var WorkSurface =
     ****************************************************************************/
     addNetwork: function()
     {
-        ndexClient.addNetworkToUserWorkSurface(NdexWeb.ViewModel.User().jId,
-            this.jid(),
-            function (workSurface)
+        NdexWeb.post("/users/" + encodeURIComponent(NdexWeb.ViewModel.User().jId) + "/worksurface",
+            { networkid: this.jid() },
+            function(workSurface)
             {
-                if (workSurface.networks)
-                {
-                    var updatedNetworks = ko.mapping.fromJS(workSurface.networks);
-                    WorkSurface.ViewModel.Networks(updatedNetworks());
-                    //TODO: Change the button for add to work surface to remove from work surface
-                }
+                var updatedNetworks = ko.mapping.fromJS(workSurface.networks);
+                WorkSurface.ViewModel.Networks(updatedNetworks());
             });
     },
 
     /****************************************************************************
     * Compares two networks.
     ****************************************************************************/
-    compareNetworks: function()
+    compareNetworks: function(viewModel, event)
     {
-        if ($("#divTools input:checked").length < 2)
+        var checkedNetworks = $("#divWorkSurface ul input:checked");
+        if (checkedNetworks.length < 2)
         {
             $.gritter.add({ title: "Error", text: "Two networks must be selected." });
             return;
         }
 
-        $(this).attr("href", "/network/" + $("#divTools input:checked")[0].value + "/compare/" + $("#divTools input:checked")[1].value);
+        var clickedLink = (event.target.tagName.toLowerCase() === "a") ? $(event.target) : $(event.target).parent();
+        clickedLink.attr("href",
+            "/network/" + encodeURIComponent(checkedNetworks[0].value)
+          + "/compare/" + encodeURIComponent(checkedNetworks[1].value));
     },
 
     /****************************************************************************
@@ -66,15 +66,12 @@ var WorkSurface =
     ****************************************************************************/
     loadWorkSurface: function()
     {
-        ndexClient.getUserWorkSurface(NdexWeb.ViewModel.User().jId,
+        NdexWeb.get("/users/" + encodeURIComponent(NdexWeb.ViewModel.User().jId) + "/worksurface",
+            null,
             function(workSurface)
             {
-                if (workSurface.networks)
-                {
-                    var updatedNetworks = ko.mapping.fromJS(workSurface.networks);
-                    WorkSurface.ViewModel.Networks(updatedNetworks());
-                    //TODO: Change the button for add to work surface to remove from work surface
-                }
+                var updatedNetworks = ko.mapping.fromJS(workSurface.networks);
+                WorkSurface.ViewModel.Networks(updatedNetworks());
             });
     },
 
@@ -83,16 +80,11 @@ var WorkSurface =
     ****************************************************************************/
     removeNetwork: function()
     {
-        ndexClient.deleteNetworkFromUserWorkSurface(NdexWeb.ViewModel.User().jId,
-            this.jid(),
-            function (workSurface)
+        NdexWeb.delete("/users/" + encodeURIComponent(NdexWeb.ViewModel.User().jId) + "/worksurface/" + encodeURIComponent(this.jid()),
+            function(workSurface)
             {
-                if (workSurface.networks)
-                {
-                    var updatedNetworks = ko.mapping.fromJS(workSurface.networks);
-                    WorkSurface.ViewModel.Networks(updatedNetworks());
-                    //TODO: Change the button for add to work surface to remove from work surface
-                }
+                var updatedNetworks = ko.mapping.fromJS(workSurface.networks);
+                WorkSurface.ViewModel.Networks(updatedNetworks());
             });
     },
 
@@ -116,29 +108,33 @@ var WorkSurface =
     /****************************************************************************
     * Views a network.
     ****************************************************************************/
-    viewNetwork: function()
+    viewNetwork: function(viewModel, event)
     {
-        if ($("#divTools input:checked").length < 1)
+        var checkedNetworks = $("#divWorkSurface ul input:checked");
+        if (checkedNetworks.length < 1)
         {
             $.gritter.add({ title: "Error", text: "No network selected." });
             return;
         }
 
-        $(this).attr("href", "/network/" + $("#divTools input:checked").val());
+        var clickedLink = (event.target.tagName.toLowerCase() === "a") ? $(event.target) : $(event.target).parent();
+        clickedLink.attr("href", "/network/" + encodeURIComponent(checkedNetworks[0].value));
     },
 
     /****************************************************************************
     * Visualizes a network.
     ****************************************************************************/
-    visualizeNetwork: function()
+    visualizeNetwork: function(viewModel, event)
     {
-        if ($("#divTools input:checked").length < 1)
+        var checkedNetworks = $("#divWorkSurface ul input:checked");
+        if (checkedNetworks.length < 1)
         {
             $.gritter.add({ title: "Error", text: "No network selected." });
             return;
         }
 
-        $(this).attr("href", "/network/" + $("#divTools input:checked").val() + "/visualize");
+        var clickedLink = (event.target.tagName.toLowerCase() === "a") ? $(event.target) : $(event.target).parent();
+        clickedLink.attr("href", "/network/" + encodeURIComponent(checkedNetworks[0].value) + "/visualize");
     },
 
     /****************************************************************************

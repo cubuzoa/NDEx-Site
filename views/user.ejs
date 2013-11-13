@@ -70,11 +70,11 @@
                                 <td>
                                     <div class="btn-group">
                                         <a href="javascript:void()" class="btn" title="Add to Work Surface" rel="tooltip">
-                                            <!-- ko if: WorkSurface.isOnWorkSurface(jid()) -->
+                                            <!-- ko if: !WorkSurface.isOnWorkSurface(jid()) -->
                                             <i class="icon-plus icon-white" data-bind="click: WorkSurface.addNetwork"></i>
                                             <!-- /ko -->
-                                            <!-- ko if: !WorkSurface.isOnWorkSurface(jid()) -->
-                                            <i class="icon-minus icon-white" data-bind="click: WorkSurface.removeNetwork"></i>
+                                            <!-- ko if: WorkSurface.isOnWorkSurface(jid()) -->
+                                            <i class="icon-remove icon-white" data-bind="click: WorkSurface.removeNetwork"></i>
                                             <!-- /ko -->
                                         </a>
                                         <a href="javascript:void()" class="btn" title="Request access" rel="tooltip">

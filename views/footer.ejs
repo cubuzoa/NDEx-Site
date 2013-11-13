@@ -4,7 +4,6 @@
     <div id="divModal">
       <div class="Title">
         <span></span>
-        <div class="BorderRadiusFix"></div>
         <button id="btnCloseModal" class="Red Close">X</button>
       </div>
 
@@ -15,6 +14,15 @@
       <p class="pull-right">&copy; Cytoscape Consortium 2013</p>
     </footer>
 
+    <script type="text/html" id="requestAccess">
+        <form id="frmRequest">
+            <textarea id="txtMessage"></textarea>
+
+            <div>
+                <button type="submit">Send Request</button>
+            </div>
+        </form>
+    </script>
     <script type="text/html" id="loadingImage">
       <img src="/img/loading.gif" />
       <h4>Please wait...</h4>

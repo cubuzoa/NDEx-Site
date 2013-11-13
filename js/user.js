@@ -1,6 +1,3 @@
-//TODO: Update notifications div to use bootstrap collapse css
-//TODO: Work on modal css
-//TODO: Update href relative urls for networks
 var User =
 {
     ViewModel:
@@ -58,7 +55,7 @@ var User =
     ****************************************************************************/
     requestGroupAccess: function()
     {
-        //TODO:
+        NdexWeb.showRequestModal("JOIN_GROUP", this);
     },
 
     /****************************************************************************
@@ -66,7 +63,7 @@ var User =
     ****************************************************************************/
     requestNetworkAccess: function()
     {
-        //TODO:
+        NdexWeb.showRequestModal("NETWORK_ACCESS", this);
     },
 
     /****************************************************************************

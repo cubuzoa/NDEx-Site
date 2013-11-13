@@ -151,6 +151,24 @@ var NdexWeb =
     },
 
     /****************************************************************************
+    * Sends the user's request.
+    ****************************************************************************/
+    sendRequest: function(event)
+    {
+        event.preventDefault();
+
+        var requestData = $("#txtMessage").data("Request");
+        requestData.Message = $("#txtMessage").val();
+
+        for (var ownerIndex = 0; ownerIndex < requestData.owners().length; ownerIndex++)
+        {
+            //TODO: Submit the request to each owner
+        }
+
+        NdexWeb.closeModal();
+    },
+
+    /****************************************************************************
     * Shows the modal DIV elements.
     ****************************************************************************/
     showModal: function(modalTitle, modalContent, hasCloseButton, callbackFunction)
@@ -187,12 +205,52 @@ var NdexWeb =
     },
 
     /****************************************************************************
+    * Displays the request modal dialog.
+    ****************************************************************************/
+    showRequestModal: function(requestType, requestedResource)
+    {
+        var modalTitle, defaultMessage;
+
+        switch (requestType)
+        {
+            case "GROUP_INVITATION":
+                modalTitle = "Group Invitation";
+                defaultMessage = "You are invited to become a member of " + requestedResource.groupname() + ".";
+                break;
+            case "JOIN_GROUP":
+                modalTitle = "Request to Join";
+                defaultMessage = "Please add me as a member of group " + requestedResource.groupname() + ".";
+                break;
+            case "NETWORK_ACCESS":
+                modalTitle = "Request for Network Access";
+                defaultMessage = "I'd like access to the " + requestedResource.title() + " network.";
+                break;
+            default:
+                break;
+        }
+
+        NdexWeb.showModal(modalTitle, "#requestAccess", true, function()
+        {
+            $("#txtMessage")
+                .val(defaultMessage)
+                .data("Request",
+                {
+                    FromId: NdexWeb.ViewModel.User().jId,
+                    ResourceId: requestedResource.jid(),
+                    ToId: requestedResource.owners(),
+                    Type: requestType
+                });
+        });
+    },
+
+    /****************************************************************************
     * Wires event-handlers to elements on the page.
     ****************************************************************************/
     wireEvents: function()
     {
         $("#btnCloseModal").click(this.hideModal);
         $("#signOut > a").click(this.logOut);
+        $(document).on("click", "#frmRequest", this.sendRequest);
     }
 };
 
