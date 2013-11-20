@@ -1,5 +1,6 @@
 .DS_Store
 /node_modules/
+/test_db/node_modules/*
 account_img/users/foreground/*
 account_img/users/background/*
 account_img/groups/foreground/*
