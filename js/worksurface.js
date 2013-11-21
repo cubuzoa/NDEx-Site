@@ -10,8 +10,10 @@ var WorkSurface =
     ****************************************************************************/
     _init: function()
     {
+        if (NdexWeb.ViewModel.User())
+            this.ViewModel.Networks(NdexWeb.ViewModel.User().WorkSurface());
+
         ko.applyBindings(this.ViewModel, $("#divSidebar")[0]);
-        this.loadWorkSurface();
         this.wireEvents();
     },
 
@@ -20,8 +22,8 @@ var WorkSurface =
     ****************************************************************************/
     addNetwork: function()
     {
-        NdexWeb.post("/users/" + encodeURIComponent(NdexWeb.ViewModel.User().jId) + "/worksurface",
-            { networkid: this.jid() },
+        NdexWeb.put("/users/" + encodeURIComponent(NdexWeb.ViewModel.User().Id) + "/work-surface",
+            { networkid: this.Id() },
             function(workSurface)
             {
                 var updatedNetworks = ko.mapping.fromJS(workSurface.networks);
@@ -43,7 +45,7 @@ var WorkSurface =
 
         var clickedLink = (event.target.tagName.toLowerCase() === "a") ? $(event.target) : $(event.target).parent();
         clickedLink.attr("href",
-            "/network/" + encodeURIComponent(checkedNetworks[0].value)
+            "/networks/" + encodeURIComponent(checkedNetworks[0].value)
           + "/compare/" + encodeURIComponent(checkedNetworks[1].value));
     },
 
@@ -54,7 +56,7 @@ var WorkSurface =
     {
         for (var networkIndex = 0; networkIndex < WorkSurface.ViewModel.Networks().length; networkIndex++)
         {
-            if (WorkSurface.ViewModel.Networks()[networkIndex].jid() == networkId)
+            if (WorkSurface.ViewModel.Networks()[networkIndex].Id() == networkId)
                 return true;
         }
 
@@ -62,25 +64,11 @@ var WorkSurface =
     },
 
     /****************************************************************************
-    * Loads the user's Work Surface.
-    ****************************************************************************/
-    loadWorkSurface: function()
-    {
-        NdexWeb.get("/users/" + encodeURIComponent(NdexWeb.ViewModel.User().jId) + "/worksurface",
-            null,
-            function(workSurface)
-            {
-                var updatedNetworks = ko.mapping.fromJS(workSurface.networks);
-                WorkSurface.ViewModel.Networks(updatedNetworks());
-            });
-    },
-
-    /****************************************************************************
     * Removes a network from the work surface.
     ****************************************************************************/
     removeNetwork: function()
     {
-        NdexWeb.delete("/users/" + encodeURIComponent(NdexWeb.ViewModel.User().jId) + "/worksurface/" + encodeURIComponent(this.jid()),
+        NdexWeb.delete("/users/" + encodeURIComponent(NdexWeb.ViewModel.User().Id) + "/work-surface/" + encodeURIComponent(this.Id()),
             function(workSurface)
             {
                 var updatedNetworks = ko.mapping.fromJS(workSurface.networks);
@@ -118,7 +106,7 @@ var WorkSurface =
         }
 
         var clickedLink = (event.target.tagName.toLowerCase() === "a") ? $(event.target) : $(event.target).parent();
-        clickedLink.attr("href", "/network/" + encodeURIComponent(checkedNetworks[0].value));
+        clickedLink.attr("href", "/networks/" + encodeURIComponent(checkedNetworks[0].value));
     },
 
     /****************************************************************************
@@ -134,7 +122,7 @@ var WorkSurface =
         }
 
         var clickedLink = (event.target.tagName.toLowerCase() === "a") ? $(event.target) : $(event.target).parent();
-        clickedLink.attr("href", "/network/" + encodeURIComponent(checkedNetworks[0].value) + "/visualize");
+        clickedLink.attr("href", "/networks/" + encodeURIComponent(checkedNetworks[0].value) + "/visualize");
     },
 
     /****************************************************************************

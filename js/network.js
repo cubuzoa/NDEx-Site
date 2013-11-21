@@ -1,3 +1,4 @@
+//TODO: Refactor after refactoring of Java NetworkService is complete
 var Network =
 {
     ViewModel:

@@ -8,6 +8,8 @@
 
 */
 
+//TODO: Migrate this into ndex-rest
+
 var fs = require('fs');
 var ndex = require('../js/ndexClient.js')
 
