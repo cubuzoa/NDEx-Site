@@ -38,16 +38,12 @@ var Login =
             return;
         }
 
+        //TODO: Convert this to using an authenticate method
         $.ajax(
         {
             type: "GET",
-            url: NdexWeb.ApiHost + "/users/" + Login.ViewModel.Username(),
-            dataType: "JSON",
-            beforeSend: function(xhr)
-            {
-                xhr.setRequestHeader("Authorization",
-                    "Basic " + btoa(Login.ViewModel.Username() + ":" + Login.ViewModel.Password()));
-            },
+            url: NdexWeb.ApiHost + "/users/authenticate/" + Login.ViewModel.Username() + "/" + Login.ViewModel.Password(),
+            dataType: "json",
             success: function(userData)
             {
                 //TODO: Need to create an unsupported page to let the user know they need to upgrade their browser
