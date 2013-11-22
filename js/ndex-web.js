@@ -254,8 +254,8 @@ var NdexWeb =
                 .val(defaultMessage)
                 .data("Request",
                 {
-                    FromId: NdexWeb.ViewModel.User().jId,
-                    ResourceId: requestedResource.jid(),
+                    FromId: NdexWeb.ViewModel.User().Id,
+                    ResourceId: requestedResource.Id(),
                     ToId: requestedResource.owners(),
                     Type: requestType
                 });

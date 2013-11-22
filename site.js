@@ -1,6 +1,5 @@
 var express = require("express");
 var passport = require("passport");
-var ndex_api_spec = require("./js/ndex_api_spec.js");
 var orientdb = require("orientdb");
 
 var dbConfig =
@@ -104,16 +103,6 @@ app.get("/contact", function (httpRequest, httpResponse)
 app.get("/about", function (httpRequest, httpResponse)
 {
     httpResponse.render("about", { title: "About NDEx", user: httpRequest.user });
-});
-
-app.get("/api", function (httpRequest, httpResponse)
-{
-    httpResponse.render("api_spec",
-    {
-        title: "NDEx API Specification",
-        user: httpRequest.user,
-        spec: ndex_api_spec
-    });
 });
 
 app.get("/user/:userId", function (httpRequest, httpResponse)

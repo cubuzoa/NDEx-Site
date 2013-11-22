@@ -34,8 +34,8 @@
                 <li>
                   <a href="/searchNetworks">Find Networks</a>
                 </li>
-                <li>
-                  <a id="navUploadNetwork" href="/uploadNetwork" data-bind="css: { hide: User().jId }">Upload Networks</a>
+                <li data-bind="if: User()">
+                  <a id="navUploadNetwork" href="/uploadNetwork">Upload Networks</a>
                 </li>
               </ul>
             </li>
@@ -51,7 +51,7 @@
                 </li>
               </ul>
             </li>
-            <li class="dropdown" data-bind="css: { hide: !User().jId }">
+            <li class="dropdown" data-bind="if: User()">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Users</a>
               <ul class="dropdown-menu" role="menu">
                 <li>
@@ -59,18 +59,18 @@
                 </li>
               </ul>
             </li>
-            <li class="dropdown" data-bind="css: { hide: !User().jId }">
+            <li class="dropdown" data-bind="if: User()">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Account</a>
 
               <ul class="dropdown-menu" role="menu">
                 <li>
-                  <a data-bind="attr: { href: '/user/' + User().jId }">My Account</a>
+                  <a data-bind="attr: { href: '/user/' + User().Id }">My Account</a>
                 </li>
                 <li>
-                  <a data-bind="attr: { href: '/user/' + User().jId + '/#Groups' }">My Groups</a>
+                  <a data-bind="attr: { href: '/user/' + User().Id + '/#Groups' }">My Groups</a>
                 </li>
                 <li>
-                  <a data-bind="attr: { href: '/user/' + User().jId + '/#Networks' }">My Networks</a>
+                  <a data-bind="attr: { href: '/user/' + User().Id + '/#Networks' }">My Networks</a>
                 </li>
               </ul>
             </li>
@@ -86,13 +86,13 @@
                 </li>
               </ul>
             </li>
-            <li data-bind="css: { hide: User().jId }">
+            <li data-bind="if: !User()">
               <a href="/login">Sign in</a>
             </li>
-            <li id="signOut" data-bind="css: { hide: !User().jId }">
+            <li id="signOut" data-bind="if: User()">
               <a href="#">Sign out</a>
             </li>
-            <li data-bind="css: { hide: User().jId }">
+            <li data-bind="if: !User()">
               <a href="/join">Join NDEx</a>
             </li>
           </ul>

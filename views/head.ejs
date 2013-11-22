@@ -28,20 +28,7 @@
     <script type="text/javascript" src="/js/bootstrap.js"></script>
     <script type="text/javascript" src="/js/knockout-3.0.0.js"></script>
     <script type="text/javascript" src="/js/knockout-mapping-2.4.1.js"></script>
-    <script type="text/javascript" src="/js/ndexClient.js"></script>
     <script type="text/javascript" src="/js/ndex-web.js"></script>
-    <script type="text/javascript" src="/js/ndexUI.js"></script>
-
-    <script>
-      //TODO: This isn't necessary
-      if (document.location.hostname == "www.dev.ndexbio.org")
-      {
-        ndexClient.host = "http://www.ndexbio.org:3333";
-        console.log("Special case: REST server at http://www.ndexbio.org:3333");
-      }
-      else
-        ndexClient.host = "http://" + document.location.hostname + ":3333";
-    </script>
 
     <!-- Activate tooltips -->
     <script type='text/javascript'>

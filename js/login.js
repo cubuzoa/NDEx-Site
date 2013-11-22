@@ -41,7 +41,7 @@ var Login =
         $.ajax(
         {
             type: "GET",
-            url: "http://localhost:8080/users/" + Login.ViewModel.Username(),
+            url: NdexWeb.ApiHost + "/users/" + Login.ViewModel.Username(),
             dataType: "JSON",
             beforeSend: function(xhr)
             {
