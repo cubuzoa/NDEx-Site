@@ -13,7 +13,7 @@ var Join =
     ****************************************************************************/
     _init: function()
     {
-        if (NdexWeb.ViewModel.User().jId)
+        if (NdexWeb.ViewModel.User().Id)
         {
             window.location = "/editProfile";
             return;
@@ -46,9 +46,9 @@ var Join =
             {
                 if (newUser)
                 {
-                    localStorage.username = Join.ViewModel.Username();
-                    localStorage.password = Join.ViewModel.Password();
-                    localStorage.ndexJid = newUser.jid;
+                    localStorage.Username = Join.ViewModel.Username();
+                    localStorage.Password = Join.ViewModel.Password();
+                    localStorage.UserId = newUser.id;
                     window.location = "/editProfile";
                 }
                 else

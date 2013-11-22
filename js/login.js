@@ -28,9 +28,9 @@ var Login =
             return;
         }
 
-        delete localStorage.username;
-        delete localStorage.password;
-        delete localStorage.ndexJid;
+        delete localStorage.Username;
+        delete localStorage.Password;
+        delete localStorage.UserId;
 
         if (!Login.ViewModel.Username() || !Login.ViewModel.Password())
         {
@@ -41,7 +41,7 @@ var Login =
         $.ajax(
         {
             type: "GET",
-            url: "http://localhost:3333/authenticate",
+            url: NdexWeb.ApiHost + "/users/" + Login.ViewModel.Username(),
             dataType: "JSON",
             beforeSend: function(xhr)
             {
@@ -53,10 +53,10 @@ var Login =
                 //TODO: Need to create an unsupported page to let the user know they need to upgrade their browser
                 if (userData)
                 {
-                    localStorage.username = userData.username;
-                    localStorage.password = userData.password;
-                    localStorage.ndexJid = userData.jid;
-                    window.location = "/user/" + userData.jid
+                    localStorage.Username = userData.username;
+                    localStorage.Password = Login.ViewModel.Password();
+                    localStorage.UserId = userData.id;
+                    window.location = "/user/" + userData.id
                 }
                 else
                     $.gritter.add({ title: "Server Error", text: "An error occurred during authentication. Please try again later." });

@@ -21,7 +21,7 @@
                 <li>
                     <a href="#divMembers" data-toggle="tab">Members</a>
                 </li>
-                <!-- if: NdexWeb.ViewModel.User().jId && Group.isOwner(jid()) -->
+                <!-- if: NdexWeb.ViewModel.User().Id && Group.isOwner(Id()) -->
                 <!-- ko if: 1 === 2 -->
                 <li>
                     <a href="#divAgentAccounts" data-toggle="tab">Agents</a>
@@ -106,7 +106,7 @@
             <li>
                 <a href="#displayOptions" data-toggle="modal">Display Options</a>
             </li>
-            <!-- if: NdexWeb.ViewModel.User().jId && Group.isOwner(jid()) -->
+            <!-- if: NdexWeb.ViewModel.User().Id && Group.isOwner(Id()) -->
             <!-- ko if: 1 === 2 -->
             <li>
                 <a href="/editGroupProfile/<%= groupId %>" class="accountMiniMenu">Edit Group Profile</a>

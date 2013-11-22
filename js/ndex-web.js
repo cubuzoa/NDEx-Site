@@ -3,9 +3,10 @@
  ******************************************************************************/
 var NdexWeb =
 {
-    ApiHost: "http://localhost:3333",
+    ApiHost: "http://localhost:8080/ndexbio-rest",
     ViewModel:
     {
+        User: ko.observable()
     },
     divModal: null,
     divModalBackground: null,
@@ -19,6 +20,7 @@ var NdexWeb =
         this.divModalBackground = $("#divModalBackground");
 
         ko.applyBindings(this.ViewModel, $("#navTop")[0]);
+        this.loadUser();
         this.wireEvents();
     },
 
@@ -98,13 +100,30 @@ var NdexWeb =
     },
 
     /****************************************************************************
+    * Loads the information of the currently-logged in user.
+    ****************************************************************************/
+    loadUser: function()
+    {
+        if (!localStorage.UserId)
+            return;
+
+        NdexWeb.get("/users/" + localStorage.UserId,
+            null,
+            function(userData)
+            {
+                userData = ko.mapping.fromJS(userData);
+                NdexWeb.ViewModel.User(userData());
+            });
+    },
+
+    /****************************************************************************
     * Logs the user out of the system.
     ****************************************************************************/
     logOut: function()
     {
-        delete localStorage.username;
-        delete localStorage.password;
-        delete localStorage.ndexJid;
+        delete localStorage.Username;
+        delete localStorage.Password;
+        delete localStorage.UserId;
         window.location = "/";
     },
 
@@ -235,8 +254,8 @@ var NdexWeb =
                 .val(defaultMessage)
                 .data("Request",
                 {
-                    FromId: NdexWeb.ViewModel.User().jId,
-                    ResourceId: requestedResource.jid(),
+                    FromId: NdexWeb.ViewModel.User().Id,
+                    ResourceId: requestedResource.Id(),
                     ToId: requestedResource.owners(),
                     Type: requestType
                 });
@@ -255,25 +274,13 @@ var NdexWeb =
 };
 
 /****************************************************************************
-* Retrieves the user's credentials from local storage (if they exist).
-****************************************************************************/
-NdexWeb.ViewModel.User = ko.computed(function()
-{
-    return {
-        jId: localStorage.ndexJid,
-        Password: localStorage.password,
-        Username: localStorage.username
-    };
-});
-
-/****************************************************************************
 * Returns the user's credentials as required by Basic Authentication base64
 * encoded.
 ****************************************************************************/
 NdexWeb.ViewModel.EncodedUser = ko.computed(function()
 {
-    if (NdexWeb.ViewModel.User().jId)
-        return btoa(NdexWeb.ViewModel.User().Username + ":" + NdexWeb.ViewModel.User().Password);
+    if (localStorage.UserId)
+        return btoa(localStorage.Username + ":" + localStorage.Password);
     else
         return null;
 });
