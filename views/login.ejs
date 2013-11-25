@@ -1,27 +1,33 @@
-<% include head.ejs %>
+<% include header.ejs %>
 <% include navigation.ejs %>
 
-<h1>Log In</h1>
+<div id="divLogin">
+    <h1>Log In</h1>
 
-<form id="frmLogin">
-  <div>
-    <label class="Attribute-Editable">Username:</label>
-    <input type="text" data-bind="value: Username" placeholder="Username" />
-  </div>
+    <form id="frmLogin">
+        <div>
+            <label class="Attribute-Editable">Username:</label>
+            <input type="text" data-bind="value: Username" placeholder="Username" />
+        </div>
 
-  <div>
-    <label class="Attribute-Editable">Password:</label>
-    <input type="password" data-bind="value: Password" placeholder="Password" />
-  </div>
+        <div>
+            <label class="Attribute-Editable">Password:</label>
+            <input type="password" data-bind="value: Password" placeholder="Password" />
+        </div>
 
-  <div class="AlignCenter" style="width: 350px;">
-    <button type="submit">Submit</button>
-  </div>
-</form>
+        <div class="AlignCenter" style="width: 350px;">
+            <button type="submit">Submit</button>
+        </div>
+    </form>
 
-<p>
-  <small>Not an NDEx member? Click <a href="/join">here</a> to join.</small>
-</p>
+    <p>
+        <small>Forget your password? Enter your username above and then click <a id="linkRecoverPassword" href="#">here</a> to recover it.</small>
+    </p>
+
+    <p>
+        <small>Not an NDEx member? Click <a href="/join">here</a> to join.</small>
+    </p>
+</div>
 
 <script type="text/javascript" src="/js/login.js"></script>
 

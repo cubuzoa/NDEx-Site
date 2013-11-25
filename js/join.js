@@ -13,11 +13,30 @@ var Join =
     ****************************************************************************/
     _init: function()
     {
-        if (NdexWeb.ViewModel.User().Id)
+        if (NdexWeb.ViewModel.User())
         {
             window.location = "/editProfile";
             return;
         }
+
+        $("#txtPassword").Password(
+        {
+            Confirmation:
+            {
+                IsInvalidCallback: function()
+                {
+                    $("#frmJoin button").attr("disabled", true);
+                },
+                IsValidCallback: function()
+                {
+                    $("#frmJoin button").removeAttr("disabled");
+                },
+                MatchUrl: "/img/success.png",
+                MismatchUrl: "/img/alert.png",
+                TextBox: "#txtConfirmPassword",
+            }
+        });
+
 
         ko.applyBindings(this.ViewModel, $("#frmJoin")[0]);
         this.wireEvents();
@@ -30,7 +49,9 @@ var Join =
     {
         event.preventDefault();
 
-        if (Join.ViewModel.Password() !== Join.ViewModel.PasswordConfirmation())
+        if ($("#frmJoin button").is(":disabled"))
+            return;
+        else if (Join.ViewModel.Password() !== Join.ViewModel.PasswordConfirmation())
         {
             $.gritter.add({ title: "Input Validation", text: "Passwords don't match." });
             return;

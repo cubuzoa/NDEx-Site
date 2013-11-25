@@ -3,14 +3,8 @@ var Network =
 {
     ViewModel:
     {
-        Network:
-        {
-            Edges: ko.observableArray(),
-            Id: ko.observable(),
-            Metadata: ko.observable(),
-            Nodes: ko.observableArray(),
-            Terms: ko.observableArray()
-        },
+        NetworkId: ko.observable(),
+        Network: ko.observable(),
         Search:
         {
             Direction: ko.observable("DEFAULT"),
@@ -43,9 +37,8 @@ var Network =
     ****************************************************************************/
     _init: function()
     {
-        ko.applyBindings(this.ViewModel, $("#divNetwork")[0]);
-
-        this.getNetwork();
+        ko.applyBindings(Network.ViewModel, $("#divNetwork")[0]);
+        //this.getNetwork();
         this.wireEvents();
     },
 
@@ -55,7 +48,7 @@ var Network =
     getEdges: function()
     {
         NdexWeb.get(
-            "/networks/" + encodeURIComponent(this.ViewModel.Network.Id()) + "/edge",
+            "/networks/" + encodeURIComponent(this.ViewModel.Network().id()) + "/edge",
             {
                 limit: this.ViewModel.PageSize(),
                 offset: this.ViewModel.PageIndex() - 1
@@ -80,7 +73,7 @@ var Network =
                 }
 
                 edgeArray = ko.mapping.fromJS(edgeArray);
-                Network.ViewModel.Network.Edges(edgeArray());
+                Network.ViewModel.Network().Edges(edgeArray());
             });
     },
 
@@ -90,12 +83,12 @@ var Network =
     getNetwork: function()
     {
         NdexWeb.get(
-            "/networks/" + encodeURIComponent(this.ViewModel.Network.Id()) + "/metadata",
+            "/networks/" + encodeURIComponent(this.ViewModel.NetworkId()) + "/metadata",
             null,
-            function(metadata)
+            function(network)
             {
-                var networkMetadata = ko.mapping.fromJS(metadata.network);
-                Network.ViewModel.Network.Metadata(networkMetadata);
+                network = ko.mapping.fromJS(network);
+                Network.ViewModel.Network(network());
                 Network.getNodes();
                 Network.getEdges();
             });
@@ -107,7 +100,7 @@ var Network =
     getNodes: function()
     {
         NdexWeb.get(
-            "/networks/" + encodeURIComponent(this.ViewModel.Network.Id()) + "/node",
+            "/networks/" + encodeURIComponent(this.ViewModel.Network().id()) + "/node",
             {
                 limit: this.ViewModel.PageSize(),
                 offset: this.ViewModel.PageIndex() - 1
@@ -130,7 +123,7 @@ var Network =
                 }
 
                 nodeArray = ko.mapping.fromJS(nodeArray);
-                Network.ViewModel.Network.Nodes(nodeArray());
+                Network.ViewModel.Network().Nodes(nodeArray());
 
                 //Convert the terms dictionary into an array
                 var termArray = [];
@@ -142,7 +135,7 @@ var Network =
                 }
 
                 termArray = ko.mapping.fromJS(termArray);
-                Network.ViewModel.Network.Terms(termArray());
+                Network.ViewModel.Network().Terms(termArray());
             });
     },
 

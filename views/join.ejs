@@ -1,34 +1,37 @@
-<% include head.ejs %>
+<% include header.ejs %>
 <% include navigation.ejs %>
 
-<h1>Join NDEx</h1>
+<div id="divJoin">
+    <h1>Join NDEx</h1>
 
-<form id="frmJoin">
-    <div>
-        <label class="Attribute-Editable">Username:</label>
-        <input type="text" data-bind="value: Username" placeholder="Username" />
-    </div>
+    <form id="frmJoin">
+        <div>
+            <label class="Attribute-Editable">Username:</label>
+            <input id="txtUsername" type="text" data-bind="value: Username" placeholder="Username" title="Alphanumeric characters only." rel="tooltip" />
+        </div>
 
-    <div>
-        <label class="Attribute-Editable">Password:</label>
-        <input type="password" data-bind="value: Password" placeholder="Password" />
-    </div>
+        <div>
+            <label class="Attribute-Editable">Password:</label>
+            <input id="txtPassword" type="password" data-bind="value: Password" placeholder="Password" title="It is recommended your password be at least 8 characters long, consisting of upper-case and lower-case letters, numbers, and symbols." rel="tooltip" />
+        </div>
 
-    <div>
-        <label class="Attribute-Editable">Confirm:</label>
-        <input type="password" data-bind="value: PasswordConfirmation" placeholder="Confirm password" />
-    </div>
+        <div>
+            <label class="Attribute-Editable">Confirm:</label>
+            <input id="txtConfirmPassword" type="password" data-bind="value: PasswordConfirmation" placeholder="Confirm password" />
+        </div>
 
-    <div>
-        <label class="Attribute-Editable">Email:</label>
-        <input type="email" data-bind="value: Email" placeholder="dpratt@cytoscape.com" />
-    </div>
+        <div>
+            <label class="Attribute-Editable">Email:</label>
+            <input type="email" id="txtEmail" data-bind="value: Email" placeholder="dpratt@cytoscape.com" title="Your email address will only be used for password recovery." rel="tooltip" />
+        </div>
 
-    <div class="AlignCenter" style="width: 350px;">
-        <button type="submit">Submit</button>
-    </div>
-</form>
+        <div class="AlignCenter" style="width: 350px;">
+            <button type="submit" disabled>Submit</button>
+        </div>
+    </form>
+</div>
 
+<script type="text/javascript" src="/js/password.js"></script>
 <script type="text/javascript" src="/js/join.js"></script>
 
 <% include footer.ejs %>

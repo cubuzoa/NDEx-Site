@@ -1,16 +1,17 @@
-<% include head.ejs %>
+<% include header.ejs %>
 <% include navigation.ejs %>
 <% include worksurface.ejs %>
 
 <div id="divNetwork">
-  <div id="divMetadata" data-bind="with: Network.Metadata">
-    <h3 data-bind="text: properties.title"></h3>
+  <div id="divMetadata" data-bind="if: Network()">
+    <!-- ko with: Network() -->
+    <h3 data-bind="text: title"></h3>
 
-    <p data-bind="text: properties.description"></p>
+    <p data-bind="text: description"></p>
 
     <div>
       <label class="Attribute">Source:</label>
-      <span data-bind="text: properties.source"></span>
+      <span data-bind="text: source"></span>
     </div>
 
     <div>
@@ -27,6 +28,7 @@
       <label class="Attribute">Edges:</label>
       <span data-bind="text: edgeCount"></span>
     </div>
+    <!-- /ko -->
   </div>
 
   <div id="divSearchNetwork" data-bind="with: Search">
@@ -206,7 +208,7 @@
 
 <script type="text/javascript" src="/js/network.js"></script>
 <script>
-  Network.ViewModel.Network.Id("<%=networkId%>");
+  Network.ViewModel.NetworkId("<%=networkId%>");
 </script>
 
 <% include footer.ejs %>

@@ -46,7 +46,7 @@ var User =
             function (userData)
             {
                 userData = ko.mapping.fromJS(userData);
-                User.ViewModel.User(userData.user);
+                User.ViewModel.User(userData);
             });
     },
 

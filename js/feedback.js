@@ -28,11 +28,8 @@ var Feedback =
             return;
         }
 
-        NdexWeb.post("/feedback",
-            {
-                Type: Feedback.ViewModel.Type(),
-                Text: Feedback.ViewModel.Text()
-            },
+        NdexWeb.post("/feedback/" + Feedback.ViewModel.Type(),
+            Feedback.ViewModel.Text(),
             function()
             {
                 $.gritter.add({ title: "Feedback Submitted", text: "Your feedback has been submitted." });

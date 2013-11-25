@@ -16,6 +16,27 @@ var Login =
     },
 
     /****************************************************************************
+    * Helps the user recover their password.
+    ****************************************************************************/
+    recoverPassword: function(event)
+    {
+        event.preventDefault();
+
+        if (!Login.ViewModel.Username())
+        {
+            $.gritter.add({ title: "Input Validation", text: "Please enter your username." });
+            return;
+        }
+
+        NdexWeb.get("/users/" + Login.ViewModel.Username() + "/forgot-password",
+            null,
+            function()
+            {
+                $.gritter.add({ title: "Password Recovery", text: "An email has been sent to you with further instructiosn to recover your password." });
+            });
+    },
+
+    /****************************************************************************
     * Submits the user's credentials to the server for authentication.
     ****************************************************************************/
     submitCredentials: function(event)
@@ -70,6 +91,7 @@ var Login =
     wireEvents: function()
     {
         $("#frmLogin").submit(this.submitCredentials);
+        $("#linkRecoverPassword").click(this.recoverPassword);
     }
 };
 

@@ -112,7 +112,7 @@ var NdexWeb =
             function(userData)
             {
                 userData = ko.mapping.fromJS(userData);
-                NdexWeb.ViewModel.User(userData());
+                NdexWeb.ViewModel.User(userData);
             });
     },
 

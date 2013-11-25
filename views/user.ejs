@@ -1,4 +1,4 @@
-<% include head.ejs %>
+<% include header.ejs %>
 <% include navigation.ejs %>
 
 <div id="divUser" class="row-flud" data-bind="with: User">
@@ -9,7 +9,7 @@
 
         <ul class="dropdown-menu">
             <li><a href="#displayOptions" data-toggle="modal">Display Options</a></li>
-            <!-- ko if: NdexWeb.ViewModel.User().Id === User.ViewModel.UserId() -->
+            <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
             <li><a href="/editProfile" class="accountMiniMenu">Edit Profile</a></li>
             <li><a href="#" class="accountMiniMenu">New Profile Image</a></li>
             <li><a href="#" class="accountMiniMenu">New Background Image</a></li>
@@ -63,24 +63,24 @@
                                     <i class="icon-chevron-right"></i>
                                 </td>
                                 <td>
-                                    <a data-bind="text: title, attr: { href: '/network/' + jid() }"></a>
+                                    <a data-bind="text: title, attr: { href: '/network/' + id() }"></a>
                                 </td>
                                 <td class="AlignRight" data-bind="text: nodeCount"></td>
                                 <td class="AlignRight" data-bind="text: edgeCount"></td>
                                 <td>
                                     <div class="btn-group">
                                         <a href="javascript:void()" class="btn" title="Add to Work Surface" rel="tooltip">
-                                            <!-- ko if: !WorkSurface.isOnWorkSurface(jid()) -->
+                                            <!-- ko if: !WorkSurface.isOnWorkSurface(id()) -->
                                             <i class="icon-plus icon-white" data-bind="click: WorkSurface.addNetwork"></i>
                                             <!-- /ko -->
-                                            <!-- ko if: WorkSurface.isOnWorkSurface(jid()) -->
+                                            <!-- ko if: WorkSurface.isOnWorkSurface(id()) -->
                                             <i class="icon-remove icon-white" data-bind="click: WorkSurface.removeNetwork"></i>
                                             <!-- /ko -->
                                         </a>
                                         <a href="javascript:void()" class="btn" title="Request access" rel="tooltip">
                                             <i class="icon-exchange" data-bind="click: User.requestNetworkAccess"></i>
                                         </a>
-                                        <a data-bind="attr: { href: '/network/' + jid() + '/visualize' }" class="btn" target="_blank" title="Visualize network" rel="tooltip">
+                                        <a data-bind="attr: { href: '/network/' + id() + '/visualize' }" class="btn" target="_blank" title="Visualize network" rel="tooltip">
                                             <i class="icon-eye-open"></i>
                                         </a>
                                     </div>
@@ -104,7 +104,7 @@
                                     <i class="icon-chevron-right"></i>
                                 </td>
                                 <td>
-                                    <a data-bind="text: groupname, attr: { href: '/group/' + jid() }"></a>
+                                    <a data-bind="text: name, attr: { href: '/group/' + id() }"></a>
                                 </td>
                                 <td>
                                     <div class="btn-group">
@@ -129,7 +129,7 @@
         </div>
     </div>
 
-    <div class="span3" data-bind="with: profile">
+    <div class="span3">
         <h3>
             <span data-bind="text: firstName"></span>
             <span data-bind="text: lastName"></span>

@@ -105,6 +105,11 @@ app.get("/about", function (httpRequest, httpResponse)
     httpResponse.render("about", { title: "About NDEx", user: httpRequest.user });
 });
 
+app.get("/feedback", function (httpRequest, httpResponse)
+{
+    httpResponse.render("feedback", { title: "Feedback", user: httpRequest.user });
+});
+
 app.get("/user/:userId", function (httpRequest, httpResponse)
 {
     httpResponse.render("user",

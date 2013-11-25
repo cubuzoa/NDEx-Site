@@ -11,7 +11,7 @@ var WorkSurface =
     _init: function()
     {
         if (NdexWeb.ViewModel.User())
-            this.ViewModel.Networks(NdexWeb.ViewModel.User().WorkSurface());
+            this.ViewModel.Networks(NdexWeb.ViewModel.User().workSurface());
 
         ko.applyBindings(this.ViewModel, $("#divSidebar")[0]);
         this.wireEvents();
@@ -22,11 +22,11 @@ var WorkSurface =
     ****************************************************************************/
     addNetwork: function()
     {
-        NdexWeb.put("/users/" + encodeURIComponent(NdexWeb.ViewModel.User().Id) + "/work-surface",
-            { networkid: this.Id() },
+        NdexWeb.put("/users/" + encodeURIComponent(NdexWeb.ViewModel.User().id()) + "/work-surface",
+            { networkid: this.id() },
             function(workSurface)
             {
-                var updatedNetworks = ko.mapping.fromJS(workSurface.networks);
+                var updatedNetworks = ko.mapping.fromJS(workSurface);
                 WorkSurface.ViewModel.Networks(updatedNetworks());
             });
     },
@@ -56,7 +56,7 @@ var WorkSurface =
     {
         for (var networkIndex = 0; networkIndex < WorkSurface.ViewModel.Networks().length; networkIndex++)
         {
-            if (WorkSurface.ViewModel.Networks()[networkIndex].Id() == networkId)
+            if (WorkSurface.ViewModel.Networks()[networkIndex].id() == networkId)
                 return true;
         }
 
@@ -68,7 +68,7 @@ var WorkSurface =
     ****************************************************************************/
     removeNetwork: function()
     {
-        NdexWeb.delete("/users/" + encodeURIComponent(NdexWeb.ViewModel.User().Id) + "/work-surface/" + encodeURIComponent(this.Id()),
+        NdexWeb.delete("/users/" + encodeURIComponent(NdexWeb.ViewModel.User().id()) + "/work-surface/" + encodeURIComponent(this.id()),
             function(workSurface)
             {
                 var updatedNetworks = ko.mapping.fromJS(workSurface.networks);
