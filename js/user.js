@@ -74,6 +74,20 @@ var User =
     }
 };
 
+User.ViewModel.UserRequests = ko.computed(function()
+{
+    var userRequests = [];
+    userRequests = userRequests.concat(User.ViewModel.User.requests())
+
+    for (var groupIndex = 0; groupIndex < User.ViewModel.User.ownedGroups().length; groupIndex++)
+        userRequests = userRequests.concat(User.ViewModel.User.ownedGroups()[groupIndex].requests());
+
+    for (var networkIndex = 0; networkIndex < User.ViewModel.User.ownedNetworks().length; networkIndex++)
+        userRequests = userRequests.concat(User.ViewModel.User.ownedNetworks()[networkIndex].requests())
+
+    return userRequests;
+});
+
 $(document).ready(function()
 {
     User._init();
