@@ -149,6 +149,17 @@
             <div class="notificationsHeader">Notifications</div>
 
             <div id="notifContent" style="background-color: #FFF">Requests</div>
+
+            <ul data-bind="$root.UserRequests">
+                <li>
+                    <div>
+                        From: <span data-bind="text: from"></span>
+                    </div>
+                    <div>
+                        To: <span data-bind="text: to"></span>
+                    </div>
+                </li>
+            </ul>
         </div>
     </div>
 </div>
