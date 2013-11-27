@@ -20,10 +20,9 @@ var app = express();
 var port = 9999;
 
 /******************************************************************************
-* Configure Express.
-******************************************************************************/
-app.configure(function ()
-{
+ * Configure Express.
+ ******************************************************************************/
+app.configure(function () {
     app.use(express.static(__dirname + "/public"));
     app.use(express.cookieParser());
     app.use(express.bodyParser());
@@ -34,6 +33,7 @@ app.configure(function ()
     app.use("/img", express.static(__dirname + "/img"));
     app.use("/account_img", express.static(__dirname + "/account_img"));
     app.use("/js", express.static(__dirname + "/js"));
+    app.use("/test_db", express.static(__dirname + "/test_db"));
     app.use(express.static(__dirname + "/public"));
 
     //Setup the folder to views and the view engine
@@ -42,168 +42,160 @@ app.configure(function ()
 });
 
 /******************************************************************************
-* URL routing.
-******************************************************************************/
-app.get("/", function (httpRequest, httpResponse)
-{
+ * URL routing.
+ ******************************************************************************/
+app.get("/", function (httpRequest, httpResponse) {
     httpResponse.render("home", { user: httpRequest.user, title: "Home" });
 });
 
-app.get("/login", function (httpRequest, httpResponse)
-{
+app.get("/login", function (httpRequest, httpResponse) {
     httpResponse.render("login", { user: httpRequest.user, title: "Login" });
 });
 
-app.get("/logout", function (httpRequest, httpResponse)
-{
+app.get("/logout", function (httpRequest, httpResponse) {
     httpRequest.logout();
     httpResponse.redirect("/");
 });
 
-app.get("/join", function (httpRequest, httpResponse)
-{
+app.get("/join", function (httpRequest, httpResponse) {
     httpResponse.render("join", { title: "Join", user: httpRequest.user });
 });
 
-app.get("/searchNetworks", function (httpRequest, httpResponse)
-{
+app.get("/searchNetworks", function (httpRequest, httpResponse) {
     httpResponse.render("search_networks", { title: "Networks", user: httpRequest.user });
 });
 
-app.get("/searchUsers", function (httpRequest, httpResponse)
-{
+app.get("/searchUsers", function (httpRequest, httpResponse) {
     httpResponse.render("search_users", { title: "Users", user: httpRequest.user });
 });
 
-app.get("/searchGroups", function (httpRequest, httpResponse)
-{
+app.get("/searchGroups", function (httpRequest, httpResponse) {
     httpResponse.render("search_groups", { title: "Groups", user: httpRequest.user });
 });
 
-app.get("/showTasks", function (httpRequest, httpResponse)
-{
+app.get("/showTasks", function (httpRequest, httpResponse) {
     httpResponse.render("show_tasks", { title: "Tasks", user: httpRequest.user });
 });
 
-app.get("/uploadNetwork", function (httpRequest, httpResponse)
-{
+app.get("/uploadNetwork", function (httpRequest, httpResponse) {
     httpResponse.render("upload_network", { title: "Upload Network", user: httpRequest.user });
 });
 
-app.get("/policies", function (httpRequest, httpResponse)
-{
+app.get("/policies", function (httpRequest, httpResponse) {
     httpResponse.render("policy", { title: "Policies", user: httpRequest.user });
 });
 
-app.get("/contact", function (httpRequest, httpResponse)
-{
+app.get("/contact", function (httpRequest, httpResponse) {
     httpResponse.render("contact", { title: "Contact Information", user: httpRequest.user });
 });
 
-app.get("/about", function (httpRequest, httpResponse)
-{
+app.get("/about", function (httpRequest, httpResponse) {
     httpResponse.render("about", { title: "About NDEx", user: httpRequest.user });
 });
 
-app.get("/user/:userId", function (httpRequest, httpResponse)
-{
+app.get("/triptych", function (httpRequest, httpResponse) {
+    httpResponse.render("triptych", {
+        title: "Checking Triptych Graphic Requirements"
+    });
+});
+
+app.get("/triptychView", function (httpRequest, httpResponse) {
+    var useCanvas = httpRequest.query["useCanvas"] || 'no';
+    httpResponse.render("triptychView", {
+        title: "Testing Triptych",
+        canvas: httpRequest.query["canvas"],
+        webGL: httpRequest.query["webGL"] ,
+        useCanvas : useCanvas
+    });
+});
+
+app.get("/user/:userId", function (httpRequest, httpResponse) {
     httpResponse.render("user",
-    {
-        title: "User",
-        userId: httpRequest.params["userId"],
-        user: httpRequest.user
-    });
+        {
+            title: "User",
+            userId: httpRequest.params["userId"],
+            user: httpRequest.user
+        });
 });
 
-app.get("/group/:groupId", function (httpRequest, httpResponse)
-{
+app.get("/group/:groupId", function (httpRequest, httpResponse) {
     httpResponse.render("group",
-    {
-        title: "Group",
-        groupId: httpRequest.params["groupId"],
-        user: httpRequest.user
-    });
+        {
+            title: "Group",
+            groupId: httpRequest.params["groupId"],
+            user: httpRequest.user
+        });
 });
 
-app.get("/network/:networkId", function (httpRequest, httpResponse)
-{
+app.get("/network/:networkId", function (httpRequest, httpResponse) {
     httpResponse.render("network",
-    {
-        title: "Network",
-        networkId: httpRequest.params["networkId"],
-        user: httpRequest.user
-    });
+        {
+            title: "Network",
+            networkId: httpRequest.params["networkId"],
+            user: httpRequest.user
+        });
 });
 
-app.get("/network/:networkId/visualize", function (httpRequest, httpResponse)
-{
+app.get("/network/:networkId/visualize", function (httpRequest, httpResponse) {
     httpResponse.render("cyjs_visualize_network",
-    {
-        title: "Network",
-        networkId: httpRequest.params["networkId"],
-        user: httpRequest.user
-    });
+        {
+            title: "Network",
+            networkId: httpRequest.params["networkId"],
+            user: httpRequest.user
+        });
 });
 
-app.get("/network/:network1Id/compare/:network2Id", function (httpRequest, httpResponse)
-{
+app.get("/network/:network1Id/compare/:network2Id", function (httpRequest, httpResponse) {
     httpResponse.render("triptych_compare_networks",
-    {
-        title: "Network",
-        network1Id: httpRequest.params["network1Id"],
-        network2Id: httpRequest.params["network2Id"],
-        user: httpRequest.user
-    });
+        {
+            title: "Network",
+            network1Id: httpRequest.params["network1Id"],
+            network2Id: httpRequest.params["network2Id"],
+            user: httpRequest.user
+        });
 });
 
-app.get("/newGroup", function (httpRequest, httpResponse)
-{
+app.get("/newGroup", function (httpRequest, httpResponse) {
     httpResponse.render("create_group", { title: "New Group", user: httpRequest.user });
 });
 
-app.get("/sendRequest", function (httpRequest, httpResponse)
-{
+app.get("/sendRequest", function (httpRequest, httpResponse) {
     httpResponse.render("request", { title: "Send Request", user: httpRequest.user });
 });
 
-app.get("/newTask", function (httpRequest, httpResponse)
-{
+app.get("/newTask", function (httpRequest, httpResponse) {
     httpResponse.render("new_task", { title: "New Task", user: httpRequest.user });
 });
 
-app.get("/editProfile", function (httpRequest, httpResponse)
-{
+app.get("/editProfile", function (httpRequest, httpResponse) {
     httpResponse.render("edit_profile", { title: "Edit Profile", user: httpRequest.user });
 });
 
-app.get("/editGroupProfile/:groupId", function (httpRequest, httpResponse)
-{
+app.get("/editGroupProfile/:groupId", function (httpRequest, httpResponse) {
     httpResponse.render("edit_group_profile",
-    {
-        title: "Edit Group Profile",
-        user: httpRequest.user,
-        groupId: httpRequest.params["groupId"]
-    });
+        {
+            title: "Edit Group Profile",
+            user: httpRequest.user,
+            groupId: httpRequest.params["groupId"]
+        });
 });
 
-app.get("/editAgent", function (httpRequest, httpResponse)
-{
+app.get("/editAgent", function (httpRequest, httpResponse) {
     httpResponse.render("edit_agent", { title: "Edit Agent", user: httpRequest.user });
 });
 
-app.get("/editNetworkMetadata/:networkId", function (httpRequest, httpResponse)
-{
+app.get("/editNetworkMetadata/:networkId", function (httpRequest, httpResponse) {
     httpResponse.render("edit_network_metadata",
-    {
-        title: "Edit Network Metadata",
-        user: httpRequest.user,
-        networkId: httpRequest.params["networkId"]
-    });
+        {
+            title: "Edit Network Metadata",
+            user: httpRequest.user,
+            networkId: httpRequest.params["networkId"]
+        });
 });
 
 
 /******************************************************************************
-* Start the web site.
-******************************************************************************/
+ * Start the web site.
+ ******************************************************************************/
 app.listen(port);
 console.log("NDEx Site server listening on port " + port + "...");

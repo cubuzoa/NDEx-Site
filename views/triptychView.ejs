@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<% if (typeof(webGL) == 'undefined' || typeof(canvas) == 'undefined') { %>
+<h2>Unexpected result</h2>
+
+<% } else if  (webGL == 'disabled' && canvas == 'disabled'){ %>
+
+<h2>Browser does not support either WebGL or HTML5 Canvas Graphics</h2>
+
+<% } else { %>
+
+<script>
+    var canvasAvailable = false;
+    var webGLAvailable = false;
+    var useCanvas = false;
+</script>
+
+
+
+
+<% if (typeof(useCanvas) == 'undefined') { %>
+
+<script>
+    useCanvas = false;
+    console.log("query useCanvas is undefined ")
+</script>
+
+<% } %>
+
+<% if (typeof(useCanvas) != 'undefined' && useCanvas == 'yes') { %>
+
+<script>
+    useCanvas = true;
+    console.log("query useCanvas is yes")
+</script>
+
+<% } %>
+
+
+<head>
+    <meta charset="utf-8">
+    <title>NDEx: Triptych Test</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <script src="/js/jquery-1.10.2.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/compare_networks.css"/>
+    <script type="text/javascript" src="/js/three/Three.js"></script>
+    <script type="text/javascript" src="/js/three/RequestAnimationFrame.js"></script>
+    <script type="text/javascript" src="/js/triptych/Core/Triptych-1.1.4.js"></script>
+    <script type="text/javascript" src="/js/triptych/GraphLoader/JDExGraphLoader.js"></script>
+
+    <% if (webGL == 'enabled'){ %>
+    <script>
+        webGLAvailable = true;
+    </script>
+
+    <% include webGLLibraries %>
+
+    <% } %>
+
+    <% if (canvas == 'enabled'){ %>
+    <script>
+        canvasAvailable = true;
+    </script>
+    <% include canvasLibraries %>
+
+    <% } %>
+
+    <script type="text/javascript" src="/js/triptych/Controls/BasicControls-1.1.3.js"></script>
+    <script type="text/javascript" src="/js/triptych/LayoutEngine/ForceDirectedLayoutEngine-1.1.2.js"></script>
+    <script type="text/javascript" src="/js/triptych/LayoutEngine/MP3LayoutEngine.js"></script>
+</head>
+
+<body>
+
+<div id="controls">
+    <span id="fly"><img src="/img/fly_icon.png" height=40></span>
+    <span id="zoom_in"><img src="/img/zoom_in_icon.png" height=40></span>
+    <span id="zoom_out"><img src="/img/zoom_out_icon.png" height=40></span>
+    <span id="toggle_planar_mode"><img src="/img/zoom_out_icon.png" height=40></span>
+    <% if (webGL == 'enabled'){ %>
+    <span id="toggle_visualizer"><img src="/img/zoom_in_icon.png" height=40></span>
+    <% } %>
+</div>
+
+<div id="back"><a href="/">Return to NDEx Home Page</a></div>
+
+<div id="details">
+    <div id="hide_details"><img src="/img/close_icon.png" height=40></div>
+    <div id="detailsContent"></div>
+</div>
+
+<div id="error"></div>
+
+<script>
+
+/*
+ Animation
+ */
+
+var start = Date.now();
+var rate = 30; // Hz
+var lastFrameNumber;
+
+var visualizer, graph, layoutEngine, space, controls, loader;
+
+function animate() {
+    requestAnimationFrame(animate);
+    var elapsed = Date.now() - start;
+    var frameNumber = Math.round(elapsed / (1000 / rate));
+    //
+    // Check to see if it is time for the next update
+    //
+    if (frameNumber == lastFrameNumber) return;
+    lastFrameNumber = frameNumber;
+    space.update();
+}
+
+TRIPTYCH.Node.prototype.onClick = function (event, role) {
+    if (this.selected) {
+        this.setSelected(false);
+    } else {
+        this.setSelected(true);
+    }
+    displayDetails(this);
+};
+
+//-------------------------------------
+// Details
+//-------------------------------------
+
+$("#details").hide();
+
+var detailsDisplayed = false;
+
+function displayDetails(node) {
+    if (!detailsDisplayed) {
+
+        $("#details").fadeIn(400);
+        detailsDisplayed = true;
+    }
+    detail_node = node;
+
+    $("#detailsContent").html("");
+
+    var nodeSpan = document.createElement('span'),
+            edgeTable = document.createElement('table');
+
+    $(nodeSpan).addClass("detailsNode").html(node.label);
+    $(edgeTable).addClass("edgeTable");
+    $("#detailsContent").append(nodeSpan);
+
+    /*
+     $.each(node.literals, function (predicate, value){
+     var listItem = document.createElement('li');
+     $(listItem).html(predicate + " : " + value );
+     $(detailList).append(listItem);
+     });
+     */
+    $.each(node.getEdges(), function (i, edge) {
+        var tableRow = document.createElement('tr'),
+                fromItem = document.createElement('td'),
+                relItem = document.createElement('td'),
+                toItem = document.createElement('td');
+
+        $(fromItem).html(edge.from.label);
+        $(relItem).html(edge.relationship.type);
+        $(toItem).html(edge.to.label);
+
+
+        $(tableRow).append(fromItem).append(relItem).append(toItem);
+
+        if (edge.planes) {
+            if (edge.planes.length == 1) {
+                if (edge.planes[0] == "one")$(tableRow).addClass("network1Edge");
+                if (edge.planes[0] == "two")$(tableRow).addClass("network2Edge");
+            } else {
+                $(tableRow).addClass("commonEdge");
+            }
+        }
+
+        $(edgeTable).append(tableRow);
+    });
+
+    $("#detailsContent").append(edgeTable);
+
+}
+
+function hideDetails() {
+    $("#details").fadeOut(400);
+    detailsDisplayed = false;
+    detail_node = null;
+}
+
+$("#hide_details").on("click", function (event) {
+    hideDetails();
+});
+
+$("#expand").on("click", function (event) {
+    perturbationAnimation(detail_node);
+    hideDetails();
+});
+
+
+//-------------------------------------
+// Top Right Controls
+//-------------------------------------
+
+function handleFlyMode() {
+    if (controls.flyMode == true) {
+        controls.flyMode = false;
+    } else {
+        controls.flyDestinations = [new THREE.Vector3(500, 500, 100),
+            new THREE.Vector3(-500, 500, 100),
+            new THREE.Vector3(-500, -500, 100),
+            new THREE.Vector3(500, -500, 100)];
+        controls.flyMode = true;
+        controls.flySpeed = 5;
+        controls.loiterSpeed = null;
+    }
+}
+
+var planarMode = false;
+
+function handleTogglePlanarMode() {
+    if (planarMode) {
+        planarMode = false;
+    } else {
+        planarMode = true;
+    }
+    layoutEngine.stopUpdating();
+    layoutEngineSetup();
+    space.layoutEngine = layoutEngine;
+    layoutEngine.setGraph(graph, true);
+    if (planarMode == true) {
+        layoutEngine.force2DNodePositions();
+    } else {
+        layoutEngine.randomNodePositions();
+    }
+    layoutEngine.startUpdating(400);
+}
+
+var visualizerMode = false;
+
+function handleToggleVisualizer() {
+    if (canvasAvailable && webGLAvailable) {
+        if (visualizerMode == 'webGL') {
+            window.location = "/triptychView?canvas=<%=canvas%>&webGL=<%=webGL%>&useCanvas=yes";
+        } else if (visualizerMode == 'canvas') {
+            window.location = "/triptychView?canvas=<%=canvas%>&webGL=<%=webGL%>&useCanvas=no";
+        }
+    }
+}
+
+$("#toggle_visualizer").on("click", function (event) {
+    handleToggleVisualizer();
+});
+
+$("#toggle_planar_mode").on("click", function (event) {
+    handleTogglePlanarMode();
+});
+
+$("#fly").on("click", function (event) {
+    handleFlyMode();
+});
+
+$("#zoom_in").mousedown(function (event) {
+    //console.log("zooming in");
+    controls.zoom = -1;
+});
+
+$("#zoom_in").mouseleave(function (event) {
+    //console.log("stop zooming in");
+    controls.zoom = 0;
+});
+
+$("#zoom_in").mouseup(function (event) {
+    //console.log("stop zooming in");
+    controls.zoom = 0;
+});
+
+$("#zoom_out").mousedown(function (event) {
+    //console.log("zooming out");
+    controls.zoom = 1;
+});
+
+$("#zoom_out").mouseleave(function (event) {
+    //console.log("stop zooming out");
+    controls.zoom = 0;
+});
+
+$("#zoom_out").mouseup(function (event) {
+    console.log("stop zooming out");
+    controls.zoom = 0;
+});
+
+
+//-------------------------------------
+// Setup
+//-------------------------------------
+
+function visualizerSetup(visualizerMode) {
+    if (visualizerMode == 'webGL' && webGLAvailable) {
+        visualizer = new TRIPTYCH.BEL3DVisualizer();
+    } else if (visualizerMode == 'canvas' && canvasAvailable) {
+        visualizer = new TRIPTYCH.BEL3DCanvasVisualizer();
+    }
+
+    visualizer.showLabels = false;
+    visualizer.showEdgeLabels = false;
+    visualizer.addTexture("increaseMap", "/img/increaseDot.png");
+}
+
+function layoutEngineSetup() {
+    if (planarMode) {
+        layoutEngine = new TRIPTYCH.MP3LayoutEngine();
+    } else {
+        layoutEngine = new TRIPTYCH.ForceDirectedLayoutEngine();
+    }
+
+    layoutEngine.updateCount = 400;
+}
+
+function controlsSetup() {
+    controls = new TRIPTYCH.BasicControls();
+}
+
+function selectNode(identifier) {
+    var pNode = graph.nodeByIdentifier(identifier);
+    if (pNode != null) pNode.selected = true;
+}
+
+function setFlyParameters() {
+    controls.flyToAndLookAt(new THREE.Vector3(0, 600, 100), controls.target, 5.0, 0.5);
+}
+
+function setCameraPosition() {
+    controls.camera.position.set(0, 700, 105);
+    controls.camera.up.set(0, 0, 1);
+}
+
+/*
+ Change this to use the canvas visualizer if webgl not available
+ */
+function main() {
+    // Check compatibility
+    if (!TRIPTYCH.EnvironmentDetector.webgl) {
+        TRIPTYCH.EnvironmentDetector.addGetWebGLMessage();
+    } else {
+        run();
+    }
+}
+
+
+var sourceURL = "/test_db/test_networks/pc_sif/REACTOME.G1 Phase.485618.jdex";
+
+function run() {
+    $.ajax({
+        type: "GET",
+        url: sourceURL,
+        dataType: "JSON",
+        success: function (data) {
+            console.log("got data");
+
+            loader = new TRIPTYCH.JDExGraphLoader();
+            graph = loader.load(data);
+            //belSetup();
+            console.log("loaded graph");
+            console.log("useCanvas = " + useCanvas);
+            if (webGLAvailable && !useCanvas) {
+                visualizerSetup('webGL');
+                visualizerMode = 'webGL';
+            } else {
+                visualizerSetup('canvas');
+                visualizerMode = 'canvas';
+            }
+
+
+            layoutEngineSetup();
+
+            controlsSetup();
+
+            space = new TRIPTYCH.Space(graph, visualizer, layoutEngine, controls);
+            space.init();
+
+            setCameraPosition();
+
+            setFlyParameters();
+
+            console.log("space initialized");
+            animate();
+
+        }
+    });
+}
+;
+
+// on load, execute run()
+$(run());
+
+</script>
+
+<% } %>
+
+</body>
+</html>
