@@ -5,28 +5,76 @@
 <p id="message"></p>
 <!-- btn-group from twitter allows for next div to be aligned and pulled right, easy fix-->
 <div class="btn-group">
-    <form id="searchForm">
-        <div>
+        <div id="divSearch">
             <label>Query:</label>
-            <input type="text" name="searchExpression" id="searchExpression"/><br/>
+            <input type="text" data-bind=”text: SearchString" name="searchString" id="searchString"/><br/>
+            <label>Results per Page:</label>
+            <input type="text" data-bind=”text: PageSize" name="searchString" id="searchString"/><br/>
+            <label>Page Number:</label>
+            <input type="text" data-bind=”text: PageIndex" name="searchString" id="searchString"/><br/>
         </div>
 
         <div>
-            <input type="submit" value="Search"/>
+            <input id="btnSearch" type="button" value="Search"/>
         </div>
-    </form>
 </div>
 
+<!--
 <div class="pull-right">
     <a class="ndex-options" href="#searchOptions" data-toggle="modal">
         <i class="icon-cog icon-large"></i>
     </a>
 </div>
+-->
 
-<div id="searchResults">
-
+<div id="divNetworks" class="tab-pane active">
+    <table>
+        <thead>
+        <tr>
+            <th colspan="2">Name</th>
+            <th>Nodes</th>
+            <th>Edges</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody data-bind="foreach: Networks">
+        <tr>
+            <td>
+                <i class="icon-chevron-right"></i>
+            </td>
+            <td>
+                <a data-bind="text: title"></a>
+                <!--
+                <a data-bind="text: title, attr: { href: '/network/' + id() }"></a>
+                -->
+            </td>
+            <td class="AlignRight" data-bind="text: nodeCount"></td>
+            <td class="AlignRight" data-bind="text: edgeCount"></td>
+            <td>
+                <div class="btn-group">
+                    <a href="javascript:void()" class="btn" title="Add to Work Surface" rel="tooltip">
+                        <!-- ko if: !WorkSurface.isOnWorkSurface(id()) -->
+                        <i class="icon-plus icon-white" data-bind="click: WorkSurface.addNetwork"></i>
+                        <!-- /ko -->
+                        <!-- ko if: WorkSurface.isOnWorkSurface(id()) -->
+                        <i class="icon-remove icon-white" data-bind="click: WorkSurface.removeNetwork"></i>
+                        <!-- /ko -->
+                    </a>
+                    <a href="javascript:void()" class="btn" title="Request access" rel="tooltip">
+                        <i class="icon-exchange" data-bind="click: User.requestNetworkAccess"></i>
+                    </a>
+                    <a data-bind="attr: { href: '/network/' + id() + '/visualize' }" class="btn" target="_blank"
+                       title="Visualize network" rel="tooltip">
+                        <i class="icon-eye-open"></i>
+                    </a>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 
+<!--
 <div id="searchOptions" class=" modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
      aria-hidden="true">
     <div class="modal-header">
@@ -41,105 +89,14 @@
 
     </div>
     <div class="modal-footer">
-        <button class="btn" onclick="handleSearchOptionModal()" data-dismiss="modal" aria-hidden="true"> Save Changes</button>
+        <button class="btn" onclick="handleSearchOptionModal()" data-dismiss="modal" aria-hidden="true"> Save Changes
+        </button>
         <button class="btn" data-dismiss="modal" aria-hidden="true"> Cancel</button>
     </div>
 </div>
+-->
 
-<script>
-    // global var for convenience in debugging
-    var networks;
-
-    function handleSearchOptionModal() {
-        var networksPerPage = document.getElementById('networksPerPage');
-        var currentPage = document.getElementById('currentPage') | 1;
-        if (!currentPage)
-        // Update the user's profile if there has been a change
-        if (networksPerPage != ndexUser.profile.networksPerPage) {
-            var profileChanges = {networksPerPage : networksPerPage};
-            updateFindNetworkProfileItems(profile, function () {
-                doSearch();
-            });
-        } else {
-            doSearch(currentPage);
-        }
-    };
-
-    function updateFindNetworkProfileItems(profile, callback) {
-        ndexClient.updateUserProfile(ndexUI.user.id, profile,
-                function (data) {
-                    //
-                    // Success
-                    //
-                    ndexUser.profile.networksPerPage = data.profile.networksPerPage;
-                    callback();
-                },
-                function (error) {
-                    //
-                    // Failure: display message
-                    //
-                    ndexUI.formatError(error);
-                });
-    };
-
-    function doSearch(currentPage) {
-        var networksPerPage = ndexUI.user.profile.networksPerPage | 10;
-
-        // The page number inputs are "1-based", but internally we are "0-based"
-        if (currentPage && currentPage > 0) {
-            currentPage = currentPage -1;
-        } else {
-            currentPage = 0;
-        }
-
-        var searchExpression = $('#searchExpression').val().toUpperCase();
-
-        console.log("Calling findNetworks with '" + searchExpression + "' networksPerPage = " + networksPerPage + " currentPage = " + currentPage);
-
-
-        ndexClient.findNetworks(searchExpression, networksPerPage, currentPage,
-                function (data) {   // success handler
-                    console.log("Got results from findNetworks");
-                    console.log(data);
-                    for (i in data.networks) {
-                        var network = data.networks[i];
-                        console.log(network.title);
-                    }
-
-                    // Clears the searchResults div
-                    $('#searchResults').html('<h3>Networks Found:</h3>');
-
-                    if (data.networks) {
-                        networks = data.networks;
-                        $.each(data.networks, function (index, item) {
-                            $('#searchResults').append(ndexUI.formatNetworkDescriptor(item));
-                        });
-
-                        var networksPerPage = ndexUI.user.profile.networksPerPage | 10;
-
-                        $('#searchResults').append(ndexUI.createPaginationModule(networksPerPage, currentPage, data.networks.length, 'doSearch'));
-                        $('#searchPage').attr('placeholder', 'max value: ' + data.blockAmount);
-                    }
-                },
-
-                function (error) {     // error handler
-                    ndexUI.formatError(error);
-                });
-
-        return false;
-    }
-
-    /* attach a submit handler to the form */
-    $('#searchForm').submit(function(event) {
-
-        event.preventDefault();
-        doSearch();
-    });
-
-    ndexUI.initPage();
-
-</script>
-
+<script type="text/javascript" src="/js/network_search.js"></script>
 
 <% include worksurface.ejs %>
 <% include footer.ejs %>
