@@ -4,7 +4,7 @@ var GroupSearch =
     ViewModel:
     {
         Groups: ko.observable(),
-        SearchString: ko.observable("r"),
+        SearchString: ko.observable(),
         PageIndex: ko.observable(1),
         PageSize: ko.observable(15)
     },
