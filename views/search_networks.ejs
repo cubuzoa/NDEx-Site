@@ -4,19 +4,9 @@
 <h1>Find Networks</h1>
 <p id="message"></p>
 <!-- btn-group from twitter allows for next div to be aligned and pulled right, easy fix-->
-<div class="btn-group">
-        <div id="divSearch">
-            <label>Query:</label>
-            <input type="text" data-bind=”text: SearchString" name="searchString" id="searchString"/><br/>
-            <label>Results per Page:</label>
-            <input type="text" data-bind=”text: PageSize" name="searchString" id="searchString"/><br/>
-            <label>Page Number:</label>
-            <input type="text" data-bind=”text: PageIndex" name="searchString" id="searchString"/><br/>
-        </div>
-
-        <div>
+<div id="divSearch" class="btn-group">
             <input id="btnSearch" type="button" value="Search"/>
-        </div>
+            <input type="text" data-bind=”text: SearchString" name="searchString" id="searchString"/>
 </div>
 
 <!--
@@ -30,7 +20,7 @@
 <div id="divNetworks" class="tab-pane active">
     <table>
         <thead>
-        <tr>
+        <tr data-bind="visible: NetworkSearch.resultsVisible()">
             <th colspan="2">Name</th>
             <th>Nodes</th>
             <th>Edges</th>
@@ -43,27 +33,16 @@
                 <i class="icon-chevron-right"></i>
             </td>
             <td>
-                <a data-bind="text: title"></a>
-                <!--
-                <a data-bind="text: title, attr: { href: '/network/' + id() }"></a>
-                -->
+                <a data-bind="text: title, attr: { href: '/network/' + id }"></a>
             </td>
             <td class="AlignRight" data-bind="text: nodeCount"></td>
             <td class="AlignRight" data-bind="text: edgeCount"></td>
             <td>
                 <div class="btn-group">
-                    <a href="javascript:void()" class="btn" title="Add to Work Surface" rel="tooltip">
-                        <!-- ko if: !WorkSurface.isOnWorkSurface(id()) -->
-                        <i class="icon-plus icon-white" data-bind="click: WorkSurface.addNetwork"></i>
-                        <!-- /ko -->
-                        <!-- ko if: WorkSurface.isOnWorkSurface(id()) -->
-                        <i class="icon-remove icon-white" data-bind="click: WorkSurface.removeNetwork"></i>
-                        <!-- /ko -->
-                    </a>
-                    <a href="javascript:void()" class="btn" title="Request access" rel="tooltip">
-                        <i class="icon-exchange" data-bind="click: User.requestNetworkAccess"></i>
-                    </a>
-                    <a data-bind="attr: { href: '/network/' + id() + '/visualize' }" class="btn" target="_blank"
+
+
+
+                    <a data-bind="attr: { href: '/network/' + id + '/visualize' }" class="btn" target="_blank"
                        title="Visualize network" rel="tooltip">
                         <i class="icon-eye-open"></i>
                     </a>
@@ -72,6 +51,12 @@
         </tr>
         </tbody>
     </table>
+    <input data-bind="visible: NetworkSearch.previousVisible()" id="btnPrev" type="button" value="Prev"/>
+    <span data-bind="visible: NetworkSearch.resultsVisible()">
+            Page: <span data-bind="text: PageIndex"></span>
+    </span>
+    <input data-bind="visible: NetworkSearch.nextVisible()" id="btnNext" type="button" value="Next"/>
+
 </div>
 
 <!--
@@ -98,5 +83,5 @@
 
 <script type="text/javascript" src="/js/network_search.js"></script>
 
-<% include worksurface.ejs %>
+
 <% include footer.ejs %>
