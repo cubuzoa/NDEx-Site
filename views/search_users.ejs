@@ -1,95 +1,57 @@
 <% include header.ejs %>
 <% include navigation.ejs %>
+
 <h1>Find Users</h1>
-
-<div class="btn-group">
-    <form onsubmit="return doSearch();" id="searchForm">
-        <div>
-            <label>Query:</label>
-            <input type="text" name="searchExpression" id="searchExpression"/><br/>
-        </div>
-
-        <div>
-            <input type="submit" value="Search"/>
-        </div>
-    </form>
+<p id="message"></p>
+<!-- btn-group from twitter allows for next div to be aligned and pulled right, easy fix-->
+<div id="divSearch" class="btn-group">
+    <input id="btnSearch" type="button" value="Search"/>
+    <input type="text" data-bind="value: SearchString" />
 </div>
+
+
+<!--
 <div class="pull-right">
     <a class="ndex-options" href="#searchOptions" data-toggle="modal">
         <i class="icon-cog icon-large"></i>
     </a>
 </div>
+-->
 
-<div id="searchResults">
+<div id="divUsers" class="tab-pane active">
+    <table>
+        <thead>
+        <tr>
+            <th colspan="2">User</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Website</th>
+        </tr>
+        </thead>
+        <tbody data-bind="foreach: Users">
+        <tr>
+            <td>
+                <i class="icon-chevron-right"></i>
+            </td>
+            <td>
+                <a data-bind="text: username, attr: { href: '/user/' + id }"></a>
+            </td>
 
+            <td data-bind="text: firstName"></td>
+            <td data-bind="text: lastName"></td>
+            <td>
+                <a target="_blank" data-bind="text: website, attr: { href: 'http://' + website }"></a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <input data-bind="visible: UserSearch.previousVisible()" id="btnPrev" type="button" value="Prev"/>
+    <span data-bind="visible: UserSearch.resultsVisible()">
+            Page: <span data-bind="text: PageIndex"></span>
+    </span>
+    <input data-bind="visible: UserSearch.nextVisible()" id="btnNext" type="button" value="Next"/>
 </div>
 
-<div id="searchOptions" class=" modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-     aria-hidden="true">
-    <div class="modal-header">
-        <h4 id="myModalLabel"> Group Search Options </h4>
-    </div>
-    <div class="modal-body">
-
-        <label class="span2">Search results per page: </label>
-        <input id="searchCount" type="text" class="span2" pattern="" min="1"> <br>
-        <label class="span2">Current page: </label>
-        <input id="searchPage" type="text" class="span2" pattern="" min="1" placeholder="0"> <br>
-
-    </div>
-    <div class="modal-footer">
-        <button class="btn" onclick="doSearch()" data-dismiss="modal" aria-hidden="true"> Save Changes</button>
-        <button class="btn" data-dismiss="modal" aria-hidden="true"> Cancel</button>
-    </div>
-</div>
-
-<script>
-
-    function doSearch(offset) {
-        var limitInput = document.getElementById('searchCount');
-        var limit = $(limitInput).val();
-
-        if (!offset) {
-            offset = $('#searchPage').val();
-        }
-
-        if (!limit) {
-            $(limitInput).val(2);
-            limit = 2;
-        }
-        if (!offset) {
-            offset = 1;
-        }
-
-        $('#searchPage').val(offset);
-        offset = offset - 1;
-
-        var searchExpression = $('#searchExpression').val().toUpperCase();
-
-        ndexClient.findUsers(searchExpression, limit, offset, function (data) {
-                    $('#searchResults').html('');
-
-                    if (data.users) {
-                        $('#searchResults').append('Available Users');
-                        $.each(data.users, function (index, item) {
-                            $('#searchResults').append(ndexUI.formatUserDescriptor(item));
-                        });
-
-                        $('#searchResults').append(ndexUI.createPaginationModule('2', offset, data.users.length, 'doSearch'));
-                        //$('#searchPage').attr('placeholder', 'max value: ' + data.blockAmount);
-                    }
-                },
-                // error handler
-                function (error) {
-                    $('#searchResults').append();
-                });
-
-        return false;
-    }
-
-    ndexUI.initPage();
-
-
-</script>
+<script type="text/javascript" src="/js/user_search.js"></script>
 
 <% include footer.ejs %>
