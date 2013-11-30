@@ -14,8 +14,30 @@ var User =
         ko.applyBindings(this.ViewModel, $("#divUser")[0]);
 
         this.autoSelectTab();
-        this.loadUser();
+
+        if (NdexWeb.ViewModel.User().id() !== this.ViewModel.UserId())
+            this.loadUser();
+        else
+            this.ViewModel.User(NdexWeb.ViewModel.User());
+
         this.wireEvents();
+    },
+
+    /****************************************************************************
+    * Accepts a user's request.
+    ****************************************************************************/
+    acceptRequest: function(event)
+    {
+        var acceptedRequest = event.data;
+        acceptedRequest.response = "ACCEPTED";
+        acceptedRequest.responder = NdexWeb.ViewModel.User.id();
+
+        NdexWeb.post("/requests",
+            ko.mapping.toJSON(acceptedRequest),
+            function ()
+            {
+                NdexWeb.hideModal();
+            });
     },
 
     /****************************************************************************
@@ -37,6 +59,50 @@ var User =
     },
 
     /****************************************************************************
+    * Determines if the user can respond to a request.
+    ****************************************************************************/
+    canRespond: function(userRequest)
+    {
+        if (userRequest.toId() == User.ViewModel.User().id())
+            return true;
+
+        for (var groupIndex = 0; groupIndex < User.ViewModel.User().groups().length; groupIndex++)
+        {
+            if (userRequest.toId() != User.ViewModel.User().groups()[groupIndex].resourceId())
+                continue;
+
+            return true;
+        }
+
+        for (var networkIndex = 0; networkIndex < User.ViewModel.User().networks().length; networkIndex++)
+        {
+            if (userRequest.toId() != User.ViewModel.User().networks()[networkIndex].resourceId())
+                continue;
+
+            return true;
+        }
+
+        return false;
+    },
+
+    /****************************************************************************
+    * Declines a user's request.
+    ****************************************************************************/
+    declineRequest: function(event)
+    {
+        var declinedRequest = event.data;
+        declinedRequest.response = "DECLINED";
+        declinedRequest.responder = NdexWeb.ViewModel.User.id();
+
+        NdexWeb.post("/requests",
+            ko.mapping.toJSON(declinedRequest),
+            function ()
+            {
+                NdexWeb.hideModal();
+            });
+    },
+
+    /****************************************************************************
     * Loads the user's information.
     ****************************************************************************/
     loadUser: function()
@@ -55,7 +121,7 @@ var User =
     ****************************************************************************/
     requestGroupAccess: function()
     {
-        NdexWeb.showRequestModal("JOIN_GROUP", this);
+        NdexWeb.showRequestModal("Join Group", this);
     },
 
     /****************************************************************************
@@ -63,7 +129,33 @@ var User =
     ****************************************************************************/
     requestNetworkAccess: function()
     {
-        NdexWeb.showRequestModal("NETWORK_ACCESS", this);
+        NdexWeb.showRequestModal("Network Access", this);
+    },
+
+    /****************************************************************************
+    * Displays a user's request in a modal dialog.
+    ****************************************************************************/
+    showRequest: function(userRequest)
+    {
+        NdexWeb.showModal("Request", "#userRequest", true, function()
+        {
+            $("#divModalContent #spanFrom").text(userRequest.from());
+            $("#divModalContent #spanTo").text(userRequest.to());
+            $("#divModalContent p").text(userRequest.message());
+
+            if (typeof(userRequest.response) !== "undefined")
+            {
+                $("#divModalContent strong").removeClass("hide");
+                $("#divModalContent strong > em").text(userRequest.response());
+                $("#divModalContent strong > span").text(userRequest.responder());
+            }
+            else if (User.canRespond(userRequest))
+            {
+                $("#divModalContent button").removeClass("hide");
+                $("#divModalContent button:first-of-type").click(userRequest, User.declineRequest);
+                $("#divModalContent button:last-of-type").click(userRequest, User.acceptRequest);
+            }
+        });
     },
 
     /****************************************************************************
@@ -73,20 +165,6 @@ var User =
     {
     }
 };
-
-User.ViewModel.UserRequests = ko.computed(function()
-{
-    var userRequests = [];
-    userRequests = userRequests.concat(User.ViewModel.User.requests())
-
-    for (var groupIndex = 0; groupIndex < User.ViewModel.User.ownedGroups().length; groupIndex++)
-        userRequests = userRequests.concat(User.ViewModel.User.ownedGroups()[groupIndex].requests());
-
-    for (var networkIndex = 0; networkIndex < User.ViewModel.User.ownedNetworks().length; networkIndex++)
-        userRequests = userRequests.concat(User.ViewModel.User.ownedNetworks()[networkIndex].requests())
-
-    return userRequests;
-});
 
 $(document).ready(function()
 {

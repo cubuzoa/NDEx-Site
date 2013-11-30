@@ -1,7 +1,7 @@
 <% include header.ejs %>
 <% include navigation.ejs %>
 
-<div id="divUser" class="row-flud" data-bind="with: User">
+<div id="divUser" class="row-fluid" data-bind="with: User">
     <div class="span2 dropdown pull-right">
         <a class="ndex-options dropdown-toggle Hand" data-toggle="dropdown">
             <i class="icon-cog icon-large"></i>
@@ -52,35 +52,31 @@
                         <thead>
                             <tr>
                                 <th colspan="2">Name</th>
-                                <th>Nodes</th>
-                                <th>Edges</th>
                                 <th></th>
                             </tr>
                         </thead>
-                        <tbody data-bind="foreach: ownedNetworks">
+                        <tbody data-bind="foreach: networks">
                             <tr>
                                 <td>
                                     <i class="icon-chevron-right"></i>
                                 </td>
                                 <td>
-                                    <a data-bind="text: title, attr: { href: '/network/' + id() }"></a>
+                                    <a data-bind="text: resourceName, attr: { href: '/network/' + resourceId() }"></a>
                                 </td>
-                                <td class="AlignRight" data-bind="text: nodeCount"></td>
-                                <td class="AlignRight" data-bind="text: edgeCount"></td>
                                 <td>
                                     <div class="btn-group">
                                         <a href="javascript:void()" class="btn" title="Add to Work Surface" rel="tooltip">
-                                            <!-- ko if: !WorkSurface.isOnWorkSurface(id()) -->
+                                            <!-- ko if: !WorkSurface.isOnWorkSurface(resourceId()) -->
                                             <i class="icon-plus icon-white" data-bind="click: WorkSurface.addNetwork"></i>
                                             <!-- /ko -->
-                                            <!-- ko if: WorkSurface.isOnWorkSurface(id()) -->
+                                            <!-- ko if: WorkSurface.isOnWorkSurface(resourceId()) -->
                                             <i class="icon-remove icon-white" data-bind="click: WorkSurface.removeNetwork"></i>
                                             <!-- /ko -->
                                         </a>
                                         <a href="javascript:void()" class="btn" title="Request access" rel="tooltip">
                                             <i class="icon-exchange" data-bind="click: User.requestNetworkAccess"></i>
                                         </a>
-                                        <a data-bind="attr: { href: '/network/' + id() + '/visualize' }" class="btn" target="_blank" title="Visualize network" rel="tooltip">
+                                        <a data-bind="attr: { href: '/network/' + resourceId() + '/visualize' }" class="btn" target="_blank" title="Visualize network" rel="tooltip">
                                             <i class="icon-eye-open"></i>
                                         </a>
                                     </div>
@@ -98,13 +94,13 @@
                                 <th></th>
                             </tr>
                         </thead>
-                        <tbody data-bind="foreach: ownedGroups">
+                        <tbody data-bind="foreach: groups">
                             <tr>
                                 <td>
                                     <i class="icon-chevron-right"></i>
                                 </td>
                                 <td>
-                                    <a data-bind="text: name, attr: { href: '/group/' + id() }"></a>
+                                    <a data-bind="text: resourceName, attr: { href: '/group/' + resourceId() }"></a>
                                 </td>
                                 <td>
                                     <div class="btn-group">
@@ -119,11 +115,9 @@
                 </div>
 
                 <div id="divMemberships" class="tab-pane">
-
                 </div>
 
                 <div id="divAgentAccounts" class="tab-pane">
-
                 </div>
             </div>
         </div>
@@ -133,9 +127,6 @@
         <h3>
             <span data-bind="text: firstName"></span>
             <span data-bind="text: lastName"></span>
-            <!-- ko if: $parent.organizationName -->
-            <span data-bind="text: organiziationName"></span>
-            <!-- /ko -->
         </h3>
 
         <p>
@@ -145,19 +136,19 @@
 
         <p data-bind="text: description"></p>
 
-        <div id="notifications" class="notifications">
-            <div class="notificationsHeader">Notifications</div>
+        <div id="divNotifications">
+            <h4>Notifications</h4>
 
-            <div id="notifContent" style="background-color: #FFF">Requests</div>
+            <h5>Requests</h5>
 
-            <ul data-bind="$root.UserRequests">
+            <ul data-bind="foreach: requests">
                 <li>
-                    <div>
-                        From: <span data-bind="text: from"></span>
-                    </div>
-                    <div>
-                        To: <span data-bind="text: to"></span>
-                    </div>
+                    <!-- ko if: fromId() === NdexWeb.ViewModel.User().id() -->
+                    From: <a href="javascript:void()" data-bind="click: User.showRequest">You</a>
+                    <!-- /ko -->
+                    <!-- ko if: fromId() !== NdexWeb.ViewModel.User().id() -->
+                    From: <a href="javascript:void()" data-bind="text: from, click: User.showRequest"></a>
+                    <!-- /ko -->
                 </li>
             </ul>
         </div>
@@ -167,6 +158,28 @@
 <script type="text/javascript" src="/js/user.js"></script>
 <script type="text/javascript">
     User.ViewModel.UserId("<%=userId%>");
+</script>
+
+<script type="text/html" id="userRequest">
+    <div style="margin: 0 auto; width: 75%" class="AlignLeft">
+        <label class="Attribute">From:</label>
+        <span id="spanFrom"></span>
+    </div>
+
+    <div style="margin: 0 auto; width: 75%" class="AlignLeft">
+        <label class="Attribute">To:</label>
+        <span id="spanTo"></span>
+    </div>
+
+    <hr />
+
+    <p></p>
+
+    <div style="margin-top: 2em;">
+        <strong class="hide">This request was <em></em> by <span></span>.</strong>
+        <button type="button" class="pull-right hide">Decline</button>
+        <button type="button" class="pull-left hide">Accept</button>
+    </div>
 </script>
 
 <% include worksurface.ejs %>

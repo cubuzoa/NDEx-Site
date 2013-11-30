@@ -94,7 +94,7 @@ var NdexWeb =
     {
         setTimeout(function()
         {
-            NdexWeb.divModalBackground.fadeOut("fast");
+            NdexWeb.divModalBackground.hide();
             NdexWeb.divModal.fadeOut("fast");
         }, 500);
     },
@@ -107,13 +107,23 @@ var NdexWeb =
         if (!localStorage.UserId)
             return;
 
-        NdexWeb.get("/users/" + localStorage.UserId,
-            null,
-            function(userData)
+        $.ajax(
+        {
+            type: "GET",
+            async: false,
+            url: NdexWeb.ApiHost + "/users/" + localStorage.UserId,
+            dataType: "JSON",
+            beforeSend: function(xhr)
+            {
+                xhr.setRequestHeader("Authorization", "Basic " + NdexWeb.ViewModel.EncodedUser());
+            },
+            success: function(userData)
             {
                 userData = ko.mapping.fromJS(userData);
                 NdexWeb.ViewModel.User(userData);
-            });
+            },
+            error: NdexWeb.errorHandler
+        });
     },
 
     /****************************************************************************
@@ -232,17 +242,17 @@ var NdexWeb =
 
         switch (requestType)
         {
-            case "GROUP_INVITATION":
+            case "Group Invitation":
                 modalTitle = "Group Invitation";
-                defaultMessage = "You are invited to become a member of " + requestedResource.groupname() + ".";
+                defaultMessage = "You are invited to become a member of " + requestedResource.resourceName() + ".";
                 break;
-            case "JOIN_GROUP":
+            case "Join Group":
                 modalTitle = "Request to Join";
-                defaultMessage = "Please add me as a member of group " + requestedResource.groupname() + ".";
+                defaultMessage = "Please add me as a member of group " + requestedResource.resourceName() + ".";
                 break;
-            case "NETWORK_ACCESS":
+            case "Network Access":
                 modalTitle = "Request for Network Access";
-                defaultMessage = "I'd like access to the " + requestedResource.title() + " network.";
+                defaultMessage = "I'd like access to the " + requestedResource.resourceName() + " network.";
                 break;
             default:
                 break;
@@ -255,8 +265,7 @@ var NdexWeb =
                 .data("Request",
                 {
                     FromId: NdexWeb.ViewModel.User().Id,
-                    ResourceId: requestedResource.Id(),
-                    ToId: requestedResource.owners(),
+                    ToId: requestedResource.resourceId(),
                     Type: requestType
                 });
         });
@@ -268,7 +277,6 @@ var NdexWeb =
     wireEvents: function()
     {
         $("#btnCloseModal").click(this.hideModal);
-        $("#signOut > a").click(this.logOut);
         $(document).on("click", "#frmRequest", this.sendRequest);
     }
 };

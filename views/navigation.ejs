@@ -92,8 +92,8 @@
                         <li data-bind="if: !User()">
                             <a href="/login">Sign in</a>
                         </li>
-                        <li id="signOut" data-bind="if: User()">
-                            <a href="#">Sign out</a>
+                        <li data-bind="if: User()">
+                            <a href="#" data-bind="click: NdexWeb.logOut">Sign out</a>
                         </li>
                         <li data-bind="if: !User()">
                             <a href="/join">Join NDEx</a>

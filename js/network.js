@@ -50,8 +50,8 @@ var Network =
         NdexWeb.get(
             "/networks/" + encodeURIComponent(this.ViewModel.Network().id()) + "/edge",
             {
-                limit: this.ViewModel.PageSize(),
-                offset: this.ViewModel.PageIndex() - 1
+                skip: this.ViewModel.PageIndex() - 1,
+                top: this.ViewModel.PageSize()
             },
             function(edges)
             {
@@ -102,8 +102,8 @@ var Network =
         NdexWeb.get(
             "/networks/" + encodeURIComponent(this.ViewModel.Network().id()) + "/node",
             {
-                limit: this.ViewModel.PageSize(),
-                offset: this.ViewModel.PageIndex() - 1
+                skip: this.ViewModel.PageIndex() - 1,
+                top: this.ViewModel.PageSize()
             },
             function(nodes)
             {
