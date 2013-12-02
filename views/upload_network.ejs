@@ -36,7 +36,7 @@
 <div id="dataToUpload"></div>
 
 <script>
-    var data, files, file, onloadEvent, xml;
+    var data, files, file, onloadEvent, xml, returnedNetwork;
 
     function handleFileSelect(selectEvt) {
         files = selectEvt.target.files; // FileList object
@@ -48,6 +48,8 @@
             var name = file.name;
             // Check file format by suffix
             if (hasSuffix(name, ".xbel")) {
+                $('#message').html("XBEL uploading is temporarily disabled, cannot upload " + name);
+                /*
                 // XBEL Format  (convert to JDEx and upload)
                 $('#message').html("Converting text to XML (XBEL) for " + name);
                 xml = $.parseXML(evt.target.result);
@@ -56,10 +58,12 @@
                 data = graph.toJDEx();
                 $('#dataToUpload').html(graph.serializeJDEx());
                 $('#message').html("Ready to upload " + name);
-
+                */
 
             } else if (hasSuffix(name, ".sif")) {
+                $('#message').html("SIF uploading is temporarily disabled, cannot upload " + name);
                 // SIF Format  (convert to JDEx and upload)
+                /*
                 var lines = evt.target.result.split("\n");
                 // SIF data is now an array of strings
                 $('#message').html("Converting SIF to JDEx for " + name);
@@ -72,13 +76,23 @@
                 data = graph.toJDEx();
                 //$('#dataToUpload').html(graph.serializeJDEx());
                 $('#message').html("Ready to upload " + name);
-
+                */
             } else if (hasSuffix(name, ".jdex")) {
                 // JDEx Format (just upload)
                 data = JSON.parse(evt.target.result);
-                //$('#dataToUpload').html(data);
+                data.members =
+                [
+                    {
+                        permissions: "ADMIN",
+                        resourceId: NdexWeb.ViewModel.User().id(),
+                        resourceName: NdexWeb.ViewModel.User().username()
+                    }
+                ];
+                delete data.nodeTypes;
+                //$('#dataToUpload').html(JSON.stringify(data) + JSON.stringify(data));
                 $('#message').html("Ready to upload " + name);
                 //doUpload(data);
+
             } else {
                 $('#message').html("Unsupported file type: " + type);
             }
@@ -111,7 +125,27 @@
     /* attach a submit handler to the form */
     $('#networkUploadForm').submit(function (event) {
         event.preventDefault();  // stop form from submitting normally
-        $('#message').html("Uploading JDEx with account = " + ndexUI.user.id + " for " + file.name);
+        $('#message').html("Uploading JDEx with account = " + NdexWeb.ViewModel.User().id() + " for " + file.name);
+
+        NdexWeb.put(
+                "/networks",  data,
+                function (network) {
+                    //
+                    // Success: redirect to edit metadata for the new network
+                    //
+                    //returnedNetwork =  network;
+                    //window.location = "/editNetworkMetadata/" + network.id;
+                    window.location = "/user/" + NdexWeb.ViewModel.User().id();
+                },
+                function (error) {
+                    //
+                    // Failure: display message
+                    //
+                    $('#message').html(JSON.stringify(error));
+                }
+
+        );
+        /*
         ndexClient.createNetwork(data, ndexUI.user.id,
                 function (result) {
                     //
@@ -125,6 +159,7 @@
                     //
                     $('#message').html(JSON.stringify(error));
                 });
+                */
     });
 
     function hasSuffix(str, suffix){
@@ -133,8 +168,6 @@
         }
         return false;
     }
-
-    ndexUI.initPage();
 
 </script>
 <% include footer.ejs %>
