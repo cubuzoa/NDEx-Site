@@ -51,18 +51,22 @@
                 null,
                 function (network) {
                     if (network.edgeCount && network.edgeCount > visualizationMax) {
-                        $('#message').html("<span class='errorMessage'>Network has " + networkMetadata.network.edgeCount + " edges, more than current maximum of " + visualizationMax + "</span>");
+                        $('#message').html("<span class='errorMessage'>Network has " + network.edgeCount + " edges, more than current maximum of " + visualizationMax + "</span>");
                     }
-                    NdexWeb.get(
+                    NdexWeb.post(
                             "/networks/" + encodeURIComponent(networkJID) + "/edges",
-                            {top: visualizationMax, skip: 0},
-                            function (data) {
+                            {
+                                top: visualizationMax,
+                                skip: 0,
+                                searchString: ""
+                            },
+                            function (network) {
                                 var elements = {nodes: [], edges: []};
-                                result = data;
-                                $.each(data.network.nodes, function (index, node) {
+                                result = network;
+                                $.each(network.nodes, function (index, node) {
                                     var label = node.name;
-                                    if (node.represents && data.network.terms && data.network.terms[node.represents]) {
-                                        var term = data.network.terms[node.represents];
+                                    if (node.represents && network.terms && network.terms[node.represents]) {
+                                        var term = network.terms[node.represents];
                                         label = term.name;
                                     }
                                     var cyNode = {data: {id: "n" + index, name: label}};
@@ -70,7 +74,7 @@
 
                                 });
 
-                                $.each(data.network.edges, function (index, edge) {
+                                $.each(network.edges, function (index, edge) {
                                     var cyEdge = {data: {source: "n" + edge.s, target: "n" + edge.o}};
                                     elements.edges.push(cyEdge);
                                 });

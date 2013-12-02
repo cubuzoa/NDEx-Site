@@ -31,15 +31,15 @@ var NetworkSearch =
             "/networks/search",
             {
                 searchString : NetworkSearch.ViewModel.SearchString(),
-                limit: NetworkSearch.ViewModel.PageSize(),
+                top: NetworkSearch.ViewModel.PageSize(),
                 skip: skip
             },
             function(networkSearchResult)
             {
                 var page =  networkSearchResult.skip + 1;
-                console.log("Got page " + page + " with " + networkSearchResult.networks.length + " networks");
+                console.log("Got page " + page + " with " + networkSearchResult.results.length + " networks");
                 NetworkSearch.ViewModel.PageIndex(page);
-                NetworkSearch.ViewModel.Networks(networkSearchResult.networks);
+                NetworkSearch.ViewModel.Networks(networkSearchResult.results);
             });
     },
 

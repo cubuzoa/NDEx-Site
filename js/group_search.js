@@ -32,15 +32,15 @@ var GroupSearch =
             "/groups/search",
             {
                 searchString : GroupSearch.ViewModel.SearchString(),
-                limit: GroupSearch.ViewModel.PageSize(),
+                top: GroupSearch.ViewModel.PageSize(),
                 skip: skip
             },
             function(groupSearchResult)
             {
                 var page =  groupSearchResult.skip + 1;
-                console.log("Got page " + page + " with " + groupSearchResult.groups.length + " groups");
+                console.log("Got page " + page + " with " + groupSearchResult.results.length + " groups");
                 GroupSearch.ViewModel.PageIndex(page);
-                GroupSearch.ViewModel.Groups(groupSearchResult.groups);
+                GroupSearch.ViewModel.Groups(groupSearchResult.results);
             });
     },
 
