@@ -31,15 +31,15 @@ var UserSearch =
             "/users/search",
             {
                 searchString : UserSearch.ViewModel.SearchString(),
-                limit: UserSearch.ViewModel.PageSize(),
+                top: UserSearch.ViewModel.PageSize(),
                 skip: skip
             },
             function(userSearchResult)
             {
                 var page =  userSearchResult.skip + 1;
-                console.log("Got page " + page + " with " + userSearchResult.users.length + " users");
+                console.log("Got page " + page + " with " + userSearchResult.results.length + " users");
                 UserSearch.ViewModel.PageIndex(page);
-                UserSearch.ViewModel.Users(userSearchResult.users);
+                UserSearch.ViewModel.Users(userSearchResult.results);
             });
     },
 
