@@ -110,19 +110,23 @@ app.get("/feedback", function (httpRequest, httpResponse)
     httpResponse.render("feedback", { title: "Feedback", user: httpRequest.user });
 });
 
-app.get("/triptych", function (httpRequest, httpResponse) {
+app.get("/network/:networkId/triptych", function (httpRequest, httpResponse) {
     httpResponse.render("triptych", {
-        title: "Checking Triptych Graphic Requirements"
+        title: "Checking Triptych Graphic Requirements",
+        networkId: httpRequest.params["networkId"],
+        user: httpRequest.user
     });
 });
 
-app.get("/triptychView", function (httpRequest, httpResponse) {
+app.get("/network/:networkId/triptychView", function (httpRequest, httpResponse) {
     var useCanvas = httpRequest.query["useCanvas"] || 'no';
     httpResponse.render("triptychView", {
         title: "Testing Triptych",
         canvas: httpRequest.query["canvas"],
         webGL: httpRequest.query["webGL"] ,
-        useCanvas : useCanvas
+        useCanvas : useCanvas,
+        networkId: httpRequest.params["networkId"],
+        user: httpRequest.user
     });
 });
 

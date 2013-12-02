@@ -1,49 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-<% if (typeof(webGL) == 'undefined' || typeof(canvas) == 'undefined') { %>
-<h2>Unexpected result</h2>
-
-<% } else if  (webGL == 'disabled' && canvas == 'disabled'){ %>
-
-<h2>Browser does not support either WebGL or HTML5 Canvas Graphics</h2>
-
-<% } else { %>
-
-<script>
-    var canvasAvailable = false;
-    var webGLAvailable = false;
-    var useCanvas = false;
-</script>
-
-
-
-
-<% if (typeof(useCanvas) == 'undefined') { %>
-
-<script>
-    useCanvas = false;
-    console.log("query useCanvas is undefined ")
-</script>
-
-<% } %>
-
-<% if (typeof(useCanvas) != 'undefined' && useCanvas == 'yes') { %>
-
-<script>
-    useCanvas = true;
-    console.log("query useCanvas is yes")
-</script>
-
-<% } %>
-
-
 <head>
-    <meta charset="utf-8">
-    <title>NDEx: Triptych Test</title>
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <meta charset="utf-8"/>
+    <title>NDEx:<%= title %></title>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/knockout-3.0.0.js"></script>
+    <script type="text/javascript" src="/js/knockout-mapping-2.4.1.js"></script>
+    <script type="text/javascript" src="/js/ndex-web.js"></script>
 
-    <script src="/js/jquery-1.10.2.min.js"></script>
+    <% if (typeof(webGL) == 'undefined' || typeof(canvas) == 'undefined') { %>
+    <h2>Unexpected result</h2>
+
+    <% } else if  (webGL == 'disabled' && canvas == 'disabled'){ %>
+
+    <h2>Browser does not support either WebGL or HTML5 Canvas Graphics</h2>
+
+    <% } else { %>
+
+    <script>
+        var canvasAvailable = false;
+        var webGLAvailable = false;
+        var useCanvas = false;
+        var networkJID = '<%= networkId %>';
+    </script>
+
+    <% if (typeof(useCanvas) == 'undefined') { %>
+
+    <script>
+        useCanvas = false;
+        console.log("query useCanvas is undefined ")
+    </script>
+
+    <% } %>
+    <% if (typeof(useCanvas) != 'undefined' && useCanvas == 'yes') { %>
+
+    <script>
+        useCanvas = true;
+        console.log("query useCanvas is yes")
+    </script>
+
+    <% } %>
+
     <link rel="stylesheet" type="text/css" href="/css/compare_networks.css"/>
     <script type="text/javascript" src="/js/three/Three.js"></script>
     <script type="text/javascript" src="/js/three/RequestAnimationFrame.js"></script>
@@ -56,22 +53,18 @@
     </script>
 
     <% include webGLLibraries %>
-
     <% } %>
-
     <% if (canvas == 'enabled'){ %>
     <script>
         canvasAvailable = true;
     </script>
     <% include canvasLibraries %>
-
     <% } %>
 
     <script type="text/javascript" src="/js/triptych/Controls/BasicControls-1.1.3.js"></script>
     <script type="text/javascript" src="/js/triptych/LayoutEngine/ForceDirectedLayoutEngine-1.1.2.js"></script>
     <script type="text/javascript" src="/js/triptych/LayoutEngine/MP3LayoutEngine.js"></script>
 </head>
-
 <body>
 
 <div id="controls">
@@ -246,9 +239,9 @@ var visualizerMode = false;
 function handleToggleVisualizer() {
     if (canvasAvailable && webGLAvailable) {
         if (visualizerMode == 'webGL') {
-            window.location = "/triptychView?canvas=<%=canvas%>&webGL=<%=webGL%>&useCanvas=yes";
+            window.location = "/network/<%=networkId%>/triptychView?canvas=<%=canvas%>&webGL=<%=webGL%>&useCanvas=yes";
         } else if (visualizerMode == 'canvas') {
-            window.location = "/triptychView?canvas=<%=canvas%>&webGL=<%=webGL%>&useCanvas=no";
+            window.location = "/network/<%=networkId%>/triptychView?canvas=<%=canvas%>&webGL=<%=webGL%>&useCanvas=no";
         }
     }
 }
@@ -352,52 +345,113 @@ function main() {
     }
 }
 
+var visualizationMax = 1000;
 
-var sourceURL = "/test_db/test_networks/pc_sif/REACTOME.G1 Phase.485618.jdex";
+// On load, we get the network, then push it to cytoscape.js on the callback
+$(document).ready(function () {
+    NdexWeb.get(
+            "/networks/" + encodeURIComponent(networkJID),
+            null,
+            function (network) {
+                if (network.edgeCount && network.edgeCount > visualizationMax) {
+                    $('#message').html("<span class='errorMessage'>Network has " + network.edgeCount + " edges, more than current maximum of " + visualizationMax + "</span>");
+                }
+                NdexWeb.post(
+                        "/networks/" + encodeURIComponent(networkJID) + "/edges",
+                        {
+                            top: visualizationMax,
+                            skip: 0,
+                            searchString: ""
+                        },
+                        function (network) {
+                            {
+                                console.log("got network");
 
-function run() {
-    $.ajax({
-        type: "GET",
-        url: sourceURL,
-        dataType: "JSON",
-        success: function (data) {
-            console.log("got data");
-
-            loader = new TRIPTYCH.JDExGraphLoader();
-            graph = loader.load(data);
-            //belSetup();
-            console.log("loaded graph");
-            console.log("useCanvas = " + useCanvas);
-            if (webGLAvailable && !useCanvas) {
-                visualizerSetup('webGL');
-                visualizerMode = 'webGL';
-            } else {
-                visualizerSetup('canvas');
-                visualizerMode = 'canvas';
-            }
+                                loader = new TRIPTYCH.JDExGraphLoader();
+                                graph = loader.load(network);
+                                //belSetup();
+                                console.log("loaded graph");
+                                console.log("useCanvas = " + useCanvas);
+                                if (webGLAvailable && !useCanvas) {
+                                    visualizerSetup('webGL');
+                                    visualizerMode = 'webGL';
+                                } else {
+                                    visualizerSetup('canvas');
+                                    visualizerMode = 'canvas';
+                                }
 
 
-            layoutEngineSetup();
+                                layoutEngineSetup();
 
-            controlsSetup();
+                                controlsSetup();
 
-            space = new TRIPTYCH.Space(graph, visualizer, layoutEngine, controls);
-            space.init();
+                                space = new TRIPTYCH.Space(graph, visualizer, layoutEngine, controls);
+                                space.init();
 
-            setCameraPosition();
+                                setCameraPosition();
 
-            setFlyParameters();
+                                setFlyParameters();
 
-            console.log("space initialized");
-            animate();
+                                console.log("space initialized");
+                                animate();
 
-        }
-    });
-}
-;
+                            }
+                        }
 
-// on load, execute run()
-$(run());
+                );
+
+            });
+
+});
+
+
+/*
+ var sourceURL = "/test_db/test_networks/pc_sif/REACTOME.G1 Phase.485618.jdex";
+
+ function run() {
+ $.ajax({
+ type: "GET",
+ url: sourceURL,
+ dataType: "JSON",
+ success: function (data) {
+ console.log("got data");
+
+ loader = new TRIPTYCH.JDExGraphLoader();
+ graph = loader.load(data);
+ //belSetup();
+ console.log("loaded graph");
+ console.log("useCanvas = " + useCanvas);
+ if (webGLAvailable && !useCanvas) {
+ visualizerSetup('webGL');
+ visualizerMode = 'webGL';
+ } else {
+ visualizerSetup('canvas');
+ visualizerMode = 'canvas';
+ }
+
+
+ layoutEngineSetup();
+
+ controlsSetup();
+
+ space = new TRIPTYCH.Space(graph, visualizer, layoutEngine, controls);
+ space.init();
+
+ setCameraPosition();
+
+ setFlyParameters();
+
+ console.log("space initialized");
+ animate();
+
+ }
+ });
+ };
+
+ // on load, execute run()
+ $(run());
+ */
+
 
 </script>
 
