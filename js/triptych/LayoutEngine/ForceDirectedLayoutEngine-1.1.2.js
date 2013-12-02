@@ -49,9 +49,9 @@ TRIPTYCH.ForceDirectedLayoutEngine.prototype.randomNodePositions = function(){
 	}
 };
 
-TRIPTYCH.ForceDirectedLayoutEngine.prototype.setGraph = function(graph){
+TRIPTYCH.ForceDirectedLayoutEngine.prototype.setGraph = function(graph, keepPositions){
 	this.graph = graph;
-	this.randomNodePositions();
+	if (!keepPositions) this.randomNodePositions();
 };
 
 TRIPTYCH.ForceDirectedLayoutEngine.prototype.getAverageForce = function(){
