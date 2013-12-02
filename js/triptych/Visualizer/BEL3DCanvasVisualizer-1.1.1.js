@@ -224,7 +224,7 @@ TRIPTYCH.BEL3DCanvasVisualizer.prototype.initResources = function(){
 	this.resources.blueMeshMaterial = new THREE.MeshBasicMaterial( { color: 0x00ffff } ) ;
 	this.resources.greenMeshMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00 } ) ;
 	this.resources.redMeshMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } ) ;
-	this.resources.grayMeshMaterial = new THREE.MeshBasicMaterial( { color: 0x777788 } ) ;
+	this.resources.grayMeshMaterial = new THREE.MeshBasicMaterial( { color: 0xAAAAAA } ) ;
 	this.resources.purpleMeshMaterial = new THREE.MeshBasicMaterial( { color: 0xff00ff } ) ;
 
 	this.resources.blueNodeMaterial = this.makeCircleParticleMaterial(100, '#00ffff');
@@ -232,11 +232,11 @@ TRIPTYCH.BEL3DCanvasVisualizer.prototype.initResources = function(){
 	this.resources.redNodeMaterial = this.makeCircleParticleMaterial(100, '#ff0000');
 	this.resources.yellowNodeMaterial = this.makeCircleParticleMaterial(100, '#ffff00');
 
-	this.resources.grayNodeMaterial = this.makeCircleParticleMaterial(100, '#777788');
+	this.resources.grayNodeMaterial = this.makeCircleParticleMaterial(100, '#AAAAAA');
 	this.resources.purpleNodeMaterial = this.makeCircleParticleMaterial(100, '#FF00FF');
 
 	this.resources.connectorLineMaterial = new THREE.LineBasicMaterial( { color: 0xFFFFFF, opacity: 0.5 } );
-	this.resources.grayLineMaterial = new THREE.LineBasicMaterial( { color: 0x777788 } );
+	this.resources.grayLineMaterial = new THREE.LineBasicMaterial( { color: 0xAAAAAA } );
 
 	
 	this.resources.smallParticleMaterial = this.makeCircleParticleMaterial(6, '#FFFFFF');

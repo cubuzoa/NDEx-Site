@@ -24,6 +24,16 @@ TRIPTYCH.MP3LayoutEngine.prototype.randomNodePositions = function(){
 	}
 };
 
+// force 2d positions in the z=0 plane
+TRIPTYCH.MP3LayoutEngine.prototype.force2DNodePositions = function(){
+    var nodes = this.graph.nodes;
+    var len = nodes.length;
+    for (var i = 0; i<len; i++){
+        var node = nodes[i];
+        node.position.set(node.position.x, node.position.y, 0);
+    }
+};
+
 
 // in this layout engine, forces can only be applied in the x-y plane
 TRIPTYCH.MP3LayoutEngine.prototype.addForce = function(node, vector, scalar){

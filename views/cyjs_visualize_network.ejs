@@ -1,23 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
+<% include header.ejs %>
 
-<head>
-    <meta charset="utf-8">
-    <title>NDEx: Visualize Network</title>
-    <meta name="description" content="">
-    <meta name="author" content="">
+<script src="/js/cytoscape.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/visualize_network.css"/>
 
-    <script src="/js/jquery-1.10.2.min.js"></script>
-    <script src="/js/ndexClient.js"></script>
-    <script src="/js/ndexUI.js"></script>
-    <script src="/js/cytoscape.js"></script>
-    <link rel="stylesheet" type="text/css" href="/css/visualize_network.css"/>
-</head>
-<body>
 <script>
-
+    var result = [];
     // the network id passed from the ejs template
-    var networkRID = '<%= networkId %>'
+    var networkJID = '<%= networkId %>'
 
     //				'text-outline-width': 2,
     //				'text-outline-color': '#888'
@@ -32,8 +21,7 @@
                 .css({
                     'content': 'data(name)',
                     'text-valign': 'center',
-                    'color': 'white',
-
+                    'color': 'white'
                 })
                 .selector('edge')
                 .css({
@@ -51,57 +39,53 @@
                 .css({
                     'opacity': 0.25,
                     'text-opacity': 0
-                }),
-
-
+                })
     };
 
     var visualizationMax = 1000;
 
     // On load, we get the network, then push it to cytoscape.js on the callback
-    $(document).ready(function()
-    {
-        ndexClient.getNetworkMetadata(networkRID, function (networkMetadata) {
+    $(document).ready(function () {
+        NdexWeb.get(
+                "/networks/" + encodeURIComponent(networkJID),
+                null,
+                function (network) {
+                    if (network.edgeCount && network.edgeCount > visualizationMax) {
+                        $('#message').html("<span class='errorMessage'>Network has " + networkMetadata.network.edgeCount + " edges, more than current maximum of " + visualizationMax + "</span>");
+                    }
+                    NdexWeb.get(
+                            "/networks/" + encodeURIComponent(networkJID) + "/edges",
+                            {top: visualizationMax, skip: 0},
+                            function (data) {
+                                var elements = {nodes: [], edges: []};
+                                result = data;
+                                $.each(data.network.nodes, function (index, node) {
+                                    var label = node.name;
+                                    if (node.represents && data.network.terms && data.network.terms[node.represents]) {
+                                        var term = data.network.terms[node.represents];
+                                        label = term.name;
+                                    }
+                                    var cyNode = {data: {id: "n" + index, name: label}};
+                                    elements.nodes.push(cyNode);
 
-            // Check to be sure network is less than visualizationMAX edges
-            if (networkMetadata.network.edgeCount && networkMetadata.network.edgeCount > visualizationMax) {
-                $('#message').html("<span class='errorMessage'>Network has " + networkMetadata.network.edgeCount + " edges, more than current maximum of " + visualizationMax + "</span>");
-            } else {
+                                });
 
-                ndexClient.getNetwork(networkRID, function (data) {
-                            console.log("Got results from getNetwork");
-                            console.log(data);
+                                $.each(data.network.edges, function (index, edge) {
+                                    var cyEdge = {data: {source: "n" + edge.s, target: "n" + edge.o}};
+                                    elements.edges.push(cyEdge);
+                                });
 
-                            var elements = {nodes: [], edges: []};
+                                cyNetworkParams.elements = elements;
 
-                            $.each(data.network.nodes, function (index, node) {
-                                var label = node.name;
-                                if (node.represents && data.network.terms && data.network.terms[node.represents]) {
-                                    var term = data.network.terms[node.represents];
-                                    label = term.name;
-                                }
-                                var cyNode = {data: {id: "n" + index, name: label}};
-                                elements.nodes.push(cyNode);
+                                $('#cy').cytoscape(cyNetworkParams);
+                            }
 
-                            });
+                    );
 
-                            $.each(data.network.edges, function (index, edge) {
-                                var cyEdge = {data: {source: "n" + edge.s, target: "n" + edge.o}};
-                                elements.edges.push(cyEdge);
-                            });
+                });
 
-                            cyNetworkParams.elements = elements;
-
-                            $('#cy').cytoscape(cyNetworkParams);
-
-                        },
-                        // error handler
-                        function (error) {
-                            ndexUI.formatError(error);
-                        });
-            }
-        });
     });
+
 </script>
 
 
@@ -111,5 +95,4 @@
 <div id="message"></div>
 <div id="cy"></div>
 
-</body>
-</html>
+<% include footer.ejs %>
