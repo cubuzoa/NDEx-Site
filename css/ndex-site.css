@@ -68,6 +68,12 @@ label
   display: inline-block;
 }
 
+input[readonly],
+textarea[readonly]
+{
+    background: #FFF;
+}
+
 input[type="number"]
 {
   width: 5em;

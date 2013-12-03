@@ -19,6 +19,9 @@ var NdexWeb =
         this.divModal = $("#divModal");
         this.divModalBackground = $("#divModalBackground");
 
+        if (location.hostname.toLowerCase() != "localhost")
+            this.ApiHost = "/rest/ndexbio-rest";
+
         ko.applyBindings(this.ViewModel, $("#navTop")[0]);
         this.loadUser();
         this.wireEvents();

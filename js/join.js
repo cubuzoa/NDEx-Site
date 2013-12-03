@@ -70,7 +70,7 @@ var Join =
                     localStorage.Username = Join.ViewModel.Username();
                     localStorage.Password = Join.ViewModel.Password();
                     localStorage.UserId = newUser.id;
-                    window.location = "/users/" + localStorage.UserId;
+                    window.location = "/user/" + localStorage.UserId;
                 }
                 else
                     $.gritter.add({ title: "Server Error", text: "An error occurred creating your user, please try again later." });

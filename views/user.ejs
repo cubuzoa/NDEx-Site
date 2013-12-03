@@ -61,9 +61,15 @@
                                     <i class="icon-chevron-right"></i>
                                 </td>
                                 <td>
+                                    <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
                                     <a data-bind="text: resourceName, attr: { href: '/network/' + resourceId() }"></a>
+                                    <!-- /ko -->
+                                    <!-- ko if: NdexWeb.ViewModel.User().id() != User.ViewModel.User().id() -->
+                                    <span data-bind="text: resourceName"></span>
+                                    <!-- /ko -->
+
                                 </td>
-                                <td>
+                                <td data-bind="if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id()">
                                     <div class="btn-group">
                                         <a href="javascript:void()" class="btn" title="Add to Work Surface" rel="tooltip">
                                             <!-- ko if: !WorkSurface.isOnWorkSurface(resourceId()) -->
@@ -100,9 +106,14 @@
                                     <i class="icon-chevron-right"></i>
                                 </td>
                                 <td>
+                                    <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
                                     <a data-bind="text: resourceName, attr: { href: '/group/' + resourceId() }"></a>
+                                    <!-- /ko -->
+                                    <!-- ko if: NdexWeb.ViewModel.User().id() != User.ViewModel.User().id() -->
+                                    <span data-bind="text: resourceName"></span>
+                                    <!-- /ko -->
                                 </td>
-                                <td>
+                                <td data-bind="if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id()">
                                     <div class="btn-group">
                                         <a href="javascript:void()" class="btn" title="Request access" rel="tooltip">
                                             <i class="icon-exchange" data-bind="click: User.requestGroupAccess"></i>
@@ -149,6 +160,7 @@
 
         <textarea class="Invisible" style="height: 100px; width: 100%;" readonly placeholder="Description" data-bind="value: description, isEditable: User.ViewModel.User().id(), event: { change: User.updateUser }"></textarea>
 
+        <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
         <div id="divNotifications">
             <h4>Notifications</h4>
 
@@ -165,6 +177,7 @@
                 </li>
             </ul>
         </div>
+        <!-- /ko -->
     </div>
 </div>
 
