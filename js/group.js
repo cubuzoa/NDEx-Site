@@ -37,17 +37,41 @@ var Group =
     },
 
     /****************************************************************************
+    * Determines if the user has write-access to the group.
+    ****************************************************************************/
+    canEdit: function()
+    {
+        for (var groupIndex = 0; groupIndex < NdexWeb.ViewModel.User().groups().length; groupIndex++)
+        {
+            var group = NdexWeb.ViewModel.User().groups()[groupIndex];
+            if (group.resourceId() === Group.ViewModel.Group().id() && group.permissions() != "READ")
+                return true;
+        }
+
+        return false;
+    },
+
+    /****************************************************************************
     * Loads the group.
     ****************************************************************************/
     loadGroup: function()
     {
         NdexWeb.get("/groups/" + encodeURIComponent(Group.ViewModel.GroupId()),
             null,
-            function (groupData)
+            function (group)
             {
-                groupData = ko.mapping.fromJS(groupData);
-                Group.ViewModel.Group(groupData.group);
+                group = ko.mapping.fromJS(group);
+                Group.ViewModel.Group(group);
             });
+    },
+
+    /****************************************************************************
+    * Updates the group.
+    ****************************************************************************/
+    updateGroup: function()
+    {
+        NdexWeb.post("/groups",
+            ko.mapping.toJS(Group.ViewModel.Group()));
     },
 
     /****************************************************************************

@@ -121,27 +121,56 @@ th
     padding: 3px 7px;
 }
 
+textarea
+{
+    resize: none;
+}
+
 /******************************************************************************
 * Styling by class
 ******************************************************************************/
 .AlignCenter
 {
-  TEXT-ALIGN: center;
+    text-align: center;
 }
 
 .AlignLeft
 {
-  TEXT-ALIGN: left;
+    text-align: left;
 }
 
 .AlignRight
 {
-  TEXT-ALIGN: right;
+  text-align: right;
 }
 
 .Hand
 {
     cursor: pointer;
+}
+
+/*input.Invisible:not([type="checkbox"]):not([type="radio"]),*/
+input.Invisible,
+select.Invisible,
+textarea.Invisible
+{
+    border: 1px solid #FFF;
+    box-shadow: 0 0 0 0;
+    outline: 0 none;
+}
+
+input.Invisible:not([readonly]):hover,
+select.Invisible:not([readonly]):hover,
+textarea.Invisible:not([readonly]):hover
+{
+    border: 1px dashed #CCC;
+}
+
+input.Invisible:not([readonly]):focus,
+select.Invisible:not([readonly]):focus,
+textarea.Invisible:not([readonly]):focus
+{
+    border: 1px solid #52A8EC;
 }
 
 label.Attribute
@@ -434,6 +463,12 @@ img.Profile
     z-index: 2;
 }
 
+#divUser h3 > input.Invisible
+{
+    font-size: 24px;
+    width: 110px;
+}
+
 #divNotifications
 {
     background-color: white;
@@ -481,8 +516,23 @@ img.Profile
 }
 
 /******************************************************************************
+* Group styling
+******************************************************************************/
+#divGroup h3 > input.Invisible
+{
+    font-size: 24px;
+    width: 100%;
+}
+
+/******************************************************************************
 * Network styling
 ******************************************************************************/
+#divNetwork h3 > input.Invisible
+{
+    font-size: 24px;
+    width: 40%;
+}
+
 #divNetwork ul
 {
   list-style: none;

@@ -125,16 +125,24 @@
 
     <div class="span3">
         <h3>
-            <span data-bind="text: firstName"></span>
-            <span data-bind="text: lastName"></span>
+            <input type="text" class="Invisible" readonly placeholder="First Name" data-bind="value: firstName, isEditable: User.ViewModel.User().id(), event: { change: User.updateUser }" />
+            <input type="text" class="Invisible" readonly placeholder="Last Name" data-bind="value: lastName, isEditable: User.ViewModel.User().id(), event: { change: User.updateUser }" />
         </h3>
 
-        <p>
-            <strong>Web Site:</strong>
-            <a target="_blank" data-bind="text: website, attr: { href: website() }"></a>
-        </p>
+        <div>
+            <input type="text" class="Invisible" placeholder="Email Address" readonly data-bind="value: emailAddress, isEditable: User.ViewModel.User().id(), event: { change: User.updateUser }" />
+        </div>
 
-        <p data-bind="text: description"></p>
+        <div>
+            <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
+            <input type="text" class="Invisible" placeholder="Website URL" readonly data-bind="value: website, isEditable: User.ViewModel.User().id(), event: { change: User.updateUser }" />
+            <!-- /ko -->
+            <!-- ko if: NdexWeb.ViewModel.User().id() != User.ViewModel.User().id() -->
+            <a target="_blank" data-bind="text: website, attr: { href: website() }"></a>
+            <!-- /ko -->
+        </div>
+
+        <textarea class="Invisible" style="height: 100px; width: 100%;" readonly placeholder="Description" data-bind="value: description, isEditable: User.ViewModel.User().id(), event: { change: User.updateUser }"></textarea>
 
         <div id="divNotifications">
             <h4>Notifications</h4>
@@ -178,7 +186,7 @@
     <div style="margin-top: 2em;">
         <strong class="hide">This request was <em></em> by <span></span>.</strong>
         <button type="button" class="pull-right hide">Decline</button>
-        <button type="button" class="pull-left hide">Accept</button>
+        <button type="button" class="pull-left hide">Accept ▼</button>
     </div>
 </script>
 

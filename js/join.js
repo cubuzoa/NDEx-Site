@@ -5,7 +5,7 @@ var Join =
         Username: ko.observable(),
         Password: ko.observable(),
         PasswordConfirmation: ko.observable(),
-        Email: ko.observable()
+        EmailAddress: ko.observable()
     },
 
     /****************************************************************************
@@ -61,7 +61,7 @@ var Join =
             {
                 username: Join.ViewModel.Username(),
                 password: Join.ViewModel.Password(),
-                email: Join.ViewModel.Email()
+                emailAddress: Join.ViewModel.EmailAddress()
             },
             function(newUser)
             {
@@ -70,7 +70,7 @@ var Join =
                     localStorage.Username = Join.ViewModel.Username();
                     localStorage.Password = Join.ViewModel.Password();
                     localStorage.UserId = newUser.id;
-                    window.location = "/editProfile";
+                    window.location = "/users/" + localStorage.UserId;
                 }
                 else
                     $.gritter.add({ title: "Server Error", text: "An error occurred creating your user, please try again later." });

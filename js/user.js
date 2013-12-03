@@ -143,7 +143,7 @@ var User =
             $("#divModalContent #spanTo").text(userRequest.to());
             $("#divModalContent p").text(userRequest.message());
 
-            if (typeof(userRequest.response) !== "undefined")
+            if (!userRequest.response())
             {
                 $("#divModalContent strong").removeClass("hide");
                 $("#divModalContent strong > em").text(userRequest.response());
@@ -156,6 +156,15 @@ var User =
                 $("#divModalContent button:last-of-type").click(userRequest, User.acceptRequest);
             }
         });
+    },
+
+    /****************************************************************************
+    * Updates the user.
+    ****************************************************************************/
+    updateUser: function()
+    {
+        NdexWeb.post("/users",
+            ko.mapping.toJS(User.ViewModel.User()));
     },
 
     /****************************************************************************

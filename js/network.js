@@ -38,8 +38,23 @@ var Network =
     _init: function()
     {
         ko.applyBindings(Network.ViewModel, $("#divNetwork")[0]);
-        //this.getNetwork();
+        this.getNetwork();
         this.wireEvents();
+    },
+
+    /****************************************************************************
+    * Determines if the user has write-access to the network.
+    ****************************************************************************/
+    canEdit: function()
+    {
+        for (var networkIndex = 0; networkIndex < NdexWeb.ViewModel.User().networks().length; networkIndex++)
+        {
+            var network = NdexWeb.ViewModel.User().networks()[networkIndex];
+            if (network.resourceId() === Network.ViewModel.Network().id() && network.permissions() != "READ")
+                return true;
+        }
+
+        return false;
     },
 
     /****************************************************************************
@@ -83,14 +98,15 @@ var Network =
     getNetwork: function()
     {
         NdexWeb.get(
-            "/networks/" + encodeURIComponent(this.ViewModel.NetworkId()) + "/metadata",
+            "/networks/" + encodeURIComponent(this.ViewModel.NetworkId()),
             null,
             function(network)
             {
                 network = ko.mapping.fromJS(network);
-                Network.ViewModel.Network(network());
-                Network.getNodes();
-                Network.getEdges();
+                Network.ViewModel.Network(network);
+                //TODO: These need to be updated per Dexter's latest changes
+                //Network.getNodes();
+                //Network.getEdges();
             });
     },
 
@@ -158,6 +174,15 @@ var Network =
         }).next().hide();
 
         $("dl.Accordion > dt.Expanded").next().show();
+    },
+
+    /****************************************************************************
+    * Updates the network.
+    ****************************************************************************/
+    updateNetwork: function()
+    {
+        NdexWeb.post("/networks/",
+            ko.mapping.toJS(Network.ViewModel.Network()));
     },
 
     /****************************************************************************

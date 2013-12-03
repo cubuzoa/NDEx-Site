@@ -5,11 +5,11 @@
     <div class="span7">
         <div id="divProfileImages">
             <div>
-                <img class="Profile" data-bind="attr: { src: '../img/foreground/' + groupname() + '.jpg' }" />
+                <img class="Profile" data-bind="attr: { src: '../img/foreground/' + name() + '.jpg' }" />
             </div>
 
             <div>
-                <img class="ProfileBackground" data-bind="attr: { src: '../img/background/' + groupname() + '.jpg' }" />
+                <img class="ProfileBackground" data-bind="attr: { src: '../img/background/' + name() + '.jpg' }" />
             </div>
         </div>
 
@@ -21,12 +21,9 @@
                 <li>
                     <a href="#divMembers" data-toggle="tab">Members</a>
                 </li>
-                <!-- if: NdexWeb.ViewModel.User().Id && Group.isOwner(Id()) -->
-                <!-- ko if: 1 === 2 -->
-                <li>
+                <li data-bind="if: false">
                     <a href="#divAgentAccounts" data-toggle="tab">Agents</a>
                 </li>
-                <!-- /ko -->
             </ul>
 
             <div class="tab-content">
@@ -35,21 +32,17 @@
                         <thead>
                         <tr>
                             <th colspan="2">Name</th>
-                            <th>Nodes</th>
-                            <th>Edges</th>
                             <th></th>
                         </tr>
                         </thead>
-                        <tbody data-bind="foreach: ownedNetworks">
+                        <tbody data-bind="foreach: networks">
                         <tr>
                             <td>
                                 <i class="icon-chevron-right"></i>
                             </td>
                             <td>
-                                <a data-bind="text: title, attr: { href: '/network/' + jid() }"></a>
+                                <a data-bind="text: resourceName, attr: { href: '/network/' + resourceId() }"></a>
                             </td>
-                            <td class="AlignRight" data-bind="text: nodeCount"></td>
-                            <td class="AlignRight" data-bind="text: edgeCount"></td>
                             <td>
                                 <div class="btn-group">
                                     <a href="javascript:void()" class="btn" title="Add to Work Surface" rel="tooltip">
@@ -73,28 +66,51 @@
                     </table>
                 </div>
 
-                <div class="tab-pane" id="divMembers"></div>
+                <div class="tab-pane" id="divMembers">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <!-- ko if: Group.canEdit() -->
+                                <th>Permissions</th>
+                                <!-- /ko -->
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: members">
+                            <tr>
+                                <td data-bind="text: resourceName"></td>
+                                <!-- ko if: Group.canEdit() -->
+                                <td data-bind="text: permissions"></td>
+                                <!-- /ko -->
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
                 <div class="tab-pane" id="divAgentAccounts"></div>
             </div>
         </div>
     </div>
 
-    <div id="profile" class="span3" data-bind="with: profile">
-        <h3 data-bind="text: organizationName"></h3>
+    <div id="profile" class="span3">
+        <h3>
+            <input type="text" class="Invisible" readonly placeholder="Name" data-bind="value: name, isEditable: Group.ViewModel.Group().id(), event: { change: Group.updateGroup }" />
+        </h3>
 
-        <p>
-            <strong>Web Site:</strong>
-            <a target="_blank" data-bind="text: website, attr: { href: website() }"></a>
-        </p>
-
-        <p data-bind="text: description"></p>
-
-        <div id="notifications" class="notifications">
-            <div class="notificationsHeader">Notifications</div>
-
-            <div id="notifContent" style="background-color: #FFF">Requests</div>
+        <div>
+            <input type="text" class="Invisible" readonly placeholder="Organization Name" data-bind="value: organizationName, isEditable: Group.ViewModel.Group().id(), event: { change: Group.updateGroup }" />
         </div>
+
+        <div>
+            <!-- ko if: Group.canEdit() -->
+            <input type="text" class="Invisible" placeholder="Website URL" readonly data-bind="value: website, isEditable: Group.ViewModel.Group().id(), event: { change: Group.updateGroup }" />
+            <!-- /ko -->
+            <!-- ko if: !Group.canEdit() -->
+            <a target="_blank" data-bind="text: website, attr: { href: website() }"></a>
+            <!-- /ko -->
+        </div>
+
+        <textarea class="Invisible" style="height: 100px; width: 100%;" readonly placeholder="Description" data-bind="value: description, isEditable: Group.ViewModel.Group().id(), event: { change: Group.updateGroup }"></textarea>
     </div>
 
     <div class="span2 dropdown">
@@ -106,8 +122,7 @@
             <li>
                 <a href="#displayOptions" data-toggle="modal">Display Options</a>
             </li>
-            <!-- if: NdexWeb.ViewModel.User().Id && Group.isOwner(Id()) -->
-            <!-- ko if: 1 === 2 -->
+            <!-- ko if: Group.canEdit() -->
             <li>
                 <a href="/editGroupProfile/<%= groupId %>" class="accountMiniMenu">Edit Group Profile</a>
             </li>
