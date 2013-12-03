@@ -11,7 +11,6 @@
         "util": "0.4.9",
         "connect-flash": "0.1.x",
         "ejs" : "0.8.3",
-        "orientdb": "*",
         "contextify": "*",
         "jquery": "1.8.x",
         "request" : "2.20.x", 

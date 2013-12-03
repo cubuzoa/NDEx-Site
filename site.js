@@ -1,20 +1,5 @@
 var express = require("express");
 var passport = require("passport");
-var orientdb = require("orientdb");
-
-var dbConfig =
-{
-    user_name: "admin",
-    user_password: "admin"
-};
-
-var serverConfig =
-{
-    host: "localhost",
-    port: 2424
-};
-
-var server = new orientdb.Server(serverConfig);
 
 var app = express();
 var port = 9999;
