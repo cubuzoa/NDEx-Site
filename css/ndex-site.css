@@ -469,6 +469,12 @@ img.Profile
     width: 110px;
 }
 
+#divUser #txtPassword,
+#divUser #txtConfirmPassword
+{
+    width: 125px;
+}
+
 #divNotifications
 {
     background-color: white;

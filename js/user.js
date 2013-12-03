@@ -1,5 +1,6 @@
 var User =
 {
+    PasswordsMatch: true,
     ViewModel:
     {
         UserId: ko.observable(),
@@ -18,7 +19,27 @@ var User =
         if (NdexWeb.ViewModel.User().id() !== this.ViewModel.UserId())
             this.loadUser();
         else
+        {
             this.ViewModel.User(NdexWeb.ViewModel.User());
+
+            $("#txtPassword").Password(
+            {
+                Confirmation:
+                {
+                    IsInvalidCallback: function()
+                    {
+                        User.PasswordsMatch = false;
+                    },
+                    IsValidCallback: function()
+                    {
+                        User.PasswordsMatch = true;
+                    },
+                    MatchUrl: "/img/success.png",
+                    MismatchUrl: "/img/alert.png",
+                    TextBox: "#txtConfirmPassword"
+                }
+            });
+        }
 
         this.wireEvents();
     },
@@ -83,6 +104,23 @@ var User =
         }
 
         return false;
+    },
+
+    /****************************************************************************
+    * Changes the user's password.
+    ****************************************************************************/
+    changePassword: function()
+    {
+        if (!User.PasswordsMatch)
+            return;
+
+        NdexWeb.post("/users/" + encodeURIComponent(User.ViewModel.UserId()) + "/password",
+            $("#txtPassword").val(),
+            function()
+            {
+                localStorage.Password = $("#txtPassword").val();
+                $.gritter.add({ title: "Password Changed", text: "Your password has been changed." });
+            });
     },
 
     /****************************************************************************

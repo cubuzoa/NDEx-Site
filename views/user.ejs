@@ -133,6 +133,11 @@
             <input type="text" class="Invisible" placeholder="Email Address" readonly data-bind="value: emailAddress, isEditable: User.ViewModel.User().id(), event: { change: User.updateUser }" />
         </div>
 
+        <div data-bind="if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id()">
+            <input type="text" id="txtPassword" class="Invisible" placeholder="New Password" data-bind="event: { 'change': User.changePassword }" />
+            <input type="text" id="txtConfirmPassword" class="Invisible" placeholder="Confirm Password" data-bind="event: { 'change': User.changePassword }" />
+        </div>
+
         <div>
             <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
             <input type="text" class="Invisible" placeholder="Website URL" readonly data-bind="value: website, isEditable: User.ViewModel.User().id(), event: { change: User.updateUser }" />
@@ -163,6 +168,7 @@
     </div>
 </div>
 
+<script type="text/javascript" src="/js/password.js"></script>
 <script type="text/javascript" src="/js/user.js"></script>
 <script type="text/javascript">
     User.ViewModel.UserId("<%=userId%>");
