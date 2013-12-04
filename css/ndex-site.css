@@ -455,17 +455,7 @@ dl.Accordion > dd
     position: relative;
 }
 
-img.ProfileBackground
-{
-    width: 100%;
-    height: 200px;
-    padding: 0;
-    position: relative;
-    left: 0;
-    top: 0;
-}
-
-img.Profile
+#imgProfile
 {
     width: 15%;
     position: absolute;
@@ -474,6 +464,16 @@ img.Profile
     border-width: 3px;
     border-color: blue;
     z-index: 2;
+}
+
+#imgProfileBackground
+{
+    width: 100%;
+    height: 200px;
+    padding: 0;
+    position: relative;
+    left: 0;
+    top: 0;
 }
 
 #divUser h3 > input.Invisible

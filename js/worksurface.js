@@ -22,7 +22,7 @@ var WorkSurface =
     ****************************************************************************/
     addNetwork: function()
     {
-        NdexWeb.put("/users/" + encodeURIComponent(NdexWeb.ViewModel.User().id()) + "/work-surface",
+        NdexWeb.put("/users/" + NdexWeb.ViewModel.User().id() + "/work-surface",
             { networkid: this.id() },
             function(workSurface)
             {
@@ -45,8 +45,8 @@ var WorkSurface =
 
         var clickedLink = (event.target.tagName.toLowerCase() === "a") ? $(event.target) : $(event.target).parent();
         clickedLink.attr("href",
-            "/networks/" + encodeURIComponent(checkedNetworks[0].value)
-          + "/compare/" + encodeURIComponent(checkedNetworks[1].value));
+            "/networks/" + checkedNetworks[0].value
+          + "/compare/" + checkedNetworks[1].value);
     },
 
     /****************************************************************************
@@ -68,7 +68,7 @@ var WorkSurface =
     ****************************************************************************/
     removeNetwork: function()
     {
-        NdexWeb.delete("/users/" + encodeURIComponent(NdexWeb.ViewModel.User().id()) + "/work-surface/" + encodeURIComponent(this.id()),
+        NdexWeb.delete("/users/" + NdexWeb.ViewModel.User().id() + "/work-surface/" + this.id(),
             function(workSurface)
             {
                 var updatedNetworks = ko.mapping.fromJS(workSurface.networks);
@@ -106,7 +106,7 @@ var WorkSurface =
         }
 
         var clickedLink = (event.target.tagName.toLowerCase() === "a") ? $(event.target) : $(event.target).parent();
-        clickedLink.attr("href", "/networks/" + encodeURIComponent(checkedNetworks[0].value));
+        clickedLink.attr("href", "/networks/" + checkedNetworks[0].value);
     },
 
     /****************************************************************************
@@ -122,7 +122,7 @@ var WorkSurface =
         }
 
         var clickedLink = (event.target.tagName.toLowerCase() === "a") ? $(event.target) : $(event.target).parent();
-        clickedLink.attr("href", "/networks/" + encodeURIComponent(checkedNetworks[0].value) + "/visualize");
+        clickedLink.attr("href", "/networks/" + checkedNetworks[0].value + "/visualize");
     },
 
     /****************************************************************************

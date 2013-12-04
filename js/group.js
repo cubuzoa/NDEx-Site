@@ -56,7 +56,7 @@ var Group =
     ****************************************************************************/
     loadGroup: function()
     {
-        NdexWeb.get("/groups/" + encodeURIComponent(Group.ViewModel.GroupId()),
+        NdexWeb.get("/groups/" + Group.ViewModel.GroupId(),
             null,
             function (group)
             {

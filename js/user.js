@@ -1,6 +1,5 @@
 var User =
 {
-    PasswordsMatch: true,
     ViewModel:
     {
         UserId: ko.observable(),
@@ -19,27 +18,7 @@ var User =
         if (NdexWeb.ViewModel.User().id() !== this.ViewModel.UserId())
             this.loadUser();
         else
-        {
             this.ViewModel.User(NdexWeb.ViewModel.User());
-
-            $("#txtPassword").Password(
-            {
-                Confirmation:
-                {
-                    IsInvalidCallback: function()
-                    {
-                        User.PasswordsMatch = false;
-                    },
-                    IsValidCallback: function()
-                    {
-                        User.PasswordsMatch = true;
-                    },
-                    MatchUrl: "/img/success.png",
-                    MismatchUrl: "/img/alert.png",
-                    TextBox: "#txtConfirmPassword"
-                }
-            });
-        }
 
         this.wireEvents();
     },
@@ -51,7 +30,7 @@ var User =
     {
         var acceptedRequest = event.data;
         acceptedRequest.response = "ACCEPTED";
-        acceptedRequest.responder = NdexWeb.ViewModel.User.id();
+        acceptedRequest.responder = NdexWeb.ViewModel.User().id();
 
         NdexWeb.post("/requests",
             ko.mapping.toJSON(acceptedRequest),
@@ -111,16 +90,106 @@ var User =
     ****************************************************************************/
     changePassword: function()
     {
-        if (!User.PasswordsMatch)
-            return;
-
-        NdexWeb.post("/users/" + encodeURIComponent(User.ViewModel.UserId()) + "/password",
-            $("#txtPassword").val(),
-            function()
+        NdexWeb.showModal("Change Password", "#changePassword", true, function()
+        {
+            $("#txtPassword").Password(
             {
-                localStorage.Password = $("#txtPassword").val();
-                $.gritter.add({ title: "Password Changed", text: "Your password has been changed." });
+                Confirmation:
+                {
+                    IsInvalidCallback: function()
+                    {
+                        $("#divModalContent button").attr("disabled", true);
+                    },
+                    IsValidCallback: function()
+                    {
+                        $("#divModalContent button").removeAttr("disabled");
+                    },
+                    MatchUrl: "/img/success.png",
+                    MismatchUrl: "/img/alert.png",
+                    TextBox: "#txtConfirmPassword"
+                }
             });
+
+            $("#divModalContent button").click(function()
+            {
+                NdexWeb.post("/users/" + User.ViewModel.UserId() + "/password",
+                    $("#txtPassword").val(),
+                    function()
+                    {
+                        localStorage.Password = $("#txtPassword").val();
+                        $.gritter.add({ title: "Password Changed", text: "Your password has been changed." });
+                        NdexWeb.hideModal();
+                    });
+            });
+        });
+    },
+
+    /****************************************************************************
+    * Changes the user's profile background image.
+    ****************************************************************************/
+    changeProfileBackground: function()
+    {
+        NdexWeb.showModal("Change Profile Background", "#changeImage", true, function()
+        {
+            $("#frmChangeImage").attr("action", NdexWeb.ApiHost + "/users/" + NdexWeb.ViewModel.User().id() + "/profile-background");
+            $("#fileNewImage").change(function()
+            {
+                $("#frmChangeImage").ajaxForm(
+                {
+                    iframe: true,
+                    dataType: "json",
+                    beforeSend: function(xhr)
+                    {
+                        xhr.setRequestHeader("Authorization", "Basic " + NdexWeb.ViewModel.EncodedUser());
+                    },
+                    success: function()
+                    {
+                        $("#imgProfileBackground").attr("src", "");
+                        $("#imgProfileBackground").attr("src", "/img/background/" + NdexWeb.ViewModel.User().username() + ".jpg");
+                    },
+                    error: function(jqXHR, textStatus, errorThrown)
+                    {
+                        $.gritter.add({ title: "Failure", text: "Failed to change your profile background." });
+                    }
+                });
+
+                $("#frmChangeImage").submit();
+            });
+        });
+    },
+
+    /****************************************************************************
+    * Changes the user's profile image.
+    ****************************************************************************/
+    changeProfileImage: function()
+    {
+        NdexWeb.showModal("Change Profile Image", "#changeImage", true, function()
+        {
+            $("#frmChangeImage").attr("action", NdexWeb.ApiHost + "/users/" + NdexWeb.ViewModel.User().id() + "/profile-image");
+            $("#fileNewImage").change(function()
+            {
+                $("#frmChangeImage").ajaxForm(
+                {
+                    iframe: true,
+                    dataType: "json",
+                    beforeSend: function(xhr)
+                    {
+                        xhr.setRequestHeader("Authorization", "Basic " + NdexWeb.ViewModel.EncodedUser());
+                    },
+                    success: function()
+                    {
+                        $("#imgProfile").attr("src", "");
+                        $("#imgProfile").attr("src", "/img/foreground/" + NdexWeb.ViewModel.User().username() + ".jpg");
+                    },
+                    error: function(jqXHR, textStatus, errorThrown)
+                    {
+                        $.gritter.add({ title: "Failure", text: "Failed to change your profile image." });
+                    }
+                });
+
+                $("#frmChangeImage").submit();
+            });
+        });
     },
 
     /****************************************************************************
@@ -130,7 +199,7 @@ var User =
     {
         var declinedRequest = event.data;
         declinedRequest.response = "DECLINED";
-        declinedRequest.responder = NdexWeb.ViewModel.User.id();
+        declinedRequest.responder = NdexWeb.ViewModel.User().id();
 
         NdexWeb.post("/requests",
             ko.mapping.toJSON(declinedRequest),
@@ -145,7 +214,7 @@ var User =
     ****************************************************************************/
     loadUser: function()
     {
-        NdexWeb.get("/users/" + encodeURIComponent(User.ViewModel.UserId()),
+        NdexWeb.get("/users/" + User.ViewModel.UserId(),
             null,
             function (userData)
             {
@@ -181,7 +250,7 @@ var User =
             $("#divModalContent #spanTo").text(userRequest.to());
             $("#divModalContent p").text(userRequest.message());
 
-            if (!userRequest.response())
+            if (userRequest.response())
             {
                 $("#divModalContent strong").removeClass("hide");
                 $("#divModalContent strong > em").text(userRequest.response());
@@ -190,8 +259,8 @@ var User =
             else if (User.canRespond(userRequest))
             {
                 $("#divModalContent button").removeClass("hide");
-                $("#divModalContent button:first-of-type").click(userRequest, User.declineRequest);
-                $("#divModalContent button:last-of-type").click(userRequest, User.acceptRequest);
+                $("#divModalContent #btnDecline").click(userRequest, User.declineRequest);
+                $("#divModalContent #btnAccept").click(userRequest, User.acceptRequest);
             }
         });
     },
@@ -210,6 +279,15 @@ var User =
     ****************************************************************************/
     wireEvents: function()
     {
+        $("#imgProfile").error(function()
+        {
+            this.src = "/img/default-profile.png";
+        });
+
+        $("#imgProfileBackground").error(function()
+        {
+            this.src = "/img/default-background.png";
+        });
     }
 };
 

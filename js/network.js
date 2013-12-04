@@ -63,7 +63,7 @@ var Network =
     getEdges: function()
     {
         NdexWeb.get(
-            "/networks/" + encodeURIComponent(this.ViewModel.Network().id()) + "/edge",
+            "/networks/" + this.ViewModel.Network().id() + "/edge",
             {
                 skip: this.ViewModel.PageIndex() - 1,
                 top: this.ViewModel.PageSize()
@@ -98,7 +98,7 @@ var Network =
     getNetwork: function()
     {
         NdexWeb.get(
-            "/networks/" + encodeURIComponent(this.ViewModel.NetworkId()),
+            "/networks/" + this.ViewModel.NetworkId(),
             null,
             function(network)
             {
@@ -116,7 +116,7 @@ var Network =
     getNodes: function()
     {
         NdexWeb.get(
-            "/networks/" + encodeURIComponent(this.ViewModel.Network().id()) + "/node",
+            "/networks/" + this.ViewModel.Network().id() + "/node",
             {
                 skip: this.ViewModel.PageIndex() - 1,
                 top: this.ViewModel.PageSize()

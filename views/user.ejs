@@ -7,26 +7,35 @@
             <i class="icon-cog icon-large"></i>
         </a>
 
+        <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
         <ul class="dropdown-menu">
-            <li><a href="#displayOptions" data-toggle="modal">Display Options</a></li>
-            <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
-            <li><a href="/editProfile" class="accountMiniMenu">Edit Profile</a></li>
-            <li><a href="#" class="accountMiniMenu">New Profile Image</a></li>
-            <li><a href="#" class="accountMiniMenu">New Background Image</a></li>
-            <li><a href="/sendRequest" class="accountMiniMenu">Create a Request</a></li>
-            <li><a href="/editAgent" class="accountMiniMenu">Edit/Create Agent</a></li>
-            <!-- /ko -->
+            <li>
+                <a href="/newGroup" class="accountMiniMenu">Create Group</a>
+            </li>
+            <li>
+                <a href="/uploadNetwork" class="accountMiniMenu">Create Network</a>
+            </li>
+            <li>
+                <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.changeProfileImage">Change Profile Image</a>
+            </li>
+            <li>
+                <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.changeProfileBackground">Change Background Image</a>
+            </li>
+            <li>
+                <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.changePassword">Change Password</a>
+            </li>
         </ul>
+        <!-- /ko -->
     </div>
 
     <div class="span7">
         <div id="divProfileImages">
             <div>
-                <img class="Profile" data-bind="attr: { src: '../img/foreground/' + username() + '.jpg' }" />
+                <img id="imgProfile" data-bind="attr: { src: '/img/foreground/' + username() + '.jpg' }" />
             </div>
 
             <div>
-                <img class="ProfileBackground" data-bind="attr: { src: '../img/background/' + username() + '.jpg' }" />
+                <img id="imgProfileBackground" data-bind="attr: { src: '/img/background/' + username() + '.jpg' }" />
             </div>
         </div>
 
@@ -144,11 +153,6 @@
             <input type="text" class="Invisible" placeholder="Email Address" readonly data-bind="value: emailAddress, isEditable: User.ViewModel.User().id(), event: { change: User.updateUser }" />
         </div>
 
-        <div data-bind="if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id()">
-            <input type="text" id="txtPassword" class="Invisible" placeholder="New Password" data-bind="event: { 'change': User.changePassword }" />
-            <input type="text" id="txtConfirmPassword" class="Invisible" placeholder="Confirm Password" data-bind="event: { 'change': User.changePassword }" />
-        </div>
-
         <div>
             <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
             <input type="text" class="Invisible" placeholder="Website URL" readonly data-bind="value: website, isEditable: User.ViewModel.User().id(), event: { change: User.updateUser }" />
@@ -169,10 +173,10 @@
             <ul data-bind="foreach: requests">
                 <li>
                     <!-- ko if: fromId() === NdexWeb.ViewModel.User().id() -->
-                    From: <a href="javascript:void()" data-bind="click: User.showRequest">You</a>
+                    From: <a href="javascript:void()" data-bind="css: { 'text-success': response() === 'ACCEPTED', 'text-error': response() === 'DECLINED' }, click: User.showRequest">You</a>
                     <!-- /ko -->
                     <!-- ko if: fromId() !== NdexWeb.ViewModel.User().id() -->
-                    From: <a href="javascript:void()" data-bind="text: from, click: User.showRequest"></a>
+                    From: <a href="javascript:void()" data-bind="css: { 'text-success': response() === 'ACCEPTED', 'text-error': response() === 'DECLINED' }, text: from, click: User.showRequest"></a>
                     <!-- /ko -->
                 </li>
             </ul>
@@ -187,6 +191,28 @@
     User.ViewModel.UserId("<%=userId%>");
 </script>
 
+<script type="text/html" id="changePassword">
+    <div style="margin: 0 auto; text-align: left; width: 60%">
+        <label class="Attribute-Editable">Password:</label>
+        <input type="text" id="txtPassword" placeholder="New Password" />
+    </div>
+
+    <div style="margin: 0 auto; text-align: left; width: 60%;">
+        <label class="Attribute-Editable">Confirm:</label>
+        <input type="text" id="txtConfirmPassword" placeholder="Type it again" />
+    </div>
+
+    <div class="AlignCenter">
+        <button type="button">Change Password</button>
+    </div>
+</script>
+<script type="text/html" id="changeImage">
+    <p>Select the new image</p>
+
+    <form id="frmChangeImage" method="post" enctype="multipart/form-data">
+        <input type="file" id="fileNewImage" name="fileNewImage" />
+    </form>
+</script>
 <script type="text/html" id="userRequest">
     <div style="margin: 0 auto; width: 75%" class="AlignLeft">
         <label class="Attribute">From:</label>
@@ -204,8 +230,8 @@
 
     <div style="margin-top: 2em;">
         <strong class="hide">This request was <em></em> by <span></span>.</strong>
-        <button type="button" class="pull-right hide">Decline</button>
-        <button type="button" class="pull-left hide">Accept ▼</button>
+        <button type="button" id="btnDecline" class="pull-right hide">Decline</button>
+        <button type="button" id="btnAccept" class="pull-left hide">Accept ▼</button>
     </div>
 </script>
 
