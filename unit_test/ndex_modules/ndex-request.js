@@ -2,13 +2,15 @@ var request = require('request'),
     assert = require('assert'),
     should = require('should');
 
-var baseRoute = "http://localhost:3333"
+var baseRoute = "http://localhost:8080/ndexbio-rest"
 
 exports.setBaseRoute = function(route) {
     baseRoute = route;
 }
 
-exports.guest = {username: 'guest', password: 'guestpassword'}
+// The test database includes a user named "dexterpratt" with password "insecure"
+// TODO: update test db to be more generic.
+exports.guest = {username: 'dexterpratt', password: 'insecure'}
 
 exports.get = function(route, params, user, callback, debug){
     var url = baseRoute + route,

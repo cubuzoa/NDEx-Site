@@ -1,7 +1,6 @@
 var request = require('request'),
     assert = require('assert'),
     should = require('should'),
-    ndexClient = require('../../js/ndexClient.js')
     ndex = require('../ndex_modules/ndex-request.js');
 
 describe('authentication-test', function () {
@@ -19,7 +18,7 @@ describe('authentication-test', function () {
     describe('testAuthenticateExistingUser', function(){
         it("should get 200 when attempting to authenticate dexterpratt", function (done){
             ndex.get(
-                '/authenticate',
+                '/users/authenticate/' + dexter.username + "/" + dexter.password,
                 {},
                 dexter,
                 function(err, res, body){
