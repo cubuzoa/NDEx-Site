@@ -19,7 +19,7 @@ exports.get = function(route, params, user, callback, debug){
             username: user.username,
             password: user.password,
             sendImmediately: true
-        } ;
+        };
 
     if (debug){
         console.log("making GET request to " + url);
@@ -83,4 +83,31 @@ exports.delete  = function(route, user, callback, debug){
         },
         callback
     );
+}
+
+exports.put = function(route, putData, user, callback, debug)
+{
+
+    var url = baseRoute + route,
+        json =  putData || {},
+        auth =  {
+            username: user.username,
+            password: user.password,
+            sendImmediately: true
+        } ;
+
+    if (debug){
+        console.log("making DELETE request to " + url);
+        console.log("auth params: " + JSON.stringify(auth));
+    }
+
+    request({
+            method: 'PUT',
+            url: url,
+            auth: auth,
+            json: json
+        },
+        callback
+    );
+
 }
