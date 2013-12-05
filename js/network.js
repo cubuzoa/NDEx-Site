@@ -1,6 +1,10 @@
-//TODO: Refactor after refactoring of Java NetworkService is complete
+//TODO: How to make PageSize interact with MaxEdges & MaxNodes - should it?
 var Network =
 {
+    IsLoadingNextPage: true,
+    PageIndex: ko.observable(1),
+    PageSize: ko.observable(25),
+    PagingFunction: null,
     ViewModel:
     {
         NetworkId: ko.observable(),
@@ -27,9 +31,7 @@ var Network =
                 Starting: ko.observableArray(),
                 Target: ko.observableArray()
             }
-        },
-        PageIndex: ko.observable(1),
-        PageSize: ko.observable(25)
+        }
     },
 
     /****************************************************************************
@@ -173,11 +175,17 @@ var Network =
     getEdges: function()
     {
         NdexWeb.get(
-            "/networks/" + this.ViewModel.Network().id() + "/edges/" + Network.ViewModel.PageIndex() + "/" + Network.ViewModel.PageSize(),
+            "/networks/" + this.ViewModel.Network().id() + "/edges/" + Network.PageIndex() + "/" + Network.PageSize(),
             null,
             function(networkEdges)
             {
+                Network.IsLoadingNextPage = false;
                 Network.buildSubnetwork(networkEdges);
+            },
+            function(exception)
+            {
+                Network.IsLoadingNextPage = false;
+                NdexWeb.errorHandler(exception);
             });
     },
 
@@ -209,8 +217,32 @@ var Network =
                     network.terms = ko.observable();
 
                 Network.ViewModel.Network(network);
+
+                Network.PagingFunction = Network.getEdges;
+                Network.PageIndex = 0;
                 Network.getEdges();
             });
+    },
+
+    /****************************************************************************
+    * Checks to see if the user scrolled near the bottom of the page, which
+    * triggers a request for the next page of data.
+    ****************************************************************************/
+    infiniteScroll: function()
+    {
+        //TODO: Right now it's dumb, it just keeps adding elements to the DOM.
+        //This needs to be updated such that next/previous DOM elements are
+        //replaced with a single DOM element of the same height so the scrollbar
+        //continues to be accurate.
+        if ($("#divSubnetwork").scrollTop() > parseInt(($("#divSubnetwork").height()) * .67))
+        {
+            if (Network.IsLoadingNextPage === false)
+            {
+                Network.IsLoadingNextPage = true;
+                Network.PageIndex++;
+                Network.PagingFunction();
+            }
+        }
     },
 
     /****************************************************************************
@@ -225,6 +257,7 @@ var Network =
         startingTerms.push($("#divSearch input[type='search']").val());
 
         //TODO: Eventually push the whole Search object up and make the server-side model match it.
+        //TODO: Need to add paging to server-side queryNetwork API method
         NdexWeb.post("/networks/" + Network.ViewModel.NetworkId() + "/query",
             {
                 representationCriterion: Network.ViewModel.Search.Fuzziness(),
@@ -234,6 +267,7 @@ var Network =
             },
             function(subnetwork)
             {
+                Network.PagingFunction = Network.queryNetwork;
                 Network.buildSubnetwork(subnetwork);
             });
     },
@@ -275,6 +309,7 @@ var Network =
     {
         this.setupAccordion();
         $("#frmSearchNetwork").submit(this.queryNetwork);
+        $("#divSubnetwork").scroll(this.infiniteScroll);
 
         //TODO: Add knockout event-handler for moving items
         $("#ulFilterableTerms").sortable(

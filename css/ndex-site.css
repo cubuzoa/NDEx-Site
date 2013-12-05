@@ -577,37 +577,6 @@ dl.Accordion > dd
   width: 250px;
 }
 
-#divNetworkResults
-{
-  float: left;
-  width: 55%;
-}
-
-#divNetworkResults ul:not(.nav) > li
-{
-  background: #E7F6FE;
-  border-top: 1px solid #246E98;
-  display: block;
-  padding: 1px 3px;
-}
-
-#divEdges > ul em
-{
-  color: #246E98;
-  font-style: none;
-}
-
-#divEdges > ul strong
-{
-  color: #FF8E08;
-  font-weight: normal;
-}
-
-#divNodes > ul li
-{
-  color: #246E98;
-}
-
 #divSearchNetwork ul
 {
   border: 1px dashed #C0C0C0;
@@ -663,6 +632,17 @@ dl.Accordion > dd
   background: -webkit-linear-gradient(top, #440000, #550000);
   border-top: 1px solid #330000;
   filter: progid : DXImageTransform . Microsoft . gradient(startColorstr = "#440000", endColorstr = "#550000");
+}
+
+#divNetworkResults
+{
+    float: left;
+    width: 55%;
+}
+
+#divSubnetwork
+{
+    OVERFLOW-Y: auto;
 }
 
 /******************************************************************************

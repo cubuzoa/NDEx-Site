@@ -29,7 +29,8 @@ var User =
     acceptRequest: function(event)
     {
         var acceptedRequest = event.data;
-        acceptedRequest.response = "ACCEPTED";
+        acceptedRequest.response = $(this).val();
+        acceptedRequest.responseMessage = $("#divModalContent textarea").val();
         acceptedRequest.responder = NdexWeb.ViewModel.User().id();
 
         NdexWeb.post("/requests",
@@ -194,6 +195,7 @@ var User =
     {
         var declinedRequest = event.data;
         declinedRequest.response = "DECLINED";
+        declinedRequest.responseMessage = $("#divModalContent textarea").val();
         declinedRequest.responder = NdexWeb.ViewModel.User().id();
 
         NdexWeb.post("/requests",
@@ -250,12 +252,23 @@ var User =
                 $("#divModalContent strong").removeClass("hide");
                 $("#divModalContent strong > em").text(userRequest.response());
                 $("#divModalContent strong > span").text(userRequest.responder());
+
+                //Now that the user has viewed one of their requests that was
+                //responded to, delete the request
+                if (userRequest.toId() === NdexWeb.ViewModel.User.id())
+                {
+                    $("#btnCloseModal").click(function()
+                    {
+                        NdexWeb.delete("/requests/" + userRequest.id());
+                        NdexWeb.hideModal();
+                    });
+                }
             }
             else if (User.canRespond(userRequest))
             {
                 $("#divModalContent button").removeClass("hide");
                 $("#divModalContent #btnDecline").click(userRequest, User.declineRequest);
-                $("#divModalContent #btnAccept").click(userRequest, User.acceptRequest);
+                $("#divModalContent #select").change(userRequest, User.acceptRequest);
             }
         });
     },

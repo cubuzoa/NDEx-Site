@@ -187,10 +187,10 @@
             <ul data-bind="foreach: requests">
                 <li>
                     <!-- ko if: fromId() === NdexWeb.ViewModel.User().id() -->
-                    From: <a href="javascript:void()" data-bind="css: { 'text-success': response() === 'ACCEPTED', 'text-error': response() === 'DECLINED' }, click: User.showRequest">You</a>
+                    From: <a href="javascript:void()" data-bind="css: { 'text-success': response() != 'DECLINED', 'text-error': response() === 'DECLINED' }, click: User.showRequest">You</a>
                     <!-- /ko -->
                     <!-- ko if: fromId() !== NdexWeb.ViewModel.User().id() -->
-                    From: <a href="javascript:void()" data-bind="css: { 'text-success': response() === 'ACCEPTED', 'text-error': response() === 'DECLINED' }, text: from, click: User.showRequest"></a>
+                    From: <a href="javascript:void()" data-bind="css: { 'text-success': response() != 'DECLINED', 'text-error': response() === 'DECLINED' }, text: from, click: User.showRequest"></a>
                     <!-- /ko -->
                 </li>
             </ul>
@@ -238,14 +238,21 @@
         <span id="spanTo"></span>
     </div>
 
-    <hr />
-
     <p></p>
 
-    <div style="margin-top: 2em;">
+    <hr />
+
+    <textarea style="height: 60px; width: 60%"></textarea>
+
+    <div style="margin-top: 2em; position: relative;">
         <strong class="hide">This request was <em></em> by <span></span>.</strong>
         <button type="button" id="btnDecline" class="pull-right hide">Decline</button>
         <button type="button" id="btnAccept" class="pull-left hide">Accept ▼</button>
+        <select style="bottom: -38px; left: 0px; opacity: 0; position: absolute; width: 80px; z-index: 2;">
+            <option value="READ">Read</option>
+            <option value="WRITE">Write</option>
+            <option value="ADMIN">Admin</option>
+        </select>
     </div>
 </script>
 
