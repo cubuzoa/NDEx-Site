@@ -234,7 +234,7 @@ var Network =
             },
             function(subnetwork)
             {
-                Network.buildsubnetwork(subnetwork);
+                Network.buildSubnetwork(subnetwork);
             });
     },
 

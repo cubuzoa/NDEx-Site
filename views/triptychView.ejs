@@ -356,13 +356,10 @@ $(document).ready(function () {
                 if (network.edgeCount && network.edgeCount > visualizationMax) {
                     $('#message').html("<span class='errorMessage'>Network has " + network.edgeCount + " edges, more than current maximum of " + visualizationMax + "</span>");
                 }
-                NdexWeb.post(
-                        "/networks/" + encodeURIComponent(networkJID) + "/edges",
-                        {
-                            top: visualizationMax,
-                            skip: 0,
-                            searchString: ""
-                        },
+                NdexWeb.get(
+                        "/networks/" + encodeURIComponent(networkJID) + "/edges/" + visualizationMax + "/" + 0,
+
+                        {},
                         function (network) {
                             {
                                 console.log("got network");
