@@ -42,16 +42,22 @@
         <div class="tabbable">
             <ul class="nav nav-tabs tab-title">
                 <li class="active">
-                    <a href="#divNetworks" data-toggle="tab">Networks</a>
+                    <a href="#divNetworks" data-toggle="tab">
+                        <i class="icon-exchange"></i>
+                        Networks
+                    </a>
                 </li>
                 <li>
-                    <a href="#divGroups" data-toggle="tab">Groups</a>
+                    <a href="#divGroups" data-toggle="tab">
+                        <i class="icon-group"></i>
+                        Groups
+                    </a>
                 </li>
-                <li id="divMemberships" class="hide">
-                    <a href="#groups" data-toggle="tab">Memberships</a>
-                </li>
-                <li id="divAgentAccounts" class="hide">
-                    <a href="#ownedAgentAccounts" data-toggle="tab">Agents</a>
+                <li data-bind="if: false">
+                    <a href="#divAgentAccounts" data-toggle="tab">
+                        <i class="icon-cogs"></i>
+                        Agents
+                    </a>
                 </li>
             </ul>
 
@@ -78,9 +84,10 @@
                                     <!-- /ko -->
 
                                 </td>
-                                <td data-bind="if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id()">
+                                <td>
                                     <div class="btn-group">
-                                        <a href="javascript:void()" class="btn" title="Add to Work Surface" rel="tooltip">
+                                        <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
+                                        <a href="javascript:void()" class="btn" title="Add to Work Surface">
                                             <!-- ko if: !WorkSurface.isOnWorkSurface(resourceId()) -->
                                             <i class="icon-plus icon-white" data-bind="click: WorkSurface.addNetwork"></i>
                                             <!-- /ko -->
@@ -88,12 +95,19 @@
                                             <i class="icon-remove icon-white" data-bind="click: WorkSurface.removeNetwork"></i>
                                             <!-- /ko -->
                                         </a>
-                                        <a href="javascript:void()" class="btn" title="Request access" rel="tooltip">
-                                            <i class="icon-exchange" data-bind="click: User.requestNetworkAccess"></i>
+                                        <!-- /ko -->
+
+                                        <!-- ko if: NdexWeb.ViewModel.User().id() != User.ViewModel.User().id() -->
+                                        <a href="javascript:void()" class="btn" title="Request access">
+                                            <i class="icon-envelope-alt" data-bind="click: User.requestNetworkAccess"></i>
                                         </a>
-                                        <a data-bind="attr: { href: '/network/' + resourceId() + '/visualize' }" class="btn" target="_blank" title="Visualize network" rel="tooltip">
+                                        <!-- /ko -->
+
+                                        <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
+                                        <a data-bind="attr: { href: '/network/' + resourceId() + '/visualize' }" class="btn" target="_blank" title="Visualize network">
                                             <i class="icon-eye-open"></i>
                                         </a>
+                                        <!-- /ko -->
                                     </div>
                                 </td>
                             </tr>
@@ -122,10 +136,10 @@
                                     <span data-bind="text: resourceName"></span>
                                     <!-- /ko -->
                                 </td>
-                                <td data-bind="if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id()">
+                                <td>
                                     <div class="btn-group">
-                                        <a href="javascript:void()" class="btn" title="Request access" rel="tooltip">
-                                            <i class="icon-exchange" data-bind="click: User.requestGroupAccess"></i>
+                                        <a href="javascript:void()" class="btn" title="Request access">
+                                            <i class="icon-envelope-alt" data-bind="click: User.requestGroupAccess"></i>
                                         </a>
                                     </div>
                                 </td>
@@ -162,7 +176,7 @@
             <!-- /ko -->
         </div>
 
-        <textarea class="Invisible" style="height: 100px; width: 100%;" readonly placeholder="Description" data-bind="value: description, isEditable: User.ViewModel.User().id(), event: { change: User.updateUser }"></textarea>
+        <textarea class="Invisible" style="height: 60px; width: 100%;" readonly placeholder="Description" data-bind="value: description, isEditable: User.ViewModel.User().id(), event: { change: User.updateUser }"></textarea>
 
         <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
         <div id="divNotifications">

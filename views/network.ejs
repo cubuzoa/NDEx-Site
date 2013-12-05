@@ -9,16 +9,16 @@
             <input type="text" class="Invisible" readonly placeholder="Title" data-bind="value: title, isEditable: Network.ViewModel.Network().id(), event: { change: Network.updateNetwork }"/>
         </h3>
 
-        <textarea class="Invisible" style="height: 100px; width: 40%;" readonly placeholder="Description" data-bind="value: description, isEditable: Network.ViewModel.Network().id(), event: { change: Network.updateNetwork }"></textarea>
+        <textarea class="Invisible" style="height: 60px; width: 40%;" readonly placeholder="Description" data-bind="value: description, isEditable: Network.ViewModel.Network().id(), event: { change: Network.updateNetwork }"></textarea>
 
         <div data-bind="if: Network.canEdit()">
-            <label class="Attribute-Editable">Public</label>
+            <label class="Attribute-Editable">Public:</label>
             <input type="checkbox" data-bind="checked: isPublic, event: { change: Network.updateNetwork }" />
         </div>
 
         <div>
-            <label class="Attribute-Editable">Source:</label>
-            <input type="text" readonly placeholder="Source" data-bind="value: source, isEditable: Network.ViewModel.Network().id(), event: { change: Network.updateNetwork }"/>
+            <label class="Attribute">Source:</label>
+            <span data-bind="text: source"></span>
         </div>
 
         <div>
@@ -39,7 +39,7 @@
     </div>
 
     <div id="divSearchNetwork" data-bind="with: Search">
-        <form>
+        <form id="frmSearchNetwork">
             <div id="divSearch">
                 <i class="icon-search"></i>
                 <input type="search" placeholder="Search keywords" data-bind="value: Keywords"/>
@@ -54,19 +54,19 @@
                 <dd>
                     <div>
                         <label class="Attribute-Editable">Max Nodes:</label>
-                        <input type="range" min="1" max="100" step="1" data-bind="value: MaxNodes, valueUpdate: 'mousemove'"/>
+                        <input type="range" min="1" max="1000" step="1" data-bind="value: MaxNodes, valueUpdate: 'mousemove'"/>
                         <span data-bind="text: MaxNodes"></span>
                     </div>
 
                     <div>
                         <label class="Attribute-Editable">Max Edges:</label>
-                        <input type="range" id="txtMaxEdges" min="1" max="100" step="1" data-bind="value: MaxEdges, valueUpdate: 'mousemove'"/>
+                        <input type="range" id="txtMaxEdges" min="1" max="1000" step="1" data-bind="value: MaxEdges, valueUpdate: 'mousemove'"/>
                         <span data-bind="text: MaxEdges"></span>
                     </div>
 
                     <div>
                         <label class="Attribute-Editable" for="">Max Paths:</label>
-                        <input type="range" min="1" max="100" step="1" data-bind="value: MaxPaths, valueUpdate: 'mousemove'"/>
+                        <input type="range" min="1" max="1000" step="1" data-bind="value: MaxPaths, valueUpdate: 'mousemove'"/>
                         <span data-bind="text: MaxPaths"></span>
                     </div>
 
@@ -122,7 +122,6 @@
                     <div>
                         <label class="Attribute-Editable">Direction:</label>
                         <select data-bind="value: Direction">
-                            <option value="DEFAULT">Default</option>
                             <option value="UPSTREAM">Upstream</option>
                             <option value="DOWNSTREAM">Downstream</option>
                             <option value="BOTH">Both</option>
@@ -171,15 +170,15 @@
     <div id="divNetworkResults">
         <ul class="nav nav-tabs tab-title">
             <li class="active">
-                <a href="#divEdges" data-toggle="tab">
-                    <i class="icon-star-empty"></i>
-                    Edges
+                <a href="#divSubnetwork" data-toggle="tab">
+                    <i class="icon-exchange"></i>
+                    Subnetwork
                 </a>
             </li>
             <li>
-                <a href="#divNodes" data-toggle="tab">
-                    <i class="icon-star"></i>
-                    Nodes
+                <a href="#divMembers" data-toggle="tab">
+                    <i class="icon-male"></i>
+                    Members
                 </a>
             </li>
             <li>
@@ -191,24 +190,77 @@
         </ul>
 
         <div class="tab-content" data-bind="with: Network">
-            <div class="tab-pane active" id="divEdges">
-                <ul data-bind="foreach: Edges">
-                    <li>
-                        <em data-bind="text: subject.term.name"></em>
-                        <strong data-bind="text: predicate.name"></strong>
-                        <em data-bind="text: object.term.name"></em>
-                    </li>
-                </ul>
+            <div class="tab-pane active" id="divSubnetwork">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Predicate</th>
+                            <th>Object</th>
+                            <th>Citation</th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach: edges">
+                        <tr>
+                            <td data-bind="text: subject.term.name"></td>
+                            <td data-bind="text: predicate.name"></td>
+                            <td data-bind="text: object.term.name"></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
-            <div class="tab-pane" id="divNodes">
-                <ul data-bind="foreach: Nodes">
-                    <li data-bind="text: term.name"></li>
-                </ul>
+            <div class="tab-pane" id="divMembers">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <!-- ko if: Network.canEdit() -->
+                        <th>Permissions</th>
+                        <!-- /ko -->
+                    </tr>
+                    </thead>
+                    <tbody data-bind="foreach: members">
+                    <tr>
+                        <td data-bind="text: resourceName"></td>
+                        <!-- ko if: Network.canEdit() -->
+                        <td data-bind="text: permissions"></td>
+                        <!-- /ko -->
+                    </tr>
+                    </tbody>
+                </table>
             </div>
 
             <div class="tab-pane" id="divVisualize">
-
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Engine</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>
+                            <a data-bind="attr: { href: '/network' + $root.NetworkId() + '/visualize' }">Cytoscape</a>
+                        </td>
+                        <td>
+                            An engine that supplies a basic visualization of the network in a two-dimensional wheel.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a data-bind="attr: { href: '/network' + $root.NetworkId() + '/triptych' }">Triptych</a>
+                        </td>
+                        <td>
+                            An engine that supplies a three-dimensional force-graph of the network. Uses WebGL if
+                            supported by the browser or gracefully degrades to HTML 5's Canvas. Not usable by older
+                            browsers that don't at least support HTML 5's Canvas.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

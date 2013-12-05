@@ -7,10 +7,10 @@ var Network =
         Network: ko.observable(),
         Search:
         {
-            Direction: ko.observable("DEFAULT"),
+            Direction: ko.observable("BOTH"),
             Fuzziness: ko.observable("STRICT"),
             Keywords: ko.observable(""),
-            MaxDepth: ko.observable(10),
+            MaxDepth: ko.observable(1),
             MaxEdges: ko.observable(10),
             MaxNodes: ko.observable(10),
             MaxPaths: ko.observable(10),
@@ -29,7 +29,7 @@ var Network =
             }
         },
         PageIndex: ko.observable(1),
-        PageSize: ko.observable(15)
+        PageSize: ko.observable(25)
     },
 
     /****************************************************************************
@@ -37,9 +37,119 @@ var Network =
     ****************************************************************************/
     _init: function()
     {
+        $("#divSearch input[type='search']").autocomplete(
+        {
+            delay: 500,
+            minLength: 3,
+            source: Network.autoSuggestTerms
+        });
+
         ko.applyBindings(Network.ViewModel, $("#divNetwork")[0]);
+
         this.getNetwork();
         this.wireEvents();
+    },
+
+    /**************************************************************************
+    * Retrieves terms that start with whatever is typed into the search box.
+    **************************************************************************/
+    autoSuggestTerms: function(request, response)
+    {
+        NdexWeb.get("/networks/" + Network.ViewModel.NetworkId() + "/autosuggest/" + request.term,
+            null,
+            function(matchingTerms)
+            {
+                response(matchingTerms);
+            });
+    },
+
+    /**************************************************************************
+    * Builds the subnetwork.
+    **************************************************************************/
+    buildSubnetwork: function(subnetwork)
+    {
+        var networkCitations = ko.mapping.fromJS(subnetwork.citations);
+        var networkSupports = ko.mapping.fromJS(subnetwork.supports);
+
+        if (typeof(networkCitations) === "function")
+            Network.ViewModel.Network().citations(networkCitations());
+        else
+            Network.ViewModel.Network().citations(networkCitations);
+
+        if (typeof(networkSupports) === "function")
+            Network.ViewModel.Network().citations(networkSupports());
+        else
+            Network.ViewModel.Network().citations(networkSupports);
+
+        Network.buildEdges(subnetwork);
+        Network.buildNodes(subnetwork);
+        Network.buildTerms(subnetwork);
+    },
+
+    /**************************************************************************
+    * Maps the edges of the subnetwork into an array. This is done by
+    * recursively traversing the edges, nodes, and terms dictionaries to get
+    * references to the subject, predicate, and object.
+    **************************************************************************/
+    buildEdges: function(subnetwork)
+    {
+        var edgeArray = [];
+        for (var edge in subnetwork.edges)
+        {
+            var newEdge = {};
+            newEdge.id = edge;
+            newEdge.subject = subnetwork.nodes[subnetwork.edges[edge].s];
+            newEdge.subject.term = subnetwork.terms[newEdge.subject.represents];
+            newEdge.predicate = subnetwork.terms[subnetwork.edges[edge].p];
+            newEdge.object = subnetwork.nodes[subnetwork.edges[edge].o];
+            newEdge.object.term = subnetwork.terms[newEdge.object.represents];
+
+            edgeArray.push(newEdge);
+        }
+
+        edgeArray = ko.mapping.fromJS(edgeArray);
+        Network.ViewModel.Network().edges(edgeArray());
+    },
+
+    /**************************************************************************
+    * Maps the nodes of the subnetwork into an array.
+    **************************************************************************/
+    buildNodes: function(subnetwork)
+    {
+        var nodeArray = [];
+        for (var node in subnetwork.nodes)
+        {
+            var newNode = {}; //subnetwork.nodes[node];
+            newNode.id = node;
+
+            //Only use nodes that represent terms; lookup the term
+            if (subnetwork.nodes[node].represents)
+            {
+                newNode.represents = subnetwork.nodes[node].represents;
+                newNode.term = subnetwork.terms[newNode.represents];
+                nodeArray.push(newNode);
+            }
+        }
+
+        nodeArray = ko.mapping.fromJS(nodeArray);
+        Network.ViewModel.Network().nodes(nodeArray());
+    },
+
+    /**************************************************************************
+    * Maps the terms of the subnetwork into an array.
+    **************************************************************************/
+    buildTerms: function(subnetwork)
+    {
+        var termArray = [];
+        for (var term in subnetwork.terms)
+        {
+            var newTerm = {};
+            newTerm.id = term;
+            termArray.push(newTerm);
+        }
+
+        termArray = ko.mapping.fromJS(termArray);
+        Network.ViewModel.Network().terms(termArray());
     },
 
     /****************************************************************************
@@ -63,32 +173,11 @@ var Network =
     getEdges: function()
     {
         NdexWeb.get(
-            "/networks/" + this.ViewModel.Network().id() + "/edge",
+            "/networks/" + this.ViewModel.Network().id() + "/edges/" + Network.ViewModel.PageIndex() + "/" + Network.ViewModel.PageSize(),
+            null,
+            function(networkEdges)
             {
-                skip: this.ViewModel.PageIndex() - 1,
-                top: this.ViewModel.PageSize()
-            },
-            function(edges)
-            {
-                //The edges collection is a dictionary, so convert it into an array.
-                //Each edge is a reference to a subject, predicate, and object; each
-                //one must be looked up in a separate array
-                var edgeArray = [];
-                for (var edge in edges.network.edges)
-                {
-                    var newEdge = edges.network.edges[edge];
-                    newEdge.id = newEdge;
-                    newEdge.subject = edges.network.nodes[edges.network.edges[edge].s];
-                    newEdge.subject.term = edges.network.terms[newEdge.subject.represents];
-                    newEdge.predicate = edges.network.terms[edges.network.edges[edge].p];
-                    newEdge.object = edges.network.nodes[edges.network.edges[edge].o];
-                    newEdge.object.term = edges.network.terms[newEdge.object.represents];
-
-                    edgeArray.push(newEdge);
-                }
-
-                edgeArray = ko.mapping.fromJS(edgeArray);
-                Network.ViewModel.Network().Edges(edgeArray());
+                Network.buildSubnetwork(networkEdges);
             });
     },
 
@@ -103,55 +192,49 @@ var Network =
             function(network)
             {
                 network = ko.mapping.fromJS(network);
+
+                if (typeof(network.citations) != "function")
+                    network.citations = ko.observable();
+
+                if (typeof(network.edges) != "function")
+                    network.edges = ko.observable();
+
+                if (typeof(network.nodes) != "function")
+                    network.nodes = ko.observable();
+
+                if (typeof(network.supports) != "function")
+                    network.supports = ko.observable();
+
+                if (typeof(network.terms) != "function")
+                    network.terms = ko.observable();
+
                 Network.ViewModel.Network(network);
-                //TODO: These need to be updated per Dexter's latest changes
-                //Network.getNodes();
-                //Network.getEdges();
+                Network.getEdges();
             });
     },
 
     /****************************************************************************
-    * Gets network nodes.
+    * Queries the network for the specified subnetwork using the provided
+    * search parameters.
     ****************************************************************************/
-    getNodes: function()
+    queryNetwork: function(event)
     {
-        NdexWeb.get(
-            "/networks/" + this.ViewModel.Network().id() + "/node",
+        event.preventDefault();
+
+        var startingTerms = [];
+        startingTerms.push($("#divSearch input[type='search']").val());
+
+        //TODO: Eventually push the whole Search object up and make the server-side model match it.
+        NdexWeb.post("/networks/" + Network.ViewModel.NetworkId() + "/query",
             {
-                skip: this.ViewModel.PageIndex() - 1,
-                top: this.ViewModel.PageSize()
+                representationCriterion: Network.ViewModel.Search.Fuzziness(),
+                searchDepth: Network.ViewModel.Search.MaxDepth(),
+                searchType: Network.ViewModel.Search.Direction(),
+                startingTermStrings: startingTerms
             },
-            function(nodes)
+            function(subnetwork)
             {
-                //The nodes collection is a dictionary, so convert it into an array
-                var nodeArray = [];
-                for (var node in nodes.network.nodes)
-                {
-                    var newNode = nodes.network.nodes[node];
-                    newNode.id = node;
-
-                    //Only use nodes that represent terms; lookup the term
-                    if (newNode.represents)
-                    {
-                        newNode.term = nodes.network.terms[newNode.represents];
-                        nodeArray.push(newNode);
-                    }
-                }
-
-                nodeArray = ko.mapping.fromJS(nodeArray);
-                Network.ViewModel.Network().Nodes(nodeArray());
-
-                //Convert the terms dictionary into an array
-                var termArray = [];
-                for (var term in nodes.network.terms)
-                {
-                    var newTerm = nodes.network.terms[term];
-                    newTerm.id = term;
-                    termArray.push(newTerm);
-                }
-
-                termArray = ko.mapping.fromJS(termArray);
-                Network.ViewModel.Network().Terms(termArray());
+                Network.buildsubnetwork(subnetwork);
             });
     },
 
@@ -190,41 +273,45 @@ var Network =
     ****************************************************************************/
     wireEvents: function()
     {
+        this.setupAccordion();
+        $("#frmSearchNetwork").submit(this.queryNetwork);
+
         //TODO: Add knockout event-handler for moving items
-        //TODO: Move these to a modal, or add more accordion keys?
-        //TODO: What to do for visualization?
         $("#ulFilterableTerms").sortable(
         {
             connectWith: ".FilterableTerms",
             placeholder: "ui-state-highlight"
         });
+
         $("#ulTermsIncluded").sortable(
         {
             connectWith: ".FilterableTerms",
             placeholder: "ui-state-highlight"
         });
+
         $("#ulTermsExcluded").sortable(
         {
             connectWith: ".FilterableTerms",
             placeholder: "ui-state-highlight"
         });
+
         $("#ulTraversalTerms").sortable(
         {
             connectWith: ".TraversalTerms",
             placeholder: "ui-state-highlight"
         });
+
         $("#ulStartingTerms").sortable(
         {
             connectWith: ".TraversalTerms",
             placeholder: "ui-state-highlight"
         });
+
         $("#ulTargetTerms").sortable(
         {
             connectWith: ".TraversalTerms",
             placeholder: "ui-state-highlight"
         });
-
-        this.setupAccordion();
     }
 };
 

@@ -39,11 +39,7 @@
             <td class="AlignRight" data-bind="text: edgeCount"></td>
             <td>
                 <div class="btn-group">
-
-
-
-                    <a data-bind="attr: { href: '/network/' + id + '/visualize' }" class="btn" target="_blank"
-                       title="Visualize network" rel="tooltip">
+                    <a data-bind="attr: { href: '/network/' + id + '/visualize' }" class="btn" target="_blank" title="Visualize network">
                         <i class="icon-eye-open"></i>
                     </a>
                 </div>
@@ -51,11 +47,12 @@
         </tr>
         </tbody>
     </table>
-    <input data-bind="visible: NetworkSearch.previousVisible()" id="btnPrev" type="button" value="Prev"/>
+    <input data-bind="visible: NetworkSearch.previousVisible()" id="btnPrev" type="button" value="Prev" />
     <span data-bind="visible: NetworkSearch.resultsVisible()">
-            Page: <span data-bind="text: PageIndex"></span>
+        Page:
+        <span data-bind="text: PageIndex"></span>
     </span>
-    <input data-bind="visible: NetworkSearch.nextVisible()" id="btnNext" type="button" value="Next"/>
+    <input data-bind="visible: NetworkSearch.nextVisible()" id="btnNext" type="button" value="Next" />
 
 </div>
 

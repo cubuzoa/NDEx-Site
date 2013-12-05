@@ -134,26 +134,24 @@ var User =
             $("#frmChangeImage").attr("action", NdexWeb.ApiHost + "/users/" + NdexWeb.ViewModel.User().id() + "/profile-background");
             $("#fileNewImage").change(function()
             {
-                $("#frmChangeImage").ajaxForm(
+                $("#frmChangeImage").ajaxSubmit(
                 {
-                    iframe: true,
                     dataType: "json",
                     beforeSend: function(xhr)
                     {
                         xhr.setRequestHeader("Authorization", "Basic " + NdexWeb.ViewModel.EncodedUser());
+                        xhr.setRequestHeader("Test Header", "Dammit");
                     },
                     success: function()
                     {
-                        $("#imgProfileBackground").attr("src", "");
-                        $("#imgProfileBackground").attr("src", "/img/background/" + NdexWeb.ViewModel.User().username() + ".jpg");
+                        $("#imgProfileBackground").attr("src", "/img/background/" + NdexWeb.ViewModel.User().username() + ".jpg?" + Math.random(100000, 1000000));
+                        NdexWeb.hideModal();
                     },
                     error: function(jqXHR, textStatus, errorThrown)
                     {
                         $.gritter.add({ title: "Failure", text: "Failed to change your profile background." });
                     }
                 });
-
-                $("#frmChangeImage").submit();
             });
         });
     },
@@ -168,9 +166,8 @@ var User =
             $("#frmChangeImage").attr("action", NdexWeb.ApiHost + "/users/" + NdexWeb.ViewModel.User().id() + "/profile-image");
             $("#fileNewImage").change(function()
             {
-                $("#frmChangeImage").ajaxForm(
+                $("#frmChangeImage").ajaxSubmit(
                 {
-                    iframe: true,
                     dataType: "json",
                     beforeSend: function(xhr)
                     {
@@ -178,16 +175,14 @@ var User =
                     },
                     success: function()
                     {
-                        $("#imgProfile").attr("src", "");
-                        $("#imgProfile").attr("src", "/img/foreground/" + NdexWeb.ViewModel.User().username() + ".jpg");
+                        $("#imgProfile").attr("src", "/img/foreground/" + NdexWeb.ViewModel.User().username() + ".jpg?" + Math.random(100000, 1000000));
+                        NdexWeb.hideModal();
                     },
                     error: function(jqXHR, textStatus, errorThrown)
                     {
                         $.gritter.add({ title: "Failure", text: "Failed to change your profile image." });
                     }
                 });
-
-                $("#frmChangeImage").submit();
             });
         });
     },

@@ -190,14 +190,15 @@ var NdexWeb =
         event.preventDefault();
 
         var requestData = $("#txtMessage").data("Request");
-        requestData.Message = $("#txtMessage").val();
+        requestData.message = $("#txtMessage").val();
 
-        for (var ownerIndex = 0; ownerIndex < requestData.owners().length; ownerIndex++)
-        {
-            //TODO: Submit the request to each owner
-        }
-
-        NdexWeb.closeModal();
+        NdexWeb.put("/requests",
+            requestData,
+            function()
+            {
+                $.gritter.add({ title: "Request Sent", text: "Your request has been sent." });
+                NdexWeb.hideModal();
+            });
     },
 
     /****************************************************************************
@@ -267,9 +268,9 @@ var NdexWeb =
                 .val(defaultMessage)
                 .data("Request",
                 {
-                    FromId: NdexWeb.ViewModel.User().Id,
-                    ToId: requestedResource.resourceId(),
-                    Type: requestType
+                    fromId: NdexWeb.ViewModel.User().id(),
+                    toId: requestedResource.resourceId(),
+                    requestType: requestType
                 });
         });
     },
@@ -280,7 +281,12 @@ var NdexWeb =
     wireEvents: function()
     {
         $("#btnCloseModal").click(this.hideModal);
-        $(document).on("click", "#frmRequest", this.sendRequest);
+        $(document).on("submit", "#frmRequest", this.sendRequest);
+
+        $(document).on("[title]", function()
+        {
+            $(this).tooltip();
+        });
     }
 };
 
