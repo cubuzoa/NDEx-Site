@@ -2,9 +2,8 @@
 var Network =
 {
     IsLoadingNextPage: true,
-    PageIndex: ko.observable(1),
-    PageSize: ko.observable(25),
-    PagingFunction: null,
+    PageIndex: 1,
+    PageSize: 25,
     ViewModel:
     {
         NetworkId: ko.observable(),
@@ -175,17 +174,17 @@ var Network =
     getEdges: function()
     {
         NdexWeb.get(
-            "/networks/" + this.ViewModel.Network().id() + "/edges/" + Network.PageIndex() + "/" + Network.PageSize(),
+            "/networks/" + this.ViewModel.Network().id() + "/edges/" + (Network.PageIndex - 1) + "/" + Network.PageSize,
             null,
             function(networkEdges)
             {
                 Network.IsLoadingNextPage = false;
                 Network.buildSubnetwork(networkEdges);
             },
-            function(exception)
+            function(jqXHR, textStatus, errorThrown)
             {
                 Network.IsLoadingNextPage = false;
-                NdexWeb.errorHandler(exception);
+                NdexWeb.errorHandler(jqXHR, textStatus, errorThrown);
             });
     },
 
@@ -217,9 +216,8 @@ var Network =
                     network.terms = ko.observable();
 
                 Network.ViewModel.Network(network);
-
-                Network.PagingFunction = Network.getEdges;
-                Network.PageIndex = 0;
+                Network.PageIndex = 1;
+                $("#divSubnetwork").scroll(this.infiniteScroll);
                 Network.getEdges();
             });
     },
@@ -240,7 +238,7 @@ var Network =
             {
                 Network.IsLoadingNextPage = true;
                 Network.PageIndex++;
-                Network.PagingFunction();
+                Network.getEdges();
             }
         }
     },
@@ -267,7 +265,7 @@ var Network =
             },
             function(subnetwork)
             {
-                Network.PagingFunction = Network.queryNetwork;
+                $("#divSubnetwork").unbind("scroll");
                 Network.buildSubnetwork(subnetwork);
             });
     },
@@ -309,7 +307,6 @@ var Network =
     {
         this.setupAccordion();
         $("#frmSearchNetwork").submit(this.queryNetwork);
-        $("#divSubnetwork").scroll(this.infiniteScroll);
 
         //TODO: Add knockout event-handler for moving items
         $("#ulFilterableTerms").sortable(

@@ -64,10 +64,9 @@ var NdexWeb =
     /****************************************************************************
     * Default error handling.
     ****************************************************************************/
-    errorHandler: function(exception)
+    errorHandler: function(jqXHR, textStatus, errorThrown)
     {
-        console.log("Exception thrown: " + JSON.stringify(exception));
-        //$.gritter.add({ title: "Exception", text: JSON.stringify(exception) });
+        $.gritter.add({ title: errorThrown, text: jqXHR.responseText });
     },
 
     /****************************************************************************
