@@ -1,17 +1,16 @@
 <% include header.ejs %>
 
-<script src="/js/cytoscape.js"></script>
+<script src="/js/cytoscape.js-2.0.3/cytoscape.min.js"></script>
+<script src="/js/cytoscape.js-2.0.3/arbor.js"></script>
 <link rel="stylesheet" type="text/css" href="/css/visualize_network.css"/>
 
 <script>
+    var cy;
     var result = [];
     // the network id passed from the ejs template
     var networkJID = '<%= networkId %>'
-
-    //				'text-outline-width': 2,
-    //				'text-outline-color': '#888'
-
-    var cyNetworkParams = {
+/*
+    var cyOptions = {
 
         layout: {
             name: 'circle'
@@ -39,10 +38,96 @@
                 .css({
                     'opacity': 0.25,
                     'text-opacity': 0
-                })
+                }),
+        ready: function(){
+            cy = this;
+        }
     };
+ */
 
-    var visualizationMax = 1000;
+    //				'text-outline-width': 2,
+    //				'text-outline-color': '#888'
+    function loadCy(elements){
+
+        options = {
+            showOverlay: false,
+            minZoom: 0.5,
+            maxZoom: 2,
+
+            style: cytoscape.stylesheet()
+                    .selector('node')
+                    .css({
+                        'content': 'data(name)',
+                        'font-family': 'helvetica',
+                        'font-size': 14,
+                        'text-outline-width': 3,
+                        'text-outline-color': '#888',
+                        'text-valign': 'center',
+                        'color': '#fff',
+                        'width': 'mapData(weight, 30, 80, 20, 50)',
+                        'height': 'mapData(height, 0, 200, 10, 45)',
+                        'border-color': '#fff'
+                    })
+                    .selector(':selected')
+                    .css({
+                        'background-color': '#000',
+                        'line-color': '#000',
+                        'target-arrow-color': '#000',
+                        'text-outline-color': '#000'
+                    })
+                    .selector('edge')
+                    .css({
+                        'width': 2,
+                        'target-arrow-shape': 'triangle'
+                    })
+            ,
+
+            elements: elements,
+
+            ready: undefined,
+
+            layout: {
+                name: 'arbor',
+                liveUpdate: true, // whether to show the layout as it's running
+                ready: undefined, // callback on layoutready
+                stop: undefined, // callback on layoutstop
+                maxSimulationTime: 4000, // max length in ms to run the layout
+                fit: true, // reset viewport to fit default simulationBounds
+                padding: [ 50, 50, 50, 50 ], // top, right, bottom, left
+                simulationBounds: undefined, // [x1, y1, x2, y2]; [0, 0, width, height] by default
+                ungrabifyWhileSimulating: true, // so you can't drag nodes during layout
+
+                // forces used by arbor (use arbor default on undefined)
+                repulsion: undefined,
+                stiffness: undefined,
+                friction: undefined,
+                gravity: true,
+                fps: undefined,
+                precision: undefined,
+
+                // static numbers or functions that dynamically return what these
+                // values should be for each element
+                nodeMass: undefined,
+                edgeLength: undefined,
+
+                stepSize: 1, // size of timestep in simulation
+
+                // function that returns true if the system is stable to indicate
+                // that the layout can be stopped
+                stableEnergy: function( energy ){
+                    var e = energy;
+                    return (e.max <= 0.5) || (e.mean <= 0.3);
+                }
+            }
+        };
+
+        $('#cy').cytoscape(options);
+        return cy;
+
+    }
+
+    var maxEdges = 1000;
+    var skip = 0;
 
     // On load, we get the network, then push it to cytoscape.js on the callback
     $(document).ready(function () {
@@ -50,11 +135,11 @@
                 "/networks/" + encodeURIComponent(networkJID),
                 null,
                 function (network) {
-                    if (network.edgeCount && network.edgeCount > visualizationMax) {
-                        $('#message').html("<span class='errorMessage'>Network has " + network.edgeCount + " edges, more than current maximum of " + visualizationMax + "</span>");
+                    if (network.edgeCount && network.edgeCount > top) {
+                        $('#message').html("<span class='errorMessage'>Network has " + network.edgeCount + " edges, more than current maximum of " + top + "</span>");
                     }
                     NdexWeb.get(
-                            "/networks/" + encodeURIComponent(networkJID) + "/edges/" + visualizationMax + "/" + 0,
+                            "/networks/" + encodeURIComponent(networkJID) + "/edges/" + skip + "/" + maxEdges,
                             {},
                             function (network) {
                                 var elements = {nodes: [], edges: []};
@@ -75,9 +160,8 @@
                                     elements.edges.push(cyEdge);
                                 });
 
-                                cyNetworkParams.elements = elements;
+                                loadCy(elements);
 
-                                $('#cy').cytoscape(cyNetworkParams);
                             }
 
                     );

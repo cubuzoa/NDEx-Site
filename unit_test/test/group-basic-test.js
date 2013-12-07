@@ -8,7 +8,7 @@ var request = require('request'),
 describe('group-basic', function () {
 
 	//josh is to be used in multiple test cases
-	var josh, group1, group2;
+	var josh, group1, group2, group3;
 	before( function (done) {
 		console.log('setup: group-basic test');
         josh = {
@@ -20,27 +20,39 @@ describe('group-basic', function () {
             name : "Group1",
             organizationName: "fake",
             website: "fake",
-            description: "fake"
+            description: "fake",
+            members : [
+                {}
+                ]
         };
         group2 = {
             name : "Group2",
             organizationName: "fake",
             website: "fake",
-            description: "fake"
+            description: "fake",
+            members : [
+                {}
+                ]
         };
 
         group3 = {
             name : "Group3",
             organizationName: "fake",
             website: "fake",
-            description: "fake"
+            description: "fake",
+            members : [
+                {}
+            ]
         };
 
         invalidGroup = {
             name : "$!invalid!",
             organizationName: "fake",
             website: "fake",
-            description: "fake"
+            description: "fake",
+            members : [
+                {}
+            ]
         };
 
 		ndex.put(
@@ -63,16 +75,21 @@ describe('group-basic', function () {
 			}
 		);
 	});
-	
+
+
 	describe('group-basic', function(){
+
+
 		describe(" -> group-basic non-existent", function(){
 			it("should not get 200 when attempting to create group with non-existent user", function(done){
+
+                group3.members[0].resourceId = "C21R4444";
+                group3.members[0].resourceName = "josh";
+                group3.members[0].permissions = "ADMIN";
+
 				ndex.put(
 					'/groups/',
-					{
-                        ownerId : "C21R4444",
-                        newGroup : group3
-                    },
+					group3,
 					josh,
 					function(err,res,body){
 						if(err) { done(err) }
@@ -87,12 +104,13 @@ describe('group-basic', function () {
 
 		describe(" -> group-basic invalid groupName", function(){
 			it("should not get 200 for attempting to create group with invalid groupname", function(done){
+                invalidGroup.members[0].resourceId = josh.id;
+                invalidGroup.members[0].resourceName = josh.name;
+                invalidGroup.members[0].permissions = "ADMIN";
+
 				ndex.put(
 					'/groups/',
-					{
-                        ownerId : josh.id ,
-                        newGroup : invalidGroup
-                    },
+					invalidGroup,
 					josh,
 					function(err,res,body){
 						if(err) { done(err) }
@@ -108,12 +126,14 @@ describe('group-basic', function () {
 
 		describe(" -> group-basic create ok", function(){
 			it("should get 200 for attempting to create group1 for Josh, returns group id", function(done){
+
+                group1.members[0].resourceId = josh.id;
+                group1.members[0].resourceName = josh.name;
+                group1.members[0].permissions = "ADMIN";
+
 				ndex.put(
 					'/groups/',
-                    {
-                        ownerId : josh.id ,
-                        newGroup : group1
-                    },
+                    group1,
 					josh,
 					function(err,res,body){
 						if(err) { done(err) }
@@ -133,10 +153,7 @@ describe('group-basic', function () {
 			it("should not get 200 when attempting to create group with taken groupname", function(done){
 				ndex.put(
 					'/groups/',
-					{
-                        ownerId : josh.id ,
-                        newGroup : group1
-                    },
+                    group1,
 					josh,
 					function(err,res,body){
 						if(err) { done(err) }
@@ -177,16 +194,16 @@ describe('group-basic', function () {
 						else {
                             console.log(JSON.stringify(res.body));
 							res.should.have.status(200);
-							var ownedGroups = res.body.user.ownedGroups;
+							var ownedGroups = res.body.groups;
 							var firstOwnedGroup = ownedGroups[0];
-							group1.jid.should.equal(firstOwnedGroup.jid);
-							//console.log(firstOwnedGroup.jid)
+							group1.id.should.equal(firstOwnedGroup.resourceId);
 							done();
 						}
 					}
 				);
 			});
 		});
+
 
 		describe(" -> group-basic delete non-existent", function(){
 			it("should not get 200 when attempting to delete group by non-existent id C22R444444", function(done){
@@ -205,14 +222,14 @@ describe('group-basic', function () {
 		});
 
 		describe(" -> group-basic delete ok", function(){
-			it("should get 200 for attempting to delete group1", function(done){
+			it("should get 204 when attempting to delete group1", function(done){
 				ndex.delete(
 					'/groups/' + group1.id,
 					josh,
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
-							res.should.have.status(200);
+							res.should.have.status(204);
 							done();
 						}
 					}
@@ -220,8 +237,27 @@ describe('group-basic', function () {
 			});
 		});
 
-		describe(" -> group-basic delete already deleted", function(){
-			it("should not get 200 when attempting to get deleted group1", function(done){
+        describe(" -> josh test", function(){
+            it("should get 200 for attempting to get user josh", function(done){
+                ndex.get(
+                    '/users/' + josh.id,
+                    {},
+                    josh,
+                    function(err,res,body){
+                        if(err) { done(err) }
+                        else {
+                            console.log(JSON.stringify(res.body));
+                            res.should.have.status(200);
+                            done();
+                        }
+                    }
+                );
+            });
+        });
+
+
+        describe(" -> group-basic delete already deleted", function(){
+			it("should not get 200 when attempting to delete deleted group1", function(done){
 				ndex.delete(
 					'/groups/' + group1.id,
 					josh,
@@ -236,6 +272,24 @@ describe('group-basic', function () {
 			});
 		});
 
+        describe(" -> josh test", function(){
+            it("should get 200 for attempting to get user josh", function(done){
+                ndex.get(
+                    '/users/' + josh.id,
+                    {},
+                    josh,
+                    function(err,res,body){
+                        if(err) { done(err) }
+                        else {
+                            console.log(JSON.stringify(res.body));
+                            res.should.have.status(200);
+                            done();
+                        }
+                    }
+                );
+            });
+        });
+
 		describe(" -> group-basic get user and show deleted group not owned", function(){
 			it("should get 200 for attempting to get user josh, should not find group1", function(done){
 				ndex.get(
@@ -245,10 +299,10 @@ describe('group-basic', function () {
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
+                            console.log(JSON.stringify(res.body));
 							res.should.have.status(200);
-							var groupData = res.body.user.ownedGroups;
-							groupData.should.be.empty;
-							//console.log(groupData.length)//.jid)
+							var ownedGroups = res.body.groups;
+							ownedGroups.should.be.empty;
 							done();
 						}
 					}
@@ -258,12 +312,14 @@ describe('group-basic', function () {
 
 		describe(" -> group-basic create second group", function(){
 			it("should get 200 for attempting to create another group for Josh, returns id", function(done){
+
+                group2.members[0].resourceId = josh.id;
+                group2.members[0].resourceName = josh.name;
+                group2.members[0].permissions = "ADMIN";
+
 				ndex.put(
 					'/groups/',
-					{
-                        ownerId : josh.id ,
-                        newGroup : group2
-                    },
+					group2,
 					josh,
 					function(err,res,body){
 						if(err) { done(err) }
@@ -279,14 +335,14 @@ describe('group-basic', function () {
 		});
 
 		describe(" -> group-basic delete second group", function(){
-			it("should get 200 for attempting to delete group2", function(done){
+			it("should get 204 when attempting to delete group2", function(done){
 				ndex.delete(
 					'/groups/' + group2.id,
 					josh,
 					function(err,res,body){
 						if(err) { done(err) }
 						else {
-							res.should.have.status(200);
+							res.should.have.status(204);
 							done();
 						}
 					}
@@ -310,18 +366,22 @@ describe('group-basic', function () {
 				);
 			});
 		});
-		
+
+
+
 	});
-	
+
 	after( function (done) {
 		console.log('teardown: group-basic test')
 		ndex.delete(
 			'/users/' + josh.id,
-			josh,
+			ndex.guest,
 	  		function(err, res, body){
+                console.log(JSON.stringify(res.body));
 	  			if(err) { done(err) }
-	  			else { 
-	  				res.should.have.status(200);
+	  			else {
+
+	  				res.should.have.status(204);
 	  				console.log('...complete');// confirmation of completion
 	  				done();
 	  			} 
