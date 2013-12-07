@@ -11,12 +11,17 @@ var fs = require('fs');
 var site_config_dir = '../config/';
 var config = {};
 var welcomeMessage = "<h2>NDEx Site Server</h2>";
+var accountImgDir = "/opt/ndex/accountImg/"
 
 fs.exists(site_config_dir + "site_config.json", function (exists) {
     if (exists){
         console.log("Found site_config.json, will take NDEx Site Configuration from that file.");
         var config_text = fs.readFileSync(site_config_dir + "site_config.json");
         config = JSON.parse(config_text);
+        if (config.accountImgDir){
+            console.log("Setting the location of account profile images to '" + config.accountImgDir + "'");
+            accountImgDir = config.accountImgDir;
+        }
     } else {
         console.log("Using Default NDEx Site Configuration.");
     }
@@ -28,9 +33,9 @@ fs.exists(site_config_dir + "welcomeMessage.html", function (exists) {
     if (exists){
         console.log("Found welcomeMessage.html, will replace default welcomeMessage");
         welcomeMessage = fs.readFileSync(site_config_dir + "welcomeMessage.html");
-        console.log("Using Custom NDEx Site Welcome Message." + welcomeMessage);
+        console.log("Using Custom NDEx Site Welcome Message.\n" + welcomeMessage);
     } else {
-        console.log("Using Default NDEx Site Welcome Message." + welcomeMessage);
+        console.log("Using Default NDEx Site Welcome Message.\n" + welcomeMessage);
     }
 });
 
@@ -48,6 +53,10 @@ var port = 9999;
 /******************************************************************************
 * Configure Express.
 ******************************************************************************/
+
+console.log("express __dirname = " + __dirname);
+console.log("accountImgDir = " + accountImgDir);
+
 app.configure(function ()
 {
     app.use(express.static(__dirname + "/public"));
@@ -58,7 +67,7 @@ app.configure(function ()
     //Setup static directories
     app.use("/css", express.static(__dirname + "/css"));
     app.use("/img", express.static(__dirname + "/img"));
-    app.use("/account_img", express.static(__dirname + "/account_img"));
+    app.use("/account_img", express.static(__dirname + "/img"));
     app.use("/js", express.static(__dirname + "/js"));
     app.use(express.static(__dirname + "/public"));
 
