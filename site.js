@@ -1,5 +1,46 @@
+
+//-----------------------------------------------------------
+//
+//	Load site.json configuration from ../config/site_config.json
+//
+//  if not found, configuration is set to default
+//
+//-----------------------------------------------------------
+
+var fs = require('fs');
+var site_config_dir = '../config/';
+var config = {};
+var welcomeMessage = "<h2>NDEx Site Server</h2>";
+
+fs.exists(site_config_dir + "site_config.json", function (exists) {
+    if (exists){
+        console.log("Found site_config.json, will take NDEx Site Configuration from that file.");
+        var config_text = fs.readFileSync(site_config_dir + "site_config.json");
+        config = JSON.parse(config_text);
+    } else {
+        console.log("Using Default NDEx Site Configuration.");
+    }
+});
+
+console.log("NDEX Site Configuration: " + JSON.stringify(config));
+
+fs.exists(site_config_dir + "welcomeMessage.html", function (exists) {
+    if (exists){
+        console.log("Found welcomeMessage.html, will replace default welcomeMessage");
+        welcomeMessage = fs.readFileSync(site_config_dir + "welcomeMessage.html");
+        console.log("Using Custom NDEx Site Welcome Message." + welcomeMessage);
+    } else {
+        console.log("Using Default NDEx Site Welcome Message." + welcomeMessage);
+    }
+});
+
+//-----------------------------------------------------------
+//
+//	NDEx site.js uses the express.js framework
+//
+//-----------------------------------------------------------
 var express = require("express");
-var passport = require("passport");
+//var passport = require("passport");
 
 var app = express();
 var port = 9999;
@@ -31,7 +72,12 @@ app.configure(function ()
 ******************************************************************************/
 app.get("/", function (httpRequest, httpResponse)
 {
-    httpResponse.render("home", { user: httpRequest.user, title: "Home" });
+    httpResponse.render("home",
+        {
+            user: httpRequest.user,
+            title: "Home",
+            welcomeMessage : welcomeMessage
+        });
 });
 
 app.get("/login", function (httpRequest, httpResponse)
