@@ -300,7 +300,7 @@ function visualizerSetup(visualizerMode) {
         visualizer = new TRIPTYCH.BEL3DCanvasVisualizer();
     }
 
-    visualizer.showLabels = false;
+    visualizer.showLabels = true;
     visualizer.showEdgeLabels = false;
     visualizer.addTexture("increaseMap", "/img/increaseDot.png");
 }
@@ -345,7 +345,8 @@ function main() {
     }
 }
 
-var visualizationMax = 1000;
+var maxEdges = 1000;
+var skip = 0;
 
 // On load, we get the network, then push it to cytoscape.js on the callback
 $(document).ready(function () {
@@ -353,11 +354,11 @@ $(document).ready(function () {
             "/networks/" + encodeURIComponent(networkJID),
             null,
             function (network) {
-                if (network.edgeCount && network.edgeCount > visualizationMax) {
-                    $('#message').html("<span class='errorMessage'>Network has " + network.edgeCount + " edges, more than current maximum of " + visualizationMax + "</span>");
+                if (network.edgeCount && network.edgeCount > maxEdges) {
+                    $('#message').html("<span class='errorMessage'>Network has " + network.edgeCount + " edges, more than current maximum of " + maxEdges + "</span>");
                 }
                 NdexWeb.get(
-                        "/networks/" + encodeURIComponent(networkJID) + "/edges/" + visualizationMax + "/" + 0,
+                        "/networks/" + encodeURIComponent(networkJID) + "/edges/" + skip + "/" + maxEdges,
 
                         {},
                         function (network) {

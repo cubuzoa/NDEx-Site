@@ -125,7 +125,7 @@ var User =
                     },
                     success: function()
                     {
-                        $("#imgProfileBackground").attr("src", "/img/background/" + NdexWeb.ViewModel.User().username() + ".jpg?" + Math.random(100000, 1000000));
+                        $("#imgProfileBackground").attr("src", "/account_img/background/" + NdexWeb.ViewModel.User().username() + ".jpg?" + Math.random(100000, 1000000));
                         NdexWeb.hideModal();
                     },
                     error: function(jqXHR, textStatus, errorThrown)
@@ -156,7 +156,7 @@ var User =
                     },
                     success: function()
                     {
-                        $("#imgProfile").attr("src", "/img/foreground/" + NdexWeb.ViewModel.User().username() + ".jpg?" + Math.random(100000, 1000000));
+                        $("#imgProfile").attr("src", "/account_img/foreground/" + NdexWeb.ViewModel.User().username() + ".jpg?" + Math.random(100000, 1000000));
                         NdexWeb.hideModal();
                     },
                     error: function(jqXHR, textStatus, errorThrown)
