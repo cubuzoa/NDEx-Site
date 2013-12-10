@@ -1,39 +1,46 @@
-    </div>
+</div>
 
-    <div id="divModalBackground"></div>
-    <div id="divModal">
-      <div class="Title">
+<div id="divModalBackground"></div>
+<div id="divModal">
+    <div class="Title">
         <span></span>
         <button id="btnCloseModal" class="Red Close">X</button>
-      </div>
-
-      <div id="divModalContent"></div>
     </div>
 
-    <footer class="navbar navbar-fixed-bottom">
-      <p class="pull-right">&copy; Cytoscape Consortium 2013</p>
-    </footer>
+    <div id="divModalContent"></div>
+</div>
 
-    <script type="text/html" id="requestAccess">
-        <form id="frmRequest">
-            <textarea id="txtMessage"></textarea>
+<footer class="navbar navbar-fixed-bottom">
+    <span class="pull-right">&copy; Cytoscape Consortium 2013</span>
 
-            <div>
-                <button type="submit">Send Request</button>
-            </div>
-        </form>
-    </script>
-    <script type="text/html" id="loadingImage">
-      <img src="/img/loading.gif" />
-      <h4>Please wait...</h4>
-    </script>
-    <script type="text/html" id="confirmAction">
-      <h4></h4>
+    <a href="mailto:support@ndexbio.org" class="pull-left">Contact Support</a>
+</footer>
 
-      <img src="/images/alert.png" style="DISPLAY: block; MARGIN: 20px auto;" />
+<script type="text/html" id="requestAccess">
+    <form id="frmRequest">
+        <div class="hide">
+            <label class="Attribute-Editable">Group:</label>
+            <select id="ddlGroup"></select>
+        </div>
 
-      <button type="button" id="btnConfirm">Yes</button>
-      <button type="button" id="btnDecline">No</button>
-    </script>
-  </body>
+        <textarea id="txtMessage"></textarea>
+
+        <div>
+            <button type="submit">Send Request</button>
+        </div>
+    </form>
+</script>
+<script type="text/html" id="loadingImage">
+    <img src="/img/loading.gif"/>
+    <h4>Please wait...</h4>
+</script>
+<script type="text/html" id="confirmAction">
+    <h4></h4>
+
+    <img src="/images/alert.png" style="DISPLAY: block; MARGIN: 20px auto;"/>
+
+    <button type="button" id="btnConfirm">Yes</button>
+    <button type="button" id="btnDecline">No</button>
+</script>
+</body>
 </html>

@@ -13,51 +13,22 @@
                 <div class="nav-collapse">
                     <ul class="nav pull-left main-nav">
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Networks</a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Search</a>
 
                             <ul class="dropdown-menu" role="menu">
                                 <li>
-                                    <a href="/searchNetworks">Find Networks</a>
+                                    <a href="/searchGroups">Groups</a>
                                 </li>
-                                <li data-bind="if: User()">
-                                    <a id="navUploadNetwork" href="/uploadNetwork">Upload Networks</a>
+                                <li>
+                                    <a href="/searchNetworks">Networks</a>
+                                </li>
+                                <li>
+                                    <a href="/searchUsers">Users</a>
                                 </li>
                             </ul>
                         </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Groups</a>
-
-                            <ul class="dropdown-menu" role="menu">
-                                <li>
-                                    <a href="/searchGroups">Find Groups</a>
-                                </li>
-                                <li>
-                                    <a id="navNewGroup" href="/newGroup">New Group</a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="dropdown" data-bind="if: User()">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Users</a>
-                            <ul class="dropdown-menu" role="menu">
-                                <li>
-                                    <a href="/searchUsers">Find Users</a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="dropdown" data-bind="if: User()">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Account</a>
-
-                            <ul class="dropdown-menu" role="menu">
-                                <li>
-                                    <a data-bind="attr: { href: '/user/' + User().id() }">My Account</a>
-                                </li>
-                                <li>
-                                    <a data-bind="attr: { href: '/user/' + User().id() + '/#Groups' }">My Groups</a>
-                                </li>
-                                <li>
-                                    <a data-bind="attr: { href: '/user/' + User().id() + '/#Networks' }">My Networks</a>
-                                </li>
-                            </ul>
+                        <li data-bind="if: User()">
+                            <a data-bind="attr: { href: '/user/' + User().id() }">My Account</a>
                         </li>
                         <li class="dropdown hide">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tasks</a>

@@ -1,24 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-<script>
-    var canvas = 'disabled',
-            webGL = 'disabled';
-    if (!!window.CanvasRenderingContext2D) {
-        canvas = 'enabled';
-    }
+    <script>
+        var canvas = "disabled",
+            webGL = "disabled";
 
-    if ((function () {
-        try {
-            return !!window.WebGLRenderingContext && !!document.createElement('canvas').getContext('experimental-webgl');
+        if (!!window.CanvasRenderingContext2D)
+            canvas = "enabled";
+
+        if ((function ()
+        {
+            try
+            {
+                return !!window.WebGLRenderingContext && !!document.createElement('canvas').getContext('experimental-webgl');
+            }
+            catch (e)
+            {
+                return false;
+            }
+        })())
+        {
+            webGL = "enabled";
         }
-        catch (e) {
-            return false;
-        }
-    })()) {
-        webGL = 'enabled'
-    }
 
-    window.location = "/network/<%=networkId%>/triptychView?canvas=" + canvas + "&webGL=" + webGL;
-</script>
-
+        window.location = "/network/<%=networkId%>/triptychView?canvas=" + canvas + "&webGL=" + webGL;
+    </script>
 </html>

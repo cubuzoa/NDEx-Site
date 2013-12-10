@@ -32,7 +32,7 @@ var Login =
             null,
             function()
             {
-                $.gritter.add({ title: "Password Recovery", text: "An email has been sent to you with further instructiosn to recover your password." });
+                $.gritter.add({ title: "Password Recovery", text: "An email has been sent to you with further instructions to recover your password." });
             });
     },
 
@@ -63,7 +63,7 @@ var Login =
         $.ajax(
         {
             type: "GET",
-            url: NdexWeb.ApiHost + "/users/authenticate/" + Login.ViewModel.Username() + "/" + Login.ViewModel.Password(),
+            url: NdexWeb.ApiHost + "/users/authenticate/" + encodeURIComponent(Login.ViewModel.Username()) + "/" + encodeURIComponent(Login.ViewModel.Password()),
             dataType: "json",
             success: function(userData)
             {
