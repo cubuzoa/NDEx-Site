@@ -51,8 +51,8 @@
 
             <dl class="Accordion">
                 <dt>Limit What's Displayed</dt>
-                <dd>
-                    <div>
+                <dd class="Expanded">
+                    <div class="hide">
                         <label class="Attribute-Editable">Max Nodes:</label>
                         <input type="range" min="1" max="1000" step="1" data-bind="value: MaxNodes, valueUpdate: 'mousemove'"/>
                         <span data-bind="text: MaxNodes"></span>
@@ -64,18 +64,18 @@
                         <span data-bind="text: MaxEdges"></span>
                     </div>
 
-                    <div>
+                    <div class="hide">
                         <label class="Attribute-Editable" for="">Max Paths:</label>
                         <input type="range" min="1" max="1000" step="1" data-bind="value: MaxPaths, valueUpdate: 'mousemove'"/>
                         <span data-bind="text: MaxPaths"></span>
                     </div>
 
-                    <div>
+                    <div class="hide">
                         <label class="Attribute-Editable">Retain Paths:</label>
                         <input type="checkbox" data-bind="checked: RetainPaths"/>
                     </div>
 
-                    <div>
+                    <div class="hide">
                         <label class="Attribute-Editable" for="ddlFuzziness">Fuzziness:</label>
                         <select id="ddlFuzziness">
                             <option value="STRICT">Strict</option>
@@ -86,13 +86,13 @@
                 </dd>
                 <dt>Filter Results</dt>
                 <dd>
-                    <select>
+                    <select class="hide">
                         <option>Canned filter settings?</option>
                     </select>
 
                     <h4>Terms</h4>
 
-                    <ul id="ulFilterableTerms" data-bind="foreach: $root.Network.Terms">
+                    <ul id="ulFilterableTerms" class="hide" data-bind="foreach: $root.Network.Terms">
                         <li>
                             <i class="icon-reorder"></i>
                             <span data-bind="text: name"></span>
@@ -101,7 +101,7 @@
 
                     <h4>Included</h4>
 
-                    <ul id="ulTermsIncluded" data-bind="foreach: Terms.Included">
+                    <ul id="ulTermsIncluded" class="hide" data-bind="foreach: Terms.Included">
                         <li>
                             <i class="icon-reorder"></i>
                             <span data-bind="text: name"></span>
@@ -110,7 +110,7 @@
 
                     <h4>Excluded</h4>
 
-                    <ul id="ulTermsExcluded" data-bind="foreach: Terms.Excluded">
+                    <ul id="ulTermsExcluded" class="hide" data-bind="foreach: Terms.Excluded">
                         <li>
                             <i class="icon-reorder"></i>
                             <span data-bind="text: name"></span>
@@ -119,7 +119,7 @@
                 </dd>
                 <dt>Restrict Graph Traversal</dt>
                 <dd>
-                    <div>
+                    <div class="hide">
                         <label class="Attribute-Editable">Direction:</label>
                         <select data-bind="value: Direction">
                             <option value="UPSTREAM">Upstream</option>
@@ -129,7 +129,7 @@
                         </select>
                     </div>
 
-                    <div>
+                    <div class="hide">
                         <label class="Attribute-Editable">Max Depth:</label>
                         <input type="range" min="1" max="10" step="1"
                                data-bind="value: MaxDepth, valueUpdate: 'mousemove'"/>
@@ -138,7 +138,7 @@
 
                     <h4>Terms</h4>
 
-                    <ul id="ulTraversalTerms" data-bind="foreach: $root.Network.Terms">
+                    <ul id="ulTraversalTerms" class="hide" data-bind="foreach: $root.Network.Terms">
                         <li>
                             <i class="icon-reorder"></i>
                             <span data-bind="text: name"></span>
@@ -147,7 +147,7 @@
 
                     <h4>Starting Terms</h4>
 
-                    <ul id="ulStartingTerms" data-bind="foreach: Terms.Starting">
+                    <ul id="ulStartingTerms" class="hide" data-bind="foreach: Terms.Starting">
                         <li>
                             <i class="icon-reorder"></i>
                             <span data-bind="text: name"></span>
@@ -156,7 +156,7 @@
 
                     <h4>Target Terms</h4>
 
-                    <ul id="ulTargetTerms" data-bind="foreach: Terms.Target">
+                    <ul id="ulTargetTerms" class="hide" data-bind="foreach: Terms.Target">
                         <li>
                             <i class="icon-reorder"></i>
                             <span data-bind="text: name"></span>

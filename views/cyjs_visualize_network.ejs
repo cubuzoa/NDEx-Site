@@ -5,94 +5,92 @@
 
 <script>
     var result = [];
-    // the network id passed from the ejs template
     var networkJID = '<%= networkId %>'
 
-    //				'text-outline-width': 2,
-    //				'text-outline-color': '#888'
-
-    var cyNetworkParams = {
-
-        layout: {
-            name: 'circle'
-        },
-        style: cytoscape.stylesheet()
-                .selector('node')
-                .css({
-                    'content': 'data(name)',
-                    'text-valign': 'center',
-                    'color': 'white'
-                })
-                .selector('edge')
-                .css({
-                    'target-arrow-shape': 'triangle',
-                    'line-color': '#33ff33'
-                })
-                .selector(':selected')
-                .css({
-                    'background-color': 'red',
-                    'line-color': 'red',
-                    'target-arrow-color': 'red',
-                    'source-arrow-color': 'red'
-                })
-                .selector('.faded')
-                .css({
-                    'opacity': 0.25,
-                    'text-opacity': 0
-                })
+    var cyNetworkParams =
+    {
+        layout: { name: "circle" },
+        style: cytoscape
+            .stylesheet()
+            .selector("node")
+            .css(
+            {
+                "content": "data(name)",
+                "text-valign": "center",
+                "color": "white"
+            })
+            .selector("edge")
+            .css(
+            {
+                "target-arrow-shape": "triangle",
+                "line-color": '#33ff33'
+            })
+            .selector(":selected")
+            .css(
+            {
+                "background-color": "red",
+                "line-color": "red",
+                "target-arrow-color": "red",
+                "source-arrow-color": "red"
+            })
+            .selector(".faded")
+            .css(
+            {
+                "opacity": 0.25,
+                "text-opacity": 0
+            })
     };
 
     var visualizationMax = 1000;
 
     // On load, we get the network, then push it to cytoscape.js on the callback
-    $(document).ready(function () {
-        NdexWeb.get(
-                "/networks/" + encodeURIComponent(networkJID),
-                null,
-                function (network) {
-                    if (network.edgeCount && network.edgeCount > visualizationMax) {
-                        $('#message').html("<span class='errorMessage'>Network has " + network.edgeCount + " edges, more than current maximum of " + visualizationMax + "</span>");
-                    }
-                    NdexWeb.get(
-                            "/networks/" + encodeURIComponent(networkJID) + "/edges/" + visualizationMax + "/" + 0,
-                            {},
-                            function (network) {
-                                var elements = {nodes: [], edges: []};
-                                result = network;
-                                $.each(network.nodes, function (index, node) {
-                                    var label = node.name;
-                                    if (node.represents && network.terms && network.terms[node.represents]) {
-                                        var term = network.terms[node.represents];
-                                        label = term.name;
-                                    }
-                                    var cyNode = {data: {id: "n" + index, name: label}};
-                                    elements.nodes.push(cyNode);
+    $(document).ready(function()
+    {
+        NdexWeb.get("/networks/" + encodeURIComponent(networkJID),
+            null,
+            function(network)
+            {
+                if (network.edgeCount && network.edgeCount > visualizationMax)
+                    $("#message").html("<span class='errorMessage'>Network has " + network.edgeCount + " edges, more than current maximum of " + visualizationMax + "</span>");
 
-                                });
-
-                                $.each(network.edges, function (index, edge) {
-                                    var cyEdge = {data: {source: "n" + edge.s, target: "n" + edge.o}};
-                                    elements.edges.push(cyEdge);
-                                });
-
-                                cyNetworkParams.elements = elements;
-
-                                $('#cy').cytoscape(cyNetworkParams);
+                NdexWeb.get("/networks/" + encodeURIComponent(networkJID) + "/edges/" + 0 + "/" + visualizationMax,
+                    {},
+                    function(network)
+                    {
+                        var elements = {nodes: [], edges: []};
+                        result = network;
+                        $.each(network.nodes, function(index, node)
+                        {
+                            var label = node.name;
+                            if (node.represents && network.terms && network.terms[node.represents])
+                            {
+                                var term = network.terms[node.represents];
+                                label = term.name;
                             }
 
-                    );
+                            var cyNode = {data: {id: "n" + index, name: label}};
+                            elements.nodes.push(cyNode);
+                        });
 
-                });
+                        $.each(network.edges, function(index, edge)
+                        {
+                            var cyEdge = {data: {source: "n" + edge.s, target: "n" + edge.o}};
+                            elements.edges.push(cyEdge);
+                        });
 
+                        cyNetworkParams.elements = elements;
+
+                        $("#cy").cytoscape(cyNetworkParams);
+                    }
+                );
+            });
     });
-
 </script>
 
 
 <!--
 <div id="back"><a href="/">Return to NDEx Home Page</a><span id="message"></span></div>
 -->
-<div id="message"></div>
 <div id="cy"></div>
 
 <% include footer.ejs %>

@@ -7,13 +7,13 @@
             <i class="icon-cog icon-large"></i>
         </a>
 
-        <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
         <ul class="dropdown-menu">
+            <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
             <li>
-                <a href="/newGroup" class="accountMiniMenu">Create Group</a>
+                <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.createGroup">Create Group</a>
             </li>
             <li>
-                <a href="/uploadNetwork" class="accountMiniMenu">Create Network</a>
+                <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.createNetwork">Create Network</a>
             </li>
             <li>
                 <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.changeProfileImage">Change Profile Image</a>
@@ -24,8 +24,15 @@
             <li>
                 <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.changePassword">Change Password</a>
             </li>
+            <!-- /ko -->
+            <!-- ko if: NdexWeb.ViewModel.User().id() != User.ViewModel.User().id() -->
+                <!-- ko if: NdexWeb.ViewModel.User().groups().length > 0 -->
+            <li>
+                <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.inviteToGroup">Invite to Join...</a>
+            </li>
+                <!-- /ko -->
+            <!-- /ko -->
         </ul>
-        <!-- /ko -->
     </div>
 
     <div class="span7">
@@ -159,7 +166,7 @@
 
     <div class="span3">
         <h3>
-            <input type="text" class="Invisible" readonly placeholder="First Name" data-bind="value: firstName, isEditable: User.ViewModel.User().id(), event: { change: User.updateUser }" />
+            <input type="text" class="AlignRight Invisible" readonly placeholder="First Name" data-bind="value: firstName, isEditable: User.ViewModel.User().id(), event: { change: User.updateUser }" />
             <input type="text" class="Invisible" readonly placeholder="Last Name" data-bind="value: lastName, isEditable: User.ViewModel.User().id(), event: { change: User.updateUser }" />
         </h3>
 
@@ -216,7 +223,7 @@
         <input type="text" id="txtConfirmPassword" placeholder="Type it again" />
     </div>
 
-    <div class="AlignCenter">
+    <div>
         <button type="button">Change Password</button>
     </div>
 </script>
@@ -225,6 +232,31 @@
 
     <form id="frmChangeImage" method="post" enctype="multipart/form-data">
         <input type="file" id="fileNewImage" name="fileNewImage" />
+    </form>
+</script>
+<script type="text/html" id="createGroup">
+    <form id="frmCreateGroup">
+        <label class="Attribute-Editable">Name:</label>
+        <input type="text" id="txtGroupName" placeholder="Group name" pattern="[A-Za-z0-9 -]{6,50}" />
+
+        <div>
+            <button type="submit">Create</button>
+        </div>
+    </form>
+</script>
+<script type="text/html" id="createNetwork">
+    <form id="frmCreateNetwork" method="put" enctype="multipart/form-data">
+        <label class="Attribute-Editable">Network File:</label>
+        <input type="file" id="fileNetwork" name="fileNetwork" />
+
+        <hr />
+
+        <h3>Errors</h3>
+
+        <div style="height: 100px; overflow-y: auto;">
+            <ul>
+            </ul>
+        </div>
     </form>
 </script>
 <script type="text/html" id="userRequest">

@@ -247,7 +247,7 @@ var NdexWeb =
         {
             case "Group Invitation":
                 modalTitle = "Group Invitation";
-                defaultMessage = "You are invited to become a member of " + requestedResource.resourceName() + ".";
+                defaultMessage = "You are invited to become a member.";
                 break;
             case "Join Group":
                 modalTitle = "Request to Join";
@@ -263,14 +263,43 @@ var NdexWeb =
 
         NdexWeb.showModal(modalTitle, "#requestAccess", true, function()
         {
-            $("#txtMessage")
-                .val(defaultMessage)
-                .data("Request",
+            if (requestType === "Group Invitation")
+            {
+                $("#divModalContent div").removeClass("hide");
+
+                var ddlGroup = $("#divModalContent #ddlGroup");
+                for (var groupIndex = 0; groupIndex < NdexWeb.ViewModel.User().groups().length; groupIndex++)
                 {
-                    fromId: NdexWeb.ViewModel.User().id(),
-                    toId: requestedResource.resourceId(),
+                    ddlGroup.append($("<option></option>")
+                        .attr("value", NdexWeb.ViewModel.User().groups()[groupIndex].resourceId())
+                        .text(NdexWeb.ViewModel.User().groups()[groupIndex].resourceName()));
+                }
+
+                ddlGroup.change(function()
+                {
+                    $("#txtMessage").val("You are invited to become a member of " + ddlGroup.children(":selected").text() + ".");
+                });
+
+                ddlGroup.trigger("change");
+
+                $("#txtMessage").data("Request",
+                {
+                    fromId: ddlGroup.val(),
+                    toId: NdexWeb.ViewModel.User().id(),
                     requestType: requestType
                 });
+            }
+            else
+            {
+                $("#txtMessage")
+                    .val(defaultMessage)
+                    .data("Request",
+                    {
+                        fromId: NdexWeb.ViewModel.User().id(),
+                        toId: requestedResource.resourceId(),
+                        requestType: requestType
+                    });
+            }
         });
     },
 

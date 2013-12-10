@@ -13,8 +13,6 @@ var User =
     {
         ko.applyBindings(this.ViewModel, $("#divUser")[0]);
 
-        this.autoSelectTab();
-
         if (NdexWeb.ViewModel.User().id() !== this.ViewModel.UserId())
             this.loadUser();
         else
@@ -39,24 +37,6 @@ var User =
             {
                 NdexWeb.hideModal();
             });
-    },
-
-    /****************************************************************************
-    * Auto-selects the tab based on the hash of the browser location.
-    * Additionally adds some logic to ensure the tab stays selected on reload.
-    ****************************************************************************/
-    autoSelectTab: function()
-    {
-        //TODO: Test this - does it work?
-        var selectedTab = document.location.hash;
-
-        if (selectedTab)
-            $("ul.nav-tabs a[href='" + selectedTab.replace("#", "#div") + "']").tab("show");
-
-        $(".nav-tabs a").on("shown", function(e)
-        {
-            window.location.hash = e.target.hash.replace("#", "#" + prefix);
-        });
     },
 
     /****************************************************************************
@@ -189,6 +169,70 @@ var User =
     },
 
     /****************************************************************************
+    * Displays a modal that allows a user to create a group.
+    ****************************************************************************/
+    createGroup: function()
+    {
+        NdexWeb.showModal("Create Group", "#createGroup", true, function()
+        {
+            $("#frmCreateGroup").submit(function(event)
+            {
+                event.preventDefault();
+
+                NdexWeb.put("/groups/",
+                    {
+                        accountType: "Group",
+                        members:
+                        [{
+                            permissions: "ADMIN",
+                            resourceId: NdexWeb.ViewModel.User().id()
+                        }],
+                        name: $("#txtGroupName").val()
+                    },
+                    function(newGroup)
+                    {
+                        window.location = "/group/" + newGroup.id;
+                    },
+                    function(jqXHR, textStatus, errorThrown)
+                    {
+                        $.gritter.add({ title: "Failure", text: "Failed to create the group." });
+                    });
+            });
+        });
+    },
+
+    /****************************************************************************
+    * Displays a modal that allows a user to create a network.
+    ****************************************************************************/
+    createNetwork: function()
+    {
+        NdexWeb.showModal("Create Network", "#createNetwork", true, function()
+        {
+            $("#frmCreateNetwork").attr("action", NdexWeb.ApiHost + "/networks/");
+            $("#fileCreateNetwork").change(function()
+            {
+                $("#frmCreateNetwork").ajaxSubmit(
+                {
+                    dataType: "json",
+                    beforeSend: function(xhr)
+                    {
+                        xhr.setRequestHeader("Authorization", "Basic " + NdexWeb.ViewModel.EncodedUser());
+                    },
+                    success: function(newNetwork)
+                    {
+                        window.location = "/network/" + newNetwork.id;
+                    },
+                    error: function(jqXHR, textStatus, errorThrown)
+                    {
+                        //TODO: Need to add errors to the unordered list, but need to see how they're returned first
+                        $.gritter.add({ title: "Failure", text: "Failed to create the network." });
+                    }
+                });
+            });
+        });
+    },
+
+    /****************************************************************************
     * Declines a user's request.
     ****************************************************************************/
     declineRequest: function(event)
@@ -204,6 +248,14 @@ var User =
             {
                 NdexWeb.hideModal();
             });
+    },
+
+    /****************************************************************************
+    * Invites the user to join a group.
+    ****************************************************************************/
+    inviteToGroup: function()
+    {
+        NdexWeb.showRequestModal("Group Invitation");
     },
 
     /****************************************************************************
