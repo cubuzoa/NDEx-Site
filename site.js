@@ -10,7 +10,7 @@ var fs = require('fs');
 var site_config_dir = '../config/';
 var config = {};
 var welcomeMessage = "<h2>NDEx Site Server</h2>";
-var accountImgDir = "/accountImg/"
+var accountImgDir = "/account_img/"
 
 
 if (fs.existsSync(site_config_dir + "site_config.json")) {

@@ -19,7 +19,7 @@
                 <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.changeProfileImage">Change Profile Image</a>
             </li>
             <li>
-                <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.changeProfileBackground">Change Background Image</a>
+                <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.changeProfileImage">Change Background Image</a>
             </li>
             <li>
                 <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.changePassword">Change Password</a>
@@ -231,7 +231,9 @@
     <p>Select the new image</p>
 
     <form id="frmChangeImage" method="post" enctype="multipart/form-data">
-        <input type="file" id="fileNewImage" name="fileNewImage" />
+        <input type="hidden" id="hidFilename" name="filename" />
+
+        <input type="file" id="fileUpload" name="fileUpload" />
     </form>
 </script>
 <script type="text/html" id="createGroup">
@@ -245,9 +247,11 @@
     </form>
 </script>
 <script type="text/html" id="createNetwork">
-    <form id="frmCreateNetwork" method="put" enctype="multipart/form-data">
+    <form id="frmCreateNetwork" method="POST" enctype="multipart/form-data">
+        <input type="hidden" id="hidFilename" name="filename" />
+
         <label class="Attribute-Editable">Network File:</label>
-        <input type="file" id="fileNetwork" name="fileNetwork" />
+        <input type="file" id="fileUpload" name="fileUpload" />
 
         <hr />
 

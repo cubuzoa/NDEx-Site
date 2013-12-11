@@ -106,47 +106,22 @@ var User =
     },
 
     /****************************************************************************
-    * Changes the user's profile background image.
-    ****************************************************************************/
-    changeProfileBackground: function()
-    {
-        NdexWeb.showModal("Change Profile Background", "#changeImage", true, function()
-        {
-            $("#frmChangeImage").attr("action", NdexWeb.ApiHost + "/users/" + NdexWeb.ViewModel.User().id() + "/profile-background");
-            $("#fileNewImage").change(function()
-            {
-                $("#frmChangeImage").ajaxSubmit(
-                {
-                    dataType: "json",
-                    beforeSend: function(xhr)
-                    {
-                        xhr.setRequestHeader("Authorization", "Basic " + NdexWeb.ViewModel.EncodedUser());
-                        xhr.setRequestHeader("Test Header", "Dammit");
-                    },
-                    success: function()
-                    {
-                        $("#imgProfileBackground").attr("src", "/account_img/background/" + NdexWeb.ViewModel.User().username() + ".jpg?" + Math.random(100000, 1000000));
-                        NdexWeb.hideModal();
-                    },
-                    error: function(jqXHR, textStatus, errorThrown)
-                    {
-                        $.gritter.add({ title: "Failure", text: "Failed to change your profile background." });
-                    }
-                });
-            });
-        });
-    },
-
-    /****************************************************************************
     * Changes the user's profile image.
     ****************************************************************************/
-    changeProfileImage: function()
+    changeProfileImage: function(viewModel, event)
     {
+        var imageType;
+        if ($(event).target.text() === "Change Profile Image")
+            imageType = "profile";
+        else
+            imageType = "background";
+
         NdexWeb.showModal("Change Profile Image", "#changeImage", true, function()
         {
-            $("#frmChangeImage").attr("action", NdexWeb.ApiHost + "/users/" + NdexWeb.ViewModel.User().id() + "/profile-image");
-            $("#fileNewImage").change(function()
+            $("#frmChangeImage").attr("action", NdexWeb.ApiHost + "/users/image/" + imageType);
+            $("#fileUpload").change(function()
             {
+                $("#hidFilename").val($(this).val());
                 $("#frmChangeImage").ajaxSubmit(
                 {
                     dataType: "json",
@@ -182,11 +157,6 @@ var User =
                 NdexWeb.put("/groups/",
                     {
                         accountType: "Group",
-                        members:
-                        [{
-                            permissions: "ADMIN",
-                            resourceId: NdexWeb.ViewModel.User().id()
-                        }],
                         name: $("#txtGroupName").val()
                     },
                     function(newGroup)
@@ -208,9 +178,10 @@ var User =
     {
         NdexWeb.showModal("Create Network", "#createNetwork", true, function()
         {
-            $("#frmCreateNetwork").attr("action", NdexWeb.ApiHost + "/networks/");
-            $("#fileCreateNetwork").change(function()
+            $("#frmCreateNetwork").attr("action", NdexWeb.ApiHost + "/networks/upload");
+            $("#fileUpload").change(function()
             {
+                $("#hidFilename").val($(this).val());
                 $("#frmCreateNetwork").ajaxSubmit(
                 {
                     dataType: "json",
