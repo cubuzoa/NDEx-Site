@@ -93,7 +93,7 @@ var User =
 
             $("#divModalContent button").click(function()
             {
-                NdexWeb.post("/users/" + User.ViewModel.UserId() + "/password",
+                NdexWeb.post("/users/password",
                     $("#txtPassword").val(),
                     function()
                     {

@@ -22,7 +22,7 @@ var WorkSurface =
     ****************************************************************************/
     addNetwork: function()
     {
-        NdexWeb.put("/users/" + NdexWeb.ViewModel.User().id() + "/work-surface",
+        NdexWeb.put("/users/work-surface",
             { networkid: this.id() },
             function(workSurface)
             {
@@ -68,7 +68,7 @@ var WorkSurface =
     ****************************************************************************/
     removeNetwork: function()
     {
-        NdexWeb.delete("/users/" + NdexWeb.ViewModel.User().id() + "/work-surface/" + this.id(),
+        NdexWeb.delete("/users/work-surface/" + this.id(),
             function(workSurface)
             {
                 var updatedNetworks = ko.mapping.fromJS(workSurface.networks);
