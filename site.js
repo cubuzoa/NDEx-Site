@@ -1,11 +1,3 @@
-//-----------------------------------------------------------
-//
-//	Load site.json configuration from ../config/site_config.json
-//
-//  if not found, configuration is set to default
-//
-//-----------------------------------------------------------
-
 var fs = require('fs');
 var site_config_dir = '../config/';
 var config = {};
@@ -39,7 +31,6 @@ else
 //
 //-----------------------------------------------------------
 var express = require("express");
-//var passport = require("passport");
 
 var app = express();
 var port = 9999;
