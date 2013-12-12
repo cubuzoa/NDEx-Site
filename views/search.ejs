@@ -1,0 +1,98 @@
+<% include header.ejs %>
+<% include navigation.ejs %>
+
+<h1>Search <%=searchType%></h1>
+
+<form id="frmSearch" style="width: 330px;">
+    <div>
+        <label class="Attribute-Editable">Search:</label>
+        <input type="search" />
+    </div>
+
+    <div class="AlignCenter">
+        <button type="submit">Search</button>
+    </div>
+</form>
+
+<table id="tblSearchResults" data-bind="if: Results()">
+    <thead>
+        <tr>
+            <!-- ko if: Search.SearchType === "Groups" -->
+            <th></th>
+            <th>Name</th>
+            <th>Organization Name</th>
+            <th>Website</th>
+            <!-- /ko -->
+            <!-- ko if: Search.SearchType === "Networks" -->
+            <th></th>
+            <th>Title</th>
+            <th>Edges</th>
+            <th>Nodes</th>
+            <!-- /ko -->
+            <!-- ko if: Search.SearchType === "Users" -->
+            <th></th>
+            <th>Username</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Website</th>
+            <!-- /ko -->
+        </tr>
+    </thead>
+    <!-- ko if: Results().length === 0 -->
+    <tbody>
+        <tr>
+            <td colspan="5">No results found that match your criteria.</td>
+        </tr>
+    </tbody>
+    <!-- /ko -->
+    <!-- ko if: Results().length > 0 && Search.SearchType === 'Groups' -->
+    <tbody data-bind="foreach: Results">
+        <tr>
+            <td>
+                <img style="height: 32px; width: 28px;" data-bind="attr: { src: '../img/foreground/' + name() + '.jpg' }" />
+            </td>
+            <td>
+                <a data-bind="text: name, attr: { href: '/group/' + id() }"></a>
+            </td>
+            <td data-bind="text: organizationName"></td>
+            <td data-bind="text: website"></td>
+        </tr>
+    </tbody>
+    <!-- /ko -->
+    <!-- ko if: Results().length > 0 && Search.SearchType === 'Networks' -->
+    <tbody data-bind="foreach: Results">
+        <tr>
+            <td>
+                <i class="icon-chevron-right"></i>
+            </td>
+            <td>
+                <a data-bind="text: title, attr: { href: '/network/' + id() }"></a>
+            </td>
+            <td class="AlignRight" data-bind="text: nodeCount"></td>
+            <td class="AlignRight" data-bind="text: edgeCount"></td>
+        </tr>
+    </tbody>
+    <!-- /ko -->
+    <!-- ko if: Results().length > 0 && Search.SearchType === 'Users' -->
+    <tbody data-bind="foreach: Results">
+        <tr>
+            <td>
+                <img style="height: 32px; width: 28px;" data-bind="attr: { src: '../img/foreground/' + username() + '.jpg' }" />
+            </td>
+            <td>
+                <a data-bind="text: username, attr: { href: '/user/' + id() }"></a>
+            </td>
+            <td data-bind="text: firstName"></td>
+            <td data-bind="text: lastName"></td>
+            <td data-bind="text: website"></td>
+        </tr>
+    </tbody>
+    <!-- /ko -->
+</table>
+
+<script type="text/javascript" src="/js/search.js"></script>
+<script type="text/javascript">
+    Search.SearchType = "<%=searchType%>";
+</script>
+
+<% include footer.ejs %>

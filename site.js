@@ -90,19 +90,13 @@ app.get("/join", function(httpRequest, httpResponse)
     httpResponse.render("join", { title: "Join", user: httpRequest.user });
 });
 
-app.get("/searchNetworks", function(httpRequest, httpResponse)
+app.get("/search/:searchType", function(httpRequest, httpResponse)
 {
-    httpResponse.render("search_networks", { title: "Networks", user: httpRequest.user });
-});
-
-app.get("/searchUsers", function(httpRequest, httpResponse)
-{
-    httpResponse.render("search_users", { title: "Users", user: httpRequest.user });
-});
-
-app.get("/searchGroups", function(httpRequest, httpResponse)
-{
-    httpResponse.render("search_groups", { title: "Groups", user: httpRequest.user });
+    httpResponse.render("search", {
+        title: "Search" + httpRequest.searchType,
+        searchType: httpRequest.params["searchType"],
+        user: httpRequest.user
+    });
 });
 
 app.get("/showTasks", function(httpRequest, httpResponse)

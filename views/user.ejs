@@ -189,7 +189,10 @@
         <div id="divNotifications">
             <h4>Notifications</h4>
 
-            <h5>Requests</h5>
+            <h5>
+                <i class="icon-envelope-alt"></i>
+                Requests
+            </h5>
 
             <ul data-bind="foreach: requests">
                 <li>
@@ -199,6 +202,22 @@
                     <!-- ko if: fromId() !== NdexWeb.ViewModel.User().id() -->
                     From: <a href="javascript:void()" data-bind="css: { 'text-success': response() != 'DECLINED', 'text-error': response() === 'DECLINED' }, text: from, click: User.showRequest"></a>
                     <!-- /ko -->
+                </li>
+            </ul>
+
+            <h5>
+                <i class="icon-gears"></i>
+                Tasks
+            </h5>
+
+            <ul data-bind="foreach: tasks">
+                <li>
+                    <span data-bind="text: description() + ': ' + resource()"></span>
+                    <div class="progress">
+                        <div class="progress-bar" data-bind="css: { 'progress-bar-success': status() === 'COMPLETED', 'progress-bar-error': status() === 'FAILED', 'progress-bar-info': status() === 'PROCESSING', 'progress-bar-warning': status() === 'COMPLETED_WITH_WARNINGS' || status() === 'COMPLETED_WITH_ERRORS' }">
+                            <span class="sr-only" data-bind="text: progress() + '% Completed'"></span>
+                        </div>
+                    </div>
                 </li>
             </ul>
         </div>

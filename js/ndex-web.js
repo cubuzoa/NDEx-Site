@@ -4,6 +4,7 @@
 var NdexWeb =
 {
     ApiHost: "http://localhost:8080/ndexbio-rest",
+    TaskTimer: null,
     ViewModel:
     {
         User: ko.observable()
@@ -123,6 +124,9 @@ var NdexWeb =
             {
                 userData = ko.mapping.fromJS(userData);
                 NdexWeb.ViewModel.User(userData);
+
+                if (NdexWeb.ViewModel.HasActiveTasks())
+                    NdexWeb.TaskTimer = setInterval(NdexWeb.updateTasks, 3000);
             },
             error: NdexWeb.errorHandler
         });
@@ -304,6 +308,34 @@ var NdexWeb =
     },
 
     /****************************************************************************
+    * Updates the progress and/or status of the user's unfinished tasks.
+    ****************************************************************************/
+    updateTasks: function()
+    {
+        for (var taskIndex = 0; taskIndex < NdexWeb.ViewModel.User().tasks().length; taskIndex++)
+        {
+            var currentTask = NdexWeb.ViewModel.User().tasks()[taskIndex];
+            if (currentTask.status() === "Queued" || currentTask.status() == "Processing")
+            {
+                NdexWeb.get("/tasks/" + currentTask.id(),
+                    null,
+                    function(updatedTask)
+                    {
+                        currentTask.progress(updatedTask.progress);
+                        currentTask.status(updatedTask.status);
+                    },
+                    function()
+                    {
+                        //Don't do anything if updating a task failed
+                    });
+            }
+        }
+
+        if (!NdexWeb.ViewModel.HasActiveTasks())
+            clearInterval(NdexWeb.TaskTimer);
+    },
+
+    /****************************************************************************
     * Wires event-handlers to elements on the page.
     ****************************************************************************/
     wireEvents: function()
@@ -328,6 +360,24 @@ NdexWeb.ViewModel.EncodedUser = ko.computed(function()
         return btoa(localStorage.Username + ":" + localStorage.Password);
     else
         return null;
+});
+
+/****************************************************************************
+* Determines if the user has unfinished tasks or not.
+****************************************************************************/
+NdexWeb.ViewModel.HasActiveTasks = ko.computed(function()
+{
+    if (NdexWeb.ViewModel.User())
+    {
+        for (var taskIndex = 0; taskIndex < NdexWeb.ViewModel.User().tasks().length; taskIndex++)
+        {
+            var currentTask = NdexWeb.ViewModel.User().tasks()[taskIndex];
+            if (currentTask.status() === "Queued" || currentTask.status() == "Processing")
+                return true;
+        }
+    }
+
+    return false;
 });
 
 $(document).ready(function()

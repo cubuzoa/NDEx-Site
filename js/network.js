@@ -1,4 +1,3 @@
-//TODO: How to make PageSize interact with MaxEdges & MaxNodes - should it?
 var Network =
 {
     IsLoadingNextPage: true,
@@ -65,29 +64,6 @@ var Network =
     },
 
     /**************************************************************************
-    * Builds the subnetwork.
-    **************************************************************************/
-    buildSubnetwork: function(subnetwork)
-    {
-        var networkCitations = ko.mapping.fromJS(subnetwork.citations);
-        var networkSupports = ko.mapping.fromJS(subnetwork.supports);
-
-        if (typeof(networkCitations) === "function")
-            Network.ViewModel.Network().citations(networkCitations());
-        else
-            Network.ViewModel.Network().citations(networkCitations);
-
-        if (typeof(networkSupports) === "function")
-            Network.ViewModel.Network().citations(networkSupports());
-        else
-            Network.ViewModel.Network().citations(networkSupports);
-
-        Network.buildEdges(subnetwork);
-        Network.buildNodes(subnetwork);
-        Network.buildTerms(subnetwork);
-    },
-
-    /**************************************************************************
     * Maps the edges of the subnetwork into an array. This is done by
     * recursively traversing the edges, nodes, and terms dictionaries to get
     * references to the subject, predicate, and object.
@@ -109,7 +85,11 @@ var Network =
         }
 
         edgeArray = ko.mapping.fromJS(edgeArray);
-        Network.ViewModel.Network().edges(edgeArray());
+
+        if (Network.PageIndex === 1)
+            Network.ViewModel.Network().edges(edgeArray());
+        else
+            Network.ViewModel.Network().edges.push.apply(edgeArray());
     },
 
     /**************************************************************************
@@ -133,7 +113,49 @@ var Network =
         }
 
         nodeArray = ko.mapping.fromJS(nodeArray);
-        Network.ViewModel.Network().nodes(nodeArray());
+
+        if (Network.PageIndex === 1)
+            Network.ViewModel.Network().nodes(nodeArray());
+        else
+            Network.ViewModel.Network().nodes.push.apply(nodeArray());
+    },
+
+    /**************************************************************************
+    * Builds the subnetwork.
+    **************************************************************************/
+    buildSubnetwork: function(subnetwork)
+    {
+        var networkCitations = ko.mapping.fromJS(subnetwork.citations);
+        var networkSupports = ko.mapping.fromJS(subnetwork.supports);
+
+        if (Network.PageIndex === 1)
+        {
+            if (typeof(networkCitations) === "function")
+                Network.ViewModel.Network().citations(networkCitations());
+            else
+                Network.ViewModel.Network().citations(networkCitations);
+
+            if (typeof(networkSupports) === "function")
+                Network.ViewModel.Network().citations(networkSupports());
+            else
+                Network.ViewModel.Network().citations(networkSupports);
+        }
+        else
+        {
+            if (typeof(networkCitations) === "function")
+                Network.ViewModel.Network().citations.push.apply(networkCitations());
+            else
+                Network.ViewModel.Network().citations.push.apply(networkCitations);
+
+            if (typeof(networkSupports) === "function")
+                Network.ViewModel.Network().citations.push.apply(networkSupports());
+            else
+                Network.ViewModel.Network().citations.push.apply(networkSupports);
+        }
+
+        Network.buildEdges(subnetwork);
+        Network.buildNodes(subnetwork);
+        Network.buildTerms(subnetwork);
     },
 
     /**************************************************************************
@@ -150,7 +172,11 @@ var Network =
         }
 
         termArray = ko.mapping.fromJS(termArray);
-        Network.ViewModel.Network().terms(termArray());
+
+        if (Network.PageIndex === 1)
+            Network.ViewModel.Network().terms(termArray());
+        else
+            Network.ViewModel.Network().terms.push.apply(termArray());
     },
 
     /****************************************************************************
@@ -179,6 +205,13 @@ var Network =
             function(networkEdges)
             {
                 Network.IsLoadingNextPage = false;
+
+                if (!networkEdges || networkEdges.length < 1)
+                {
+                    $("#divSubnetwork").unbind("scroll");
+                    return;
+                }
+
                 Network.buildSubnetwork(networkEdges);
             },
             function(jqXHR, textStatus, errorThrown)
@@ -217,8 +250,8 @@ var Network =
 
                 Network.ViewModel.Network(network);
                 Network.PageIndex = 1;
-                $("#divSubnetwork").scroll(this.infiniteScroll);
                 Network.getEdges();
+                $("#divSubnetwork").scroll(this.infiniteScroll);
             });
     },
 
