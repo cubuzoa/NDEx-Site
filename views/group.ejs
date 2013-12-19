@@ -84,16 +84,23 @@
                         <thead>
                             <tr>
                                 <th>Name</th>
-                                <!-- ko if: Group.canEdit() -->
                                 <th>Permissions</th>
-                                <!-- /ko -->
                             </tr>
                         </thead>
                         <tbody data-bind="foreach: members">
                             <tr>
                                 <td data-bind="text: resourceName"></td>
-                                <!-- ko if: Group.canEdit() -->
+                                <!-- ko if: !Group.canEdit() -->
                                 <td data-bind="text: permissions"></td>
+                                <!-- /ko -->
+                                <!-- ko if: Group.canEdit() -->
+                                <td>
+                                    <select data-bind="value: permissions, event: { change: Group.changeMemberPermissions }">
+                                        <option value="READ">Read</option>
+                                        <option value="WRITE">Write</option>
+                                        <option value="ADMIN">Admin</option>
+                                    </select>
+                                </td>
                                 <!-- /ko -->
                             </tr>
                         </tbody>

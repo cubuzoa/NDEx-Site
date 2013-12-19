@@ -29,7 +29,8 @@ var Network =
                 Starting: ko.observableArray(),
                 Target: ko.observableArray()
             }
-        }
+        },
+        Subnetwork: ko.observable()
     },
 
     /****************************************************************************
@@ -195,6 +196,19 @@ var Network =
     },
 
     /****************************************************************************
+    * Changes the member's permissions.
+    ****************************************************************************/
+    changeMemberPermissions: function(networkMember, event)
+    {
+        NdexWeb.post("/networks",
+            ko.mapping.toJS(Network.ViewModel.Network()),
+            function()
+            {
+                $.gritter.add({ title: "Network Updated", text: groupMember().resourceName() + "'s permissions have been changed." });
+            });
+    },
+
+    /****************************************************************************
     * Gets network edges.
     ****************************************************************************/
     getEdges: function()
@@ -299,8 +313,47 @@ var Network =
             function(subnetwork)
             {
                 $("#divSubnetwork").unbind("scroll");
-                Network.buildSubnetwork(subnetwork);
+
+                if (subnetwork != null)
+                {
+                    Network.ViewModel.Subnetwork(ko.mapping.fromJS(subnetwork));
+                    Network.buildSubnetwork(subnetwork);
+                }
             });
+    },
+
+    /****************************************************************************
+    * Displays a modal that allows the user to save the subnetwork as its own
+    * separate network.
+    ****************************************************************************/
+    saveSubnetwork: function(viewModel, event)
+    {
+        NdexWeb.showModal("Save Subnetwork", "#saveSubnetwork", true, function()
+        {
+            $("#frmSaveSubnetwork").submit(function(event)
+            {
+                event.preventDefault();
+
+                NdexWeb.put("/networks",
+                    {
+                        citations: ko.mapping.toJS(Network.ViewModel.Subnetwork().citations),
+                        description: $("#txtDescription").val(),
+                        edges: ko.mapping.toJS(Network.ViewModel.Subnetwork().edges),
+                        format: "JDEX",
+                        isPublic: $("#chkIsPublic").prop("checked"),
+                        nodes: ko.mapping.toJS(Network.ViewModel.Subnetwork().nodes),
+                        source: "Subnetwork of " + Network.ViewModel.Network().title(),
+                        supports: ko.mapping.toJS(Network.ViewModel.Subnetwork().supports),
+                        terms: ko.mapping.toJS(Network.ViewModel.Subnetwork().terms),
+                        title: $("#txtTitle").val()
+                    },
+                    function(newNetwork)
+                    {
+                        NdexWeb.hideModal();
+                        window.location = "/network/" + newNetwork.id;
+                    });
+            });
+        });
     },
 
     /****************************************************************************

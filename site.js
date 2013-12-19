@@ -93,7 +93,7 @@ app.get("/join", function(httpRequest, httpResponse)
 app.get("/search/:searchType", function(httpRequest, httpResponse)
 {
     httpResponse.render("search", {
-        title: "Search" + httpRequest.searchType,
+        title: "Search " + httpRequest.params["searchType"],
         searchType: httpRequest.params["searchType"],
         user: httpRequest.user
     });

@@ -42,10 +42,11 @@
         <form id="frmSearchNetwork">
             <div id="divSearch">
                 <i class="icon-search"></i>
-                <input type="search" placeholder="Search keywords" data-bind="value: Keywords"/>
+                <input type="search" placeholder="Search keywords" data-bind="value: Keywords, valueUpdate: 'keypress'"/>
 
                 <div>
-                    <button type="submit" class="btn" data-bind="enabled: Keywords.length > 0">Search</button>
+                    <button type="submit" class="btn" data-bind="enable: Keywords().length > 0">Search</button>
+                    <button type="button" class="btn" data-bind="enable: $root.Subnetwork(), click: Network.saveSubnetwork" rel="tooltip" title="Saves the subnetwork from the query as a Network">Save Subnetwork</button>
                 </div>
             </div>
 
@@ -216,16 +217,23 @@
                     <thead>
                     <tr>
                         <th>Name</th>
-                        <!-- ko if: Network.canEdit() -->
                         <th>Permissions</th>
-                        <!-- /ko -->
                     </tr>
                     </thead>
                     <tbody data-bind="foreach: members">
                     <tr>
                         <td data-bind="text: resourceName"></td>
-                        <!-- ko if: Network.canEdit() -->
+                        <!-- ko if: !Network.canEdit() -->
                         <td data-bind="text: permissions"></td>
+                        <!-- /ko -->
+                        <!-- ko if: Network.canEdit() -->
+                        <td>
+                            <select data-bind="value: permissions, event: { change: Group.changeMemberPermissions }">
+                                <option value="READ">Read</option>
+                                <option value="WRITE">Write</option>
+                                <option value="ADMIN">Admin</option>
+                            </select>
+                        </td>
                         <!-- /ko -->
                     </tr>
                     </tbody>
@@ -271,4 +279,24 @@
     Network.ViewModel.NetworkId("<%=networkId%>");
 </script>
 
+<script type="text/html" id="saveSubnetwork">
+    <form id="frmSaveSubnetwork">
+        <div>
+            <label class="Attribute-Editable">Title:</label>
+            <input type="text" id="txtTitle" placeholder="Network title" />
+        </div>
+
+        <div>
+            <label class="Attribute-Editable">Public:</label>
+            <input type="checkbox" id="chkIsPublic" />
+            <span style="display: inline-block; width: 202px;"></span>
+        </div>
+
+        <textarea id="txtDescription" style="height: 60px; width: 314px;" placeholder="Description"></textarea>
+
+        <div class="AlignCenter">
+            <button type="submit">Create Network</button>
+        </div>
+    </form>
+</script>
 <% include footer.ejs %>

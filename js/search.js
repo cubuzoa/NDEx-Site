@@ -14,6 +14,7 @@ var Search =
     ****************************************************************************/
     _init: function()
     {
+        this.ViewModel.Results(ko.mapping.fromJSON(localStorage[Search.SearchType + " Search"])());
         ko.applyBindings(this.ViewModel, $("#tblSearchResults")[0]);
         this.wireEvents();
     },
@@ -64,12 +65,16 @@ var Search =
                     return;
                 }
 
-                searchResults = ko.mapping.fromJS(searchResults);
-
                 if (Search.PageIndex === 1)
-                    Search.ViewModel.Results(searchResults());
+                    localStorage[Search.SearchType + " Search"] = JSON.stringify(searchResults);
                 else
-                    Search.ViewModel.Results.push.apply(searchResults());
+                {
+                    var storedResults = JSON.parse(localStorage[Search.SearchType + " Search"]);
+                    storedResults.push.apply(searchResults);
+                    localStorage[Search.SearchType + " Search"] = JSON.stringify(storedResults);
+                }
+
+                Search.ViewModel.Results(ko.mapping.fromJSON(localStorage[Search.SearchType + " Search"])());
             },
             function(jqXHR, textStatus, errorThrown)
             {

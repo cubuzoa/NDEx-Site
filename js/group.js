@@ -52,6 +52,19 @@ var Group =
     },
 
     /****************************************************************************
+    * Changes the member's permissions.
+    ****************************************************************************/
+    changeMemberPermissions: function(groupMember, event)
+    {
+        NdexWeb.post("/groups",
+            ko.mapping.toJS(Group.ViewModel.Group()),
+            function()
+            {
+                $.gritter.add({ title: "Group Updated", text: groupMember().resourceName() + "'s permissions have been changed." });
+            });
+    },
+
+    /****************************************************************************
     * Loads the group.
     ****************************************************************************/
     loadGroup: function()
