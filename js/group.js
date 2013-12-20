@@ -56,11 +56,11 @@ var Group =
     ****************************************************************************/
     changeMemberPermissions: function(groupMember, event)
     {
-        NdexWeb.post("/groups",
-            ko.mapping.toJS(Group.ViewModel.Group()),
+        NdexWeb.post("/groups/" + Group.ViewModel.Group().id() + "/member",
+            ko.mapping.toJS(groupMember),
             function()
             {
-                $.gritter.add({ title: "Group Updated", text: groupMember().resourceName() + "'s permissions have been changed." });
+                $.gritter.add({ title: "Group Updated", text: groupMember.resourceName + "'s permissions have been changed." });
             });
     },
 
@@ -76,6 +76,21 @@ var Group =
                 group = ko.mapping.fromJS(group);
                 Group.ViewModel.Group(group);
             });
+    },
+
+    /****************************************************************************
+    * Removes a member from the group.
+    ****************************************************************************/
+    removeMember: function(groupMember, event)
+    {
+        NdexWeb.confirmAction("Are you sure you want to remove this member?", function()
+        {
+            NdexWeb.delete("/groups/" + Group.ViewModel.Group().id() + "/member/" + groupMember.resourceId(),
+                function()
+                {
+                    $.gritter.add({ title: "Group Updated", text: groupMember.resourceName() + "'s permissions have been changed." });
+                });
+        });
     },
 
     /****************************************************************************

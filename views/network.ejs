@@ -218,6 +218,7 @@
                     <tr>
                         <th>Name</th>
                         <th>Permissions</th>
+                        <th></th>
                     </tr>
                     </thead>
                     <tbody data-bind="foreach: members">
@@ -228,11 +229,14 @@
                         <!-- /ko -->
                         <!-- ko if: Network.canEdit() -->
                         <td>
-                            <select data-bind="value: permissions, event: { change: Group.changeMemberPermissions }">
+                            <select style="position: relative; top: 0.4em;" data-bind="value: permissions, event: { change: Group.changeMemberPermissions }">
                                 <option value="READ">Read</option>
                                 <option value="WRITE">Write</option>
                                 <option value="ADMIN">Admin</option>
                             </select>
+                        </td>
+                        <td>
+                            <a href="javascript:void()" data-bind="click: Network.removeMember">Remove</a>
                         </td>
                         <!-- /ko -->
                     </tr>

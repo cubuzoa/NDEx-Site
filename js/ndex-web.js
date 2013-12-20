@@ -35,7 +35,7 @@ var NdexWeb =
     confirmAction: function(actionText, confirmCallback)
     {
         NdexWeb.showModal("Confirmation", "#confirmAction");
-        NdexWeb.divModal.find("h4").text("Are you sure you want to " + actionText + "?");
+        NdexWeb.divModal.find("h4").text(actionText);
         $("#btnDecline").click(NdexWeb.hideModal);
         $("#btnConfirm").click(function()
         {
@@ -53,12 +53,13 @@ var NdexWeb =
         {
             type: "DELETE",
             url: NdexWeb.ApiHost + url,
+            dataType: "JSON",
             beforeSend: function(xhr)
             {
                 xhr.setRequestHeader("Authorization", "Basic " + NdexWeb.ViewModel.EncodedUser());
             },
             success: callback,
-            error: errorHandler || NdexWeb.errorHandler()
+            error: errorHandler || NdexWeb.errorHandler
         });
     },
 
@@ -67,7 +68,12 @@ var NdexWeb =
     ****************************************************************************/
     errorHandler: function(jqXHR, textStatus, errorThrown)
     {
-        $.gritter.add({ title: errorThrown, text: jqXHR.responseText });
+        if (arguments.length >= 3)
+            $.gritter.add({ title: errorThrown, text: jqXHR.responseText });
+        else if (arguments.length === 1)
+            $.gritter.add({ title: "Oops", text: exception })
+        else
+            $.gritter.add({ title: "Oops", text: "Something went wrong and we haven't figured this one out yet!" })
     },
 
     /****************************************************************************

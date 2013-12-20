@@ -200,11 +200,11 @@ var Network =
     ****************************************************************************/
     changeMemberPermissions: function(networkMember, event)
     {
-        NdexWeb.post("/networks",
-            ko.mapping.toJS(Network.ViewModel.Network()),
+        NdexWeb.post("/networks/" + Network.ViewModel.Network().id() + "/member",
+            ko.mapping.toJS(networkMember),
             function()
             {
-                $.gritter.add({ title: "Network Updated", text: groupMember().resourceName() + "'s permissions have been changed." });
+                $.gritter.add({ title: "Network Updated", text: groupMember.resourceName() + "'s permissions have been changed." });
             });
     },
 
@@ -320,6 +320,21 @@ var Network =
                     Network.buildSubnetwork(subnetwork);
                 }
             });
+    },
+
+    /****************************************************************************
+    * Removes a member from the network.
+    ****************************************************************************/
+    removeMember: function(networkMember, event)
+    {
+        NdexWeb.confirmAction("Are you sure you want to remove this member?", function()
+        {
+            NdexWeb.delete("/networks/" + Network.ViewModel.Network().id() + "/member/" + networkMember.resourceId(),
+                function()
+                {
+                    $.gritter.add({ title: "Network Updated", text: networkMember.resourceName() + "'s permissions have been changed." });
+                });
+        });
     },
 
     /****************************************************************************
