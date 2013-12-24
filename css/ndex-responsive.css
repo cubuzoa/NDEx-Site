@@ -1,0 +1,166 @@
+/******************************************************************************
+* Smaller than standard 960 (devices and browsers)
+******************************************************************************/
+@media only screen and (max-width: 959px)
+{
+    .navbar-fixed-top,
+    .navbar-fixed-bottom
+    {
+        position: fixed;
+    }
+
+
+    #tblSearchResults
+    {
+        width: 100%;
+    }
+}
+
+/******************************************************************************
+* Tablet Portrait size to standard 960 (devices and browsers)
+******************************************************************************/
+@media only screen and (min-width: 768px) and (max-width: 959px)
+{
+    #imgProfile
+    {
+        top: 25%;
+    }
+
+    #imgProfileBackground
+    {
+        height: 150px;
+    }
+}
+
+/******************************************************************************
+* All Mobile Sizes (devices and browser)
+******************************************************************************/
+@media only screen and (max-width: 767px)
+{
+    #imgProfile
+    {
+        top: 40%;
+    }
+
+    #imgProfileBackground
+    {
+        height: 150px;
+    }
+}
+
+/******************************************************************************
+* Mobile Landscape Size to Tablet Portrait (devices and browsers)
+******************************************************************************/
+@media only screen and (min-width: 481px) and (max-width: 767px)
+{
+
+}
+
+/******************************************************************************
+* Mobile Portrait Size to Mobile Landscape Size (devices and browsers)
+******************************************************************************/
+@media only screen and (max-width: 480px)
+{
+    body
+    {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    input, textarea, .uneditable-input
+    {
+        width: 175px;
+    }
+
+    nav
+    {
+        margin-bottom: 20px;
+    }
+
+    select
+    {
+        width: auto;
+    }
+
+    .mobile-hide
+    {
+        display: none;
+    }
+
+    .navbar-fixed-top
+    {
+        position: static;
+    }
+
+    .navbar .brand
+    {
+        margin-left: 0;
+    }
+
+    .navbar .btn-navbar
+    {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .tabbable table
+    {
+        width: 100%;
+    }
+
+    #divLogin,
+    #divJoin
+    {
+        width: 100%;
+    }
+
+    #frmLogin .Attribute-Editable,
+    #frmJoin .Attribute-Editable,
+    #frmSearch .Attribute-Editable
+    {
+        display: none;
+    }
+
+    #frmLogin div,
+    #frmJoin div,
+    #frmSearch div
+    {
+        text-align: center;
+    }
+
+    #divSidebar
+    {
+        position: absolute;
+        top: 52px;
+    }
+
+    #divUser div.dropdown,
+    #divGroup div.dropdown
+    {
+        display: block;
+        left: 0;
+        position: relative;
+        text-align: left;
+    }
+
+    #imgProfile
+    {
+        top: 20%;
+    }
+
+    #imgProfileBackground
+    {
+        height: 120px;
+    }
+
+    #divUser div.tabbable,
+    #divGroup div.tabbable
+    {
+        margin-bottom: 50px;
+    }
+
+    #divNotifications
+    {
+        margin-bottom: 20px;
+    }
+}

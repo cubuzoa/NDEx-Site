@@ -12,7 +12,45 @@
                 <img id="imgProfileBackground" data-bind="attr: { src: '../img/background/' + name() + '.jpg' }" />
             </div>
         </div>
+    </div>
 
+    <div class="span4 pull-right" style="position: relative;">
+        <div class="dropdown" data-bind="if: Group.canEdit()">
+            <a class="ndex-options dropdown-toggle Hand" data-toggle="dropdown">
+                <i class="icon-cog icon-large"></i>
+            </a>
+
+            <ul class="dropdown-menu">
+                <li>
+                    <a href="#" class="accountMiniMenu">New Group Profile Image</a>
+                </li>
+                <li>
+                    <a href="#" class="accountMiniMenu">New Background Image</a>
+                </li>
+            </ul>
+        </div>
+
+        <h3 class="AlignCenter">
+            <input type="text" class="Invisible" readonly placeholder="Name" data-bind="value: name, isEditable: Group.ViewModel.Group().id(), event: { change: Group.updateGroup }" />
+        </h3>
+
+        <div>
+            <input type="text" class="Invisible" readonly placeholder="Organization Name" data-bind="value: organizationName, isEditable: Group.ViewModel.Group().id(), event: { change: Group.updateGroup }" />
+        </div>
+
+        <div>
+            <!-- ko if: Group.canEdit() -->
+            <input type="text" class="Invisible" placeholder="Website URL" readonly data-bind="value: website, isEditable: Group.ViewModel.Group().id(), event: { change: Group.updateGroup }" />
+            <!-- /ko -->
+            <!-- ko if: !Group.canEdit() -->
+            <a target="_blank" data-bind="text: website, attr: { href: website() }"></a>
+            <!-- /ko -->
+        </div>
+
+        <textarea class="Invisible" style="height: 60px; width: 100%;" readonly placeholder="Description" data-bind="value: description, isEditable: Group.ViewModel.Group().id(), event: { change: Group.updateGroup }"></textarea>
+    </div>
+
+    <div class="span7">
         <div class="tabbable">
             <ul class="nav nav-tabs tab-title">
                 <li class="active">
@@ -40,7 +78,8 @@
                     <table>
                         <thead>
                         <tr>
-                            <th colspan="2">Name</th>
+                            <th style="width: 10px;"></th>
+                            <th>Name</th>
                             <th></th>
                         </tr>
                         </thead>
@@ -82,31 +121,35 @@
                 <div class="tab-pane" id="divMembers">
                     <table>
                         <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Permissions</th>
-                                <th></th>
-                            </tr>
+                        <tr>
+                            <th style="width: 10px;"></th>
+                            <th style="width: 40%;">Name</th>
+                            <th style="width: 30%">Permissions</th>
+                            <th></th>
+                        </tr>
                         </thead>
                         <tbody data-bind="foreach: members">
-                            <tr>
-                                <td data-bind="text: resourceName"></td>
-                                <!-- ko if: !Group.canEdit() -->
-                                <td data-bind="text: permissions"></td>
-                                <!-- /ko -->
-                                <!-- ko if: Group.canEdit() -->
-                                <td>
-                                    <select style="position: relative; top: 0.4em;" data-bind="value: permissions, event: { change: Group.changeMemberPermissions }">
-                                        <option value="READ">Read</option>
-                                        <option value="WRITE">Write</option>
-                                        <option value="ADMIN">Admin</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <a href="javascript:void()" data-bind="click: Group.removeMember">Remove</a>
-                                </td>
-                                <!-- /ko -->
-                            </tr>
+                        <tr>
+                            <td>
+                                <i class="icon-chevron-right"></i>
+                            </td>
+                            <td data-bind="text: resourceName"></td>
+                            <!-- ko if: !Group.canEdit() -->
+                            <td data-bind="text: permissions"></td>
+                            <!-- /ko -->
+                            <!-- ko if: Group.canEdit() -->
+                            <td>
+                                <select style="position: relative; top: 0.4em;" data-bind="value: permissions, event: { change: Group.changeMemberPermissions }">
+                                    <option value="READ">Read</option>
+                                    <option value="WRITE">Write</option>
+                                    <option value="ADMIN">Admin</option>
+                                </select>
+                            </td>
+                            <td>
+                                <a href="javascript:void()" data-bind="click: Group.removeMember">Remove</a>
+                            </td>
+                            <!-- /ko -->
+                        </tr>
                         </tbody>
                     </table>
                 </div>
@@ -114,56 +157,6 @@
                 <div class="tab-pane" id="divAgentAccounts"></div>
             </div>
         </div>
-    </div>
-
-    <div id="profile" class="span3">
-        <h3>
-            <input type="text" class="Invisible" readonly placeholder="Name" data-bind="value: name, isEditable: Group.ViewModel.Group().id(), event: { change: Group.updateGroup }" />
-        </h3>
-
-        <div>
-            <input type="text" class="Invisible" readonly placeholder="Organization Name" data-bind="value: organizationName, isEditable: Group.ViewModel.Group().id(), event: { change: Group.updateGroup }" />
-        </div>
-
-        <div>
-            <!-- ko if: Group.canEdit() -->
-            <input type="text" class="Invisible" placeholder="Website URL" readonly data-bind="value: website, isEditable: Group.ViewModel.Group().id(), event: { change: Group.updateGroup }" />
-            <!-- /ko -->
-            <!-- ko if: !Group.canEdit() -->
-            <a target="_blank" data-bind="text: website, attr: { href: website() }"></a>
-            <!-- /ko -->
-        </div>
-
-        <textarea class="Invisible" style="height: 60px; width: 100%;" readonly placeholder="Description" data-bind="value: description, isEditable: Group.ViewModel.Group().id(), event: { change: Group.updateGroup }"></textarea>
-    </div>
-
-    <div class="span2 dropdown">
-        <a class="ndex-options dropdown-toggle" data-toggle="dropdown">
-            <i class="icon-cog icon-large"></i>
-        </a>
-
-        <ul class="dropdown-menu">
-            <li>
-                <a href="#displayOptions" data-toggle="modal">Display Options</a>
-            </li>
-            <!-- ko if: Group.canEdit() -->
-            <li>
-                <a href="/editGroupProfile/<%= groupId %>" class="accountMiniMenu">Edit Group Profile</a>
-            </li>
-            <li>
-                <a href="#" class="accountMiniMenu">New Group Profile Image</a>
-            </li>
-            <li>
-                <a href="#" class="accountMiniMenu">New Background Image</a>
-            </li>
-            <li>
-                <a href="/sendRequest" class="accountMiniMenu">Create a Request</a>
-            </li>
-            <li>
-                <a href="/editAgent" class="accountMiniMenu">Edit/Create Agent</a>
-            </li>
-            <!-- /ko -->
-        </ul>
     </div>
 </div>
 

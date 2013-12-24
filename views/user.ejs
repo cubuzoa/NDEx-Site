@@ -2,39 +2,6 @@
 <% include navigation.ejs %>
 
 <div id="divUser" class="row-fluid" data-bind="with: User">
-    <div class="span2 dropdown pull-right">
-        <a class="ndex-options dropdown-toggle Hand" data-toggle="dropdown">
-            <i class="icon-cog icon-large"></i>
-        </a>
-
-        <ul class="dropdown-menu">
-            <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
-            <li>
-                <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.createGroup">Create Group</a>
-            </li>
-            <li>
-                <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.createNetwork">Create Network</a>
-            </li>
-            <li>
-                <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.changeProfileImage">Change Profile Image</a>
-            </li>
-            <li>
-                <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.changeProfileImage">Change Background Image</a>
-            </li>
-            <li>
-                <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.changePassword">Change Password</a>
-            </li>
-            <!-- /ko -->
-            <!-- ko if: NdexWeb.ViewModel.User().id() != User.ViewModel.User().id() -->
-                <!-- ko if: NdexWeb.ViewModel.User().groups().length > 0 -->
-            <li>
-                <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.inviteToGroup">Invite to Join...</a>
-            </li>
-                <!-- /ko -->
-            <!-- /ko -->
-        </ul>
-    </div>
-
     <div class="span7">
         <div id="divProfileImages">
             <div>
@@ -45,127 +12,43 @@
                 <img id="imgProfileBackground" data-bind="attr: { src: '/img/background/' + username() + '.jpg' }" />
             </div>
         </div>
-
-        <div class="tabbable">
-            <ul class="nav nav-tabs tab-title">
-                <li class="active">
-                    <a href="#divNetworks" data-toggle="tab">
-                        <i class="icon-exchange"></i>
-                        Networks
-                    </a>
-                </li>
-                <li>
-                    <a href="#divGroups" data-toggle="tab">
-                        <i class="icon-group"></i>
-                        Groups
-                    </a>
-                </li>
-                <li data-bind="if: false">
-                    <a href="#divAgentAccounts" data-toggle="tab">
-                        <i class="icon-cogs"></i>
-                        Agents
-                    </a>
-                </li>
-            </ul>
-
-            <div class="tab-content">
-                <div id="divNetworks" class="tab-pane active">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th colspan="2">Name</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody data-bind="foreach: networks">
-                            <tr>
-                                <td>
-                                    <i class="icon-chevron-right"></i>
-                                </td>
-                                <td>
-                                    <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
-                                    <a data-bind="text: resourceName, attr: { href: '/network/' + resourceId() }"></a>
-                                    <!-- /ko -->
-                                    <!-- ko if: NdexWeb.ViewModel.User().id() != User.ViewModel.User().id() -->
-                                    <span data-bind="text: resourceName"></span>
-                                    <!-- /ko -->
-
-                                </td>
-                                <td>
-                                    <div class="btn-group">
-                                        <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
-                                        <a href="javascript:void()" class="btn" title="Add to Work Surface">
-                                            <!-- ko if: !WorkSurface.isOnWorkSurface(resourceId()) -->
-                                            <i class="icon-plus icon-white" data-bind="click: WorkSurface.addNetwork"></i>
-                                            <!-- /ko -->
-                                            <!-- ko if: WorkSurface.isOnWorkSurface(resourceId()) -->
-                                            <i class="icon-remove icon-white" data-bind="click: WorkSurface.removeNetwork"></i>
-                                            <!-- /ko -->
-                                        </a>
-                                        <!-- /ko -->
-
-                                        <!-- ko if: NdexWeb.ViewModel.User().id() != User.ViewModel.User().id() -->
-                                        <a href="javascript:void()" class="btn" title="Request access">
-                                            <i class="icon-envelope-alt" data-bind="click: User.requestNetworkAccess"></i>
-                                        </a>
-                                        <!-- /ko -->
-
-                                        <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
-                                        <a data-bind="attr: { href: '/network/' + resourceId() + '/visualize' }" class="btn" target="_blank" title="Visualize network">
-                                            <i class="icon-eye-open"></i>
-                                        </a>
-                                        <!-- /ko -->
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div id="divGroups" class="tab-pane">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th colspan="2">Name</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody data-bind="foreach: groups">
-                            <tr>
-                                <td>
-                                    <i class="icon-chevron-right"></i>
-                                </td>
-                                <td>
-                                    <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
-                                    <a data-bind="text: resourceName, attr: { href: '/group/' + resourceId() }"></a>
-                                    <!-- /ko -->
-                                    <!-- ko if: NdexWeb.ViewModel.User().id() != User.ViewModel.User().id() -->
-                                    <span data-bind="text: resourceName"></span>
-                                    <!-- /ko -->
-                                </td>
-                                <td>
-                                    <div class="btn-group">
-                                        <a href="javascript:void()" class="btn" title="Request access">
-                                            <i class="icon-envelope-alt" data-bind="click: User.requestGroupAccess"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div id="divMemberships" class="tab-pane">
-                </div>
-
-                <div id="divAgentAccounts" class="tab-pane">
-                </div>
-            </div>
-        </div>
     </div>
 
-    <div class="span3">
-        <h3>
+    <div class="span4 pull-right" style="position: relative;">
+        <div class="dropdown">
+            <a class="ndex-options dropdown-toggle Hand" data-toggle="dropdown">
+                <i class="icon-cog icon-large"></i>
+            </a>
+
+            <ul class="dropdown-menu">
+                <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
+                <li>
+                    <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.createGroup">Create Group</a>
+                </li>
+                <li>
+                    <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.createNetwork">Create Network</a>
+                </li>
+                <li>
+                    <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.changeProfileImage">Change Profile Image</a>
+                </li>
+                <li>
+                    <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.changeProfileImage">Change Background Image</a>
+                </li>
+                <li>
+                    <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.changePassword">Change Password</a>
+                </li>
+                <!-- /ko -->
+                <!-- ko if: NdexWeb.ViewModel.User().id() != User.ViewModel.User().id() -->
+                <!-- ko if: NdexWeb.ViewModel.User().groups().length > 0 -->
+                <li>
+                    <a href="javascript:void()" class="accountMiniMenu" data-bind="click: User.inviteToGroup">Invite to Join...</a>
+                </li>
+                <!-- /ko -->
+                <!-- /ko -->
+            </ul>
+        </div>
+
+        <h3 class="AlignCenter">
             <input type="text" class="AlignRight Invisible" readonly placeholder="First Name" data-bind="value: firstName, isEditable: User.ViewModel.User().id(), event: { change: User.updateUser }" />
             <input type="text" class="Invisible" readonly placeholder="Last Name" data-bind="value: lastName, isEditable: User.ViewModel.User().id(), event: { change: User.updateUser }" />
         </h3>
@@ -183,7 +66,7 @@
             <!-- /ko -->
         </div>
 
-        <textarea class="Invisible" style="height: 60px; width: 100%;" readonly placeholder="Description" data-bind="value: description, isEditable: User.ViewModel.User().id(), event: { change: User.updateUser }"></textarea>
+        <textarea class="Invisible" style="height: 60px; width: 95%;" readonly placeholder="Description" data-bind="value: description, isEditable: User.ViewModel.User().id(), event: { change: User.updateUser }"></textarea>
 
         <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
         <div id="divNotifications">
@@ -222,6 +105,127 @@
             </ul>
         </div>
         <!-- /ko -->
+    </div>
+
+    <div class="span7">
+        <div class="tabbable">
+            <ul class="nav nav-tabs tab-title">
+                <li class="active">
+                    <a href="#divNetworks" data-toggle="tab">
+                        <i class="icon-exchange"></i>
+                        Networks
+                    </a>
+                </li>
+                <li>
+                    <a href="#divGroups" data-toggle="tab">
+                        <i class="icon-group"></i>
+                        Groups
+                    </a>
+                </li>
+                <li data-bind="if: false">
+                    <a href="#divAgentAccounts" data-toggle="tab">
+                        <i class="icon-cogs"></i>
+                        Agents
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div id="divNetworks" class="tab-pane active">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th style="width: 10px;"></th>
+                            <th>Name</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody data-bind="foreach: networks">
+                        <tr>
+                            <td>
+                                <i class="icon-chevron-right"></i>
+                            </td>
+                            <td>
+                                <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
+                                <a data-bind="text: resourceName, attr: { href: '/network/' + resourceId() }"></a>
+                                <!-- /ko -->
+                                <!-- ko if: NdexWeb.ViewModel.User().id() != User.ViewModel.User().id() -->
+                                <span data-bind="text: resourceName"></span>
+                                <!-- /ko -->
+
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
+                                    <a href="javascript:void()" class="btn" title="Add to Work Surface">
+                                        <!-- ko if: !WorkSurface.isOnWorkSurface(resourceId()) -->
+                                        <i class="icon-plus icon-white" data-bind="click: WorkSurface.addNetwork"></i>
+                                        <!-- /ko -->
+                                        <!-- ko if: WorkSurface.isOnWorkSurface(resourceId()) -->
+                                        <i class="icon-remove icon-white" data-bind="click: WorkSurface.removeNetwork"></i>
+                                        <!-- /ko -->
+                                    </a>
+                                    <!-- /ko -->
+
+                                    <!-- ko if: NdexWeb.ViewModel.User().id() != User.ViewModel.User().id() -->
+                                    <a href="javascript:void()" class="btn" title="Request access">
+                                        <i class="icon-envelope-alt" data-bind="click: User.requestNetworkAccess"></i>
+                                    </a>
+                                    <!-- /ko -->
+
+                                    <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
+                                    <a data-bind="attr: { href: '/network/' + resourceId() + '/visualize' }" class="btn" target="_blank" title="Visualize network">
+                                        <i class="icon-eye-open"></i>
+                                    </a>
+                                    <!-- /ko -->
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="divGroups" class="tab-pane">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th style="width: 10px;"></th>
+                            <th>Name</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody data-bind="foreach: groups">
+                        <tr>
+                            <td>
+                                <i class="icon-chevron-right"></i>
+                            </td>
+                            <td>
+                                <!-- ko if: NdexWeb.ViewModel.User().id() === User.ViewModel.User().id() -->
+                                <a data-bind="text: resourceName, attr: { href: '/group/' + resourceId() }"></a>
+                                <!-- /ko -->
+                                <!-- ko if: NdexWeb.ViewModel.User().id() != User.ViewModel.User().id() -->
+                                <span data-bind="text: resourceName"></span>
+                                <!-- /ko -->
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="javascript:void()" class="btn" title="Request access">
+                                        <i class="icon-envelope-alt" data-bind="click: User.requestGroupAccess"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="divMemberships" class="tab-pane">
+                </div>
+
+                <div id="divAgentAccounts" class="tab-pane">
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
