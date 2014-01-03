@@ -551,10 +551,51 @@ dl.Accordion > dd
 /******************************************************************************
 * Network styling
 ******************************************************************************/
+#divNetwork
+{
+    position: relative;
+}
+
+#dlNetworkAccordion > dt
+{
+    display: none;
+}
+
+#dlNetworkAccordion > dd
+{
+    background: #fff;
+    display: block;
+}
+
+#ddMetadata
+{
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 40%;
+}
+
+#ddSearchNetwork
+{
+    left: 0;
+    position: absolute;
+    top: 400px;
+    width: 40%;
+}
+
+#ddSubnetwork
+{
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 55%;
+}
+
 #divNetwork h3 > input.Invisible
 {
     font-size: 24px;
-    width: 40%;
+    text-align: center;
+    width: 100%;
 }
 
 #divNetwork ul
@@ -570,19 +611,23 @@ dl.Accordion > dd
   cursor: move;
 }
 
-#divSearchNetwork
+#ddMetadata textarea
 {
-  float: left;
-  margin: 20px 50px 0 0;
-  width: 40%;
+    height: 60px;
+    width: 40%;
 }
 
-#divSearchNetwork #divSearch input
+#ddSearchNetwork #divSearch
+{
+    margin-bottom: 25px;
+}
+
+#ddSearchNetwork #divSearch input
 {
   width: 250px;
 }
 
-#divSearchNetwork ul
+#ddSearchNetwork ul
 {
   border: 1px dashed #C0C0C0;
   display: inline-block;
@@ -591,7 +636,7 @@ dl.Accordion > dd
   overflow-y: auto;
 }
 
-#divSearchNetwork ul > li
+#ddSearchNetwork ul > li
 {
   color: #FFF;
   font-size: 0.8em;
@@ -637,12 +682,6 @@ dl.Accordion > dd
   background: -webkit-linear-gradient(top, #440000, #550000);
   border-top: 1px solid #330000;
   filter: progid : DXImageTransform . Microsoft . gradient(startColorstr = "#440000", endColorstr = "#550000");
-}
-
-#divNetworkResults
-{
-    float: left;
-    width: 55%;
 }
 
 #divSubnetwork

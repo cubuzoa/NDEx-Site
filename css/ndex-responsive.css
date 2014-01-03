@@ -173,4 +173,95 @@
     {
         margin-bottom: 20px;
     }
+
+    #divNetwork > dl.Accordion
+    {
+        width: 97%;
+    }
+
+    #divNetwork > dl.Accordion dt
+    {
+        display: block;
+    }
+
+    #ddMetadata,
+    #ddSearchNetwork,
+    #ddSubnetwork
+    {
+        position: static;
+        width: 100%;
+    }
+
+    #divNetwork h3 > input.Invisible
+    {
+        font-size: 24px;
+        width: 90%;
+    }
+
+    #ddMetadata textarea
+    {
+        height: 60px;
+        width: 90%;
+    }
+
+    #ddSearchNetwork #divSearch input
+    {
+        width: 80%;
+    }
+
+    #ddSearchNetwork dl.Accordion
+    {
+        width: 90%;
+    }
+
+    #ulSubnetwork
+    {
+        width: 92%;
+    }
+
+    #ulSubnetwork li
+    {
+        padding: 0.5em 0;
+    }
+
+    #ulSubnetwork li:nth-child(odd)
+    {
+        background: #DDD;
+        background: linear-gradient(center top, #FFF, #DDD);
+        background: -moz-linear-gradient(center top, #FFF, #DDD);
+        background: -ms-linear-gradient(center top, #FFF, #DDD);
+        background: -o-linear-gradient(center top, #FFF, #DDD);
+        background: -webkit-linear-gradient(top, #FFF, #DDD);
+        border-top: 1px solid #666;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#FFF", endColorstr="#DDD");
+    }
+
+    #ulSubnetwork li:nth-child(even)
+    {
+        background: #BBB;
+        background: linear-gradient(center top, #DDD, #BBB);
+        background: -moz-linear-gradient(center top, #DDD, #BBB);
+        background: -ms-linear-gradient(center top, #DDD, #BBB);
+        background: -o-linear-gradient(center top, #DDD, #BBB);
+        background: -webkit-linear-gradient(top, #DDD, #BBB);
+        border-top: 1px solid #666;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#DDD", endColorstr="#BBB");
+    }
+
+    #ulSubnetwork > li > strong:first-child
+    {
+        display: block;
+    }
+
+    #ulSubnetwork em
+    {
+        display: block;
+        text-align: center;
+    }
+
+    #ulSubnetwork > li > strong:last-child
+    {
+        display: block;
+        text-align: right;
+    }
 }

@@ -59,7 +59,6 @@ var Login =
             return;
         }
 
-        //TODO: Convert this to using an authenticate method
         $.ajax(
         {
             type: "GET",

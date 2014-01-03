@@ -45,9 +45,9 @@ var Network =
             source: Network.autoSuggestTerms
         });
 
+        this.getNetwork();
         ko.applyBindings(Network.ViewModel, $("#divNetwork")[0]);
 
-        this.getNetwork();
         this.wireEvents();
     },
 
@@ -240,10 +240,17 @@ var Network =
     ****************************************************************************/
     getNetwork: function()
     {
-        NdexWeb.get(
-            "/networks/" + this.ViewModel.NetworkId(),
-            null,
-            function(network)
+        $.ajax(
+        {
+            async: false,
+            type: "GET",
+            url: NdexWeb.ApiHost + "/networks/" + this.ViewModel.NetworkId(),
+            dataType: "json",
+            beforeSend: function(xhr)
+            {
+                xhr.setRequestHeader("Authorization", "Basic " + NdexWeb.ViewModel.EncodedUser());
+            },
+            success: function(network)
             {
                 network = ko.mapping.fromJS(network);
 
@@ -266,7 +273,10 @@ var Network =
                 Network.PageIndex = 1;
                 Network.getEdges();
                 $("#divSubnetwork").scroll(this.infiniteScroll);
-            });
+
+            },
+            error: NdexWeb.errorHandler
+        });
     },
 
     /****************************************************************************
@@ -376,20 +386,23 @@ var Network =
     ****************************************************************************/
     setupAccordion: function()
     {
-        $("dl.Accordion > dt").click(function()
+        var accordionSelector = "#ddSearchNetwork dl.Accordion > dt";
+        if ($(window).width() < 481)
+            accordionSelector = "dl.Accordion > dt";
+
+        $(accordionSelector).click(function()
         {
             var accordionKey = $(this);
-
             if (accordionKey.hasClass("Expanded"))
                 return;
 
             accordionKey.parent().children("dt.Expanded").toggleClass("Expanded");
             accordionKey.toggleClass("Expanded");
-            $("dd:visible").slideUp("fast");
+            accordionKey.parent().children("dd:visible").slideUp("fast");
             accordionKey.next().slideDown("fast");
         }).next().hide();
 
-        $("dl.Accordion > dt.Expanded").next().show();
+        $(accordionSelector + ".Expanded").next().show();
     },
 
     /****************************************************************************

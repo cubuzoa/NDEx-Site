@@ -3,279 +3,246 @@
 <% include worksurface.ejs %>
 
 <div id="divNetwork">
-    <div id="divMetadata" data-bind="if: Network()">
-        <!-- ko with: Network() -->
-        <h3>
-            <input type="text" class="Invisible" readonly placeholder="Title" data-bind="value: title, isEditable: Network.ViewModel.Network().id(), event: { change: Network.updateNetwork }"/>
-        </h3>
+    <dl id="dlNetworkAccordion" class="Accordion">
+        <dt class="Expanded">Metadata</dt>
+        <dd id="ddMetadata">
+            <!-- ko with: Network() -->
+            <h3>
+                <input type="text" class="Invisible" readonly placeholder="Title" data-bind="value: title, isEditable: Network.ViewModel.Network().id(), event: { change: Network.updateNetwork }"/>
+            </h3>
 
-        <textarea class="Invisible" style="height: 60px; width: 40%;" readonly placeholder="Description" data-bind="value: description, isEditable: Network.ViewModel.Network().id(), event: { change: Network.updateNetwork }"></textarea>
+            <textarea class="Invisible" readonly placeholder="Description" data-bind="value: description, isEditable: Network.ViewModel.Network().id(), event: { change: Network.updateNetwork }"></textarea>
 
-        <div data-bind="if: Network.canEdit()">
-            <label class="Attribute-Editable">Public:</label>
-            <input type="checkbox" data-bind="checked: isPublic, event: { change: Network.updateNetwork }" />
-        </div>
-
-        <div>
-            <label class="Attribute">Source:</label>
-            <span data-bind="text: source"></span>
-        </div>
-
-        <div>
-            <label class="Attribute">Format:</label>
-            <span data-bind="text: format"></span>
-        </div>
-
-        <div>
-            <label class="Attribute">Nodes:</label>
-            <span data-bind="text: nodeCount"></span>
-        </div>
-
-        <div>
-            <label class="Attribute">Edges:</label>
-            <span data-bind="text: edgeCount"></span>
-        </div>
-        <!-- /ko -->
-    </div>
-
-    <div id="divSearchNetwork" data-bind="with: Search">
-        <form id="frmSearchNetwork">
-            <div id="divSearch">
-                <i class="icon-search"></i>
-                <input type="search" placeholder="Search keywords" data-bind="value: Keywords, valueUpdate: 'keypress'"/>
-
-                <div>
-                    <button type="submit" class="btn" data-bind="enable: Keywords().length > 0">Search</button>
-                    <button type="button" class="btn" data-bind="enable: $root.Subnetwork(), click: Network.saveSubnetwork" rel="tooltip" title="Saves the subnetwork from the query as a Network">Save Subnetwork</button>
-                </div>
+            <div data-bind="if: Network.canEdit()">
+                <label class="Attribute-Editable">Public:</label>
+                <input type="checkbox" data-bind="checked: isPublic, event: { change: Network.updateNetwork }" />
             </div>
 
-            <dl class="Accordion">
-                <dt>Limit What's Displayed</dt>
-                <dd class="Expanded">
-                    <div class="hide">
-                        <label class="Attribute-Editable">Max Nodes:</label>
-                        <input type="range" min="1" max="1000" step="1" data-bind="value: MaxNodes, valueUpdate: 'mousemove'"/>
-                        <span data-bind="text: MaxNodes"></span>
-                    </div>
+            <div>
+                <label class="Attribute">Source:</label>
+                <span data-bind="text: source"></span>
+            </div>
+
+            <div>
+                <label class="Attribute">Format:</label>
+                <span data-bind="text: format"></span>
+            </div>
+
+            <div>
+                <label class="Attribute">Nodes:</label>
+                <span data-bind="text: nodeCount"></span>
+            </div>
+
+            <div>
+                <label class="Attribute">Edges:</label>
+                <span data-bind="text: edgeCount"></span>
+            </div>
+            <!-- /ko -->
+        </dd>
+        <!-- ko if: $(window).width() < 481 -->
+        <dt>Members</dt>
+        <dd data-bind="template: { name: 'membersTemplate', data: Network() }">
+        </dd>
+        <!-- /ko -->
+        <dt>Search</dt>
+        <dd id="ddSearchNetwork" data-bind="with: Search">
+            <form id="frmSearchNetwork">
+                <div id="divSearch">
+                    <i class="icon-search"></i>
+                    <input type="search" placeholder="Search keywords" data-bind="value: Keywords, valueUpdate: 'keypress'"/>
 
                     <div>
-                        <label class="Attribute-Editable">Max Edges:</label>
-                        <input type="range" id="txtMaxEdges" min="1" max="1000" step="1" data-bind="value: MaxEdges, valueUpdate: 'mousemove'"/>
-                        <span data-bind="text: MaxEdges"></span>
+                        <button type="submit" class="btn" data-bind="enable: Keywords().length > 0">Search</button>
+                        <button type="button" class="btn" data-bind="enable: $root.Subnetwork(), click: Network.saveSubnetwork" rel="tooltip" title="Saves the subnetwork from the query as a Network">Save Subnetwork</button>
                     </div>
+                </div>
 
-                    <div class="hide">
-                        <label class="Attribute-Editable" for="">Max Paths:</label>
-                        <input type="range" min="1" max="1000" step="1" data-bind="value: MaxPaths, valueUpdate: 'mousemove'"/>
-                        <span data-bind="text: MaxPaths"></span>
-                    </div>
+                <dl class="Accordion">
+                    <dt>Limit What's Displayed</dt>
+                    <dd class="Expanded">
+                        <div class="hide">
+                            <label class="Attribute-Editable">Max Nodes:</label>
+                            <input type="range" min="1" max="1000" step="1" data-bind="value: MaxNodes, valueUpdate: 'mousemove'"/>
+                            <span data-bind="text: MaxNodes"></span>
+                        </div>
 
-                    <div class="hide">
-                        <label class="Attribute-Editable">Retain Paths:</label>
-                        <input type="checkbox" data-bind="checked: RetainPaths"/>
-                    </div>
+                        <div>
+                            <label class="Attribute-Editable">Max Edges:</label>
+                            <input type="range" id="txtMaxEdges" min="1" max="1000" step="1" data-bind="value: MaxEdges, valueUpdate: 'mousemove'"/>
+                            <span data-bind="text: MaxEdges"></span>
+                        </div>
 
-                    <div class="hide">
-                        <label class="Attribute-Editable" for="ddlFuzziness">Fuzziness:</label>
-                        <select id="ddlFuzziness">
-                            <option value="STRICT">Strict</option>
-                            <option value="FUNCTIONAL">Functional</option>
-                            <option value="PERMISSIVE">Permissive</option>
+                        <div class="hide">
+                            <label class="Attribute-Editable" for="">Max Paths:</label>
+                            <input type="range" min="1" max="1000" step="1" data-bind="value: MaxPaths, valueUpdate: 'mousemove'"/>
+                            <span data-bind="text: MaxPaths"></span>
+                        </div>
+
+                        <div class="hide">
+                            <label class="Attribute-Editable">Retain Paths:</label>
+                            <input type="checkbox" data-bind="checked: RetainPaths"/>
+                        </div>
+
+                        <div class="hide">
+                            <label class="Attribute-Editable" for="ddlFuzziness">Fuzziness:</label>
+                            <select id="ddlFuzziness">
+                                <option value="STRICT">Strict</option>
+                                <option value="FUNCTIONAL">Functional</option>
+                                <option value="PERMISSIVE">Permissive</option>
+                            </select>
+                        </div>
+                    </dd>
+                    <dt>Filter Results</dt>
+                    <dd>
+                        <select class="hide">
+                            <option>Canned filter settings?</option>
                         </select>
-                    </div>
-                </dd>
-                <dt>Filter Results</dt>
-                <dd>
-                    <select class="hide">
-                        <option>Canned filter settings?</option>
-                    </select>
 
-                    <h4>Terms</h4>
+                        <h4>Terms</h4>
 
-                    <ul id="ulFilterableTerms" class="hide" data-bind="foreach: $root.Network.Terms">
-                        <li>
-                            <i class="icon-reorder"></i>
-                            <span data-bind="text: name"></span>
-                        </li>
-                    </ul>
+                        <ul id="ulFilterableTerms" class="hide" data-bind="foreach: $root.Network.Terms">
+                            <li>
+                                <i class="icon-reorder"></i>
+                                <span data-bind="text: name"></span>
+                            </li>
+                        </ul>
 
-                    <h4>Included</h4>
+                        <h4>Included</h4>
 
-                    <ul id="ulTermsIncluded" class="hide" data-bind="foreach: Terms.Included">
-                        <li>
-                            <i class="icon-reorder"></i>
-                            <span data-bind="text: name"></span>
-                        </li>
-                    </ul>
+                        <ul id="ulTermsIncluded" class="hide" data-bind="foreach: Terms.Included">
+                            <li>
+                                <i class="icon-reorder"></i>
+                                <span data-bind="text: name"></span>
+                            </li>
+                        </ul>
 
-                    <h4>Excluded</h4>
+                        <h4>Excluded</h4>
 
-                    <ul id="ulTermsExcluded" class="hide" data-bind="foreach: Terms.Excluded">
-                        <li>
-                            <i class="icon-reorder"></i>
-                            <span data-bind="text: name"></span>
-                        </li>
-                    </ul>
-                </dd>
-                <dt>Restrict Graph Traversal</dt>
-                <dd>
-                    <div class="hide">
-                        <label class="Attribute-Editable">Direction:</label>
-                        <select data-bind="value: Direction">
-                            <option value="UPSTREAM">Upstream</option>
-                            <option value="DOWNSTREAM">Downstream</option>
-                            <option value="BOTH">Both</option>
-                            <option value="INTERCONNECT">Interconnect</option>
-                        </select>
-                    </div>
+                        <ul id="ulTermsExcluded" class="hide" data-bind="foreach: Terms.Excluded">
+                            <li>
+                                <i class="icon-reorder"></i>
+                                <span data-bind="text: name"></span>
+                            </li>
+                        </ul>
+                    </dd>
+                    <dt>Restrict Graph Traversal</dt>
+                    <dd>
+                        <div class="hide">
+                            <label class="Attribute-Editable">Direction:</label>
+                            <select data-bind="value: Direction">
+                                <option value="UPSTREAM">Upstream</option>
+                                <option value="DOWNSTREAM">Downstream</option>
+                                <option value="BOTH">Both</option>
+                                <option value="INTERCONNECT">Interconnect</option>
+                            </select>
+                        </div>
 
-                    <div class="hide">
-                        <label class="Attribute-Editable">Max Depth:</label>
-                        <input type="range" min="1" max="10" step="1"
-                               data-bind="value: MaxDepth, valueUpdate: 'mousemove'"/>
-                        <span data-bind="text: MaxDepth"></span>
-                    </div>
+                        <div class="hide">
+                            <label class="Attribute-Editable">Max Depth:</label>
+                            <input type="range" min="1" max="10" step="1"
+                                   data-bind="value: MaxDepth, valueUpdate: 'mousemove'"/>
+                            <span data-bind="text: MaxDepth"></span>
+                        </div>
 
-                    <h4>Terms</h4>
+                        <h4>Terms</h4>
 
-                    <ul id="ulTraversalTerms" class="hide" data-bind="foreach: $root.Network.Terms">
-                        <li>
-                            <i class="icon-reorder"></i>
-                            <span data-bind="text: name"></span>
-                        </li>
-                    </ul>
+                        <ul id="ulTraversalTerms" class="hide" data-bind="foreach: $root.Network.Terms">
+                            <li>
+                                <i class="icon-reorder"></i>
+                                <span data-bind="text: name"></span>
+                            </li>
+                        </ul>
 
-                    <h4>Starting Terms</h4>
+                        <h4>Starting Terms</h4>
 
-                    <ul id="ulStartingTerms" class="hide" data-bind="foreach: Terms.Starting">
-                        <li>
-                            <i class="icon-reorder"></i>
-                            <span data-bind="text: name"></span>
-                        </li>
-                    </ul>
+                        <ul id="ulStartingTerms" class="hide" data-bind="foreach: Terms.Starting">
+                            <li>
+                                <i class="icon-reorder"></i>
+                                <span data-bind="text: name"></span>
+                            </li>
+                        </ul>
 
-                    <h4>Target Terms</h4>
+                        <h4>Target Terms</h4>
 
-                    <ul id="ulTargetTerms" class="hide" data-bind="foreach: Terms.Target">
-                        <li>
-                            <i class="icon-reorder"></i>
-                            <span data-bind="text: name"></span>
-                        </li>
-                    </ul>
-                </dd>
-            </dl>
-        </form>
-    </div>
+                        <ul id="ulTargetTerms" class="hide" data-bind="foreach: Terms.Target">
+                            <li>
+                                <i class="icon-reorder"></i>
+                                <span data-bind="text: name"></span>
+                            </li>
+                        </ul>
+                    </dd>
+                </dl>
+            </form>
+        </dd>
+        <dt>Subnetwork</dt>
+        <dd id="ddSubnetwork">
+            <!-- ko if: $(window).width() > 480 -->
+            <ul class="nav nav-tabs tab-title">
+                <li class="active">
+                    <a href="#divSubnetwork" data-toggle="tab">
+                        <i class="icon-exchange"></i>
+                        Subnetwork
+                    </a>
+                </li>
+                <li>
+                    <a href="#divMembers" data-toggle="tab">
+                        <i class="icon-male"></i>
+                        Members
+                    </a>
+                </li>
+                <li>
+                    <a href="#divVisualize" data-toggle="tab">
+                        <i class="icon-eye-open"></i>
+                        Visualize
+                    </a>
+                </li>
+            </ul>
 
-    <div id="divNetworkResults">
-        <ul class="nav nav-tabs tab-title">
-            <li class="active">
-                <a href="#divSubnetwork" data-toggle="tab">
-                    <i class="icon-exchange"></i>
-                    Subnetwork
-                </a>
-            </li>
-            <li>
-                <a href="#divMembers" data-toggle="tab">
-                    <i class="icon-male"></i>
-                    Members
-                </a>
-            </li>
-            <li>
-                <a href="#divVisualize" data-toggle="tab">
-                    <i class="icon-eye-open"></i>
-                    Visualize
-                </a>
-            </li>
-        </ul>
-
-        <div class="tab-content" data-bind="with: Network">
-            <div class="tab-pane active" id="divSubnetwork">
-                <table>
-                    <thead>
+            <div class="tab-content" data-bind="with: Network">
+                <div class="tab-pane active" id="divSubnetwork">
+                    <table>
+                        <thead>
                         <tr>
                             <th>Subject</th>
                             <th>Predicate</th>
                             <th>Object</th>
                             <th>Citation</th>
                         </tr>
-                    </thead>
-                    <tbody data-bind="foreach: edges">
+                        </thead>
+                        <tbody data-bind="foreach: edges">
                         <tr>
                             <td data-bind="text: subject.term.name"></td>
                             <td data-bind="text: predicate.name"></td>
                             <td data-bind="text: object.term.name"></td>
                             <td></td>
                         </tr>
-                    </tbody>
-                </table>
-            </div>
+                        </tbody>
+                    </table>
+                </div>
 
-            <div class="tab-pane" id="divMembers">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Permissions</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody data-bind="foreach: members">
-                    <tr>
-                        <td data-bind="text: resourceName"></td>
-                        <!-- ko if: !Network.canEdit() -->
-                        <td data-bind="text: permissions"></td>
-                        <!-- /ko -->
-                        <!-- ko if: Network.canEdit() -->
-                        <td>
-                            <select style="position: relative; top: 0.4em;" data-bind="value: permissions, event: { change: Network.changeMemberPermissions }">
-                                <option value="READ">Read</option>
-                                <option value="WRITE">Write</option>
-                                <option value="ADMIN">Admin</option>
-                            </select>
-                        </td>
-                        <td>
-                            <a href="javascript:void()" data-bind="click: Network.removeMember">Remove</a>
-                        </td>
-                        <!-- /ko -->
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
+                <div class="tab-pane" id="divMembers" data-bind="template: { name: 'membersTemplate' }">
+                </div>
 
-            <div class="tab-pane" id="divVisualize">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Engine</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>
-                            <a data-bind="attr: { href: '/network/' + $root.NetworkId() + '/visualize' }">Cytoscape</a>
-                        </td>
-                        <td>
-                            An engine that supplies a basic visualization of the network in a two-dimensional wheel.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <a data-bind="attr: { href: '/network/' + $root.NetworkId() + '/triptych' }">Triptych</a>
-                        </td>
-                        <td>
-                            An engine that supplies a three-dimensional force-graph of the network. Uses WebGL if
-                            supported by the browser or gracefully degrades to HTML 5's Canvas. Not usable by older
-                            browsers that don't at least support HTML 5's Canvas.
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+                <div class="tab-pane" id="divVisualize" data-bind="template: { name: 'visualizeTemplate' }">
+                </div>
             </div>
-        </div>
-    </div>
+            <!-- /ko -->
+            <!-- ko if: $(window).width() < 481 -->
+            <ul id="ulSubnetwork" data-bind="foreach: Network().edges">
+                <li>
+                    <strong data-bind="text: subject.term.name"></strong>
+                    <em data-bind="text: predicate.name"></em>
+                    <strong data-bind="text: object.term.name"></strong>
+                </li>
+            </ul>
+            <!-- /ko -->
+        </dd>
+        <!-- ko if: $(window).width() < 481 -->
+        <dt>Visualize</dt>
+        <dd data-bind="template: { name: 'visualizeTemplate' }">
+        </dd>
+        <!-- /ko -->
+    </dl>
 </div>
 
 <script type="text/javascript" src="/js/network.js"></script>
@@ -283,6 +250,67 @@
     Network.ViewModel.NetworkId("<%=networkId%>");
 </script>
 
+<script type="text/html" id="membersTemplate">
+    <table style="width: 100%;">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th style="width: 30%;">Permissions</th>
+            <th style="width: 10%;"></th>
+        </tr>
+        </thead>
+        <tbody data-bind="foreach: members">
+        <tr>
+            <td data-bind="text: resourceName"></td>
+            <!-- ko if: !Network.canEdit() -->
+            <td data-bind="text: permissions"></td>
+            <!-- /ko -->
+            <!-- ko if: Network.canEdit() -->
+            <td>
+                <select style="position: relative; top: 0.4em;" data-bind="value: permissions, event: { change: Network.changeMemberPermissions }">
+                    <option value="READ">Read</option>
+                    <option value="WRITE">Write</option>
+                    <option value="ADMIN">Admin</option>
+                </select>
+            </td>
+            <td>
+                <a href="javascript:void()" data-bind="click: Network.removeMember">Remove</a>
+            </td>
+            <!-- /ko -->
+        </tr>
+        </tbody>
+    </table>
+</script>
+<script type="text/html" id="visualizeTemplate">
+    <table>
+        <thead>
+        <tr>
+            <th>Engine</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                <a data-bind="attr: { href: '/network/' + $root.NetworkId() + '/visualize' }">Cytoscape</a>
+            </td>
+            <td>
+                An engine that supplies a basic visualization of the network in a two-dimensional wheel.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a data-bind="attr: { href: '/network/' + $root.NetworkId() + '/triptych' }">Triptych</a>
+            </td>
+            <td>
+                An engine that supplies a three-dimensional force-graph of the network. Uses WebGL if
+                supported by the browser or gracefully degrades to HTML 5's Canvas. Not usable by older
+                browsers that don't at least support HTML 5's Canvas.
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</script>
 <script type="text/html" id="saveSubnetwork">
     <form id="frmSaveSubnetwork">
         <div>
