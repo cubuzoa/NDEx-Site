@@ -366,11 +366,11 @@ var Network =
                         edges: ko.mapping.toJS(Network.ViewModel.Subnetwork().edges),
                         format: "JDEX",
                         isPublic: $("#chkIsPublic").prop("checked"),
+                        name: $("#txtName").val(),
                         nodes: ko.mapping.toJS(Network.ViewModel.Subnetwork().nodes),
-                        source: "Subnetwork of " + Network.ViewModel.Network().title(),
+                        source: "Subnetwork of " + Network.ViewModel.Network().name(),
                         supports: ko.mapping.toJS(Network.ViewModel.Subnetwork().supports),
-                        terms: ko.mapping.toJS(Network.ViewModel.Subnetwork().terms),
-                        title: $("#txtTitle").val()
+                        terms: ko.mapping.toJS(Network.ViewModel.Subnetwork().terms)
                     },
                     function(newNetwork)
                     {

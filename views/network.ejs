@@ -5,10 +5,9 @@
 <div id="divNetwork">
     <dl id="dlNetworkAccordion" class="Accordion">
         <dt class="Expanded">Metadata</dt>
-        <dd id="ddMetadata">
-            <!-- ko with: Network() -->
+        <dd id="ddMetadata" data-bind="with: Network">
             <h3>
-                <input type="text" class="Invisible" readonly placeholder="Title" data-bind="value: title, isEditable: Network.ViewModel.Network().id(), event: { change: Network.updateNetwork }"/>
+                <input type="text" class="Invisible" readonly placeholder="Name" data-bind="value: name, isEditable: Network.ViewModel.Network().id(), event: { change: Network.updateNetwork }"/>
             </h3>
 
             <textarea class="Invisible" readonly placeholder="Description" data-bind="value: description, isEditable: Network.ViewModel.Network().id(), event: { change: Network.updateNetwork }"></textarea>
@@ -16,16 +15,6 @@
             <div data-bind="if: Network.canEdit()">
                 <label class="Attribute-Editable">Public:</label>
                 <input type="checkbox" data-bind="checked: isPublic, event: { change: Network.updateNetwork }" />
-            </div>
-
-            <div>
-                <label class="Attribute">Source:</label>
-                <span data-bind="text: source"></span>
-            </div>
-
-            <div>
-                <label class="Attribute">Format:</label>
-                <span data-bind="text: format"></span>
             </div>
 
             <div>
@@ -37,7 +26,13 @@
                 <label class="Attribute">Edges:</label>
                 <span data-bind="text: edgeCount"></span>
             </div>
-            <!-- /ko -->
+
+            <ul id="ulMetadata" data-bind="foreach: metadata">
+                <li>
+                    <label class="Attribute-Editable" data-bind="text: $data + ':'"></label>
+                    <input type="text" class="Invisible" readonly data-bind="value: $parent[$data], isEditable: Network.ViewModel.Network().id(), event: { change: Network.updateNetwork }" />
+                </li>
+            </ul>
         </dd>
         <!-- ko if: $(window).width() < 481 -->
         <dt>Members</dt>
@@ -314,8 +309,8 @@
 <script type="text/html" id="saveSubnetwork">
     <form id="frmSaveSubnetwork">
         <div>
-            <label class="Attribute-Editable">Title:</label>
-            <input type="text" id="txtTitle" placeholder="Network title" />
+            <label class="Attribute-Editable">Name:</label>
+            <input type="text" id="txtName" placeholder="Network name" />
         </div>
 
         <div>
