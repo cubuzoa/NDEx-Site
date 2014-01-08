@@ -17,6 +17,11 @@
                 <input type="checkbox" data-bind="checked: isPublic, event: { change: Network.updateNetwork }" />
             </div>
 
+            <div data-bind="if: Network.canEdit()">
+                <label class="Attribute-Editable">Locked:</label>
+                <input type="checkbox" data-bind="checked: isLocked, event: { change: Network.updateNetwork }" />
+            </div>
+
             <div>
                 <label class="Attribute">Nodes:</label>
                 <span data-bind="text: nodeCount"></span>
@@ -27,12 +32,22 @@
                 <span data-bind="text: edgeCount"></span>
             </div>
 
-            <ul id="ulMetadata" data-bind="foreach: metadata">
-                <li>
-                    <label class="Attribute-Editable" data-bind="text: $data + ':'"></label>
-                    <input type="text" class="Invisible" readonly data-bind="value: $parent[$data], isEditable: Network.ViewModel.Network().id(), event: { change: Network.updateNetwork }" />
-                </li>
-            </ul>
+            <hr />
+
+            <div style="height: 10em; overflow-y: auto;">
+                <ul id="ulMetadata" data-bind="foreach: metadata.items">
+                    <li>
+                        <label class="Attribute-Editable" data-bind="text: key() + ':'"></label>
+                        <input type="text" class="Invisible" readonly data-bind="value: value, isEditable: Network.ViewModel.Network().id(), event: { change: Network.updateNetwork }" />
+                        <i class="btn icon-remove mobile-hide" title="Remove" rel="tooltip" data-bind="click: Network.removeMetadata"></i>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="AlignCenter">
+                <button type="button" id="btnAddMetadata">New Metadata</button>
+            </div>
+            <hr />
         </dd>
         <!-- ko if: $(window).width() < 481 -->
         <dt>Members</dt>
@@ -193,7 +208,7 @@
                 </li>
             </ul>
 
-            <div class="tab-content" data-bind="with: Network">
+            <div class="tab-content" data-bind="with: Subnetwork">
                 <div class="tab-pane active" id="divSubnetwork">
                     <table>
                         <thead>
@@ -223,7 +238,7 @@
             </div>
             <!-- /ko -->
             <!-- ko if: $(window).width() < 481 -->
-            <ul id="ulSubnetwork" data-bind="foreach: Network().edges">
+            <ul id="ulSubnetwork" data-bind="foreach: Subnetwork().edges">
                 <li>
                     <strong data-bind="text: subject.term.name"></strong>
                     <em data-bind="text: predicate.name"></em>
@@ -245,6 +260,23 @@
     Network.ViewModel.NetworkId("<%=networkId%>");
 </script>
 
+<script type="text/html" id="newMetadata">
+    <form id="frmNewMetadata">
+        <div>
+            <label class="Attribute-Editable">Key:</label>
+            <input type="text" id="txtMetadataKey" placeholder="Species" />
+        </div>
+
+        <div>
+            <label class="Attribute-Editable">Value:</label>
+            <input type="text" id="txtMetadataValue" placeholder="Lepus temperamentalus" />
+        </div>
+
+        <div class="AlignCenter">
+            <button type="submit">Create</button>
+        </div>
+    </form>
+</script>
 <script type="text/html" id="membersTemplate">
     <table style="width: 100%;">
         <thead>
@@ -269,7 +301,7 @@
                 </select>
             </td>
             <td>
-                <a href="javascript:void()" data-bind="click: Network.removeMember">Remove</a>
+                <i class="btn icon-remove" title="Remove member" rel="tooltip" data-bind="click: Network.removeMember" />
             </td>
             <!-- /ko -->
         </tr>

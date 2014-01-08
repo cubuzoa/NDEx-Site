@@ -579,7 +579,7 @@ dl.Accordion > dd
 {
     left: 0;
     position: absolute;
-    top: 400px;
+    top: 510px;
     width: 40%;
 }
 
@@ -605,7 +605,7 @@ dl.Accordion > dd
   padding: 0;
 }
 
-#divNetwork ul > li > i
+#ddSearchNetwork ul > li > i
 {
   color: #FFF;
   cursor: move;
@@ -614,7 +614,13 @@ dl.Accordion > dd
 #ddMetadata textarea
 {
     height: 60px;
-    width: 40%;
+    width: 100%;
+}
+
+#ulMetadata i
+{
+    position: relative;
+    top: -0.35em;
 }
 
 #ddSearchNetwork #divSearch

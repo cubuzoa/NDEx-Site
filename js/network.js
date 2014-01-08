@@ -88,9 +88,9 @@ var Network =
         edgeArray = ko.mapping.fromJS(edgeArray);
 
         if (Network.PageIndex === 1)
-            Network.ViewModel.Network().edges(edgeArray());
+            Network.ViewModel.Subnetwork().edges(edgeArray());
         else
-            Network.ViewModel.Network().edges.push.apply(edgeArray());
+            Network.ViewModel.Subnetwork().edges.push.apply(edgeArray());
     },
 
     /**************************************************************************
@@ -116,9 +116,9 @@ var Network =
         nodeArray = ko.mapping.fromJS(nodeArray);
 
         if (Network.PageIndex === 1)
-            Network.ViewModel.Network().nodes(nodeArray());
+            Network.ViewModel.Subnetwork().nodes(nodeArray());
         else
-            Network.ViewModel.Network().nodes.push.apply(nodeArray());
+            Network.ViewModel.Subnetwork().nodes.push.apply(nodeArray());
     },
 
     /**************************************************************************
@@ -132,26 +132,26 @@ var Network =
         if (Network.PageIndex === 1)
         {
             if (typeof(networkCitations) === "function")
-                Network.ViewModel.Network().citations(networkCitations());
+                Network.ViewModel.Subnetwork().citations(networkCitations());
             else
-                Network.ViewModel.Network().citations(networkCitations);
+                Network.ViewModel.Subnetwork().citations(networkCitations);
 
             if (typeof(networkSupports) === "function")
-                Network.ViewModel.Network().citations(networkSupports());
+                Network.ViewModel.Subnetwork().citations(networkSupports());
             else
-                Network.ViewModel.Network().citations(networkSupports);
+                Network.ViewModel.Subnetwork().citations(networkSupports);
         }
         else
         {
             if (typeof(networkCitations) === "function")
-                Network.ViewModel.Network().citations.push.apply(networkCitations());
+                Network.ViewModel.Subnetwork().citations.push.apply(networkCitations());
             else
-                Network.ViewModel.Network().citations.push.apply(networkCitations);
+                Network.ViewModel.Subnetwork().citations.push.apply(networkCitations);
 
             if (typeof(networkSupports) === "function")
-                Network.ViewModel.Network().citations.push.apply(networkSupports());
+                Network.ViewModel.Subnetwork().citations.push.apply(networkSupports());
             else
-                Network.ViewModel.Network().citations.push.apply(networkSupports);
+                Network.ViewModel.Subnetwork().citations.push.apply(networkSupports);
         }
 
         Network.buildEdges(subnetwork);
@@ -175,9 +175,9 @@ var Network =
         termArray = ko.mapping.fromJS(termArray);
 
         if (Network.PageIndex === 1)
-            Network.ViewModel.Network().terms(termArray());
+            Network.ViewModel.Subnetwork().terms(termArray());
         else
-            Network.ViewModel.Network().terms.push.apply(termArray());
+            Network.ViewModel.Subnetwork().terms.push.apply(termArray());
     },
 
     /****************************************************************************
@@ -206,6 +206,24 @@ var Network =
             {
                 $.gritter.add({ title: "Network Updated", text: groupMember.resourceName() + "'s permissions have been changed." });
             });
+    },
+
+    /****************************************************************************
+    * Displays a modal that allows the user to create new metadata.
+    ****************************************************************************/
+    createMetadata: function()
+    {
+        NdexWeb.showModal("New Metadata", "#newMetadata", true, function()
+        {
+            $("#frmNewMetadata").submit(function(event)
+            {
+                event.preventDefault();
+
+                Network.ViewModel.Network().metadata.set($("#txtMetadataKey").val(), $("#txtMetadataValue").val());
+                Network.updateNetwork();
+                NdexWeb.hideModal();
+            });
+        });
     },
 
     /****************************************************************************
@@ -252,24 +270,38 @@ var Network =
             },
             success: function(network)
             {
+                var subnetwork = jQuery.extend(true, {}, network);
+
+                network.metadata = ko.observableDictionary(network.metadata);
+                network.metaterms = ko.observableDictionary(network.metaterms);
                 network = ko.mapping.fromJS(network);
 
-                if (typeof(network.citations) != "function")
-                    network.citations = ko.observable();
+                subnetwork.metadata = network.metadata;
+                subnetwork.metaterms = network.metaterms;
 
-                if (typeof(network.edges) != "function")
-                    network.edges = ko.observable();
+                if (typeof(subnetwork.citations) != "function")
+                    subnetwork.citations = ko.observable();
 
-                if (typeof(network.nodes) != "function")
-                    network.nodes = ko.observable();
+                if (typeof(subnetwork.edges) != "function")
+                    subnetwork.edges = ko.observable();
 
-                if (typeof(network.supports) != "function")
-                    network.supports = ko.observable();
+                if (typeof(subnetwork.metadata) != "object")
+                    subnetwork.metadata = ko.observable();
 
-                if (typeof(network.terms) != "function")
-                    network.terms = ko.observable();
+                if (typeof(subnetwork.metaterms) != "object")
+                    subnetwork.metaterms = ko.observable();
+
+                if (typeof(subnetwork.nodes) != "function")
+                    subnetwork.nodes = ko.observable();
+
+                if (typeof(subnetwork.supports) != "function")
+                    subnetwork.supports = ko.observable();
+
+                if (typeof(subnetwork.terms) != "function")
+                    subnetwork.terms = ko.observable();
 
                 Network.ViewModel.Network(network);
+                Network.ViewModel.Subnetwork(subnetwork);
                 Network.PageIndex = 1;
                 Network.getEdges();
                 $("#divSubnetwork").scroll(this.infiniteScroll);
@@ -326,6 +358,9 @@ var Network =
 
                 if (subnetwork != null)
                 {
+                    subnetwork.metadata = ko.observableDictionary(subnetwork.metadata);
+                    subnetwork.metaterms = ko.observableDictionary(subnetwork.metaterms);
+
                     Network.ViewModel.Subnetwork(ko.mapping.fromJS(subnetwork));
                     Network.buildSubnetwork(subnetwork);
                 }
@@ -348,6 +383,15 @@ var Network =
     },
 
     /****************************************************************************
+    * Removes a metadata element.
+    ****************************************************************************/
+    removeMetadata: function(metadata, event)
+    {
+        Network.ViewModel.Network().metadata.remove(metadata.key());
+        Network.updateNetwork();
+    },
+
+    /****************************************************************************
     * Displays a modal that allows the user to save the subnetwork as its own
     * separate network.
     ****************************************************************************/
@@ -364,11 +408,15 @@ var Network =
                         citations: ko.mapping.toJS(Network.ViewModel.Subnetwork().citations),
                         description: $("#txtDescription").val(),
                         edges: ko.mapping.toJS(Network.ViewModel.Subnetwork().edges),
-                        format: "JDEX",
+                        isLocked: $("#chkIsLocked").prop("checked"),
                         isPublic: $("#chkIsPublic").prop("checked"),
+                        metadata:
+                        {
+                            Source: "Subnetwork of " + Network.ViewModel.Network().name(),
+                            Format: "JDEX"
+                        },
                         name: $("#txtName").val(),
                         nodes: ko.mapping.toJS(Network.ViewModel.Subnetwork().nodes),
-                        source: "Subnetwork of " + Network.ViewModel.Network().name(),
                         supports: ko.mapping.toJS(Network.ViewModel.Subnetwork().supports),
                         terms: ko.mapping.toJS(Network.ViewModel.Subnetwork().terms)
                     },
@@ -406,12 +454,17 @@ var Network =
     },
 
     /****************************************************************************
-    * Updates the network.
+    * Updates the network. Remaps the observable dictionary arrays back to
+    * dictionaries first.
     ****************************************************************************/
     updateNetwork: function()
     {
-        NdexWeb.post("/networks/",
-            ko.mapping.toJS(Network.ViewModel.Network()));
+        var updatedNetwork = jQuery.extend(true, {}, ko.mapping.toJS(Network.ViewModel.Network()));
+
+        updatedNetwork.metadata = NdexHelpers.convertObservableDictionaryToArray(updatedNetwork.metadata);
+        updatedNetwork.metaterms = NdexHelpers.convertObservableDictionaryToArray(updatedNetwork.metaterms);
+
+        NdexWeb.post("/networks/", updatedNetwork);
     },
 
     /****************************************************************************
@@ -421,6 +474,7 @@ var Network =
     {
         this.setupAccordion();
         $("#frmSearchNetwork").submit(this.queryNetwork);
+        $("#btnAddMetadata").click(this.createMetadata);
 
         //TODO: Add knockout event-handler for moving items
         $("#ulFilterableTerms").sortable(

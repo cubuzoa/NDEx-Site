@@ -92,7 +92,8 @@
         width: auto;
     }
 
-    .mobile-hide
+    .mobile-hide,
+    [class*=" icon-"].mobile-hide
     {
         display: none;
     }
@@ -202,6 +203,11 @@
     {
         height: 60px;
         width: 90%;
+    }
+
+    #ulMetadata input
+    {
+        width: 160px;
     }
 
     #ddSearchNetwork #divSearch input
