@@ -4,7 +4,8 @@
 <h1>Search <%=searchType%></h1>
 
 <form id="frmSearch" style="width: 330px;">
-    <div>
+    <div style="position: relative;">
+        <i id="searchInfo" class="icon-info-sign Hand" title="Info" rel="tooltip" style="font-size: 1.25em; left: 20px; position: absolute; top: 0.25em;"></i>
         <label class="Attribute-Editable">Search:</label>
         <input type="search" placeholder="Search keywords" />
     </div>
@@ -93,6 +94,86 @@
 </table>
 
 <script type="text/javascript" src="/js/search.js"></script>
+<script type="text/html" id="searchHelp">
+    <dl class="Accordion">
+        <dt class="Expanded">Basic Search</dt>
+        <dd class="AlignLeft">
+            <p>
+                Search looks for networks that have a name or description that
+                <em>start with</em> the words typed in the search box (quotes are not
+                needed). The search is not case-sensitive.
+            </p>
+
+            <p>
+                <strong>Contains</strong> changes the search to find networks whose
+                name or description contains the words typed in the search box.
+            </p>
+
+            <p>
+                <strong>Exact Match</strong> changes the search to find networks whose
+                name or description is exactly all the words typed in the search box.
+            </p>
+
+            <p>
+                <strong>-desc</strong> tells the search not to look through network
+                descriptions.
+            </p>
+        </dd>
+        <dt>Advanced Search Functions</dt>
+        <dd class="AlignLeft">
+            <p>
+                Advanced search functions do not follow the basic search rules.
+                They have their own operators and work in the form of:
+                <em>{function}{operator}"{keywords}"</em> (note that keywords
+                must always be in quotes).
+
+                <strong>Note that these functions are not case-sensitive.</strong>
+            </p>
+
+            <ul>
+                <li>
+                    <strong>[metadata key]</strong> searches network metadata
+                    for the key placed in brackets with the quoted value.
+                </li>
+                <li>
+                    <strong>&lt;metaterm key&gt;</strong> searches network
+                    metaterms for thekey placed in angle brackets with the
+                    quoted value.
+                </li>
+            </ul>
+        </dd>
+        <dt>Advanced Search Operators</dt>
+        <dd class="AlignLeft">
+            <ul>
+                <li>
+                    <strong>:</strong> tells advanced search functions to find
+                    values that <em>start with</em> the quoted keywords.
+                </li>
+                <li>
+                    <strong>=</strong> tells advanced search functions to find
+                    values that <em>exactly match</em> the quoted keywords.
+                </li>
+                <li>
+                    <strong>~</strong> tells advanced search functions to find
+                    values that <em>contain</em> the quoted keywords.
+                </li>
+            </ul>
+        </dd>
+        <dt>Advanced Search Examples</dt>
+        <dd class="AlignLeft">
+            <p>
+                [Company]:"Cytoscape" will search networks for the "Company"
+                metadata key that have a value that starts with "Cytoscape".
+            </p>
+
+            <p>
+                &lt;Species&gt;="Lepus Temperamentalus" will search networks
+                for the metaterm "Species" that has a value exactly equal to
+                "Lepus Temperamentalus".
+            </p>
+        </dd>
+    </dl>
+</script>
 <script type="text/javascript">
     Search.SearchType = "<%=searchType%>";
 </script>

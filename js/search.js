@@ -83,6 +83,26 @@ var Search =
             });
     },
 
+    showSearchInfo: function()
+    {
+        NdexWeb.showModal("Advanced Search", "#searchHelp", true, function()
+        {
+            $("#divModalContent dl.Accordion dt").click(function()
+            {
+                var accordionKey = $(this);
+                if (accordionKey.hasClass("Expanded"))
+                    return;
+
+                accordionKey.parent().children("dt.Expanded").toggleClass("Expanded");
+                accordionKey.toggleClass("Expanded");
+                accordionKey.parent().children("dd:visible").slideUp("fast");
+                accordionKey.next().slideDown("fast");
+            }).next().hide();
+
+            $("#divModalContent dl.Accordion dt.Expanded").next().show();
+        });
+    },
+
     /****************************************************************************
     * Starts a new search.
     ****************************************************************************/
@@ -100,6 +120,7 @@ var Search =
     wireEvents: function()
     {
         $("#frmSearch").submit(this.startSearch);
+        $("#searchInfo").click(this.showSearchInfo);
     }
 };
 
