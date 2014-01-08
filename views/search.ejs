@@ -68,7 +68,7 @@
                 <i class="icon-chevron-right"></i>
             </td>
             <td>
-                <a data-bind="text: title, attr: { href: '/network/' + id() }"></a>
+                <a data-bind="text: name, attr: { href: '/network/' + id() }"></a>
             </td>
             <td class="AlignRight" data-bind="text: nodeCount"></td>
             <td class="AlignRight" data-bind="text: edgeCount"></td>
@@ -101,7 +101,7 @@
             <p>
                 Search looks for networks that have a name or description that
                 <em>start with</em> the words typed in the search box (quotes are not
-                needed). The search is not case-sensitive.
+                needed). <strong>Searches are case-sensitive</strong>.
             </p>
 
             <p>
@@ -127,7 +127,7 @@
                 <em>{function}{operator}"{keywords}"</em> (note that keywords
                 must always be in quotes).
 
-                <strong>Note that these functions are not case-sensitive.</strong>
+                <strong>Searches are case-sensitive</strong>.
             </p>
 
             <ul>
