@@ -14,6 +14,9 @@ var Search =
     ****************************************************************************/
     _init: function()
     {
+        if (Search.SearchType !== 'Networks')
+            $("#searchInfo").hide();
+
         this.ViewModel.Results(ko.mapping.fromJSON(localStorage[Search.SearchType + " Search"])());
         ko.applyBindings(this.ViewModel, $("#tblSearchResults")[0]);
         this.wireEvents();
@@ -83,6 +86,9 @@ var Search =
             });
     },
 
+    /****************************************************************************
+    * Displays a modal with additional information about network searches.
+    ****************************************************************************/
     showSearchInfo: function()
     {
         NdexWeb.showModal("Advanced Search", "#searchHelp", true, function()
